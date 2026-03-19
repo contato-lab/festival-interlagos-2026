@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Festival Interlagos 2026 — Google Ads Dashboard</title>
+<title>Festival Interlagos 2026 — Dashboard Google Ads + GA4</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
@@ -141,10 +141,11 @@ tbody td.pos{color:var(--positive)}
   <div class="header-divider"></div>
   <div class="header-info">
     <div class="header-client">Festival Interlagos 2026</div>
-    <div class="header-subtitle">Dashboard de Performance · Google Ads · Conta Duas Rodas (587-995-2911)</div>
+    <div class="header-subtitle">Dashboard de Performance · Google Ads + GA4 · Conta Duas Rodas (587-995-2911)</div>
   </div>
   <div class="header-badges">
     <span class="badge badge-google">📊 Google Ads</span>
+    <span class="badge" style="background:rgba(52,168,83,.15);border:1px solid rgba(52,168,83,.3);color:#34A853">📈 GA4</span>
     <span class="badge badge-period" id="periodBadge">—</span>
     <span class="badge badge-live">● AO VIVO</span>
     <span class="badge badge-loading" id="loadingBadge">⟳ Carregando…</span>
@@ -276,6 +277,81 @@ tbody td.pos{color:var(--positive)}
     </table>
   </div>
 
+
+  <!-- ══ GA4 ══════════════════════════════════════════════════════════════ -->
+  <div style="margin-top:40px;padding-top:32px;border-top:1px solid var(--border)">
+
+    <div class="section-header">
+      <span class="section-title" style="color:var(--lime)">● GA4 — Analytics do Site</span>
+      <span class="section-sub" id="ga4-updated">Aguardando dados…</span>
+    </div>
+
+    <!-- KPIs GA4 -->
+    <div class="kpi-hero" style="margin-bottom:14px">
+      <div class="kpi-card" style="--accent:#4285F4">
+        <div class="kpi-icon">👤</div>
+        <div class="kpi-label">Usuários</div>
+        <div class="kpi-value" id="ga4-users">—</div>
+        <div class="kpi-sub">novos: <span class="kpi-sub-val" id="ga4-new-users">—</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">🔗</div>
+        <div class="kpi-label">Sessões</div>
+        <div class="kpi-value" id="ga4-sessions">—</div>
+        <div class="kpi-sub">pág/sessão: <span class="kpi-sub-val" id="ga4-pps">—</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">📄</div>
+        <div class="kpi-label">Pageviews</div>
+        <div class="kpi-value" id="ga4-pageviews">—</div>
+        <div class="kpi-sub">eventos: <span class="kpi-sub-val" id="ga4-events">—</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-label">Conversões</div>
+        <div class="kpi-value" id="ga4-conv">—</div>
+        <div class="kpi-sub">bounce: <span class="kpi-sub-val" id="ga4-bounce">—</span></div>
+      </div>
+    </div>
+
+    <!-- Charts GA4 -->
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="chart-card" style="margin-bottom:0">
+        <div class="chart-card-header">
+          <div><div class="chart-title">Sessões & Usuários / dia</div><div class="chart-sub" id="ga4-chart-sub">Fonte: GA4</div></div>
+        </div>
+        <div class="chart-wrap" style="height:220px"><canvas id="ga4SessionChart"></canvas></div>
+      </div>
+      <div class="chart-card" style="margin-bottom:0">
+        <div class="chart-card-header">
+          <div><div class="chart-title">Canais de Tráfego</div><div class="chart-sub">Sessões por origem</div></div>
+        </div>
+        <div class="chart-wrap" style="height:220px"><canvas id="ga4SourceChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Top Pages -->
+    <div class="section-header">
+      <span class="section-title">Top Páginas</span>
+      <span class="section-sub">por visualizações — período completo</span>
+    </div>
+    <div class="table-wrap" style="max-height:40vh">
+      <table>
+        <thead>
+          <tr>
+            <th>Página</th>
+            <th class="right">Pageviews</th>
+            <th class="right">Sessões</th>
+          </tr>
+        </thead>
+        <tbody id="ga4PagesBody">
+          <tr><td colspan="3"><div class="empty-state"><div>📡</div>Aguardando dados GA4…</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
 </main>
 
 <footer class="footer">
@@ -292,9 +368,12 @@ tbody td.pos{color:var(--positive)}
 
 <script>
 const GADS_JSON_URL = 'google-ads-data.json';
+const GA4_JSON_URL  = 'ga4-data.json';
 let dailySeries = [];
 let campaigns   = [];
 let tlChart = null, spendChart = null, ctrChart = null;
+let ga4SessionChart = null, ga4SourceChart = null;
+let ga4Data = null;
 
 function parseDate(str){ const[y,m,d]=str.split('-').map(Number); return new Date(y,m-1,d); }
 function parseISO(str){ const[y,m,d]=str.split('-').map(Number); return new Date(y,m-1,d); }
@@ -506,6 +585,100 @@ async function refreshData(){
 }
 setInterval(refreshData,30*60*1000);
 
+// ── GA4 Render ───────────────────────────────────────────────────────────────
+function renderGA4(json) {
+  if (!json) return;
+  const t = json.totals || {};
+  document.getElementById('ga4-users').textContent     = fmt(t.users);
+  document.getElementById('ga4-new-users').textContent = fmt(t.new_users);
+  document.getElementById('ga4-sessions').textContent  = fmt(t.sessions);
+  document.getElementById('ga4-pps').textContent       = fmt(t.pages_per_session, 1);
+  document.getElementById('ga4-pageviews').textContent = fmt(t.pageviews);
+  document.getElementById('ga4-events').textContent    = fmt(t.events);
+  document.getElementById('ga4-conv').textContent      = fmt(t.conversions, 1);
+  document.getElementById('ga4-bounce').textContent    = fmtPct(t.avg_bounce_rate);
+
+  if (json.updated_at) {
+    const dt = new Date(json.updated_at);
+    document.getElementById('ga4-updated').textContent =
+      'Atualizado: ' + dt.toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  }
+
+  // Sessions chart
+  const series = json.daily_series || [];
+  const labels  = series.map(d => fmtDate(d.date).slice(0,5));
+  const sess    = series.map(d => d.sessions  || 0);
+  const users   = series.map(d => d.users     || 0);
+
+  if (!ga4SessionChart) {
+    ga4SessionChart = new Chart(document.getElementById('ga4SessionChart'), {
+      type:'line',
+      data:{ labels, datasets:[
+        {label:'Sessões', data:sess, borderColor:'#4285F4', backgroundColor:'rgba(66,133,244,0.08)',
+         borderWidth:2, pointRadius:2, fill:true, tension:0.3},
+        {label:'Usuários', data:users, borderColor:'#C8FF00', backgroundColor:'rgba(200,255,0,0.06)',
+         borderWidth:2, pointRadius:2, fill:false, tension:0.3}
+      ]},
+      options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
+        plugins:{legend:{labels:{color:'#999',usePointStyle:true}}, tooltip:tt},
+        scales:{ x:{grid:gl, ticks:{maxTicksLimit:14,maxRotation:0}}, y:{grid:gl, beginAtZero:true} }
+      }
+    });
+  } else {
+    ga4SessionChart.data.labels = labels;
+    ga4SessionChart.data.datasets[0].data = sess;
+    ga4SessionChart.data.datasets[1].data = users;
+    ga4SessionChart.update();
+  }
+
+  // Sources doughnut
+  const sources = json.traffic_sources || [];
+  const srcLabels = sources.map(s => s.channel);
+  const srcData   = sources.map(s => s.sessions);
+  const srcColors = ['#4285F4','#C8FF00','#7B2D8B','#00FF88','#FF4444','#FFC800','#34A853','#EA4335','#FBBC04','#46BDC6'];
+
+  if (!ga4SourceChart) {
+    ga4SourceChart = new Chart(document.getElementById('ga4SourceChart'), {
+      type:'doughnut',
+      data:{ labels:srcLabels, datasets:[{data:srcData,
+        backgroundColor:srcColors.slice(0,srcLabels.length),
+        borderColor:'#141414', borderWidth:2}]},
+      options:{ responsive:true, maintainAspectRatio:false, cutout:'60%',
+        plugins:{ legend:{position:'right',labels:{color:'#999',font:{size:11},usePointStyle:true,padding:10}},
+          tooltip:{...tt, callbacks:{label:ctx=>`${ctx.label}: ${fmt(ctx.raw)} sessões`}} }
+      }
+    });
+  } else {
+    ga4SourceChart.data.labels = srcLabels;
+    ga4SourceChart.data.datasets[0].data = srcData;
+    ga4SourceChart.data.datasets[0].backgroundColor = srcColors.slice(0,srcLabels.length);
+    ga4SourceChart.update();
+  }
+
+  // Top pages table
+  const pages = json.top_pages || [];
+  const tbody = document.getElementById('ga4PagesBody');
+  if (pages.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3"><div class="empty-state"><div>📡</div>Aguardando dados GA4…</div></td></tr>';
+  } else {
+    tbody.innerHTML = pages.map(p => `<tr>
+      <td style="max-width:320px;overflow:hidden;text-overflow:ellipsis" title="${p.page}">${p.page}</td>
+      <td class="right lime">${fmt(p.pageviews)}</td>
+      <td class="right">${fmt(p.sessions)}</td>
+    </tr>`).join('');
+  }
+}
+
+async function refreshGA4() {
+  try {
+    const json = await fetch(GA4_JSON_URL + '?t=' + Date.now()).then(r => r.json());
+    if (!json.totals) return;
+    ga4Data = json;
+    renderGA4(json);
+  } catch(e) { console.warn('GA4 refresh falhou:', e.message); }
+}
+setInterval(refreshGA4, 60 * 60 * 1000); // a cada hora
+
 async function initDashboard(){
   document.getElementById('loadingBadge').style.display='inline-flex';
   try{
@@ -534,6 +707,12 @@ async function initDashboard(){
   const f=filterSeries(from,today);
   initCharts(f); renderKPIs(f); renderTable(f); renderCampaigns();
   document.getElementById('btn-30d').classList.add('active');
+
+  // Carrega GA4
+  try {
+    const ga4json = await fetch(GA4_JSON_URL + '?t=' + Date.now()).then(r => r.json());
+    if (ga4json && ga4json.totals) { ga4Data = ga4json; renderGA4(ga4json); }
+  } catch(e) { console.warn('GA4 inicial falhou:', e.message); }
 
   const dtStr=new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
   document.getElementById('footerDate').textContent='Gerado em '+dtStr;

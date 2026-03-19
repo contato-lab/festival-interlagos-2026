@@ -1,0 +1,40 @@
+name: Update GA4 Data
+
+on:
+  schedule:
+    - cron: '15 */1 * * *'   # a cada hora (offset 15min do Google Ads)
+  workflow_dispatch:          # permite rodar manualmente
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install google-analytics-data google-auth-httplib2 google-auth-oauthlib
+
+      - name: Run GA4 update script
+        env:
+          GA4_PROPERTY_ID:        ${{ secrets.GA4_PROPERTY_ID }}
+          GOOGLE_ADS_CLIENT_ID:   ${{ secrets.GOOGLE_ADS_CLIENT_ID }}
+          GOOGLE_ADS_CLIENT_SECRET: ${{ secrets.GOOGLE_ADS_CLIENT_SECRET }}
+          GOOGLE_ADS_REFRESH_TOKEN: ${{ secrets.GOOGLE_ADS_REFRESH_TOKEN }}
+        run: python update-google-analytics.py
+
+      - name: Commit and push data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ga4-data.json
+          git diff --staged --quiet || git commit -m "chore: update ga4-data.json [skip ci]"
+          git push
