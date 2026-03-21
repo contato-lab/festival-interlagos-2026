@@ -1,32 +1,21 @@
 {
-  "updated_at": "2026-03-20T23:46:09.692423+00:00",
+  "updated_at": "2026-03-21T02:48:43.482923+00:00",
   "property_id": "378336436",
   "period": {
-    "start": "2025-12-20",
-    "end": "2026-03-20"
+    "start": "2025-12-21",
+    "end": "2026-03-21"
   },
   "totals": {
-    "sessions": 12162,
-    "users": 10771,
-    "new_users": 8522,
-    "pageviews": 15825,
-    "events": 45978,
+    "sessions": 12075,
+    "users": 10678,
+    "new_users": 8431,
+    "pageviews": 15820,
+    "events": 45831,
     "conversions": 0.0,
-    "pages_per_session": 1.3,
-    "avg_bounce_rate": 56.88
+    "pages_per_session": 1.31,
+    "avg_bounce_rate": 56.95
   },
   "daily_series": [
-    {
-      "date": "2025-12-20",
-      "sessions": 127,
-      "users": 123,
-      "new_users": 114,
-      "pageviews": 151,
-      "events": 489,
-      "conversions": 0.0,
-      "bounce_rate": 47.24,
-      "avg_session_s": 64.8
-    },
     {
       "date": "2025-12-21",
       "sessions": 91,
@@ -1008,40 +997,40 @@
     },
     {
       "date": "2026-03-20",
-      "sessions": 90,
-      "users": 83,
-      "new_users": 60,
-      "pageviews": 114,
-      "events": 324,
+      "sessions": 130,
+      "users": 113,
+      "new_users": 83,
+      "pageviews": 260,
+      "events": 666,
       "conversions": 0.0,
-      "bounce_rate": 60.0,
-      "avg_session_s": 124.4
+      "bounce_rate": 56.15,
+      "avg_session_s": 230.9
     }
   ],
   "traffic_sources": [
     {
       "channel": "Organic Search",
-      "sessions": 7418,
+      "sessions": 7365,
       "conversions": 0.0
     },
     {
       "channel": "Organic Social",
-      "sessions": 2314,
+      "sessions": 2323,
       "conversions": 0.0
     },
     {
       "channel": "Direct",
-      "sessions": 1535,
+      "sessions": 1525,
       "conversions": 0.0
     },
     {
       "channel": "Unassigned",
-      "sessions": 467,
+      "sessions": 462,
       "conversions": 0.0
     },
     {
       "channel": "Referral",
-      "sessions": 297,
+      "sessions": 298,
       "conversions": 0.0
     },
     {
@@ -1063,8 +1052,8 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 12848,
-      "sessions": 11816
+      "pageviews": 12844,
+      "sessions": 11791
     },
     {
       "page": "/carrinho/index",
@@ -1073,43 +1062,43 @@
     },
     {
       "page": "/ingressos/",
-      "pageviews": 506,
+      "pageviews": 505,
       "sessions": 146
     },
     {
       "page": "/vendas/ingressos/ride-pass",
-      "pageviews": 328,
-      "sessions": 47
+      "pageviews": 329,
+      "sessions": 49
     },
     {
       "page": "/ingressos",
-      "pageviews": 288,
-      "sessions": 170
+      "pageviews": 277,
+      "sessions": 163
     },
     {
       "page": "/vendas/ingressos/drive-pass",
       "pageviews": 151,
-      "sessions": 37
+      "sessions": 38
     },
     {
       "page": "/vendas/ingressos/street-pass",
-      "pageviews": 123,
-      "sessions": 33
+      "pageviews": 124,
+      "sessions": 34
     },
     {
-      "page": "/como-chegar",
-      "pageviews": 94,
-      "sessions": 83
+      "page": "/festival.php",
+      "pageviews": 92,
+      "sessions": 4
+    },
+    {
+      "page": "/event/festival-interlagos-motos",
+      "pageviews": 81,
+      "sessions": 75
     },
     {
       "page": "/login",
       "pageviews": 81,
       "sessions": 44
-    },
-    {
-      "page": "/event/festival-interlagos-motos",
-      "pageviews": 80,
-      "sessions": 74
     }
   ]
 }
