@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-03-24T22:51:39.411557+00:00",
+  "updated_at": "2026-03-24T23:48:13.856049+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2025-12-24",
     "end": "2026-03-24"
   },
   "totals": {
-    "sessions": 12900,
-    "users": 11389,
-    "new_users": 8977,
-    "pageviews": 17987,
-    "events": 50947,
+    "sessions": 12941,
+    "users": 11426,
+    "new_users": 9003,
+    "pageviews": 18073,
+    "events": 51159,
     "conversions": 0.0,
-    "pages_per_session": 1.39,
-    "avg_bounce_rate": 56.11
+    "pages_per_session": 1.4,
+    "avg_bounce_rate": 56.14
   },
   "daily_series": [
     {
@@ -1008,30 +1008,30 @@
     },
     {
       "date": "2026-03-24",
-      "sessions": 165,
-      "users": 150,
-      "new_users": 113,
-      "pageviews": 352,
-      "events": 878,
+      "sessions": 206,
+      "users": 187,
+      "new_users": 139,
+      "pageviews": 438,
+      "events": 1090,
       "conversions": 0.0,
-      "bounce_rate": 33.33,
-      "avg_session_s": 177.0
+      "bounce_rate": 35.44,
+      "avg_session_s": 178.0
     }
   ],
   "traffic_sources": [
     {
       "channel": "Organic Search",
-      "sessions": 7780,
+      "sessions": 7793,
       "conversions": 0.0
     },
     {
       "channel": "Organic Social",
-      "sessions": 2567,
+      "sessions": 2572,
       "conversions": 0.0
     },
     {
       "channel": "Direct",
-      "sessions": 1604,
+      "sessions": 1609,
       "conversions": 0.0
     },
     {
@@ -1041,7 +1041,7 @@
     },
     {
       "channel": "Referral",
-      "sessions": 357,
+      "sessions": 363,
       "conversions": 0.0
     },
     {
@@ -1068,8 +1068,13 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 14099,
-      "sessions": 12579
+      "pageviews": 14151,
+      "sessions": 12598
+    },
+    {
+      "page": "/cadastro.php",
+      "pageviews": 609,
+      "sessions": 381
     },
     {
       "page": "/carrinho/index",
@@ -1077,14 +1082,9 @@
       "sessions": 50
     },
     {
-      "page": "/cadastro.php",
-      "pageviews": 593,
-      "sessions": 367
-    },
-    {
       "page": "/ingressos/",
-      "pageviews": 537,
-      "sessions": 149
+      "pageviews": 539,
+      "sessions": 150
     },
     {
       "page": "/vendas/ingressos/ride-pass",
@@ -1093,8 +1093,8 @@
     },
     {
       "page": "/ingressos",
-      "pageviews": 303,
-      "sessions": 149
+      "pageviews": 310,
+      "sessions": 152
     },
     {
       "page": "/vendas/ingressos/drive-pass",
