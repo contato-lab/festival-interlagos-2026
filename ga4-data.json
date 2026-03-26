@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-03-26T05:51:12.784688+00:00",
+  "updated_at": "2026-03-26T07:37:40.598480+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2025-12-26",
     "end": "2026-03-26"
   },
   "totals": {
-    "sessions": 13667,
-    "users": 12051,
-    "new_users": 9497,
-    "pageviews": 19530,
-    "events": 54785,
+    "sessions": 14478,
+    "users": 12841,
+    "new_users": 10209,
+    "pageviews": 20799,
+    "events": 58078,
     "conversions": 0.0,
-    "pages_per_session": 1.43,
-    "avg_bounce_rate": 55.89
+    "pages_per_session": 1.44,
+    "avg_bounce_rate": 56.05
   },
   "daily_series": [
     {
@@ -997,45 +997,61 @@
     },
     {
       "date": "2026-03-25",
-      "sessions": 674,
-      "users": 597,
-      "new_users": 474,
-      "pageviews": 1299,
-      "events": 3246,
+      "sessions": 1338,
+      "users": 1241,
+      "new_users": 1055,
+      "pageviews": 2325,
+      "events": 5918,
       "conversions": 0.0,
-      "bounce_rate": 49.7,
-      "avg_session_s": 127.0
+      "bounce_rate": 57.77,
+      "avg_session_s": 86.7
+    },
+    {
+      "date": "2026-03-26",
+      "sessions": 147,
+      "users": 146,
+      "new_users": 131,
+      "pageviews": 243,
+      "events": 621,
+      "conversions": 0.0,
+      "bounce_rate": 62.59,
+      "avg_session_s": 109.0
     }
   ],
   "traffic_sources": [
     {
       "channel": "Organic Search",
-      "sessions": 8015,
+      "sessions": 8059,
       "conversions": 0.0
     },
     {
       "channel": "Organic Social",
-      "sessions": 2926,
+      "sessions": 3080,
       "conversions": 0.0
     },
     {
       "channel": "Direct",
-      "sessions": 1686,
-      "conversions": 0.0
-    },
-    {
-      "channel": "Unassigned",
-      "sessions": 443,
-      "conversions": 0.0
-    },
-    {
-      "channel": "Referral",
-      "sessions": 405,
+      "sessions": 1715,
       "conversions": 0.0
     },
     {
       "channel": "Paid Social",
-      "sessions": 29,
+      "sessions": 551,
+      "conversions": 0.0
+    },
+    {
+      "channel": "Unassigned",
+      "sessions": 444,
+      "conversions": 0.0
+    },
+    {
+      "channel": "Referral",
+      "sessions": 410,
+      "conversions": 0.0
+    },
+    {
+      "channel": "Paid Other",
+      "sessions": 58,
       "conversions": 0.0
     },
     {
@@ -1049,11 +1065,6 @@
       "conversions": 0.0
     },
     {
-      "channel": "Paid Other",
-      "sessions": 5,
-      "conversions": 0.0
-    },
-    {
       "channel": "Email",
       "sessions": 4,
       "conversions": 0.0
@@ -1062,13 +1073,13 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 15155,
-      "sessions": 13154
+      "pageviews": 16170,
+      "sessions": 14041
     },
     {
       "page": "/cadastro.php",
-      "pageviews": 941,
-      "sessions": 627
+      "pageviews": 1151,
+      "sessions": 784
     },
     {
       "page": "/carrinho/index",
@@ -1077,23 +1088,23 @@
     },
     {
       "page": "/ingressos/",
-      "pageviews": 572,
-      "sessions": 156
+      "pageviews": 578,
+      "sessions": 157
     },
     {
       "page": "/vendas/ingressos/ride-pass",
-      "pageviews": 377,
-      "sessions": 60
+      "pageviews": 378,
+      "sessions": 61
     },
     {
       "page": "/ingressos",
-      "pageviews": 316,
-      "sessions": 156
+      "pageviews": 325,
+      "sessions": 158
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 194,
-      "sessions": 48
+      "pageviews": 195,
+      "sessions": 49
     },
     {
       "page": "/vendas/ingressos/street-pass",
