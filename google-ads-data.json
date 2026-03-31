@@ -1,20 +1,44 @@
 {
-  "updated_at": "2026-03-31T22:01:40.800232+00:00",
+  "updated_at": "2026-03-31T22:55:26.584687+00:00",
   "customer_id": "5879952911",
   "period": {
     "start": "2025-12-31",
     "end": "2026-03-31"
   },
   "totals": {
-    "impressions": 522347,
-    "clicks": 11973,
-    "cost": 13868.715317000006,
+    "impressions": 522961,
+    "clicks": 12334,
+    "cost": 14132.594327000003,
     "conversions": 4346.901625,
-    "ctr": 2.292154449053981,
-    "cpc": 1.1583325245970104,
-    "cost_per_conv": 3.190482903325424
+    "ctr": 2.358493271964831,
+    "cpc": 1.1458240900762122,
+    "cost_per_conv": 3.251187983118896
   },
   "campaigns": [
+    {
+      "id": "23705408328",
+      "name": "[LM] [GERAL] [PMAX] [FESTIVAL INTERLAGOS 2026] [31.03.26]",
+      "status": "ENABLED",
+      "impressions": 520,
+      "clicks": 276,
+      "cost": 218.947569,
+      "conversions": 0.0,
+      "ctr": 53.07692307692308,
+      "cpc": 0.7932882934782608,
+      "cost_per_conv": 0
+    },
+    {
+      "id": "23710366061",
+      "name": "[LM] [GERAL] [PESQUI] [FESTIVAL INTERLAGOS 2026] [31.03.26]",
+      "status": "ENABLED",
+      "impressions": 94,
+      "clicks": 85,
+      "cost": 44.931441,
+      "conversions": 0.0,
+      "ctr": 90.42553191489363,
+      "cpc": 0.5286051882352941,
+      "cost_per_conv": 0
+    },
     {
       "id": "23597380079",
       "name": "[LIME] [PMAX] [DUAS RODAS CLUB] [VENDAS] [24.02.25]",
@@ -511,6 +535,13 @@
       "impressions": 13,
       "clicks": 0,
       "cost": 0.028849,
+      "conversions": 0.0
+    },
+    {
+      "date": "2026-03-31",
+      "impressions": 614,
+      "clicks": 361,
+      "cost": 263.87901,
       "conversions": 0.0
     }
   ]
