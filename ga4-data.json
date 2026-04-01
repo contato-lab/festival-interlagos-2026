@@ -1,32 +1,21 @@
 {
-  "updated_at": "2026-03-31T23:50:07.206456+00:00",
+  "updated_at": "2026-04-01T03:47:10.589859+00:00",
   "property_id": "378336436",
   "period": {
-    "start": "2025-12-31",
-    "end": "2026-03-31"
+    "start": "2026-01-01",
+    "end": "2026-04-01"
   },
   "totals": {
-    "sessions": 40629,
-    "users": 35225,
-    "new_users": 28113,
-    "pageviews": 69497,
-    "events": 176214,
+    "sessions": 45563,
+    "users": 37980,
+    "new_users": 30268,
+    "pageviews": 109453,
+    "events": 254297,
     "conversions": 0.0,
-    "pages_per_session": 1.71,
-    "avg_bounce_rate": 56.12
+    "pages_per_session": 2.4,
+    "avg_bounce_rate": 56.07
   },
   "daily_series": [
-    {
-      "date": "2025-12-31",
-      "sessions": 45,
-      "users": 39,
-      "new_users": 32,
-      "pageviews": 76,
-      "events": 196,
-      "conversions": 0.0,
-      "bounce_rate": 55.56,
-      "avg_session_s": 81.0
-    },
     {
       "date": "2026-01-01",
       "sessions": 84,
@@ -1008,45 +997,50 @@
     },
     {
       "date": "2026-03-31",
-      "sessions": 7381,
-      "users": 5041,
-      "new_users": 3276,
-      "pageviews": 19085,
-      "events": 42508,
+      "sessions": 12360,
+      "users": 7835,
+      "new_users": 5463,
+      "pageviews": 59117,
+      "events": 120787,
       "conversions": 0.0,
-      "bounce_rate": 49.56,
-      "avg_session_s": 239.8
+      "bounce_rate": 43.86,
+      "avg_session_s": 336.3
     }
   ],
   "traffic_sources": [
     {
-      "channel": "Paid Social",
-      "sessions": 14682,
+      "channel": "Organic Search",
+      "sessions": 14879,
       "conversions": 0.0
     },
     {
-      "channel": "Organic Search",
-      "sessions": 12776,
+      "channel": "Paid Social",
+      "sessions": 14757,
       "conversions": 0.0
     },
     {
       "channel": "Organic Social",
-      "sessions": 8489,
+      "sessions": 10309,
       "conversions": 0.0
     },
     {
       "channel": "Direct",
-      "sessions": 3004,
-      "conversions": 0.0
-    },
-    {
-      "channel": "Referral",
-      "sessions": 610,
+      "sessions": 3655,
       "conversions": 0.0
     },
     {
       "channel": "Unassigned",
-      "sessions": 471,
+      "sessions": 829,
+      "conversions": 0.0
+    },
+    {
+      "channel": "Referral",
+      "sessions": 661,
+      "conversions": 0.0
+    },
+    {
+      "channel": "Paid Search",
+      "sessions": 92,
       "conversions": 0.0
     },
     {
@@ -1055,8 +1049,8 @@
       "conversions": 0.0
     },
     {
-      "channel": "Paid Search",
-      "sessions": 37,
+      "channel": "(other)",
+      "sessions": 41,
       "conversions": 0.0
     },
     {
@@ -1068,58 +1062,63 @@
       "channel": "Email",
       "sessions": 4,
       "conversions": 0.0
+    },
+    {
+      "channel": "Cross-network",
+      "sessions": 1,
+      "conversions": 0.0
     }
   ],
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 55337,
-      "sessions": 39352
+      "pageviews": 78343,
+      "sessions": 43911
     },
     {
       "page": "/cadastro.php",
-      "pageviews": 8893,
-      "sessions": 6446
+      "pageviews": 11002,
+      "sessions": 7427
+    },
+    {
+      "page": "(other)",
+      "pageviews": 5499,
+      "sessions": 1381
     },
     {
       "page": "/ingressos/",
-      "pageviews": 943,
-      "sessions": 239
-    },
-    {
-      "page": "/carrinho/index",
-      "pageviews": 689,
-      "sessions": 75
+      "pageviews": 2402,
+      "sessions": 832
     },
     {
       "page": "/vendas/ingressos/ride-pass",
-      "pageviews": 577,
-      "sessions": 126
+      "pageviews": 2125,
+      "sessions": 553
     },
     {
-      "page": "/ingressos",
-      "pageviews": 466,
-      "sessions": 189
+      "page": "/carrinho/index",
+      "pageviews": 1452,
+      "sessions": 337
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 278,
-      "sessions": 83
+      "pageviews": 1196,
+      "sessions": 347
     },
     {
-      "page": "/event/festival-interlagos-motos",
-      "pageviews": 176,
-      "sessions": 156
+      "page": "/vendas/ingressos/sport-pass",
+      "pageviews": 903,
+      "sessions": 296
     },
     {
-      "page": "/vendas/ingressos/street-pass",
-      "pageviews": 139,
-      "sessions": 36
+      "page": "/ingressos",
+      "pageviews": 758,
+      "sessions": 288
     },
     {
-      "page": "/shows/",
-      "pageviews": 135,
-      "sessions": 82
+      "page": "/conta/informacoes/",
+      "pageviews": 562,
+      "sessions": 282
     }
   ]
 }
