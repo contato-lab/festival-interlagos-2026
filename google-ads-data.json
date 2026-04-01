@@ -1,55 +1,79 @@
 {
-  "updated_at": "2026-04-01T01:23:29.439147+00:00",
+  "updated_at": "2026-04-01T04:25:11.807575+00:00",
   "customer_id": "5879952911",
   "period": {
     "start": "2026-01-01",
     "end": "2026-04-01"
   },
   "totals": {
-    "impressions": 522987,
-    "clicks": 12334,
-    "cost": 14138.530716000001,
-    "conversions": 4587.901625,
-    "ctr": 2.358376020818873,
-    "cpc": 1.1463053928976814,
-    "cost_per_conv": 3.081698752858503
+    "impressions": 523245,
+    "clicks": 12437,
+    "cost": 14294.535611000003,
+    "conversions": 4588.901625,
+    "ctr": 2.3768980114477922,
+    "cpc": 1.1493556011095927,
+    "cost_per_conv": 3.1150233278317447
   },
   "campaigns": [
+    {
+      "id": "23705094165",
+      "name": "[LM] [MOTO] [PESQUI] [FESTIVAL INTERLAGOS 2026] [31.03.26]",
+      "status": "ENABLED",
+      "impressions": 143,
+      "clicks": 50,
+      "cost": 99.279621,
+      "conversions": 0.0,
+      "ctr": 34.96503496503497,
+      "cpc": 1.9855924200000001,
+      "cost_per_conv": 0
+    },
     {
       "id": "23705408328",
       "name": "[LM] [GERAL] [PMAX] [FESTIVAL INTERLAGOS 2026] [31.03.26]",
       "status": "ENABLED",
-      "impressions": 540,
-      "clicks": 272,
-      "cost": 217.793958,
+      "impressions": 544,
+      "clicks": 274,
+      "cost": 218.46063900000001,
       "conversions": 174.0,
-      "ctr": 50.37037037037037,
-      "cpc": 0.8007130808823529,
-      "cost_per_conv": 1.2516894137931034
+      "ctr": 50.36764705882353,
+      "cpc": 0.7973016021897811,
+      "cost_per_conv": 1.2555209137931036
     },
     {
       "id": "23710366061",
       "name": "[LM] [GERAL] [PESQUI] [FESTIVAL INTERLAGOS 2026] [31.03.26]",
       "status": "ENABLED",
-      "impressions": 100,
-      "clicks": 89,
-      "cost": 52.021441,
+      "impressions": 143,
+      "clicks": 119,
+      "cost": 59.640325000000004,
       "conversions": 55.0,
-      "ctr": 89.0,
-      "cpc": 0.5845105730337079,
-      "cost_per_conv": 0.9458443818181819
+      "ctr": 83.21678321678321,
+      "cpc": 0.5011792016806723,
+      "cost_per_conv": 1.0843695454545454
+    },
+    {
+      "id": "23715183778",
+      "name": "[LM] [AUTO] [PESQUI] [FESTIVAL INTERLAGOS 2026] [31.03.26]",
+      "status": "ENABLED",
+      "impressions": 70,
+      "clicks": 21,
+      "cost": 48.445771,
+      "conversions": 0.0,
+      "ctr": 30.0,
+      "cpc": 2.306941476190476,
+      "cost_per_conv": 0
     },
     {
       "id": "23597380079",
       "name": "[LIME] [PMAX] [DUAS RODAS CLUB] [VENDAS] [24.02.25]",
       "status": "PAUSED",
-      "impressions": 495257,
+      "impressions": 495255,
       "clicks": 8668,
-      "cost": 9447.861608000003,
-      "conversions": 1281.0,
-      "ctr": 1.7502024201576154,
-      "cpc": 1.0899701901245966,
-      "cost_per_conv": 7.375379865729901
+      "cost": 9447.855546000003,
+      "conversions": 1282.0,
+      "ctr": 1.750209488041514,
+      "cpc": 1.089969490770651,
+      "cost_per_conv": 7.369622110764433
     },
     {
       "id": "23078362313",
@@ -420,9 +444,9 @@
     },
     {
       "date": "2026-03-07",
-      "impressions": 178326,
+      "impressions": 178324,
       "clicks": 1215,
-      "cost": 1300.221204,
+      "cost": 1300.215142,
       "conversions": 1.25
     },
     {
@@ -458,7 +482,7 @@
       "impressions": 12323,
       "clicks": 388,
       "cost": 734.35172,
-      "conversions": 1.25
+      "conversions": 2.25
     },
     {
       "date": "2026-03-13",
@@ -539,10 +563,17 @@
     },
     {
       "date": "2026-03-31",
-      "impressions": 640,
-      "clicks": 361,
-      "cost": 269.815399,
+      "impressions": 801,
+      "clicks": 416,
+      "cost": 394.34171399999997,
       "conversions": 229.0
+    },
+    {
+      "date": "2026-04-01",
+      "impressions": 99,
+      "clicks": 48,
+      "cost": 31.484642,
+      "conversions": 0.0
     }
   ]
 }
