@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-04-01T11:15:21.475302+00:00",
+  "updated_at": "2026-04-01T14:06:50.725390+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-01-01",
     "end": "2026-04-01"
   },
   "totals": {
-    "sessions": 57601,
-    "users": 46183,
-    "new_users": 36728,
-    "pageviews": 208012,
-    "events": 452205,
+    "sessions": 58570,
+    "users": 46566,
+    "new_users": 36978,
+    "pageviews": 209291,
+    "events": 454959,
     "conversions": 0.0,
-    "pages_per_session": 3.61,
-    "avg_bounce_rate": 55.78
+    "pages_per_session": 3.57,
+    "avg_bounce_rate": 55.73
   },
   "daily_series": [
     {
@@ -997,66 +997,61 @@
     },
     {
       "date": "2026-03-31",
-      "sessions": 23455,
+      "sessions": 24036,
       "users": 15140,
       "new_users": 11502,
       "pageviews": 152198,
       "events": 307619,
       "conversions": 0.0,
-      "bounce_rate": 42.14,
-      "avg_session_s": 442.8
+      "bounce_rate": 35.7,
+      "avg_session_s": 433.1
     },
     {
       "date": "2026-04-01",
-      "sessions": 943,
-      "users": 898,
-      "new_users": 421,
-      "pageviews": 5478,
-      "events": 11076,
+      "sessions": 1331,
+      "users": 1281,
+      "new_users": 671,
+      "pageviews": 6757,
+      "events": 13830,
       "conversions": 0.0,
-      "bounce_rate": 31.39,
-      "avg_session_s": 348.8
+      "bounce_rate": 33.43,
+      "avg_session_s": 283.3
     }
   ],
   "traffic_sources": [
     {
       "channel": "Organic Search",
-      "sessions": 17601,
+      "sessions": 17664,
       "conversions": 0.0
     },
     {
       "channel": "Paid Social",
-      "sessions": 15538,
+      "sessions": 15782,
       "conversions": 0.0
     },
     {
       "channel": "Organic Social",
-      "sessions": 12598,
+      "sessions": 12437,
       "conversions": 0.0
     },
     {
       "channel": "Direct",
-      "sessions": 5841,
+      "sessions": 5829,
       "conversions": 0.0
     },
     {
       "channel": "Unassigned",
-      "sessions": 4890,
+      "sessions": 4954,
       "conversions": 0.0
     },
     {
       "channel": "Referral",
-      "sessions": 792,
+      "sessions": 806,
       "conversions": 0.0
     },
     {
       "channel": "Paid Search",
-      "sessions": 312,
-      "conversions": 0.0
-    },
-    {
-      "channel": "(other)",
-      "sessions": 148,
+      "sessions": 343,
       "conversions": 0.0
     },
     {
@@ -1083,53 +1078,53 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 105062,
-      "sessions": 52596
-    },
-    {
-      "page": "(other)",
-      "pageviews": 28169,
-      "sessions": 6218
-    },
-    {
-      "page": "/cadastro.php",
-      "pageviews": 11546,
-      "sessions": 7617
-    },
-    {
-      "page": "/ingressos/",
-      "pageviews": 11210,
-      "sessions": 4276
+      "pageviews": 114492,
+      "sessions": 57132
     },
     {
       "page": "/vendas/ingressos/ride-pass",
-      "pageviews": 10881,
-      "sessions": 2603
+      "pageviews": 13692,
+      "sessions": 3326
+    },
+    {
+      "page": "/ingressos/",
+      "pageviews": 13675,
+      "sessions": 5470
+    },
+    {
+      "page": "/cadastro.php",
+      "pageviews": 11909,
+      "sessions": 7972
     },
     {
       "page": "/carrinho/index",
-      "pageviews": 5772,
-      "sessions": 1556
+      "pageviews": 6957,
+      "sessions": 2029
     },
     {
       "page": "/vendas/ingressos/sport-pass",
-      "pageviews": 4757,
-      "sessions": 1613
+      "pageviews": 5996,
+      "sessions": 2183
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 4518,
-      "sessions": 1440
+      "pageviews": 5686,
+      "sessions": 1882
     },
     {
       "page": "/conta/informacoes/",
-      "pageviews": 3495,
-      "sessions": 1415
+      "pageviews": 5511,
+      "sessions": 2150
     },
     {
       "page": "/login",
-      "pageviews": 2827,
-      "sessions": 1280
+      "pageviews": 3850,
+      "sessions": 1914
+    },
+    {
+      "page": "/conta/pedidos/",
+      "pageviews": 3701,
+      "sessions": 1618
     }
   ]
 }
