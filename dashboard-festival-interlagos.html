@@ -342,9 +342,9 @@ tr:hover td{background:rgba(255,255,255,.018)}
     <button class="fpill" onclick="setFiltro('tudo',this)">Todo o Período</button>
   </div>
   <span class="filtro-sep">De</span>
-  <input type="date" id="filtroDE" class="filtro-date">
+  <input type="date" id="filtroDE" class="filtro-date" onchange="applyFiltro()">
   <span class="filtro-sep">Até</span>
-  <input type="date" id="filtroATE" class="filtro-date">
+  <input type="date" id="filtroATE" class="filtro-date" onchange="applyFiltro()">
   <button class="filtro-apply" onclick="applyFiltro()">Aplicar</button>
 </div>
 
