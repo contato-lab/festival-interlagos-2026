@@ -2,7 +2,7 @@ name: Update GA4 Data
 
 on:
   schedule:
-    - cron: '15 */1 * * *'   # a cada hora (offset 15min do Google Ads)
+    - cron: '15 * * * *'    # a cada hora (offset 15 min do Google Ads)
   workflow_dispatch:          # permite rodar manualmente
 
 jobs:
@@ -10,10 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write          # necessário para Workload Identity Federation
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # ── Autenticação via WIF (configura ADC para o service account) ─────────
+      # Isso é usado pelo google-auth quando GOOGLE_ADS_REFRESH_TOKEN não está
+      # disponível. Quando o service account for adicionado como Viewer no GA4,
+      # o OAuth2 abaixo pode ser removido.
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/929942968095/locations/global/workloadIdentityPools/github-actions/providers/github-actions'
+          service_account: 'festival-interlagos-dashboard@mercurial-shape-490621-h5.iam.gserviceaccount.com'
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -21,12 +32,15 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install google-analytics-data google-auth-httplib2 google-auth-oauthlib
+        run: pip install google-analytics-data google-auth google-auth-httplib2 google-auth-oauthlib
 
       - name: Run GA4 update script
         env:
-          GA4_PROPERTY_ID:        ${{ secrets.GA4_PROPERTY_ID }}
-          GOOGLE_ADS_CLIENT_ID:   ${{ secrets.GOOGLE_ADS_CLIENT_ID }}
+          GA4_PROPERTY_ID: '378336436'
+          # OAuth2 — funciona imediatamente (refresh token inclui analytics.readonly)
+          # Quando o service account for adicionado ao GA4, estas variáveis
+          # podem ser removidas e o script usará WIF automaticamente.
+          GOOGLE_ADS_CLIENT_ID:     ${{ secrets.GOOGLE_ADS_CLIENT_ID }}
           GOOGLE_ADS_CLIENT_SECRET: ${{ secrets.GOOGLE_ADS_CLIENT_SECRET }}
           GOOGLE_ADS_REFRESH_TOKEN: ${{ secrets.GOOGLE_ADS_REFRESH_TOKEN }}
         run: python update-google-analytics.py
