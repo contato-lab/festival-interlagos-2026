@@ -85,19 +85,38 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .td-zero{color:var(--text3)!important}
 .src-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:7px}
 
+/* MEDIA SECTION */
+.media-section-head{display:flex;align-items:center;justify-content:space-between;padding:18px 0 10px;border-bottom:2px solid var(--lime);margin-bottom:18px}
+.media-section-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.35rem;text-transform:uppercase;letter-spacing:.12em;color:var(--lime);display:flex;align-items:center;gap:10px}
+.media-section-title::before{content:'';display:inline-block;width:4px;height:22px;background:var(--lime);border-radius:2px}
+.media-badges{display:flex;gap:6px;flex-wrap:wrap}
+
 /* MEDIA GRID */
-.media-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.media-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden}
-.media-card.locked{opacity:.55}
-.media-platform{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.05rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.media-kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mk{background:var(--card2);border-radius:var(--rad-sm);padding:10px 12px}
-.mk-label{font-size:.66rem;color:#999;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
-.mk-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.2rem}
-.lock-overlay{position:absolute;inset:0;background:rgba(8,8,8,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;backdrop-filter:blur(3px)}
+.media-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.media-card{background:linear-gradient(168deg,#161616 0%,#111 100%);border:1px solid var(--border);border-radius:var(--radius);padding:22px;position:relative;overflow:hidden;transition:border-color .3s,box-shadow .3s}
+.media-card:hover{box-shadow:0 0 24px rgba(200,255,0,.06)}
+.media-card.locked{opacity:.5;pointer-events:none}
+.media-platform{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.1rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)}
+.media-platform .plat-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.95rem;flex-shrink:0}
+.media-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mk{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;transition:background .2s}
+.mk:hover{background:rgba(200,255,0,.04)}
+.mk-label{font-family:'Inter',sans-serif;font-size:.62rem;font-weight:600;color:#777;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.mk-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.25rem;line-height:1.1}
+.mk-highlight{background:rgba(200,255,0,.06);border-color:rgba(200,255,0,.15)}
+.mk-highlight .mk-val{color:var(--lime)}
+.mk-warn{background:rgba(255,184,0,.05);border-color:rgba(255,184,0,.12)}
+.mk-warn .mk-val{color:var(--warn)}
+.lock-overlay{position:absolute;inset:0;background:rgba(8,8,8,.65);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;backdrop-filter:blur(4px)}
 .lock-icon{font-size:2rem}
 .lock-text{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);text-align:center}
-.spk-wrap{margin-top:14px;height:72px}
+.spk-wrap{margin-top:14px;height:72px;border-top:1px solid rgba(255,255,255,.04);padding-top:10px}
+
+/* MEDIA TOTALS BAR */
+.media-totals{display:flex;align-items:center;justify-content:center;gap:32px;margin-top:16px;padding:14px 24px;background:linear-gradient(90deg,rgba(200,255,0,.06) 0%,rgba(200,255,0,.02) 50%,rgba(200,255,0,.06) 100%);border:1px solid rgba(200,255,0,.15);border-radius:10px}
+.media-totals .mt-item{text-align:center}
+.media-totals .mt-label{font-family:'Inter',sans-serif;font-size:.58rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.1em}
+.media-totals .mt-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.3rem;color:var(--lime)}
 
 /* ORGANICO */
 .org-row{display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:center}
@@ -366,50 +385,55 @@ tr:hover td{background:rgba(255,255,255,.018)}
 
 <!-- ══ MÍDIA PAGA ══ -->
 <div>
-  <div class="section-header">
-    <div class="section-title">💸 Mídia Paga — Performance por Plataforma</div>
-    <span class="badge badge-ok" style="margin-right:6px">✓ Google Ads ao vivo</span><span class="badge badge-ok">✓ Meta Ads ao vivo</span>
+  <div class="media-section-head">
+    <div class="media-section-title">Mídia Paga</div>
+    <div class="media-badges">
+      <span class="badge badge-ok">✓ Meta Ads ao vivo</span>
+      <span class="badge badge-ok">✓ Google Ads ao vivo</span>
+    </div>
   </div>
   <div class="media-grid">
 
     <!-- META -->
-    <div class="media-card" style="border-color:rgba(24,119,242,.35)">
+    <div class="media-card" style="border-color:rgba(24,119,242,.25)">
       <div class="media-platform" style="color:#1877F2">
-        <span style="font-size:1.3rem;font-weight:900">f</span> Meta Ads
+        <span class="plat-icon" style="background:rgba(24,119,242,.15);color:#1877F2">f</span> Meta Ads
       </div>
       <div class="media-kpis">
-        <div class="mk"><div class="mk-label">Investimento</div><div class="mk-val" style="color:var(--warn)" id="meta-invest">—</div></div>
+        <div class="mk mk-warn"><div class="mk-label">Investimento</div><div class="mk-val" id="meta-invest">—</div></div>
         <div class="mk"><div class="mk-label">Impressões</div><div class="mk-val" id="meta-imp">—</div></div>
         <div class="mk"><div class="mk-label">Cliques</div><div class="mk-val" id="meta-clicks">—</div></div>
         <div class="mk"><div class="mk-label">Pageview</div><div class="mk-val" id="meta-pv">—</div></div>
         <div class="mk"><div class="mk-label">Add to Cart</div><div class="mk-val" id="meta-atc">—</div></div>
         <div class="mk"><div class="mk-label">Checkout</div><div class="mk-val" id="meta-checkout">—</div></div>
-        <div class="mk"><div class="mk-label">Compras</div><div class="mk-val" style="color:var(--lime)" id="meta-compras">—</div></div>
-        <div class="mk" style="grid-column:1/-1"><div class="mk-label">Custo de Compra</div><div class="mk-val" style="color:var(--warn)" id="meta-cpp">—</div></div>
+        <div class="mk mk-highlight"><div class="mk-label">Compras</div><div class="mk-val" id="meta-compras">—</div></div>
+        <div class="mk mk-warn" style="grid-column:1/-1"><div class="mk-label">Custo de Compra</div><div class="mk-val" id="meta-cpp">—</div></div>
       </div>
       <div class="spk-wrap"><canvas id="spkMeta"></canvas></div>
     </div>
 
     <!-- GOOGLE -->
-    <div class="media-card" style="border-color:rgba(66,133,244,.35)">
+    <div class="media-card" style="border-color:rgba(66,133,244,.25)">
       <div class="media-platform" style="color:#4285F4">
-        <span style="font-size:1.2rem;font-weight:900">G</span> Google Ads
+        <span class="plat-icon" style="background:rgba(66,133,244,.15);color:#4285F4">G</span> Google Ads
       </div>
       <div class="media-kpis">
-        <div class="mk"><div class="mk-label">Investimento</div><div class="mk-val" style="color:var(--warn)" id="gads-invest">—</div></div>
+        <div class="mk mk-warn"><div class="mk-label">Investimento</div><div class="mk-val" id="gads-invest">—</div></div>
         <div class="mk"><div class="mk-label">Impressões</div><div class="mk-val" id="gads-imp">—</div></div>
         <div class="mk"><div class="mk-label">Cliques</div><div class="mk-val" id="gads-clicks">—</div></div>
         <div class="mk"><div class="mk-label">CPC</div><div class="mk-val" id="gads-cpc">—</div></div>
-        <div class="mk"><div class="mk-label">CTR</div><div class="mk-val" style="color:var(--green)" id="gads-ctr">—</div></div>
-        <div class="mk"><div class="mk-label">Conversões</div><div class="mk-val" style="color:var(--lime)" id="gads-conv">—</div></div>
-        <div class="mk" style="grid-column:1/-1"><div class="mk-label">Custo por Compra</div><div class="mk-val" style="color:var(--warn)" id="gads-cpp">—</div></div>
+        <div class="mk"><div class="mk-label">CTR</div><div class="mk-val" style="color:var(--positive)" id="gads-ctr">—</div></div>
+        <div class="mk mk-highlight"><div class="mk-label">Conversões</div><div class="mk-val" id="gads-conv">—</div></div>
+        <div class="mk mk-warn" style="grid-column:1/-1"><div class="mk-label">Custo por Compra</div><div class="mk-val" id="gads-cpp">—</div></div>
       </div>
       <div class="spk-wrap"><canvas id="spkGoogle"></canvas></div>
     </div>
 
     <!-- TIKTOK — LOCKED -->
-    <div class="media-card locked" style="border-color:rgba(0,191,255,.2)">
-      <div class="media-platform" style="color:var(--blue)">♪ TikTok Ads</div>
+    <div class="media-card locked" style="border-color:rgba(0,191,255,.15)">
+      <div class="media-platform" style="color:#00BCD4">
+        <span class="plat-icon" style="background:rgba(0,191,255,.1);color:#00BCD4">♪</span> TikTok Ads
+      </div>
       <div class="media-kpis">
         <div class="mk"><div class="mk-label">Impressões</div><div class="mk-val">—</div></div>
         <div class="mk"><div class="mk-label">Cliques</div><div class="mk-val">—</div></div>
@@ -426,6 +450,15 @@ tr:hover td{background:rgba(255,255,255,.018)}
       </div>
     </div>
 
+  </div>
+
+  <!-- TOTALS BAR -->
+  <div class="media-totals" id="mediaTotals">
+    <div class="mt-item"><div class="mt-label">Investimento Total</div><div class="mt-val" id="total-invest">—</div></div>
+    <div class="mt-item"><div class="mt-label">Impressões Total</div><div class="mt-val" id="total-imp">—</div></div>
+    <div class="mt-item"><div class="mt-label">Cliques Total</div><div class="mt-val" id="total-clicks">—</div></div>
+    <div class="mt-item"><div class="mt-label">Compras Total</div><div class="mt-val" id="total-compras">—</div></div>
+    <div class="mt-item"><div class="mt-label">CPP Médio</div><div class="mt-val" style="color:var(--warn)" id="total-cpp">—</div></div>
   </div>
 </div>
 
@@ -688,6 +721,7 @@ function applyFiltro(){
   // Atualiza Mídia Paga com o mesmo range
   if(GADS_DATA) updateGAdsCard(GADS_DATA, deStr, ateStr);
   if(META_DATA) updateMetaCard(META_DATA, deStr, ateStr);
+  updateMediaTotals(deStr, ateStr);
 }
 
 function initFiltro(){
@@ -1119,7 +1153,7 @@ async function fetchGAdsData() {
     if (data.daily_series?.length) {
       _gadsIdx = buildDailyIndex(data.daily_series);
     }
-    buildComp(); // re-renderiza com gastos no tooltip
+    buildComp(); updateMediaTotals();
   } catch(e) {
     console.warn('fetchGAdsData:', e.message);
   }
@@ -1155,6 +1189,27 @@ function updateMetaCard(data, dateFrom, dateTo) {
   buildSpkTimeline('spkMeta', arr, 'rgb(24,119,242)');
 }
 
+function updateMediaTotals(dateFrom, dateTo) {
+  let inv=0, imp=0, clk=0, comp=0;
+  if (GADS_DATA) {
+    let gs = GADS_DATA.daily_series || [];
+    if (dateFrom && dateTo) gs = gs.filter(d => d.date >= dateFrom && d.date <= dateTo);
+    gs.forEach(d => { inv += d.cost||0; imp += d.impressions||0; clk += d.clicks||0; comp += d.conversions||0; });
+  }
+  if (META_DATA) {
+    let ms = META_DATA.daily_series || META_DATA.data || [];
+    if (dateFrom && dateTo) ms = ms.filter(d => d.date >= dateFrom && d.date <= dateTo);
+    ms.forEach(d => { inv += d.cost||0; imp += d.impressions||0; clk += d.clicks||0; comp += d.purchases||0; });
+  }
+  const fmtImp = v => v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e3 ? Math.round(v/1e3)+'K' : String(v);
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('total-invest', fmtR(inv));
+  set('total-imp', fmtImp(imp));
+  set('total-clicks', Math.round(clk).toLocaleString('pt-BR'));
+  set('total-compras', Math.round(comp).toLocaleString('pt-BR'));
+  set('total-cpp', comp > 0 ? 'R$ '+(inv/comp).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—');
+}
+
 async function fetchMetaData() {
   try {
     const res = await fetch('meta-data.json?t=' + Date.now());
@@ -1165,7 +1220,7 @@ async function fetchMetaData() {
     META_DATA = data;
     updateMetaCard(data);
     _metaIdx = buildDailyIndex(arr);
-    buildComp();
+    buildComp(); updateMediaTotals();
   } catch(e) {
     // silencioso — meta-data.json ainda nao existe
   }
