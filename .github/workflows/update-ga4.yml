@@ -2,7 +2,7 @@ name: Update GA4 Data
 
 on:
   schedule:
-    - cron: '15 * * * *'    # a cada hora (offset 15 min do Google Ads)
+    - cron: '*/5 * * * *'    # a cada 5 minutos
   workflow_dispatch:          # permite rodar manualmente
 
 jobs:
@@ -51,4 +51,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add ga4-data.json
           git diff --staged --quiet || git commit -m "chore: update ga4-data.json [skip ci]"
+          git pull --rebase origin main || true
           git push

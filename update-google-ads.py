@@ -56,6 +56,7 @@ def fetch_campaign_data(client):
         FROM campaign
         WHERE segments.date BETWEEN '{start_date}' AND '{today}'
             AND campaign.status != 'REMOVED'
+            AND campaign.name LIKE '%FESTIVAL INTERLAGOS%'
         ORDER BY segments.date DESC
     """
 
