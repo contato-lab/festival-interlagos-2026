@@ -1139,7 +1139,7 @@ function updateGAdsCard(data, dateFrom, dateTo) {
   set('gads-ctr',    t.ctr.toFixed(2).replace('.',',')+' %');
   set('gads-conv',   fmtN2(t.conversions));
   set('gads-cpp',    t.cost_per_conv ? fmtR2(t.cost_per_conv) : '—');
-  buildSpkTimeline('spkGoogle', series, 'rgb(66,133,244)');
+  buildSpkTimeline('spkGoogle', series, 'rgb(200,255,0)');
 }
 
 async function fetchGAdsData() {
@@ -1186,7 +1186,7 @@ function updateMetaCard(data, dateFrom, dateTo) {
   set('meta-checkout',tot.chk ? fmtN2(tot.chk) : '—');
   set('meta-compras', tot.comp ? fmtN2(tot.comp) : '—');
   set('meta-cpp',     tot.comp > 0 ? 'R$ '+(tot.gasto/tot.comp).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—');
-  buildSpkTimeline('spkMeta', arr, 'rgb(24,119,242)');
+  buildSpkTimeline('spkMeta', arr, 'rgb(200,255,0)');
 }
 
 function updateMediaTotals(dateFrom, dateTo) {
@@ -1390,8 +1390,8 @@ buildAcoesTimeline();
 buildEdicao();
 buildMencoes(0);
 buildOrg();
-buildSpk('spkMeta',[320,890,1240,780,1050,1380,960,1120,840,1290,1480,1060,920,1350,1580,1120,880,1640],'rgb(24,119,242)');
-buildSpk('spkGoogle',[180,420,680,390,510,720,480,560,420,640,740,530,460,680,790,560,440,820],'rgb(66,133,244)');
+buildSpk('spkMeta',[320,890,1240,780,1050,1380,960,1120,840,1290,1480,1060,920,1350,1580,1120,880,1640],'rgb(200,255,0)');
+buildSpk('spkGoogle',[180,420,680,390,510,720,480,560,420,640,740,530,460,680,790,560,440,820],'rgb(200,255,0)');
 
 fetchSheet();
 fetchGA4Data();
