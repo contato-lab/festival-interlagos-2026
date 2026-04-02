@@ -1339,6 +1339,9 @@ fetchSheet();
 fetchGA4Data();
 fetchGAdsData();
 fetchMetaData();
+
+// Auto-refresh a cada 30 segundos
+setInterval(() => { fetchGAdsData(); fetchMetaData(); fetchGA4Data(); }, 30000);
 </script>
 </body>
 </html>
