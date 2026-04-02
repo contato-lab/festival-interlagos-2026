@@ -378,6 +378,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
         <span style="font-size:1.3rem;font-weight:900">f</span> Meta Ads
       </div>
       <div class="media-kpis">
+        <div class="mk"><div class="mk-label">Investimento</div><div class="mk-val" style="color:var(--warn)" id="meta-invest">—</div></div>
         <div class="mk"><div class="mk-label">Impressões</div><div class="mk-val" id="meta-imp">—</div></div>
         <div class="mk"><div class="mk-label">Cliques</div><div class="mk-val" id="meta-clicks">—</div></div>
         <div class="mk"><div class="mk-label">Pageview</div><div class="mk-val" id="meta-pv">—</div></div>
@@ -1143,6 +1144,7 @@ function updateMetaCard(data, dateFrom, dateTo) {
   const fmtImp = v => v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e3 ? Math.round(v/1e3)+'K' : String(v);
   const fmtN2  = v => Math.round(v).toLocaleString('pt-BR');
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('meta-invest',  fmtR(tot.gasto));
   set('meta-imp',     fmtImp(tot.imp));
   set('meta-clicks',  fmtN2(tot.clk));
   set('meta-pv',      tot.pv  ? fmtN2(tot.pv)  : '—');
