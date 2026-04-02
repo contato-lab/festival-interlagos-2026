@@ -1004,7 +1004,13 @@ function buildComp() {
         }
       },
       scales:{
-        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:10},maxTicksLimit:32,maxRotation:0}},
+        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:9},maxTicksLimit:32,maxRotation:0,callback:(v,i)=>{
+          const dt=dToDate(i+1);
+          const day=dt.getDate().toString().padStart(2,'0');
+          const isFirst=dt.getDate()===1;
+          const top=isFirst?`${day} ${dt.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')}`:day;
+          return[top,`D+${i+1}`];
+        }}},
         y:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:10},callback:v=>metricAtiva==='ingressos'?fmtN(v):fmtK(v)}}
       }
     }
