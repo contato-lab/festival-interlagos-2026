@@ -684,6 +684,9 @@ function applyFiltro(){
   D26.length=0;
   (filtered.length?filtered:D26_FULL).forEach(r=>D26.push(r));
   calcKPIs();buildComp();buildEdicao();
+  // Atualiza Mídia Paga com o mesmo range
+  if(GADS_DATA) updateGAdsCard(GADS_DATA, deStr, ateStr);
+  if(META_DATA) updateMetaCard(META_DATA, deStr, ateStr);
 }
 
 function initFiltro(){
@@ -1079,8 +1082,17 @@ async function fetchGA4Data() {
 // ═══════════════════════════════════════════════
 // GOOGLE ADS — fetch google-ads-data.json
 // ═══════════════════════════════════════════════
-function updateGAdsCard(data) {
-  const t = data.totals; if (!t) return;
+function updateGAdsCard(data, dateFrom, dateTo) {
+  let series = data.daily_series || [];
+  if (dateFrom && dateTo) series = series.filter(d => d.date >= dateFrom && d.date <= dateTo);
+  const t = series.reduce((a,d) => {
+    a.impressions += d.impressions||0; a.clicks += d.clicks||0;
+    a.cost += d.cost||0; a.conversions += d.conversions||0;
+    return a;
+  }, {impressions:0, clicks:0, cost:0, conversions:0});
+  t.ctr = t.impressions>0 ? (t.clicks/t.impressions*100) : 0;
+  t.cpc = t.clicks>0 ? (t.cost/t.clicks) : 0;
+  t.cost_per_conv = t.conversions>0 ? (t.cost/t.conversions) : 0;
   const fmtImp = v => v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e3 ? Math.round(v/1e3)+'K' : String(v);
   const fmtN2  = v => Math.round(v).toLocaleString('pt-BR');
   const fmtR2  = v => 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -1092,6 +1104,7 @@ function updateGAdsCard(data) {
   set('gads-ctr',    t.ctr.toFixed(2).replace('.',',')+' %');
   set('gads-conv',   fmtN2(t.conversions));
   set('gads-cpp',    t.cost_per_conv ? fmtR2(t.cost_per_conv) : '—');
+  buildSpkTimeline('spkGoogle', series, 'rgb(66,133,244)');
 }
 
 async function fetchGAdsData() {
@@ -1104,7 +1117,6 @@ async function fetchGAdsData() {
     updateGAdsCard(data);
     if (data.daily_series?.length) {
       _gadsIdx = buildDailyIndex(data.daily_series);
-      buildSpkTimeline('spkGoogle', data.daily_series, 'rgb(66,133,244)');
     }
     buildComp(); // re-renderiza com gastos no tooltip
   } catch(e) {
@@ -1115,8 +1127,9 @@ async function fetchGAdsData() {
 // ═══════════════════════════════════════════════
 // META ADS — fetch meta-data.json (quando conectado)
 // ═══════════════════════════════════════════════
-function updateMetaCard(data) {
-  const arr = data.daily_series || data.data || [];
+function updateMetaCard(data, dateFrom, dateTo) {
+  let arr = data.daily_series || data.data || [];
+  if (dateFrom && dateTo) arr = arr.filter(d => d.date >= dateFrom && d.date <= dateTo);
   const tot = arr.reduce((a, d) => {
     a.imp  += d.impressions  || d.impressoes  || 0;
     a.clk  += d.clicks       || d.cliques     || 0;
@@ -1136,7 +1149,8 @@ function updateMetaCard(data) {
   set('meta-atc',     tot.atc ? fmtN2(tot.atc) : '—');
   set('meta-checkout',tot.chk ? fmtN2(tot.chk) : '—');
   set('meta-compras', tot.comp ? fmtN2(tot.comp) : '—');
-  set('meta-cpp',     tot.comp > 0 ? 'R$ '+( tot.gasto/tot.comp).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—');
+  set('meta-cpp',     tot.comp > 0 ? 'R$ '+(tot.gasto/tot.comp).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—');
+  buildSpkTimeline('spkMeta', arr, 'rgb(24,119,242)');
 }
 
 async function fetchMetaData() {
@@ -1149,7 +1163,6 @@ async function fetchMetaData() {
     META_DATA = data;
     updateMetaCard(data);
     _metaIdx = buildDailyIndex(arr);
-    buildSpkTimeline('spkMeta', arr, 'rgb(24,119,242)');
     buildComp();
   } catch(e) {
     // silencioso — meta-data.json ainda nao existe
