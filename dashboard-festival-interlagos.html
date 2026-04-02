@@ -30,6 +30,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .badge{background:var(--lime-dim);border:1px solid var(--lime-border);border-radius:20px;color:var(--lime);padding:4px 14px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
 .badge-demo{background:rgba(255,184,0,.12);border:1px solid rgba(255,184,0,.3);color:var(--warn)}
 .badge-tiktok{background:rgba(0,191,255,.1);border:1px solid rgba(0,191,255,.25);color:var(--blue)}
+.badge-ok{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);color:#00FF88}
+.badge-pending{background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.3);color:var(--warn)}
 .gen-date{font-size:.72rem;color:#888}
 
 /* LAYOUT */
@@ -151,7 +153,8 @@ tr:hover td{background:rgba(255,255,255,.018)}
   </div>
   <div class="header-title">Dashboard de Performance — Vendas &amp; Mídia</div>
   <div class="header-right">
-    <span class="badge badge-demo" id="demoBadge">⚠ Demonstração</span>
+    <span class="badge badge-ok" style="margin-right:4px">✓ Google Ads</span><span class="badge badge-ok">✓ GA4</span>
+    <span class="badge badge-pending" id="demoBadge" style="margin-left:4px">Vendas: aguardando</span>
     <span class="badge" id="periodoBadge">2026</span>
     <span class="gen-date" id="genDate"></span>
   </div>
@@ -365,7 +368,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
 <div>
   <div class="section-header">
     <div class="section-title">💸 Mídia Paga — Performance por Plataforma</div>
-    <span class="badge badge-demo">Dados Placeholder — conectar APIs</span>
+    <span class="badge badge-ok" style="margin-right:6px">✓ Google Ads ao vivo</span><span class="badge badge-pending">Meta Ads: pendente</span>
   </div>
   <div class="media-grid">
 
@@ -375,12 +378,13 @@ tr:hover td{background:rgba(255,255,255,.018)}
         <span style="font-size:1.3rem;font-weight:900">f</span> Meta Ads
       </div>
       <div class="media-kpis">
-        <div class="mk"><div class="mk-label">Investimento</div><div class="mk-val" style="color:var(--warn)">R$ 14.280</div></div>
         <div class="mk"><div class="mk-label">Impressões</div><div class="mk-val">842K</div></div>
         <div class="mk"><div class="mk-label">Cliques</div><div class="mk-val">12.440</div></div>
-        <div class="mk"><div class="mk-label">CPM</div><div class="mk-val">R$ 16,96</div></div>
-        <div class="mk"><div class="mk-label">CTR</div><div class="mk-val" style="color:var(--green)">1,48%</div></div>
-        <div class="mk"><div class="mk-label">CPC</div><div class="mk-val">R$ 1,15</div></div>
+        <div class="mk"><div class="mk-label">Pageview</div><div class="mk-val">—</div></div>
+        <div class="mk"><div class="mk-label">Add to Cart</div><div class="mk-val">—</div></div>
+        <div class="mk"><div class="mk-label">Checkout</div><div class="mk-val">—</div></div>
+        <div class="mk"><div class="mk-label">Compras</div><div class="mk-val" style="color:var(--lime)">—</div></div>
+        <div class="mk" style="grid-column:1/-1"><div class="mk-label">Custo de Compra</div><div class="mk-val" style="color:var(--warn)">—</div></div>
       </div>
       <div class="spk-wrap"><canvas id="spkMeta"></canvas></div>
     </div>
@@ -397,6 +401,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
         <div class="mk"><div class="mk-label">CPC</div><div class="mk-val">R$ 0,89</div></div>
         <div class="mk"><div class="mk-label">CTR</div><div class="mk-val" style="color:var(--green)">3,09%</div></div>
         <div class="mk"><div class="mk-label">Conversões</div><div class="mk-val" style="color:var(--lime)">248</div></div>
+        <div class="mk" style="grid-column:1/-1"><div class="mk-label">Custo por Compra</div><div class="mk-val" style="color:var(--warn)">—</div></div>
       </div>
       <div class="spk-wrap"><canvas id="spkGoogle"></canvas></div>
     </div>
@@ -405,12 +410,13 @@ tr:hover td{background:rgba(255,255,255,.018)}
     <div class="media-card locked" style="border-color:rgba(0,191,255,.2)">
       <div class="media-platform" style="color:var(--blue)">♪ TikTok Ads</div>
       <div class="media-kpis">
-        <div class="mk"><div class="mk-label">Investimento</div><div class="mk-val">—</div></div>
         <div class="mk"><div class="mk-label">Impressões</div><div class="mk-val">—</div></div>
         <div class="mk"><div class="mk-label">Cliques</div><div class="mk-val">—</div></div>
-        <div class="mk"><div class="mk-label">CPM</div><div class="mk-val">—</div></div>
-        <div class="mk"><div class="mk-label">CTR</div><div class="mk-val">—</div></div>
-        <div class="mk"><div class="mk-label">CPC</div><div class="mk-val">—</div></div>
+        <div class="mk"><div class="mk-label">Pageview</div><div class="mk-val">—</div></div>
+        <div class="mk"><div class="mk-label">Add to Cart</div><div class="mk-val">—</div></div>
+        <div class="mk"><div class="mk-label">Checkout</div><div class="mk-val">—</div></div>
+        <div class="mk"><div class="mk-label">Compras</div><div class="mk-val">—</div></div>
+        <div class="mk" style="grid-column:1/-1"><div class="mk-label">Custo de Compra</div><div class="mk-val">—</div></div>
       </div>
       <div class="lock-overlay">
         <div class="lock-icon">🔒</div>
@@ -475,7 +481,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
 const SHEET_CSV_URL = '';
 
 // Data de início das vendas (D+1). Ajuste para a data real quando disponível.
-const DATA_INICIO = new Date('2026-03-15T00:00:00');
+const DATA_INICIO = new Date('2026-03-31T00:00:00'); // D+1 = abertura das vendas
 let D26_FULL = [];
 
 // ═══════════════════════════════════════════════
@@ -592,29 +598,10 @@ const D25 = [
 ];
 
 // ═══════════════════════════════════════════════
-// DADOS 2026 — demonstração (18 dias)
-// Substituídos automaticamente quando Google Sheets for configurado
+// DADOS 2026 — preenchidos via Google Sheets (SHEET_CSV_URL)
+// Formato esperado no Sheets: D | Dia | Fase | MotosP_R | MotosP_Q | MotosTM_R | MotosTM_Q | AutosP_R | AutosP_Q | AutosTM_R | AutosTM_Q
 // ═══════════════════════════════════════════════
-let D26 = [
-  {d:1, mp:358450,mt:91200,ap:121840,at:46230},
-  {d:2, mp:118900,mt:30180,ap:56270,at:21350},
-  {d:3, mp:62480, mt:15870,ap:18490,at:7020},
-  {d:4, mp:58340, mt:14820,ap:22810,at:8660},
-  {d:5, mp:49220, mt:12500,ap:16450,at:6250},
-  {d:6, mp:35620, mt:9050, ap:18540,at:7040},
-  {d:7, mp:31780, mt:8070, ap:17920,at:6810},
-  {d:8, mp:25890, mt:6580, ap:18640,at:7080},
-  {d:9, mp:14920, mt:3790, ap:9550, at:3630},
-  {d:10,mp:25910, mt:6590, ap:11220,at:4260},
-  {d:11,mp:24010, mt:6100, ap:18190,at:6910},
-  {d:12,mp:20260, mt:5150, ap:17730,at:6740},
-  {d:13,mp:19780, mt:5030, ap:17920,at:6810},
-  {d:14,mp:17070, mt:4340, ap:14430,at:5480},
-  {d:15,mp:28250, mt:7180, ap:19750,at:7510},
-  {d:16,mp:12790, mt:3250, ap:10230,at:3890},
-  {d:17,mp:14030, mt:3560, ap:11860,at:4510},
-  {d:18,mp:25110, mt:6380, ap:16790,at:6380}
-].map(r => ({...r, mv:r.mp+r.mt, mq:Math.round((r.mp+r.mt)/420), av:r.ap+r.at, aq:Math.round((r.ap+r.at)/350), mpQ:Math.round(r.mp/420), mtQ:Math.round(r.mt/420), apQ:Math.round(r.ap/350), atQ:Math.round(r.at/350)}));
+let D26 = [];
 
 // ═══════════════════════════════════════════════
 // MENÇÕES GERAIS (3 semanas de exemplo)
@@ -1100,6 +1087,7 @@ async function fetchGAdsData() {
     if (!data.daily_series?.length) return;
     GADS_DATA = data;
     _gadsIdx = buildDailyIndex(data.daily_series);
+    buildSpkTimeline('spkGoogle', data.daily_series, 'rgb(66,133,244)');
     buildComp(); // re-renderiza com gastos no tooltip
   } catch(e) {
     console.warn('fetchGAdsData:', e.message);
@@ -1117,6 +1105,7 @@ async function fetchMetaData() {
     if (!data.daily_series?.length) return;
     META_DATA = data;
     _metaIdx = buildDailyIndex(data.daily_series);
+    buildSpkTimeline('spkMeta', data.daily_series, 'rgb(24,119,242)');
     buildComp();
   } catch(e) {
     // silencioso — meta-data.json ainda não existe
@@ -1147,6 +1136,62 @@ function buildSpk(id,data,color){
     type:'line',
     data:{labels:data.map((_,i)=>`${i+1}`),datasets:[{data,borderColor:color,backgroundColor:color.replace('rgb(','rgba(').replace(')',',0.1)'),borderWidth:1.5,pointRadius:0,tension:0.4,fill:true}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}},animation:{duration:300}}
+  });
+}
+
+// Mini linha do tempo real — usa daily_series do JSON de cada plataforma
+function buildSpkTimeline(id, series, color) {
+  if (!series || !series.length) return;
+  const labels = series.map(d => {
+    const p = d.date.split('-');
+    return `${p[2]}/${p[1]}`;
+  });
+  const vals = series.map(d => d.cost || 0);
+  const bg = color.replace('rgb(','rgba(').replace(')',',0.12)');
+  const ex = Chart.getChart(id); if(ex) ex.destroy();
+  new Chart(document.getElementById(id), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: vals,
+        borderColor: color,
+        backgroundColor: bg,
+        borderWidth: 1.8,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: color,
+        pointHoverBorderColor: '#161616',
+        pointHoverBorderWidth: 2,
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode:'index', intersect:false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          enabled: true,
+          backgroundColor: '#161616',
+          borderColor: 'rgba(255,255,255,0.12)',
+          borderWidth: 1,
+          titleColor: '#999',
+          bodyColor: '#FFF',
+          titleFont: { size: 11 },
+          bodyFont: { family: "'Barlow Condensed', sans-serif", size: 13, weight: '700' },
+          padding: 9,
+          callbacks: {
+            title: items => items[0].label,
+            label: ctx => `  R$ ${ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`
+          }
+        }
+      },
+      scales: { x: { display: false }, y: { display: false, beginAtZero: true } },
+      animation: { duration: 400 }
+    }
   });
 }
 
