@@ -920,7 +920,12 @@ function getAnnotations() {
 
 function buildComp() {
   const n=D25.length;
-  const labels=Array.from({length:n},(_,i)=>`D+${i+1}`);
+  const labels=Array.from({length:n},(_,i)=>{
+    const dt=dToDate(i+1);
+    const d=dt.getDate().toString().padStart(2,'0');
+    const m=dt.toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
+    return`${d}/${m}`;
+  });
   const s25=getSeries(D25,metricAtiva,edicaoAtiva);
   const s26raw=getSeries(D26,metricAtiva,edicaoAtiva);
   const s26=Array(n).fill(null).map((_,i)=>i<s26raw.length?s26raw[i]:null);
@@ -999,7 +1004,7 @@ function buildComp() {
         }
       },
       scales:{
-        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:10},autoSkip:false,maxRotation:0,callback:(v,i)=>{const d=i+1;if((d-1)%7!==0)return'';return`Sem ${Math.ceil(d/7)}`}}},
+        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:10},maxTicksLimit:32,maxRotation:0}},
         y:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:10},callback:v=>metricAtiva==='ingressos'?fmtN(v):fmtK(v)}}
       }
     }
