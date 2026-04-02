@@ -1243,6 +1243,12 @@ function updateGAdsCard(data, dateFrom, dateTo) {
   buildSpkTimeline('spkGoogle', series, 'rgb(200,255,0)');
 }
 
+function getActiveDates() {
+  const de  = document.getElementById('filtroDE')?.value  || '';
+  const ate = document.getElementById('filtroATE')?.value || '';
+  return { de, ate };
+}
+
 async function fetchGAdsData() {
   try {
     const res = await fetch('google-ads-data.json?t=' + Date.now());
@@ -1250,11 +1256,12 @@ async function fetchGAdsData() {
     const data = await res.json();
     if (!data.totals) return;
     GADS_DATA = data;
-    updateGAdsCard(data);
+    const { de, ate } = getActiveDates();
+    updateGAdsCard(data, de, ate);
     if (data.daily_series?.length) {
       _gadsIdx = buildDailyIndex(data.daily_series);
     }
-    buildComp(); updateMediaTotals();
+    buildComp(); updateMediaTotals(de, ate);
   } catch(e) {
     console.warn('fetchGAdsData:', e.message);
   }
@@ -1319,9 +1326,10 @@ async function fetchMetaData() {
     const arr = data.daily_series || data.data || [];
     if (!arr.length) return;
     META_DATA = data;
-    updateMetaCard(data);
+    const { de, ate } = getActiveDates();
+    updateMetaCard(data, de, ate);
     _metaIdx = buildDailyIndex(arr);
-    buildComp(); updateMediaTotals();
+    buildComp(); updateMediaTotals(de, ate);
   } catch(e) {
     // silencioso — meta-data.json ainda nao existe
   }
