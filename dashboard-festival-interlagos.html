@@ -951,8 +951,21 @@ function buildComp() {
   cComp=new Chart(document.getElementById('chartComp'),{
     type:'line',
     data:{labels,datasets},
+    plugins:[{
+      id:'dPlusRow',
+      afterDraw(chart){
+        const ctx=chart.ctx, xS=chart.scales.x, n=chart.data.labels.length;
+        ctx.save();
+        ctx.font="9px 'Barlow Condensed',sans-serif";
+        ctx.fillStyle='#777';
+        ctx.textAlign='center';
+        for(let i=0;i<n;i++){const d=i+1;if((d-1)%7===0){ctx.fillText('D+'+d,xS.getPixelForValue(i),xS.bottom+13);}}
+        ctx.restore();
+      }
+    }],
     options:{
       responsive:true, maintainAspectRatio:false, animation:{duration:500},
+      layout:{padding:{bottom:18}},
       interaction:{mode:'index', intersect:false},
       plugins:{
         legend:{display:false},
@@ -1004,12 +1017,7 @@ function buildComp() {
         }
       },
       scales:{
-        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:8},autoSkip:false,maxRotation:90,minRotation:45,callback:(v,i)=>{
-          const dt=dToDate(i+1);
-          const dd=dt.getDate().toString().padStart(2,'0');
-          const mm=(dt.getMonth()+1).toString().padStart(2,'0');
-          return[`${dd}/${mm}`,`D+${i+1}`];
-        }}},
+        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:9},maxTicksLimit:32,maxRotation:0,callback:(v,i)=>{const dt=dToDate(i+1);return dt.getDate().toString().padStart(2,'0')+'/'+(dt.getMonth()+1).toString().padStart(2,'0');}}},
         y:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:10},callback:v=>metricAtiva==='ingressos'?fmtN(v):fmtK(v)}}
       }
     }
