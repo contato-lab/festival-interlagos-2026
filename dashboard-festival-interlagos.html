@@ -755,7 +755,7 @@ let META_DATA = null; // meta-data.json (quando conectado)
 // HELPERS
 // ═══════════════════════════════════════════════
 const fmtR = v => 'R$ '+v.toLocaleString('pt-BR',{maximumFractionDigits:0});
-const fmtK = v => v>=1e6?'R$ '+(v/1e6).toFixed(1)+'M':v>=1e3?'R$ '+(v/1e3).toFixed(0)+'K':fmtR(v);
+const fmtK = v => fmtR(v);
 const fmtN = v => v.toLocaleString('pt-BR');
 
 function setDelta(id, v26, v25) {
