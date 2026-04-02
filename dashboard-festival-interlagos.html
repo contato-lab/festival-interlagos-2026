@@ -159,6 +159,116 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .footer{border-top:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;margin-top:8px}
 .footer-lime{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.9rem;color:var(--lime);letter-spacing:.06em}
 .footer-tag{font-size:.72rem;color:var(--text3);margin-top:2px}
+/* ======== RESPONSIVE — TABLET (max 1024px) ======== */
+@media(max-width:1024px){
+  .kpi-strip{grid-template-columns:repeat(3,1fr)}
+  .media-grid{grid-template-columns:1fr 1fr}
+  .header{padding:14px 18px}
+  .main{padding:20px 18px;gap:20px}
+  .filtro-bar{padding:9px 18px}
+  .footer{padding:14px 18px}
+}
+
+/* ======== RESPONSIVE — MOBILE (max 768px) ======== */
+@media(max-width:768px){
+  /* HEADER — non-sticky, compact on mobile */
+  .header{position:relative;flex-direction:column;gap:6px;padding:10px 14px;text-align:center}
+  .header-brand{justify-content:center}
+  .header-title{font-size:.9rem;order:2;margin:0}
+  .header-right{flex-wrap:wrap;justify-content:center;order:3;gap:5px}
+
+  /* MAIN */
+  .main{padding:14px 10px;gap:16px}
+
+  /* FILTER BAR — compact grid */
+  .filtro-bar{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px;justify-content:center}
+  .filtro-label{width:100%;text-align:center;font-size:.68rem}
+  .filtro-pills{width:100%;justify-content:center}
+  .filtro-sep{display:none}
+  .filtro-date{width:calc(50% - 4px);min-width:0}
+  .filtro-apply{width:100%;text-align:center;padding:7px 20px}
+
+  /* KPI CARDS */
+  .kpi-strip{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi-card{padding:14px 14px}
+  .kpi-value{font-size:1.5rem}
+  .kpi-label{font-size:.64rem}
+  .kpi-card:nth-child(5){grid-column:1/-1}
+
+  /* SECTIONS */
+  .section-header{flex-direction:column;gap:8px;align-items:flex-start}
+  .section-title{font-size:1rem}
+  .pill-group{width:100%;justify-content:flex-start}
+
+  /* CHARTS */
+  .two-col{grid-template-columns:1fr}
+  .chart-card{padding:14px 10px}
+
+  /* MEDIA SECTION */
+  .media-section-head{flex-direction:column;gap:8px;align-items:flex-start;padding:14px 0 8px}
+  .media-section-title{font-size:1.1rem}
+  .media-grid{grid-template-columns:1fr;gap:12px}
+  .media-card{padding:16px}
+  .media-platform{font-size:.95rem}
+  .mk-val{font-size:1.1rem}
+
+  /* MEDIA TOTALS */
+  .media-totals{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;padding:14px}
+  .media-totals .mt-item:last-child{grid-column:1/-1;text-align:center}
+  .media-totals .mt-val{font-size:1.2rem}
+  .media-totals .mt-label{font-size:.54rem}
+
+  /* ORGÂNICO */
+  .org-row{grid-template-columns:1fr;gap:14px}
+  .org-donut{height:160px}
+
+  /* TABLE */
+  .table-wrap{-webkit-overflow-scrolling:touch;margin:0 -10px;padding:0 10px}
+  table{min-width:600px}
+  th{font-size:.66rem;padding:7px 8px}
+  td{font-size:.72rem;padding:6px 8px}
+
+  /* LEGEND */
+  .legend{gap:10px}
+  .legend-item{font-size:.68rem}
+
+  /* AÇÕES */
+  .acoes-legend{gap:8px}
+  .acao-leg-item{font-size:.66rem;padding:3px 8px}
+  .acoes-timeline{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+  /* FOOTER */
+  .footer{flex-direction:column;text-align:center;gap:10px;padding:14px}
+  .footer-lime{font-size:.8rem}
+
+  /* SPARKLINE */
+  .spk-wrap{height:56px;margin-top:10px}
+
+  /* NOTE */
+  .note{font-size:.65rem;padding:8px 10px}
+
+  /* CHART FOOTNOTE */
+  .chart-footnote{flex-direction:column;gap:4px;align-items:flex-start!important}
+
+  /* BADGES */
+  .badge{font-size:.68rem;padding:3px 10px}
+  .gen-date{font-size:.64rem}
+}
+
+/* ======== RESPONSIVE — SMALL PHONE (max 420px) ======== */
+@media(max-width:420px){
+  .header-title{font-size:.85rem}
+  .lime-logo{font-size:1.3rem}
+  .client-name{font-size:.9rem}
+  .kpi-strip{grid-template-columns:1fr 1fr;gap:8px}
+  .kpi-value{font-size:1.3rem}
+  .kpi-card{padding:10px 10px}
+  .media-totals{gap:12px 16px}
+  .media-totals .mt-val{font-size:1rem}
+  .mk-val{font-size:1rem}
+  .filtro-bar{grid-template-columns:1fr}
+  .filtro-date{width:calc(50% - 4px)}
+}
 </style>
 </head>
 <body>
@@ -279,7 +389,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
   <!-- Timeline de ações abaixo do gráfico -->
   <div id="acoesTimeline" class="acoes-timeline"></div>
 
-  <div style="font-size:.68rem;color:var(--text3);margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+  <div class="chart-footnote" style="font-size:.68rem;color:var(--text3);margin-top:10px;display:flex;justify-content:space-between;align-items:center">
     <span>💡 Passe o mouse sobre as linhas do gráfico para ver detalhes de cada ação</span>
     <span>* Eixo X = dia relativo de vendas &nbsp;|&nbsp; D+1 = primeiro dia da temporada</span>
   </div>
