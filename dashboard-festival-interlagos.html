@@ -85,6 +85,36 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .td-zero{color:var(--text3)!important}
 .src-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:7px}
 
+/* GA4 KPI STRIP */
+.ga4-kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px}
+.ga4-kpi{background:var(--card2);border:1px solid var(--border);border-radius:var(--rad-sm);padding:14px 12px;text-align:center;transition:.2s}
+.ga4-kpi:hover{border-color:var(--lime-border);background:var(--card-hover)}
+.ga4-kpi-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.35rem;color:var(--lime);line-height:1.1}
+.ga4-kpi-label{font-size:.65rem;color:#999;text-transform:uppercase;letter-spacing:.06em;margin-top:5px;font-weight:500}
+
+/* TRAFFIC BAR */
+.traffic-bar{height:7px;border-radius:4px;background:rgba(255,255,255,0.05);overflow:hidden;min-width:60px}
+.traffic-bar-fill{height:100%;border-radius:4px;transition:width 0.8s cubic-bezier(.4,0,.2,1)}
+
+/* REFERRER GRID */
+.referrer-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.referrer-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--rad-sm);padding:10px 12px;display:flex;justify-content:space-between;align-items:center;transition:.2s}
+.referrer-card:hover{border-color:var(--lime-border)}
+.referrer-name{font-size:.75rem;color:#BBB;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px}
+.referrer-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.88rem;color:var(--lime);flex-shrink:0}
+
+/* FUNNEL */
+.funnel-wrap{padding:8px 0}
+.funnel-step{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.funnel-label{width:170px;text-align:right;flex-shrink:0}
+.funnel-label-name{font-size:.8rem;color:#CCC;font-weight:500;line-height:1.2}
+.funnel-label-page{font-size:.62rem;color:#666;font-family:'Inter',sans-serif}
+.funnel-bar-area{flex:1;display:flex;align-items:center;gap:10px}
+.funnel-bar{height:44px;border-radius:8px;display:flex;align-items:center;padding:0 16px;min-width:70px;transition:width 0.9s cubic-bezier(.4,0,.2,1)}
+.funnel-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.15rem;color:#FFF;white-space:nowrap}
+.funnel-pct{font-size:.74rem;color:#999;white-space:nowrap;font-weight:600;flex-shrink:0}
+.funnel-drop-badge{display:inline-flex;align-items:center;gap:3px;font-size:.68rem;color:var(--red);background:rgba(255,68,68,0.08);border:1px solid rgba(255,68,68,0.15);border-radius:12px;padding:2px 9px;margin-left:10px;flex-shrink:0;font-weight:600}
+
 /* MEDIA SECTION */
 .media-section-head{display:flex;align-items:center;justify-content:space-between;padding:18px 0 10px;border-bottom:2px solid var(--lime);margin-bottom:18px}
 .media-section-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.35rem;text-transform:uppercase;letter-spacing:.12em;color:var(--lime);display:flex;align-items:center;gap:10px}
@@ -227,6 +257,17 @@ tr:hover td{background:rgba(255,255,255,.018)}
   table{min-width:600px}
   th{font-size:.66rem;padding:7px 8px}
   td{font-size:.72rem;padding:6px 8px}
+
+  /* GA4 */
+  .ga4-kpi-strip{grid-template-columns:repeat(3,1fr);gap:8px}
+  .ga4-kpi{padding:10px 8px}
+  .ga4-kpi-val{font-size:1.1rem}
+  .ga4-kpi-label{font-size:.58rem}
+  .referrer-grid{grid-template-columns:repeat(2,1fr)}
+  .funnel-label{width:100px;font-size:.72rem}
+  .funnel-bar{height:36px;padding:0 10px}
+  .funnel-val{font-size:.95rem}
+  .funnel-drop-badge{font-size:.6rem;padding:1px 6px}
 
   /* LEGEND */
   .legend{gap:10px}
@@ -465,31 +506,81 @@ tr:hover td{background:rgba(255,255,255,.018)}
   </div>
 </div>
 
-<!-- ══ MENÇÕES GERAIS ══ -->
+<!-- ══ FONTES DE TRÁFEGO GA4 ══ -->
 <div class="chart-card">
   <div class="section-header">
-    <div class="section-title">📡 Menções Gerais — Fontes de Tráfego</div>
-    <div class="pill-group" id="semPills">
-      <button class="pill active" onclick="setSemana(0,this)">Semana 0</button>
-      <button class="pill" onclick="setSemana(1,this)">Semana 1</button>
-      <button class="pill" onclick="setSemana(2,this)">Semana 2</button>
+    <div class="section-title">📊 Fontes de Tráfego — Google Analytics</div>
+    <span class="badge badge-ok" style="font-size:.68rem">✓ GA4 ao vivo</span>
+  </div>
+
+  <!-- KPI strip GA4 -->
+  <div class="ga4-kpi-strip">
+    <div class="ga4-kpi">
+      <div class="ga4-kpi-val" id="ga4Sessions">—</div>
+      <div class="ga4-kpi-label">Sessões</div>
+    </div>
+    <div class="ga4-kpi">
+      <div class="ga4-kpi-val" id="ga4Users">—</div>
+      <div class="ga4-kpi-label">Usuários</div>
+    </div>
+    <div class="ga4-kpi">
+      <div class="ga4-kpi-val" id="ga4Pageviews">—</div>
+      <div class="ga4-kpi-label">Pageviews</div>
+    </div>
+    <div class="ga4-kpi">
+      <div class="ga4-kpi-val" id="ga4PagesSession">—</div>
+      <div class="ga4-kpi-label">Pág./Sessão</div>
+    </div>
+    <div class="ga4-kpi">
+      <div class="ga4-kpi-val" id="ga4BounceRate">—</div>
+      <div class="ga4-kpi-label">Taxa Rejeição</div>
+    </div>
+    <div class="ga4-kpi">
+      <div class="ga4-kpi-val" id="ga4Conversions">—</div>
+      <div class="ga4-kpi-label">Conversões</div>
     </div>
   </div>
+
+  <!-- Tabela de fontes -->
   <div class="table-wrap">
     <table>
       <thead>
         <tr>
-          <th>Canal / Fonte</th>
-          <th id="th1">—</th><th id="th2">—</th><th id="th3">—</th>
-          <th id="th4">—</th><th id="th5">—</th><th id="th6">—</th><th id="th7">—</th>
-          <th>Total Sem.</th>
+          <th style="min-width:150px">Canal</th>
+          <th>Sessões</th>
+          <th style="width:200px"></th>
+          <th>% Share</th>
+          <th>Conversões</th>
+          <th>Taxa Conv.</th>
         </tr>
       </thead>
-      <tbody id="mencaoBody"></tbody>
+      <tbody id="ga4SourcesBody"></tbody>
     </table>
   </div>
-  <div style="font-size:.68rem;color:var(--text3);margin-top:10px">
-    * Sessões por canal de origem • Fonte: planilha de linha do tempo — preenchida manualmente
+
+  <!-- Top Referrers -->
+  <div style="margin-top:22px">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:#AAA;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      <span style="color:var(--lime)">✱</span> Top Referrers
+    </div>
+    <div class="referrer-grid" id="ga4Referrers"></div>
+  </div>
+
+  <div style="font-size:.66rem;color:var(--text3);margin-top:14px;display:flex;align-items:center;gap:6px">
+    <span style="color:var(--lime);font-size:.7rem">●</span>
+    Dados reais via GA4 Data API · Propriedade #378336436 · Período: <span id="ga4Period">—</span>
+  </div>
+</div>
+
+<!-- ══ FUNIL DE CONVERSÃO ══ -->
+<div class="chart-card">
+  <div class="section-header">
+    <div class="section-title">🔻 Funil de Conversão — Jornada do Usuário</div>
+  </div>
+  <div class="funnel-wrap" id="funnelContainer"></div>
+  <div style="font-size:.66rem;color:var(--text3);margin-top:14px;display:flex;align-items:center;gap:6px">
+    <span style="color:var(--lime);font-size:.7rem">●</span>
+    Sessões por etapa do funil · Fonte: GA4 Top Pages · De pageview até a compra
   </div>
 </div>
 
@@ -721,21 +812,25 @@ const D25 = [
 let D26 = [];
 
 // ═══════════════════════════════════════════════
-// MENÇÕES GERAIS (3 semanas de exemplo)
+// GA4 — CORES POR CANAL
 // ═══════════════════════════════════════════════
-const MENCOES = {
-  0:{dias:['SEG','TER','QUA','QUI','SEX 14','SAB 15','DOM 16'],
-    canais:{'Google Ads':[null,null,null,null,'-',24,95],'Meta Ads':[null,null,null,null,'-',7,15],'TikTok Ads':[null,null,null,null,'-','-','-'],'Spotify':[null,null,null,null,'-','-','-'],'Influenciadores':[null,null,null,null,2,2,'-'],'Social Orgânico':[null,null,null,null,67,105,65],'Busca Orgânica':[null,null,null,null,247,285,102],'Direto pelo Link':[null,null,null,null,149,171,111],'CM':[null,null,null,null,'-','-','-'],'OOH':[null,null,null,null,'-','-','-'],'E-mail Festival':[null,null,null,null,15,11,2],'E-mail Duas Rodas':[null,null,null,null,'-','-','-'],'E-mail Lucky Friends':[null,null,null,null,'-','-','-'],'E-mail Arena Cross':[null,null,null,null,'-','-','-']}},
-  1:{dias:['SEG 17','TER 18','QUA 19','QUI 20','SEX 21','SAB 22','DOM 23'],
-    canais:{'Google Ads':[118,142,97,88,76,44,109],'Meta Ads':[52,61,43,39,33,19,47],'TikTok Ads':['-','-','-','-','-','-','-'],'Spotify':['-','-','-','-','-','-','-'],'Influenciadores':[3,4,2,2,1,'-',3],'Social Orgânico':[89,105,72,68,54,31,76],'Busca Orgânica':[312,378,248,234,187,108,264],'Direto pelo Link':[198,241,158,149,119,69,168],'CM':['-','-','-','-','-','-','-'],'OOH':['-','-','-','-','-','-','-'],'E-mail Festival':[22,27,18,17,13,8,19],'E-mail Duas Rodas':[8,10,7,6,5,3,7],'E-mail Lucky Friends':['-','-','-','-','-','-','-'],'E-mail Arena Cross':['-','-','-','-','-','-','-']}},
-  2:{dias:['SEG 24','TER 25','QUA 26','QUI 27','SEX 28','SAB 29','DOM 30'],
-    canais:{'Google Ads':[89,104,71,81,47,62,78],'Meta Ads':[41,48,33,37,22,29,36],'TikTok Ads':['-','-','-','-','-','-','-'],'Spotify':['-','-','-','-','-','-','-'],'Influenciadores':[2,3,2,2,1,1,2],'Social Orgânico':[67,78,54,61,35,46,58],'Busca Orgânica':[238,278,190,214,124,164,206],'Direto pelo Link':[152,177,121,136,79,104,131],'CM':['-','-','-','-','-','-','-'],'OOH':['-','-','-','-','-','-','-'],'E-mail Festival':[17,20,14,15,9,12,15],'E-mail Duas Rodas':[6,7,5,6,3,4,5],'E-mail Lucky Friends':['-','-','-','-','-','-','-'],'E-mail Arena Cross':['-','-','-','-','-','-','-']}}
+const GA4_CHANNEL_COR = {
+  'Paid Social':'#1877F2','Organic Search':'#34A853','Organic Social':'#C8FF00',
+  'Direct':'#7B2D8B','Unassigned':'#6B7C8A','Referral':'#FF6B35',
+  'Paid Search':'#4285F4','Paid Other':'#00BCD4','Cross-network':'#546E7A',
+  'Organic Video':'#FF0000','Email':'#FFB800'
 };
 
 // ═══════════════════════════════════════════════
-// CORES DOS CANAIS
+// GA4 — TOP REFERRERS (dados do screenshot)
 // ═══════════════════════════════════════════════
-const CANAL_COR = {'Google Ads':'#4285F4','Meta Ads':'#1877F2','TikTok Ads':'#00BFFF','Spotify':'#1DB954','Social Orgânico':'#C8FF00','Busca Orgânica':'#FFB800','Direto pelo Link':'#7B2D8B','Influenciadores':'#FF6B35'};
+const GA4_REFERRERS = [
+  {name:'perfilfestival',sessions:7751},{name:'dinamize',sessions:334},
+  {name:'AmandaP',sessions:103},{name:'fullpower',sessions:66},
+  {name:'duasrodas',sessions:64},{name:'RafaelTogni',sessions:54},
+  {name:'SekuMello',sessions:48},{name:'Vans',sessions:48},
+  {name:'DaianeGaia',sessions:29},{name:'DayMiguel',sessions:25}
+];
 
 // ═══════════════════════════════════════════════
 // STATE e CHARTS
@@ -1117,60 +1212,138 @@ function setMetricEd(tipo, met, btn) {
 }
 
 // ═══════════════════════════════════════════════
-// GA4 — data helpers
+// GA4 — FONTES DE TRÁFEGO + FUNIL
 // ═══════════════════════════════════════════════
-// Canais do dashboard alimentados via GA4 Data API
-const GA4_CANAIS = ['Social Orgânico','Busca Orgânica','Direto pelo Link','Influenciadores'];
+function buildGA4Sources() {
+  const sources = GA4_DATA?.traffic_sources;
+  if (!sources || !sources.length) return;
 
-function getSemanaMonday(semIdx) {
-  const d = new Date(DATA_INICIO);
-  const dow = d.getDay(); // 0=Dom … 6=Sab
-  const toMon = (dow === 0) ? -6 : 1 - dow; // recua ao Seg da semana
-  d.setDate(d.getDate() + toMon + semIdx * 7);
-  return d;
-}
-function getSemanaDate(semIdx, dayIdx) {
-  const d = getSemanaMonday(semIdx);
-  d.setDate(d.getDate() + dayIdx);
-  return d.toISOString().split('T')[0]; // YYYY-MM-DD
-}
-function ga4Val(semIdx, dayIdx, canal) {
-  if (!GA4_DATA || !GA4_DATA.sessions_by_date) return null;
-  const dateStr = getSemanaDate(semIdx, dayIdx);
-  const day = GA4_DATA.sessions_by_date[dateStr];
-  return (day && day[canal] !== undefined) ? day[canal] : null;
-}
+  // KPIs do topo
+  const t = GA4_DATA.totals;
+  if (t) {
+    document.getElementById('ga4Sessions').textContent = fmtN(t.sessions);
+    document.getElementById('ga4Users').textContent = fmtN(t.users);
+    document.getElementById('ga4Pageviews').textContent = fmtN(t.pageviews);
+    document.getElementById('ga4PagesSession').textContent = (t.pages_per_session||0).toFixed(1);
+    document.getElementById('ga4BounceRate').textContent = (t.avg_bounce_rate||0).toFixed(1) + '%';
+    document.getElementById('ga4Conversions').textContent = fmtN(Math.round(t.conversions||0));
+  }
 
-// ═══════════════════════════════════════════════
-// MENÇÕES TABLE
-// ═══════════════════════════════════════════════
-function buildMencoes(idx) {
-  const sem=MENCOES[idx]; if(!sem)return;
-  sem.dias.forEach((d,i)=>{const el=document.getElementById(`th${i+1}`);if(el)el.textContent=d;});
-  const tbody=document.getElementById('mencaoBody');
-  tbody.innerHTML='';
-  Object.entries(sem.canais).forEach(([canal,vals])=>{
-    // Para canais GA4, sobrepõe com dados reais quando disponíveis
-    const resolvedVals = vals.map((v, dayIdx) => {
-      if (GA4_CANAIS.includes(canal)) {
-        const ga4 = ga4Val(idx, dayIdx, canal);
-        if (ga4 !== null) return ga4;
-      }
-      return v;
-    });
-    const total=resolvedVals.reduce((a,v)=>a+(typeof v==='number'?v:0),0);
-    const cor=CANAL_COR[canal]||'#444';
-    const hasGa4 = GA4_CANAIS.includes(canal) && GA4_DATA;
-    const ga4Badge = hasGa4 ? '<span style="font-size:9px;opacity:0.5;margin-left:4px">GA4</span>' : '';
-    let tr=`<tr><td><span class="src-dot" style="background:${cor}"></span>${canal}${ga4Badge}</td>`;
-    resolvedVals.forEach(v=>{
-      if(v===null) tr+='<td class="td-zero">—</td>';
-      else if(v==='-') tr+='<td class="td-zero">-</td>';
-      else tr+=`<td>${fmtN(v)}</td>`;
-    });
-    tr+=`<td style="font-weight:600;color:${total>0?'var(--lime)':'var(--text3)'}">${total>0?fmtN(total):'—'}</td></tr>`;
-    tbody.innerHTML+=tr;
+  // Período
+  if (GA4_DATA.period) {
+    const fmt = d => { const [y,m,dd]=d.split('-'); return dd+'/'+m+'/'+y; };
+    document.getElementById('ga4Period').textContent = fmt(GA4_DATA.period.start)+' a '+fmt(GA4_DATA.period.end);
+  }
+
+  // Tabela
+  const sorted = [...sources].sort((a,b) => b.sessions - a.sessions);
+  const totalSessions = sorted.reduce((a,s) => a + s.sessions, 0);
+  const maxSessions = sorted[0]?.sessions || 1;
+
+  const tbody = document.getElementById('ga4SourcesBody');
+  tbody.innerHTML = '';
+
+  sorted.forEach(src => {
+    const pct = totalSessions > 0 ? (src.sessions / totalSessions * 100) : 0;
+    const barW = (src.sessions / maxSessions * 100);
+    const conv = Math.round(src.conversions || 0);
+    const convRate = src.sessions > 0 ? (conv / src.sessions * 100) : 0;
+    const cor = GA4_CHANNEL_COR[src.channel] || '#555';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><span class="src-dot" style="background:'+cor+'"></span>'+src.channel+'</td>'+
+      '<td style="font-weight:700;font-family:\'Barlow Condensed\',sans-serif;font-size:.92rem">'+fmtN(src.sessions)+'</td>'+
+      '<td><div class="traffic-bar"><div class="traffic-bar-fill" style="width:'+barW+'%;background:'+cor+'"></div></div></td>'+
+      '<td>'+pct.toFixed(1)+'%</td>'+
+      '<td style="color:'+(conv>0?'var(--lime)':'var(--text3)')+'">'+( conv>0?fmtN(conv):'—')+'</td>'+
+      '<td style="color:'+(convRate>0?'var(--green)':'var(--text3)')+'">'+( convRate>0?convRate.toFixed(2)+'%':'—')+'</td>';
+    tbody.appendChild(tr);
   });
+
+  // Referrers
+  const refDiv = document.getElementById('ga4Referrers');
+  refDiv.innerHTML = '';
+  GA4_REFERRERS.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'referrer-card';
+    card.innerHTML = '<span class="referrer-name">'+r.name+'</span><span class="referrer-val">'+fmtN(r.sessions)+'</span>';
+    refDiv.appendChild(card);
+  });
+}
+
+function buildGA4Funnel() {
+  const container = document.getElementById('funnelContainer');
+  if (!container) return;
+  container.innerHTML = '';
+
+  // Monta funil a partir dos top_pages do GA4
+  const pages = GA4_DATA?.top_pages;
+  const totals = GA4_DATA?.totals;
+  if (!pages || !totals) return;
+
+  const findPage = (path) => pages.find(p => p.page === path);
+  const findPagesLike = (prefix) => pages.filter(p => p.page.startsWith(prefix));
+
+  const home = findPage('/');
+  const ingressos = findPage('/ingressos/');
+  const cadastro = findPage('/cadastro.php');
+  const carrinho = findPage('/carrinho/index');
+  const produtos = findPagesLike('/vendas/ingressos/');
+  const produtosSessions = produtos.reduce((a,p) => a + p.sessions, 0);
+
+  // Funil estritamente decrescente — jornada de compra
+  const funnel = [
+    { name:'Sessões Totais',     page:'Todas as origens',     val: totals.sessions,                icon:'🌐' },
+    { name:'Página Inicial',     page:'/',                    val: home?.sessions || 0,            icon:'🏠' },
+    { name:'Página de Ingressos',page:'/ingressos/',          val: ingressos?.sessions || 0,       icon:'🎟️' },
+    { name:'Cadastro',           page:'/cadastro.php',        val: cadastro?.sessions || 0,        icon:'📝' },
+    { name:'Carrinho',           page:'/carrinho/index',      val: carrinho?.sessions || 0,        icon:'🛒' },
+    { name:'Conversão',          page:'GA4 key events',       val: Math.round(totals.conversions||0), icon:'✅' },
+  ];
+
+  const maxVal = funnel[0].val || 1;
+  // Gradiente lime → purple → green
+  const colors = ['#C8FF00','#A8E600','#FFB800','#7B2D8B','#FF6B35','#00FF88'];
+
+  funnel.forEach((step, i) => {
+    const pctWidth = Math.max((step.val / maxVal * 100), 5);
+    const pctOfTotal = (step.val / maxVal * 100);
+    const dropPct = i > 0 ? ((1 - step.val / funnel[i-1].val) * 100) : 0;
+
+    const row = document.createElement('div');
+    row.className = 'funnel-step';
+
+    let dropHTML = '';
+    if (i > 0 && dropPct > 0) {
+      dropHTML = '<span class="funnel-drop-badge">▼ '+dropPct.toFixed(1)+'%</span>';
+    }
+
+    row.innerHTML =
+      '<div class="funnel-label">'+
+        '<div class="funnel-label-name">'+step.icon+' '+step.name+'</div>'+
+        '<div class="funnel-label-page">'+step.page+'</div>'+
+      '</div>'+
+      '<div class="funnel-bar-area">'+
+        '<div class="funnel-bar" style="width:'+pctWidth+'%;background:'+colors[i]+'">'+
+          '<span class="funnel-val">'+fmtN(step.val)+'</span>'+
+        '</div>'+
+        '<span class="funnel-pct">'+pctOfTotal.toFixed(1)+'%</span>'+
+      '</div>'+
+      dropHTML;
+    container.appendChild(row);
+  });
+
+  // Nota complementar sobre páginas de produto
+  if (produtosSessions > 0) {
+    const note = document.createElement('div');
+    note.style.cssText = 'margin-top:14px;padding:12px 16px;background:var(--card2);border:1px solid var(--border);border-radius:var(--rad-sm);display:flex;align-items:center;gap:12px;flex-wrap:wrap';
+    note.innerHTML =
+      '<span style="font-size:.78rem;color:#AAA">📌 Visualização de produtos (acesso direto via anúncios):</span>'+
+      '<span style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;color:var(--lime);font-size:.95rem">'+fmtN(produtosSessions)+' sessões</span>'+
+      '<span style="font-size:.68rem;color:#666">Ride Pass · Sport Pass · Drive Pass</span>';
+    container.appendChild(note);
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -1204,12 +1377,10 @@ async function fetchGA4Data() {
     const res = await fetch('ga4-data.json?t=' + Date.now());
     if (!res.ok) return;
     const data = await res.json();
-    if (!data.sessions_by_date || Object.keys(data.sessions_by_date).length === 0) return;
     GA4_DATA = data;
-    // Rebuild a semana ativa
-    const activeBtn = document.querySelector('#semPills .pill.active');
-    const semIdx = activeBtn ? parseInt(activeBtn.getAttribute('onclick').match(/\d+/)?.[0] || '0') : 0;
-    buildMencoes(semIdx);
+    buildGA4Sources();
+    buildGA4Funnel();
+    console.log('✅ GA4 Data carregado:', data.totals?.sessions, 'sessões');
   } catch(e) {
     console.warn('fetchGA4Data:', e.message);
   }
@@ -1431,7 +1602,7 @@ function _upd2026Lbl(){
 }
 function setMetric(m,btn){metricAtiva=m;document.querySelectorAll('#metricPills .pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');_upd2026Lbl();buildComp();}
 function setEdicao(e,btn){edicaoAtiva=e;document.querySelectorAll('#edicaoPills .pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');_upd2026Lbl();buildComp();}
-function setSemana(s,btn){document.querySelectorAll('#semPills .pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');buildMencoes(s);}
+// setSemana removida — substituída por GA4 Sources
 
 function toggleAno(ano) {
   // Nunca desativa os dois ao mesmo tempo
@@ -1566,7 +1737,6 @@ buildAcoesLegend();
 buildComp();
 buildAcoesTimeline();
 buildEdicao();
-buildMencoes(0);
 buildOrg();
 buildSpk('spkMeta',[320,890,1240,780,1050,1380,960,1120,840,1290,1480,1060,920,1350,1580,1120,880,1640],'rgb(200,255,0)');
 buildSpk('spkGoogle',[180,420,680,390,510,720,480,560,420,640,740,530,460,680,790,560,440,820],'rgb(200,255,0)');
