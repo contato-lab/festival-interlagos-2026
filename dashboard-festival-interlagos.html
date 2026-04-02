@@ -895,7 +895,7 @@ function applyFiltro(){
   const filtered=D26_FULL.filter(r=>r.d>=dMin&&r.d<=dMax);
   D26.length=0;
   (filtered.length?filtered:D26_FULL).forEach(r=>D26.push(r));
-  calcKPIs();buildComp();buildEdicao();
+  calcKPIs();buildComp();buildEdicao();buildOrg();
   // Atualiza Mídia Paga com o mesmo range
   if(GADS_DATA) updateGAdsCard(GADS_DATA, deStr, ateStr);
   if(META_DATA) updateMetaCard(META_DATA, deStr, ateStr);
@@ -943,9 +943,6 @@ function calcKPIs() {
   document.getElementById('motosTMQtd').textContent=fmtN(s26.mtQ)+' ingressos';
   document.getElementById('autosProprioQtd').textContent=fmtN(s26.apQ)+' ingressos';
   document.getElementById('autosTMQtd').textContent=fmtN(s26.atQ)+' ingressos';
-  document.getElementById('orgPct').textContent='84%';
-  document.getElementById('metaPct').textContent='9%';
-  document.getElementById('googlePct').textContent='7%';
 }
 
 // ═══════════════════════════════════════════════
@@ -1530,7 +1527,7 @@ async function fetchGAdsData() {
     if (data.daily_series?.length) {
       _gadsIdx = buildDailyIndex(data.daily_series);
     }
-    buildComp(); updateMediaTotals(de, ate);
+    buildComp(); updateMediaTotals(de, ate); buildOrg();
   } catch(e) {
     console.warn('fetchGAdsData:', e.message);
   }
@@ -1598,7 +1595,7 @@ async function fetchMetaData() {
     const { de, ate } = getActiveDates();
     updateMetaCard(data, de, ate);
     _metaIdx = buildDailyIndex(arr);
-    buildComp(); updateMediaTotals(de, ate);
+    buildComp(); updateMediaTotals(de, ate); buildOrg();
   } catch(e) {
     // silencioso — meta-data.json ainda nao existe
   }
@@ -1608,11 +1605,38 @@ async function fetchMetaData() {
 // ORGÂNICO DONUT
 // ═══════════════════════════════════════════════
 function buildOrg() {
+  // Calcular distribuição real de receita
+  const totalReceita = D26.reduce((a,r) => a + (r.mv||0) + (r.av||0), 0);
+  const totalQtd = D26.reduce((a,r) => a + (r.mq||0) + (r.aq||0), 0);
+  const tktMedio = totalQtd > 0 ? totalReceita / totalQtd : 0;
+
+  const metaCompras = META_DATA?.totals?.purchases || 0;
+  const gadsConv = GADS_DATA?.totals?.conversions || 0;
+
+  let metaPct = 0, gadsPct = 0, orgPct = 100;
+  if (totalReceita > 0 && tktMedio > 0) {
+    const metaRec = metaCompras * tktMedio;
+    const gadsRec = gadsConv * tktMedio;
+    const orgRec = Math.max(totalReceita - metaRec - gadsRec, 0);
+    const soma = orgRec + metaRec + gadsRec;
+    orgPct = Math.round(orgRec / soma * 100);
+    metaPct = Math.round(metaRec / soma * 100);
+    gadsPct = Math.round(gadsRec / soma * 100);
+    // Ajusta arredondamento para somar 100
+    const diff = 100 - (orgPct + metaPct + gadsPct);
+    orgPct += diff;
+  }
+
+  // Atualiza labels
+  document.getElementById('orgPct').textContent = orgPct + '%';
+  document.getElementById('metaPct').textContent = metaPct + '%';
+  document.getElementById('googlePct').textContent = gadsPct + '%';
+
   if(cOrg)cOrg.destroy();
   cOrg=new Chart(document.getElementById('chartOrg'),{
     type:'doughnut',
     data:{labels:['Orgânico','Meta Ads','Google Ads'],
-      datasets:[{data:[84,9,7],backgroundColor:['rgba(200,255,0,0.82)','rgba(24,119,242,0.8)','rgba(66,133,244,0.75)'],borderColor:'#0A0A0A',borderWidth:3,hoverOffset:8}]},
+      datasets:[{data:[orgPct,metaPct,gadsPct],backgroundColor:['rgba(200,255,0,0.82)','rgba(24,119,242,0.8)','rgba(66,133,244,0.75)'],borderColor:'#0A0A0A',borderWidth:3,hoverOffset:8}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'72%',
       plugins:{legend:{display:false},tooltip:{backgroundColor:'#1A1A1A',borderColor:'rgba(255,255,255,0.08)',borderWidth:1,titleColor:'#888',bodyColor:'#FFF',padding:10,
         callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw}%`}}}}
@@ -1812,7 +1836,7 @@ async function fetchSheet() {
       D26.length = 0; novo.forEach(r => D26.push(r));
       D26_FULL = [...D26];
       document.getElementById('demoBadge').style.display = 'none';
-      calcKPIs(); buildComp(); buildEdicao();
+      calcKPIs(); buildComp(); buildEdicao(); buildOrg();
       console.log('✅ Google Sheets conectado:', novo.length, 'dias | Motos:', novo.map(r=>'R$'+Math.round(r.mv/1000)+'k').join(', '));
     }
   } catch(e) { console.warn('fetchSheet erro:', e.message); }
