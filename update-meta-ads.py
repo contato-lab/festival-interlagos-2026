@@ -36,7 +36,7 @@ def fetch_insights():
         'time_range':     json.dumps({'since': SINCE, 'until': UNTIL}),
         'time_increment': '1',
         'level':          'account',
-        'filtering':      json.dumps([{'field': 'campaign.name', 'operator': 'CONTAIN', 'value': 'FESTIVAL INTERLAGOS'}]),
+        'filtering':      json.dumps([{'field': 'campaign.name', 'operator': 'CONTAIN', 'value': 'FESTIVAL INTERLAGOS 2026'}]),
         'access_token':   TOKEN,
         'limit':          '500',
     }
