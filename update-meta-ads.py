@@ -27,8 +27,6 @@ ACTION_TYPES = {
     'landing_page_view': 'pageviews',
     'add_to_cart':       'add_to_cart',
     'initiate_checkout': 'checkout',
-    'purchase':          'purchases',
-    'omni_purchase':     'purchases',  # fallback
 }
 
 
@@ -38,7 +36,7 @@ def fetch_insights():
         'time_range':     json.dumps({'since': SINCE, 'until': UNTIL}),
         'time_increment': '1',
         'level':          'account',
-        'filtering':      json.dumps([{'field': 'campaign.effective_status', 'operator': 'IN', 'value': ['ACTIVE']}]),
+        'filtering':      json.dumps([{'field': 'campaign.name', 'operator': 'CONTAIN', 'value': 'FESTIVAL INTERLAGOS'}]),
         'access_token':   TOKEN,
         'limit':          '500',
     }
@@ -53,12 +51,11 @@ def parse_actions(row):
         key = ACTION_TYPES.get(action.get('action_type'))
         if key:
             result[key] += float(action.get('value', 0))
-    # deduplica omni_purchase vs purchase
-    result['purchases'] = max(
-        result.get('purchases', 0),
-        next((float(a['value']) for a in (row.get('actions') or [])
-              if a.get('action_type') == 'purchase'), 0)
-    )
+    # purchases: max(purchase, omni_purchase) para evitar contagem dupla
+    actions = row.get('actions') or []
+    p_val = sum(float(a['value']) for a in actions if a.get('action_type') == 'purchase')
+    o_val = sum(float(a['value']) for a in actions if a.get('action_type') == 'omni_purchase')
+    result['purchases'] = max(p_val, o_val)
     return result
 
 
