@@ -620,9 +620,9 @@ TikTok Ads
 
 <script>
 // ═══════════════════════════════════════════════
-// CONFIG — cole a URL do Google Sheets aqui
+// CONFIG — Google Sheets (gviz CSV — leitura pública)
 // ═══════════════════════════════════════════════
-const SHEET_CSV_URL = '';
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1jk7jjYB6n-IjkdmBUv54QEerujL_iAAP/gviz/tq?tqx=out:csv&sheet=SEMANA%200';
 
 // Data de início das vendas (D+1). Ajuste para a data real quando disponível.
 const DATA_INICIO = new Date('2026-03-31T00:00:00'); // D+1 = abertura das vendas
@@ -1457,28 +1457,89 @@ function toggleAno(ano) {
 async function fetchSheet() {
   if(!SHEET_CSV_URL) return;
   try {
-    const res=await fetch(SHEET_CSV_URL);
-    const text=await res.text();
-    const rows=text.split('\n').slice(1).filter(l=>l.trim());
-    const novo=[];
-    rows.forEach(line=>{
-      const c=line.split(',');
-      const dr=parseInt(c[1]);
-      if(!dr||isNaN(dr))return;
-      const mp=parseFloat(c[3])||0,mqP=parseInt(c[4])||0;
-      const mt=parseFloat(c[5])||0,mqT=parseInt(c[6])||0;
-      const ap=parseFloat(c[7])||0,aqP=parseInt(c[8])||0;
-      const at=parseFloat(c[9])||0,aqT=parseInt(c[10])||0;
-      novo.push({d:dr,mp,mt,ap,at,mv:mp+mt,mq:mqP+mqT,av:ap+at,aq:aqP+aqT,mpQ:mqP,mtQ:mqT,apQ:aqP,atQ:aqT});
-    });
-    if(novo.length){
-      D26.length=0; novo.forEach(r=>D26.push(r));
-      D26_FULL=[...D26];
-      document.getElementById('demoBadge').style.display='none';
-      calcKPIs(); buildComp(); buildEdicao();
-      console.log('✅ Google Sheets conectado:',novo.length,'dias');
+    const res = await fetch(SHEET_CSV_URL + '&t=' + Date.now());
+    const text = await res.text();
+
+    // Parse CSV com suporte a campos entre aspas
+    function parseCSV(raw) {
+      return raw.split('\n').map(line => {
+        const cells = []; let inQ = false, cell = '';
+        for (const ch of line) {
+          if (ch === '"') { inQ = !inQ; continue; }
+          if (ch === ',' && !inQ) { cells.push(cell.trim()); cell = ''; continue; }
+          cell += ch;
+        }
+        cells.push(cell.trim());
+        return cells;
+      });
     }
-  } catch(e){console.warn('Sheet não configurada:',e.message);}
+    const rows = parseCSV(text);
+
+    // Converte "R$ 1.234,56" → número
+    const parseMoeda = v => parseFloat((v||'').replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.').trim()) || 0;
+    const parseQtd   = v => parseInt((v||'').replace(/[^\d]/g,'')) || 0;
+
+    // Busca linha por rótulo exato em col A, a partir de afterIdx
+    const findRow = (afterIdx, match) => {
+      for (let i = afterIdx; i < rows.length; i++) {
+        if (match((rows[i][0]||'').trim())) return i;
+      }
+      return -1;
+    };
+
+    // A planilha SEMANA 0 via gviz tem formato TRANSPOSTO:
+    //   Linhas = métricas  |  Colunas B-H = dias da semana (SEG30…DOM05)
+    // O gviz agrupa a seção de mídia numa única linha header;
+    // a partir da linha 1 do array temos os dados de VENDAS.
+    const isVV  = l => l === 'VENDAS VALOR:';
+    const isQTD = l => l.startsWith('QTD');
+
+    const iMpV = findRow(1, isVV);                              // Motos Sistema Próprio — valor
+    const iMpQ = iMpV >= 0 ? findRow(iMpV + 1, isQTD) : -1;   // Motos SP — qtd
+    const iMtV = iMpQ >= 0 ? findRow(iMpQ + 1, isVV)  : -1;   // Motos Ticket Master — valor
+    const iMtQ = iMtV >= 0 ? findRow(iMtV + 1, isQTD) : -1;   // Motos TM — qtd
+    const iApV = iMtQ >= 0 ? findRow(iMtQ + 1, isVV)  : -1;   // Autos SP — valor
+    const iApQ = iApV >= 0 ? findRow(iApV + 1, isQTD) : -1;   // Autos SP — qtd
+    const iAtV = iApQ >= 0 ? findRow(iApQ + 1, isVV)  : -1;   // Autos TM — valor
+    const iAtQ = iAtV >= 0 ? findRow(iAtV + 1, isQTD) : -1;   // Autos TM — qtd
+
+    if (iMpV < 0 || iApV < 0) {
+      console.warn('fetchSheet: estrutura SEMANA 0 não reconhecida. Linhas:', rows.slice(0,5).map(r=>r[0]));
+      return;
+    }
+
+    // Colunas B…H = índices 1…7 no array = SEG30…DOM05
+    // DATA_INICIO = TER 31 → colIdx 2 = d=1 (primeiro dia de vendas)
+    const novo = [];
+    const get  = ri => (ri >= 0 ? rows[ri] : []) || [];
+    for (let c = 1; c <= 7; c++) {
+      const mp  = parseMoeda(get(iMpV)[c]);
+      const mqP = parseQtd  (get(iMpQ)[c]);
+      const mt  = parseMoeda(get(iMtV)[c]);
+      const mqT = parseQtd  (get(iMtQ)[c]);
+      const ap  = parseMoeda(get(iApV)[c]);
+      const aqP = parseQtd  (get(iApQ)[c]);
+      const at  = parseMoeda(get(iAtV)[c]);
+      const aqT = parseQtd  (get(iAtQ)[c]);
+      if (mp || mqP || mt || mqT || ap || aqP || at || aqT) {
+        novo.push({
+          d: c,  // dia sequencial dentro da semana (1=SEG30, 2=TER31…)
+          mp, mt, ap, at,
+          mv: mp + mt, mq: mqP + mqT,
+          av: ap + at, aq: aqP + aqT,
+          mpQ: mqP, mtQ: mqT, apQ: aqP, atQ: aqT
+        });
+      }
+    }
+
+    if (novo.length) {
+      D26.length = 0; novo.forEach(r => D26.push(r));
+      D26_FULL = [...D26];
+      document.getElementById('demoBadge').style.display = 'none';
+      calcKPIs(); buildComp(); buildEdicao();
+      console.log('✅ Google Sheets conectado:', novo.length, 'dias | Motos:', novo.map(r=>'R$'+Math.round(r.mv/1000)+'k').join(', '));
+    }
+  } catch(e) { console.warn('fetchSheet erro:', e.message); }
 }
 
 // ═══════════════════════════════════════════════
