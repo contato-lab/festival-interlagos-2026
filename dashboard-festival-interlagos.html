@@ -1509,7 +1509,10 @@ async function fetchSheet() {
     }
 
     // Colunas B…H = índices 1…7 no array = SEG30…DOM05
-    // DATA_INICIO = TER 31 → colIdx 2 = d=1 (primeiro dia de vendas)
+    // dToDate(d) = DATA_INICIO(31/mar) + (d-1) dias
+    // colIdx 2 = TER31 = DATA_INICIO → d = colIdx-1 = 1
+    // colIdx 3 = QUA01 = +1 dia     → d = 2
+    // colIdx 4 = QUI02 = +2 dias    → d = 3  etc.
     const novo = [];
     const get  = ri => (ri >= 0 ? rows[ri] : []) || [];
     for (let c = 1; c <= 7; c++) {
@@ -1523,7 +1526,7 @@ async function fetchSheet() {
       const aqT = parseQtd  (get(iAtQ)[c]);
       if (mp || mqP || mt || mqT || ap || aqP || at || aqT) {
         novo.push({
-          d: c,  // dia sequencial dentro da semana (1=SEG30, 2=TER31…)
+          d: c - 1,  // d=1 → TER31(DATA_INICIO), d=2 → QUA01, d=3 → QUI02…
           mp, mt, ap, at,
           mv: mp + mt, mq: mqP + mqT,
           av: ap + at, aq: aqP + aqT,
