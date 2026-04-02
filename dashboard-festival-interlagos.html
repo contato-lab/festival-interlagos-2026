@@ -397,7 +397,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
     <!-- META -->
     <div class="media-card" style="border-color:rgba(24,119,242,.25)">
       <div class="media-platform" style="color:#1877F2">
-        <span class="plat-icon" style="background:rgba(24,119,242,.15);color:#1877F2">f</span> Meta Ads
+Meta Ads
       </div>
       <div class="media-kpis">
         <div class="mk mk-warn"><div class="mk-label">Investimento</div><div class="mk-val" id="meta-invest">—</div></div>
@@ -415,7 +415,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
     <!-- GOOGLE -->
     <div class="media-card" style="border-color:rgba(66,133,244,.25)">
       <div class="media-platform" style="color:#4285F4">
-        <span class="plat-icon" style="background:rgba(66,133,244,.15);color:#4285F4">G</span> Google Ads
+Google Ads
       </div>
       <div class="media-kpis">
         <div class="mk mk-warn"><div class="mk-label">Investimento</div><div class="mk-val" id="gads-invest">—</div></div>
@@ -432,7 +432,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
     <!-- TIKTOK — LOCKED -->
     <div class="media-card locked" style="border-color:rgba(0,191,255,.15)">
       <div class="media-platform" style="color:#00BCD4">
-        <span class="plat-icon" style="background:rgba(0,191,255,.1);color:#00BCD4">♪</span> TikTok Ads
+TikTok Ads
       </div>
       <div class="media-kpis">
         <div class="mk"><div class="mk-label">Impressões</div><div class="mk-val">—</div></div>
@@ -1261,7 +1261,7 @@ function buildSpkTimeline(id, series, color) {
     return `${p[2]}/${p[1]}`;
   });
   const vals = series.map(d => d.cost || 0);
-  const bg = color.replace('rgb(','rgba(').replace(')',',0.12)');
+  const bg = color.replace('rgb(','rgba(').replace(')',',0.08)');
   const ex = Chart.getChart(id); if(ex) ex.destroy();
   new Chart(document.getElementById(id), {
     type: 'line',
@@ -1271,13 +1271,15 @@ function buildSpkTimeline(id, series, color) {
         data: vals,
         borderColor: color,
         backgroundColor: bg,
-        borderWidth: 1.8,
-        pointRadius: 0,
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: color,
-        pointHoverBorderColor: '#161616',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 7,
+        pointBackgroundColor: color,
+        pointBorderWidth: 0,
+        pointHoverBackgroundColor: '#FFF',
+        pointHoverBorderColor: color,
         pointHoverBorderWidth: 2,
-        tension: 0.4,
+        tension: 0.35,
         fill: true
       }]
     },
@@ -1290,21 +1292,22 @@ function buildSpkTimeline(id, series, color) {
         tooltip: {
           enabled: true,
           backgroundColor: '#161616',
-          borderColor: 'rgba(255,255,255,0.12)',
+          borderColor: 'rgba(200,255,0,0.25)',
           borderWidth: 1,
-          titleColor: '#999',
+          titleColor: '#C8FF00',
           bodyColor: '#FFF',
-          titleFont: { size: 11 },
-          bodyFont: { family: "'Barlow Condensed', sans-serif", size: 13, weight: '700' },
-          padding: 9,
+          titleFont: { family: "'Barlow Condensed', sans-serif", size: 12, weight: '700' },
+          bodyFont: { family: "'Barlow Condensed', sans-serif", size: 14, weight: '700' },
+          padding: 11,
+          usePointStyle: true,
           callbacks: {
             title: items => items[0].label,
-            label: ctx => `  R$ ${ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`
+            label: ctx => `  Gasto: R$ ${ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}`
           }
         }
       },
       scales: { x: { display: false }, y: { display: false, beginAtZero: true } },
-      animation: { duration: 400 }
+      animation: { duration: 500 }
     }
   });
 }
