@@ -363,12 +363,12 @@ tr:hover td{background:rgba(255,255,255,.018)}
   </div>
   <!-- Botões de toggle por ano -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-    <button id="btn2025" onclick="toggleAno('2025')" class="ano-btn active-2025" style="
-      display:flex;align-items:center;gap:7px;background:rgba(200,255,0,0.1);
-      border:1px solid rgba(200,255,0,0.4);border-radius:20px;padding:5px 14px;
+    <button id="btn2025" onclick="toggleAno('2025')" class="ano-btn" style="
+      display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:5px 14px;
       cursor:pointer;transition:.2s;font-family:'Barlow Condensed',sans-serif;
-      font-weight:700;font-size:.85rem;letter-spacing:.04em;color:#C8FF00">
-      <div style="width:22px;height:2px;background:#C8FF00;border-radius:1px"></div>
+      font-weight:700;font-size:.85rem;letter-spacing:.04em;color:#444;opacity:.5">
+      <div style="width:22px;height:2px;background:#333;border-radius:1px"></div>
       2025
     </button>
     <button id="btn2026" onclick="toggleAno('2026')" class="ano-btn active-2026" style="
@@ -768,7 +768,7 @@ const CANAL_COR = {'Google Ads':'#4285F4','Meta Ads':'#1877F2','TikTok Ads':'#00
 // STATE e CHARTS
 // ═══════════════════════════════════════════════
 let metricAtiva='receita', edicaoAtiva='total';
-let anoVisivel = { '2025': true, '2026': true };
+let anoVisivel = { '2025': false, '2026': true };
 let motosVis = { prop: true, tm: true };
 let autosVis = { prop: true, tm: true };
 let motosMetric = 'receita';
@@ -999,7 +999,7 @@ function buildComp() {
         }
       },
       scales:{
-        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',maxTicksLimit:20,font:{size:10}}},
+        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:10},autoSkip:false,maxRotation:0,callback:(v,i)=>{const d=i+1;if((d-1)%7!==0)return'';return`Sem ${Math.ceil(d/7)}`}}},
         y:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:10},callback:v=>metricAtiva==='ingressos'?fmtN(v):fmtK(v)}}
       }
     }
