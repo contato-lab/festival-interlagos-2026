@@ -900,6 +900,8 @@ function applyFiltro(){
   if(GADS_DATA) updateGAdsCard(GADS_DATA, deStr, ateStr);
   if(META_DATA) updateMetaCard(META_DATA, deStr, ateStr);
   updateMediaTotals(deStr, ateStr);
+  // Atualiza GA4 com o mesmo range
+  if(GA4_DATA) { buildGA4Sources(deStr, ateStr); buildGA4Funnel(deStr, ateStr); }
 }
 
 function initFiltro(){
@@ -1214,29 +1216,115 @@ function setMetricEd(tipo, met, btn) {
 // ═══════════════════════════════════════════════
 // GA4 — FONTES DE TRÁFEGO + FUNIL
 // ═══════════════════════════════════════════════
-function buildGA4Sources() {
-  const sources = GA4_DATA?.traffic_sources;
-  if (!sources || !sources.length) return;
+// Index do daily_series para lookup rápido
+let _ga4DailyIdx = null;
+function _buildGA4DailyIdx() {
+  if (!GA4_DATA?.daily_series) return {};
+  if (!_ga4DailyIdx) {
+    _ga4DailyIdx = {};
+    GA4_DATA.daily_series.forEach(d => { _ga4DailyIdx[d.date] = d; });
+  }
+  return _ga4DailyIdx;
+}
 
-  // KPIs do topo
-  const t = GA4_DATA.totals;
+// Filtra daily_series por range de datas
+function _ga4FilteredTotals(dateFrom, dateTo) {
+  const series = GA4_DATA?.daily_series;
+  if (!series || !series.length) return null;
+
+  let filtered = series;
+  if (dateFrom && dateTo) {
+    filtered = series.filter(d => d.date >= dateFrom && d.date <= dateTo);
+  }
+  if (!filtered.length) return null;
+
+  const sum = {sessions:0, users:0, new_users:0, pageviews:0, events:0, conversions:0, bounce_sum:0, count:0};
+  filtered.forEach(d => {
+    sum.sessions += d.sessions||0;
+    sum.users += d.users||0;
+    sum.new_users += d.new_users||0;
+    sum.pageviews += d.pageviews||0;
+    sum.events += d.events||0;
+    sum.conversions += d.conversions||0;
+    sum.bounce_sum += (d.bounce_rate||0) * (d.sessions||0);
+    sum.count++;
+  });
+  sum.pages_per_session = sum.sessions > 0 ? sum.pageviews / sum.sessions : 0;
+  sum.avg_bounce_rate = sum.sessions > 0 ? sum.bounce_sum / sum.sessions : 0;
+  return sum;
+}
+
+// Filtra sessions_by_date por range → totais por canal
+function _ga4FilteredChannels(dateFrom, dateTo) {
+  const sbd = GA4_DATA?.sessions_by_date;
+  if (!sbd) return null;
+  const channelTotals = {};
+  Object.entries(sbd).forEach(([date, channels]) => {
+    if (dateFrom && dateTo && (date < dateFrom || date > dateTo)) return;
+    Object.entries(channels).forEach(([ch, val]) => {
+      channelTotals[ch] = (channelTotals[ch]||0) + val;
+    });
+  });
+  return Object.keys(channelTotals).length > 0 ? channelTotals : null;
+}
+
+// Mapeia nomes GA4 internos ↔ traffic_sources
+const _GA4_CHANNEL_MAP = {
+  'Busca Orgânica':'Organic Search','Social Orgânico':'Organic Social','Direto pelo Link':'Direct'
+};
+const _GA4_CHANNEL_MAP_REV = {};
+Object.entries(_GA4_CHANNEL_MAP).forEach(([k,v]) => { _GA4_CHANNEL_MAP_REV[v] = k; });
+
+function buildGA4Sources(dateFrom, dateTo) {
+  if (!GA4_DATA) return;
+  const hasFilter = dateFrom && dateTo;
+
+  // KPIs — filtrar daily_series pelo range ativo
+  const t = hasFilter ? _ga4FilteredTotals(dateFrom, dateTo) : GA4_DATA.totals;
   if (t) {
-    document.getElementById('ga4Sessions').textContent = fmtN(t.sessions);
-    document.getElementById('ga4Users').textContent = fmtN(t.users);
-    document.getElementById('ga4Pageviews').textContent = fmtN(t.pageviews);
+    document.getElementById('ga4Sessions').textContent = fmtN(Math.round(t.sessions));
+    document.getElementById('ga4Users').textContent = fmtN(Math.round(t.users));
+    document.getElementById('ga4Pageviews').textContent = fmtN(Math.round(t.pageviews));
     document.getElementById('ga4PagesSession').textContent = (t.pages_per_session||0).toFixed(1);
     document.getElementById('ga4BounceRate').textContent = (t.avg_bounce_rate||0).toFixed(1) + '%';
     document.getElementById('ga4Conversions').textContent = fmtN(Math.round(t.conversions||0));
   }
 
-  // Período
-  if (GA4_DATA.period) {
-    const fmt = d => { const [y,m,dd]=d.split('-'); return dd+'/'+m+'/'+y; };
-    document.getElementById('ga4Period').textContent = fmt(GA4_DATA.period.start)+' a '+fmt(GA4_DATA.period.end);
+  // Período label
+  const fmtD = d => { const [y,m,dd]=d.split('-'); return dd+'/'+m; };
+  if (hasFilter) {
+    document.getElementById('ga4Period').textContent = fmtD(dateFrom)+' a '+fmtD(dateTo)+' (filtrado)';
+  } else if (GA4_DATA.period) {
+    const fmtFull = d => { const [y,m,dd]=d.split('-'); return dd+'/'+m+'/'+y; };
+    document.getElementById('ga4Period').textContent = fmtFull(GA4_DATA.period.start)+' a '+fmtFull(GA4_DATA.period.end);
   }
 
-  // Tabela
-  const sorted = [...sources].sort((a,b) => b.sessions - a.sessions);
+  // Tabela — traffic_sources com override de canais filtrados quando possível
+  const sources = GA4_DATA?.traffic_sources;
+  if (!sources || !sources.length) return;
+
+  let displaySources;
+  const filteredChannels = hasFilter ? _ga4FilteredChannels(dateFrom, dateTo) : null;
+
+  if (filteredChannels) {
+    // Recalcula canais que temos dados diários, mantém proporção dos outros
+    const fullTotal = sources.reduce((a,s) => a + s.sessions, 0);
+    const filteredTotal = t ? t.sessions : fullTotal;
+    displaySources = sources.map(src => {
+      const mappedName = _GA4_CHANNEL_MAP_REV[src.channel];
+      if (mappedName && filteredChannels[mappedName] !== undefined) {
+        // Temos dados diários para este canal
+        return { channel: src.channel, sessions: filteredChannels[mappedName], conversions: 0, _exact: true };
+      }
+      // Escala proporcional para canais sem dados diários
+      const ratio = fullTotal > 0 ? filteredTotal / fullTotal : 1;
+      return { channel: src.channel, sessions: Math.round(src.sessions * ratio), conversions: Math.round((src.conversions||0) * ratio), _exact: false };
+    });
+  } else {
+    displaySources = sources.map(s => ({...s}));
+  }
+
+  const sorted = [...displaySources].sort((a,b) => b.sessions - a.sessions);
   const totalSessions = sorted.reduce((a,s) => a + s.sessions, 0);
   const maxSessions = sorted[0]?.sessions || 1;
 
@@ -1249,10 +1337,11 @@ function buildGA4Sources() {
     const conv = Math.round(src.conversions || 0);
     const convRate = src.sessions > 0 ? (conv / src.sessions * 100) : 0;
     const cor = GA4_CHANNEL_COR[src.channel] || '#555';
+    const approx = (hasFilter && !src._exact) ? ' *' : '';
 
     const tr = document.createElement('tr');
     tr.innerHTML =
-      '<td><span class="src-dot" style="background:'+cor+'"></span>'+src.channel+'</td>'+
+      '<td><span class="src-dot" style="background:'+cor+'"></span>'+src.channel+approx+'</td>'+
       '<td style="font-weight:700;font-family:\'Barlow Condensed\',sans-serif;font-size:.92rem">'+fmtN(src.sessions)+'</td>'+
       '<td><div class="traffic-bar"><div class="traffic-bar-fill" style="width:'+barW+'%;background:'+cor+'"></div></div></td>'+
       '<td>'+pct.toFixed(1)+'%</td>'+
@@ -1272,14 +1361,15 @@ function buildGA4Sources() {
   });
 }
 
-function buildGA4Funnel() {
+function buildGA4Funnel(dateFrom, dateTo) {
   const container = document.getElementById('funnelContainer');
   if (!container) return;
   container.innerHTML = '';
 
   // Monta funil a partir dos top_pages do GA4
   const pages = GA4_DATA?.top_pages;
-  const totals = GA4_DATA?.totals;
+  const hasFilter = dateFrom && dateTo;
+  const totals = hasFilter ? _ga4FilteredTotals(dateFrom, dateTo) : GA4_DATA?.totals;
   if (!pages || !totals) return;
 
   const findPage = (path) => pages.find(p => p.page === path);
@@ -1292,14 +1382,19 @@ function buildGA4Funnel() {
   const produtos = findPagesLike('/vendas/ingressos/');
   const produtosSessions = produtos.reduce((a,p) => a + p.sessions, 0);
 
+  // Quando filtrado, escala as sessões das páginas proporcionalmente
+  const fullSessions = GA4_DATA.totals?.sessions || 1;
+  const ratio = hasFilter ? (totals.sessions / fullSessions) : 1;
+  const scale = v => hasFilter ? Math.round(v * ratio) : v;
+
   // Funil estritamente decrescente — jornada de compra
   const funnel = [
-    { name:'Sessões Totais',     page:'Todas as origens',     val: totals.sessions,                icon:'🌐' },
-    { name:'Página Inicial',     page:'/',                    val: home?.sessions || 0,            icon:'🏠' },
-    { name:'Página de Ingressos',page:'/ingressos/',          val: ingressos?.sessions || 0,       icon:'🎟️' },
-    { name:'Cadastro',           page:'/cadastro.php',        val: cadastro?.sessions || 0,        icon:'📝' },
-    { name:'Carrinho',           page:'/carrinho/index',      val: carrinho?.sessions || 0,        icon:'🛒' },
-    { name:'Conversão',          page:'GA4 key events',       val: Math.round(totals.conversions||0), icon:'✅' },
+    { name:'Sessões Totais',     page:'Todas as origens',     val: Math.round(totals.sessions),        icon:'🌐' },
+    { name:'Página Inicial',     page:'/',                    val: scale(home?.sessions || 0),         icon:'🏠' },
+    { name:'Página de Ingressos',page:'/ingressos/',          val: scale(ingressos?.sessions || 0),    icon:'🎟️' },
+    { name:'Cadastro',           page:'/cadastro.php',        val: scale(cadastro?.sessions || 0),     icon:'📝' },
+    { name:'Carrinho',           page:'/carrinho/index',      val: scale(carrinho?.sessions || 0),     icon:'🛒' },
+    { name:'Conversão',          page:'GA4 key events',       val: Math.round(totals.conversions||0),  icon:'✅' },
   ];
 
   const maxVal = funnel[0].val || 1;
@@ -1335,12 +1430,13 @@ function buildGA4Funnel() {
   });
 
   // Nota complementar sobre páginas de produto
-  if (produtosSessions > 0) {
+  const scaledProdutos = scale(produtosSessions);
+  if (scaledProdutos > 0) {
     const note = document.createElement('div');
     note.style.cssText = 'margin-top:14px;padding:12px 16px;background:var(--card2);border:1px solid var(--border);border-radius:var(--rad-sm);display:flex;align-items:center;gap:12px;flex-wrap:wrap';
     note.innerHTML =
       '<span style="font-size:.78rem;color:#AAA">📌 Visualização de produtos (acesso direto via anúncios):</span>'+
-      '<span style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;color:var(--lime);font-size:.95rem">'+fmtN(produtosSessions)+' sessões</span>'+
+      '<span style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;color:var(--lime);font-size:.95rem">'+fmtN(scaledProdutos)+' sessões</span>'+
       '<span style="font-size:.68rem;color:#666">Ride Pass · Sport Pass · Drive Pass</span>';
     container.appendChild(note);
   }
@@ -1378,8 +1474,10 @@ async function fetchGA4Data() {
     if (!res.ok) return;
     const data = await res.json();
     GA4_DATA = data;
-    buildGA4Sources();
-    buildGA4Funnel();
+    _ga4DailyIdx = null; // reset index ao recarregar
+    const { de, ate } = getActiveDates();
+    buildGA4Sources(de, ate);
+    buildGA4Funnel(de, ate);
     console.log('✅ GA4 Data carregado:', data.totals?.sessions, 'sessões');
   } catch(e) {
     console.warn('fetchGA4Data:', e.message);
