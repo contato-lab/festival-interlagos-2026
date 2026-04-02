@@ -377,7 +377,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
       cursor:pointer;transition:.2s;font-family:'Barlow Condensed',sans-serif;
       font-weight:700;font-size:.85rem;letter-spacing:.04em;color:#7B2D8B">
       <div style="width:22px;height:2px;background:#7B2D8B;border-radius:1px"></div>
-      2026
+      <span id="lbl2026">2026</span>
     </button>
     <span style="font-size:.7rem;color:var(--text3);margin-left:4px">clique para mostrar/ocultar cada ano</span>
   </div>
@@ -1416,8 +1416,13 @@ function buildSpkTimeline(id, series, color) {
 // ═══════════════════════════════════════════════
 // CONTROLES
 // ═══════════════════════════════════════════════
-function setMetric(m,btn){metricAtiva=m;document.querySelectorAll('#metricPills .pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');buildComp();}
-function setEdicao(e,btn){edicaoAtiva=e;document.querySelectorAll('#edicaoPills .pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');buildComp();}
+function _upd2026Lbl(){
+  const ed={total:'Total',motos:'Motos',autos:'Autos'}[edicaoAtiva]||'Total';
+  const met={receita:'Receita',ingressos:'Ingressos',tkt:'TKT Médio'}[metricAtiva]||'';
+  document.getElementById('lbl2026').textContent='2026 · '+ed+(met&&met!=='Receita'?' · '+met:'');
+}
+function setMetric(m,btn){metricAtiva=m;document.querySelectorAll('#metricPills .pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');_upd2026Lbl();buildComp();}
+function setEdicao(e,btn){edicaoAtiva=e;document.querySelectorAll('#edicaoPills .pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');_upd2026Lbl();buildComp();}
 function setSemana(s,btn){document.querySelectorAll('#semPills .pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');buildMencoes(s);}
 
 function toggleAno(ano) {
@@ -1558,6 +1563,7 @@ buildOrg();
 buildSpk('spkMeta',[320,890,1240,780,1050,1380,960,1120,840,1290,1480,1060,920,1350,1580,1120,880,1640],'rgb(200,255,0)');
 buildSpk('spkGoogle',[180,420,680,390,510,720,480,560,420,640,740,530,460,680,790,560,440,820],'rgb(200,255,0)');
 
+_upd2026Lbl();
 fetchSheet();
 fetchGA4Data();
 fetchGAdsData();
