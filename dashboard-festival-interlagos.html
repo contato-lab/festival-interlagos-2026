@@ -378,13 +378,13 @@ tr:hover td{background:rgba(255,255,255,.018)}
         <span style="font-size:1.3rem;font-weight:900">f</span> Meta Ads
       </div>
       <div class="media-kpis">
-        <div class="mk"><div class="mk-label">Impressões</div><div class="mk-val">842K</div></div>
-        <div class="mk"><div class="mk-label">Cliques</div><div class="mk-val">12.440</div></div>
-        <div class="mk"><div class="mk-label">Pageview</div><div class="mk-val">—</div></div>
-        <div class="mk"><div class="mk-label">Add to Cart</div><div class="mk-val">—</div></div>
-        <div class="mk"><div class="mk-label">Checkout</div><div class="mk-val">—</div></div>
-        <div class="mk"><div class="mk-label">Compras</div><div class="mk-val" style="color:var(--lime)">—</div></div>
-        <div class="mk" style="grid-column:1/-1"><div class="mk-label">Custo de Compra</div><div class="mk-val" style="color:var(--warn)">—</div></div>
+        <div class="mk"><div class="mk-label">Impressões</div><div class="mk-val" id="meta-imp">—</div></div>
+        <div class="mk"><div class="mk-label">Cliques</div><div class="mk-val" id="meta-clicks">—</div></div>
+        <div class="mk"><div class="mk-label">Pageview</div><div class="mk-val" id="meta-pv">—</div></div>
+        <div class="mk"><div class="mk-label">Add to Cart</div><div class="mk-val" id="meta-atc">—</div></div>
+        <div class="mk"><div class="mk-label">Checkout</div><div class="mk-val" id="meta-checkout">—</div></div>
+        <div class="mk"><div class="mk-label">Compras</div><div class="mk-val" style="color:var(--lime)" id="meta-compras">—</div></div>
+        <div class="mk" style="grid-column:1/-1"><div class="mk-label">Custo de Compra</div><div class="mk-val" style="color:var(--warn)" id="meta-cpp">—</div></div>
       </div>
       <div class="spk-wrap"><canvas id="spkMeta"></canvas></div>
     </div>
@@ -395,13 +395,13 @@ tr:hover td{background:rgba(255,255,255,.018)}
         <span style="font-size:1.2rem;font-weight:900">G</span> Google Ads
       </div>
       <div class="media-kpis">
-        <div class="mk"><div class="mk-label">Investimento</div><div class="mk-val" style="color:var(--warn)">R$ 8.760</div></div>
-        <div class="mk"><div class="mk-label">Impressões</div><div class="mk-val">318K</div></div>
-        <div class="mk"><div class="mk-label">Cliques</div><div class="mk-val">9.820</div></div>
-        <div class="mk"><div class="mk-label">CPC</div><div class="mk-val">R$ 0,89</div></div>
-        <div class="mk"><div class="mk-label">CTR</div><div class="mk-val" style="color:var(--green)">3,09%</div></div>
-        <div class="mk"><div class="mk-label">Conversões</div><div class="mk-val" style="color:var(--lime)">248</div></div>
-        <div class="mk" style="grid-column:1/-1"><div class="mk-label">Custo por Compra</div><div class="mk-val" style="color:var(--warn)">—</div></div>
+        <div class="mk"><div class="mk-label">Investimento</div><div class="mk-val" style="color:var(--warn)" id="gads-invest">—</div></div>
+        <div class="mk"><div class="mk-label">Impressões</div><div class="mk-val" id="gads-imp">—</div></div>
+        <div class="mk"><div class="mk-label">Cliques</div><div class="mk-val" id="gads-clicks">—</div></div>
+        <div class="mk"><div class="mk-label">CPC</div><div class="mk-val" id="gads-cpc">—</div></div>
+        <div class="mk"><div class="mk-label">CTR</div><div class="mk-val" style="color:var(--green)" id="gads-ctr">—</div></div>
+        <div class="mk"><div class="mk-label">Conversões</div><div class="mk-val" style="color:var(--lime)" id="gads-conv">—</div></div>
+        <div class="mk" style="grid-column:1/-1"><div class="mk-label">Custo por Compra</div><div class="mk-val" style="color:var(--warn)" id="gads-cpp">—</div></div>
       </div>
       <div class="spk-wrap"><canvas id="spkGoogle"></canvas></div>
     </div>
@@ -1079,15 +1079,33 @@ async function fetchGA4Data() {
 // ═══════════════════════════════════════════════
 // GOOGLE ADS — fetch google-ads-data.json
 // ═══════════════════════════════════════════════
+function updateGAdsCard(data) {
+  const t = data.totals; if (!t) return;
+  const fmtImp = v => v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e3 ? Math.round(v/1e3)+'K' : String(v);
+  const fmtN2  = v => Math.round(v).toLocaleString('pt-BR');
+  const fmtR2  = v => 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('gads-invest', fmtR(t.cost));
+  set('gads-imp',    fmtImp(t.impressions));
+  set('gads-clicks', fmtN2(t.clicks));
+  set('gads-cpc',    fmtR2(t.cpc));
+  set('gads-ctr',    t.ctr.toFixed(2).replace('.',',')+' %');
+  set('gads-conv',   fmtN2(t.conversions));
+  set('gads-cpp',    t.cost_per_conv ? fmtR2(t.cost_per_conv) : '—');
+}
+
 async function fetchGAdsData() {
   try {
     const res = await fetch('google-ads-data.json?t=' + Date.now());
     if (!res.ok) return;
     const data = await res.json();
-    if (!data.daily_series?.length) return;
+    if (!data.totals) return;
     GADS_DATA = data;
-    _gadsIdx = buildDailyIndex(data.daily_series);
-    buildSpkTimeline('spkGoogle', data.daily_series, 'rgb(66,133,244)');
+    updateGAdsCard(data);
+    if (data.daily_series?.length) {
+      _gadsIdx = buildDailyIndex(data.daily_series);
+      buildSpkTimeline('spkGoogle', data.daily_series, 'rgb(66,133,244)');
+    }
     buildComp(); // re-renderiza com gastos no tooltip
   } catch(e) {
     console.warn('fetchGAdsData:', e.message);
@@ -1097,18 +1115,44 @@ async function fetchGAdsData() {
 // ═══════════════════════════════════════════════
 // META ADS — fetch meta-data.json (quando conectado)
 // ═══════════════════════════════════════════════
+function updateMetaCard(data) {
+  const arr = data.daily_series || data.data || [];
+  const tot = arr.reduce((a, d) => {
+    a.imp  += d.impressions  || d.impressoes  || 0;
+    a.clk  += d.clicks       || d.cliques     || 0;
+    a.pv   += d.pageviews    || d.pageview     || 0;
+    a.atc  += d.add_to_cart  || d.atc         || 0;
+    a.chk  += d.checkout     || d.checkouts   || 0;
+    a.comp += d.purchases    || d.compras     || 0;
+    a.gasto+= d.cost         || d.gasto       || 0;
+    return a;
+  }, {imp:0,clk:0,pv:0,atc:0,chk:0,comp:0,gasto:0});
+  const fmtImp = v => v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e3 ? Math.round(v/1e3)+'K' : String(v);
+  const fmtN2  = v => Math.round(v).toLocaleString('pt-BR');
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('meta-imp',     fmtImp(tot.imp));
+  set('meta-clicks',  fmtN2(tot.clk));
+  set('meta-pv',      tot.pv  ? fmtN2(tot.pv)  : '—');
+  set('meta-atc',     tot.atc ? fmtN2(tot.atc) : '—');
+  set('meta-checkout',tot.chk ? fmtN2(tot.chk) : '—');
+  set('meta-compras', tot.comp ? fmtN2(tot.comp) : '—');
+  set('meta-cpp',     tot.comp > 0 ? 'R$ '+( tot.gasto/tot.comp).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—');
+}
+
 async function fetchMetaData() {
   try {
     const res = await fetch('meta-data.json?t=' + Date.now());
     if (!res.ok) return;
     const data = await res.json();
-    if (!data.daily_series?.length) return;
+    const arr = data.daily_series || data.data || [];
+    if (!arr.length) return;
     META_DATA = data;
-    _metaIdx = buildDailyIndex(data.daily_series);
-    buildSpkTimeline('spkMeta', data.daily_series, 'rgb(24,119,242)');
+    updateMetaCard(data);
+    _metaIdx = buildDailyIndex(arr);
+    buildSpkTimeline('spkMeta', arr, 'rgb(24,119,242)');
     buildComp();
   } catch(e) {
-    // silencioso — meta-data.json ainda não existe
+    // silencioso — meta-data.json ainda nao existe
   }
 }
 
