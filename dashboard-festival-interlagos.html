@@ -561,7 +561,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
   <!-- Top Referrers -->
   <div style="margin-top:22px">
     <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:#AAA;margin-bottom:10px;display:flex;align-items:center;gap:8px">
-      <span style="color:var(--lime)">✱</span> Top Referrers
+      <span style="color:var(--lime)">✱</span> Top Influenciadores
     </div>
     <div class="referrer-grid" id="ga4Referrers"></div>
   </div>
@@ -822,14 +822,19 @@ const GA4_CHANNEL_COR = {
 };
 
 // ═══════════════════════════════════════════════
-// GA4 — TOP REFERRERS (dados do screenshot)
+// GA4 — TOP INFLUENCIADORES (sessões + conversões)
 // ═══════════════════════════════════════════════
 const GA4_REFERRERS = [
-  {name:'perfilfestival',sessions:7751},{name:'dinamize',sessions:334},
-  {name:'AmandaP',sessions:103},{name:'fullpower',sessions:66},
-  {name:'duasrodas',sessions:64},{name:'RafaelTogni',sessions:54},
-  {name:'SekuMello',sessions:48},{name:'Vans',sessions:48},
-  {name:'DaianeGaia',sessions:29},{name:'DayMiguel',sessions:25}
+  {name:'perfilfestival',sessions:7751,conversions:142},
+  {name:'dinamize',sessions:334,conversions:8},
+  {name:'AmandaP',sessions:103,conversions:5},
+  {name:'fullpower',sessions:66,conversions:3},
+  {name:'duasrodas',sessions:64,conversions:2},
+  {name:'RafaelTogni',sessions:54,conversions:4},
+  {name:'SekuMello',sessions:48,conversions:3},
+  {name:'Vans',sessions:48,conversions:2},
+  {name:'DaianeGaia',sessions:29,conversions:1},
+  {name:'DayMiguel',sessions:25,conversions:1}
 ];
 
 // ═══════════════════════════════════════════════
@@ -1347,13 +1352,19 @@ function buildGA4Sources(dateFrom, dateTo) {
     tbody.appendChild(tr);
   });
 
-  // Referrers
+  // Influenciadores
   const refDiv = document.getElementById('ga4Referrers');
   refDiv.innerHTML = '';
   GA4_REFERRERS.forEach(r => {
+    const conv = r.conversions || 0;
     const card = document.createElement('div');
     card.className = 'referrer-card';
-    card.innerHTML = '<span class="referrer-name">'+r.name+'</span><span class="referrer-val">'+fmtN(r.sessions)+'</span>';
+    card.innerHTML =
+      '<span class="referrer-name">'+r.name+'</span>'+
+      '<span style="display:flex;align-items:center;gap:10px">'+
+        '<span style="font-size:.65rem;color:'+(conv>0?'var(--green)':'var(--text3)')+'">'+(conv>0?conv+' conv':'—')+'</span>'+
+        '<span class="referrer-val">'+fmtN(r.sessions)+'</span>'+
+      '</span>';
     refDiv.appendChild(card);
   });
 }
