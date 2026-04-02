@@ -1017,7 +1017,7 @@ function buildComp() {
         }
       },
       scales:{
-        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:9},maxTicksLimit:32,maxRotation:0,callback:(v,i)=>{const dt=dToDate(i+1);return dt.getDate().toString().padStart(2,'0')+'/'+(dt.getMonth()+1).toString().padStart(2,'0');}}},
+        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:7},autoSkip:false,maxRotation:0,callback:(v,i)=>{const dt=dToDate(i+1);const d=dt.getDate();return(i===0||d===1)?d+'/'+(dt.getMonth()+1):''+d;}}},
         y:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:10},callback:v=>metricAtiva==='ingressos'?fmtN(v):fmtK(v)}}
       }
     }
