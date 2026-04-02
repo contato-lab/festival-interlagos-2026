@@ -1,32 +1,21 @@
 {
-  "updated_at": "2026-04-01T23:51:18.304746+00:00",
+  "updated_at": "2026-04-02T04:41:55.025453+00:00",
   "property_id": "378336436",
   "period": {
-    "start": "2026-01-01",
+    "start": "2026-01-02",
     "end": "2026-04-01"
   },
   "totals": {
-    "sessions": 68996,
-    "users": 55120,
-    "new_users": 43254,
-    "pageviews": 248938,
-    "events": 543234,
-    "conversions": 160.0,
-    "pages_per_session": 3.61,
-    "avg_bounce_rate": 55.76
+    "sessions": 73160,
+    "users": 58237,
+    "new_users": 45662,
+    "pageviews": 265805,
+    "events": 580744,
+    "conversions": 239.0,
+    "pages_per_session": 3.63,
+    "avg_bounce_rate": 55.73
   },
   "daily_series": [
-    {
-      "date": "2026-01-01",
-      "sessions": 84,
-      "users": 77,
-      "new_users": 66,
-      "pageviews": 135,
-      "events": 361,
-      "conversions": 0.0,
-      "bounce_rate": 59.52,
-      "avg_session_s": 81.9
-    },
     {
       "date": "2026-01-02",
       "sessions": 91,
@@ -1008,65 +997,65 @@
     },
     {
       "date": "2026-04-01",
-      "sessions": 11757,
-      "users": 9835,
-      "new_users": 6947,
-      "pageviews": 46404,
-      "events": 102105,
-      "conversions": 160.0,
-      "bounce_rate": 36.81,
+      "sessions": 16005,
+      "users": 13029,
+      "new_users": 9421,
+      "pageviews": 63406,
+      "events": 139976,
+      "conversions": 239.0,
+      "bounce_rate": 37.14,
       "avg_session_s": 268.4
     }
   ],
   "traffic_sources": [
     {
       "channel": "Organic Search",
-      "sessions": 18829,
-      "conversions": 4.0
+      "sessions": 19327,
+      "conversions": 6.0
     },
     {
       "channel": "Paid Social",
-      "sessions": 16663,
+      "sessions": 17057,
       "conversions": 0.0
     },
     {
       "channel": "Organic Social",
-      "sessions": 13004,
+      "sessions": 13169,
       "conversions": 0.0
     },
     {
       "channel": "Direct",
-      "sessions": 8359,
-      "conversions": 29.0
+      "sessions": 9588,
+      "conversions": 51.0
     },
     {
       "channel": "Unassigned",
-      "sessions": 7521,
+      "sessions": 8496,
       "conversions": 15.0
     },
     {
       "channel": "Referral",
-      "sessions": 2000,
-      "conversions": 112.0
+      "sessions": 2499,
+      "conversions": 167.0
     },
     {
       "channel": "Paid Search",
-      "sessions": 1952,
+      "sessions": 2366,
       "conversions": 0.0
     },
     {
       "channel": "Paid Other",
-      "sessions": 75,
+      "sessions": 76,
       "conversions": 0.0
     },
     {
       "channel": "Organic Video",
-      "sessions": 20,
+      "sessions": 21,
       "conversions": 0.0
     },
     {
       "channel": "Cross-network",
-      "sessions": 13,
+      "sessions": 14,
       "conversions": 0.0
     },
     {
@@ -1083,53 +1072,285 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 129481,
-      "sessions": 64254
+      "pageviews": 135221,
+      "sessions": 66375
     },
     {
       "page": "/ingressos/",
-      "pageviews": 18329,
-      "sessions": 8065
+      "pageviews": 20196,
+      "sessions": 8966
     },
     {
       "page": "/vendas/ingressos/ride-pass",
-      "pageviews": 17134,
-      "sessions": 4688
+      "pageviews": 18808,
+      "sessions": 5189
     },
     {
       "page": "/cadastro.php",
-      "pageviews": 11918,
-      "sessions": 7975
+      "pageviews": 11925,
+      "sessions": 7983
     },
     {
       "page": "/carrinho/index",
-      "pageviews": 7985,
-      "sessions": 2449
+      "pageviews": 8563,
+      "sessions": 2646
     },
     {
       "page": "/vendas/ingressos/sport-pass",
-      "pageviews": 7541,
-      "sessions": 2996
+      "pageviews": 8138,
+      "sessions": 3279
     },
     {
       "page": "/conta/informacoes/",
-      "pageviews": 7144,
-      "sessions": 2855
+      "pageviews": 7840,
+      "sessions": 3197
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 6995,
-      "sessions": 2545
+      "pageviews": 7465,
+      "sessions": 2781
     },
     {
       "page": "/login",
-      "pageviews": 5551,
-      "sessions": 2998
+      "pageviews": 6246,
+      "sessions": 3384
     },
     {
       "page": "/conta/pedidos/",
-      "pageviews": 4704,
-      "sessions": 2128
+      "pageviews": 5137,
+      "sessions": 2359
     }
-  ]
+  ],
+  "sessions_by_date": {
+    "2026-02-15": {
+      "Busca Orgânica": 33,
+      "Social Orgânico": 19,
+      "Direto pelo Link": 9
+    },
+    "2026-02-16": {
+      "Busca Orgânica": 47,
+      "Social Orgânico": 22,
+      "Direto pelo Link": 9
+    },
+    "2026-02-17": {
+      "Busca Orgânica": 47,
+      "Social Orgânico": 28,
+      "Direto pelo Link": 15
+    },
+    "2026-02-18": {
+      "Busca Orgânica": 63,
+      "Social Orgânico": 47,
+      "Direto pelo Link": 13
+    },
+    "2026-02-19": {
+      "Busca Orgânica": 88,
+      "Social Orgânico": 36,
+      "Direto pelo Link": 31
+    },
+    "2026-02-20": {
+      "Busca Orgânica": 65,
+      "Social Orgânico": 27,
+      "Direto pelo Link": 23
+    },
+    "2026-02-21": {
+      "Busca Orgânica": 68,
+      "Social Orgânico": 22,
+      "Direto pelo Link": 8
+    },
+    "2026-02-22": {
+      "Busca Orgânica": 60,
+      "Social Orgânico": 28,
+      "Direto pelo Link": 6
+    },
+    "2026-02-23": {
+      "Busca Orgânica": 101,
+      "Social Orgânico": 36,
+      "Direto pelo Link": 27
+    },
+    "2026-02-24": {
+      "Busca Orgânica": 118,
+      "Social Orgânico": 41,
+      "Direto pelo Link": 34
+    },
+    "2026-02-25": {
+      "Busca Orgânica": 74,
+      "Social Orgânico": 32,
+      "Direto pelo Link": 18
+    },
+    "2026-02-26": {
+      "Busca Orgânica": 97,
+      "Social Orgânico": 31,
+      "Direto pelo Link": 20
+    },
+    "2026-02-27": {
+      "Busca Orgânica": 76,
+      "Social Orgânico": 32,
+      "Direto pelo Link": 20
+    },
+    "2026-02-28": {
+      "Busca Orgânica": 54,
+      "Social Orgânico": 22,
+      "Direto pelo Link": 22
+    },
+    "2026-03-01": {
+      "Social Orgânico": 110,
+      "Busca Orgânica": 66,
+      "Direto pelo Link": 26
+    },
+    "2026-03-02": {
+      "Busca Orgânica": 136,
+      "Social Orgânico": 67,
+      "Direto pelo Link": 33
+    },
+    "2026-03-03": {
+      "Busca Orgânica": 128,
+      "Social Orgânico": 45,
+      "Direto pelo Link": 24
+    },
+    "2026-03-04": {
+      "Busca Orgânica": 119,
+      "Social Orgânico": 46,
+      "Direto pelo Link": 23
+    },
+    "2026-03-05": {
+      "Busca Orgânica": 135,
+      "Social Orgânico": 41,
+      "Direto pelo Link": 39
+    },
+    "2026-03-06": {
+      "Busca Orgânica": 111,
+      "Social Orgânico": 42,
+      "Direto pelo Link": 32
+    },
+    "2026-03-07": {
+      "Busca Orgânica": 69,
+      "Social Orgânico": 44,
+      "Direto pelo Link": 28
+    },
+    "2026-03-08": {
+      "Busca Orgânica": 95,
+      "Social Orgânico": 94,
+      "Direto pelo Link": 14
+    },
+    "2026-03-09": {
+      "Busca Orgânica": 95,
+      "Social Orgânico": 43,
+      "Direto pelo Link": 24
+    },
+    "2026-03-10": {
+      "Busca Orgânica": 107,
+      "Social Orgânico": 41,
+      "Direto pelo Link": 32
+    },
+    "2026-03-11": {
+      "Busca Orgânica": 128,
+      "Social Orgânico": 57,
+      "Direto pelo Link": 30
+    },
+    "2026-03-12": {
+      "Busca Orgânica": 111,
+      "Social Orgânico": 64,
+      "Direto pelo Link": 33
+    },
+    "2026-03-13": {
+      "Busca Orgânica": 118,
+      "Social Orgânico": 40,
+      "Direto pelo Link": 22
+    },
+    "2026-03-14": {
+      "Busca Orgânica": 85,
+      "Social Orgânico": 51,
+      "Direto pelo Link": 12
+    },
+    "2026-03-15": {
+      "Busca Orgânica": 92,
+      "Social Orgânico": 63,
+      "Direto pelo Link": 13
+    },
+    "2026-03-16": {
+      "Busca Orgânica": 130,
+      "Social Orgânico": 42,
+      "Direto pelo Link": 49
+    },
+    "2026-03-17": {
+      "Busca Orgânica": 107,
+      "Direto pelo Link": 67,
+      "Social Orgânico": 41
+    },
+    "2026-03-18": {
+      "Busca Orgânica": 122,
+      "Social Orgânico": 31,
+      "Direto pelo Link": 29
+    },
+    "2026-03-19": {
+      "Busca Orgânica": 127,
+      "Social Orgânico": 61,
+      "Direto pelo Link": 65
+    },
+    "2026-03-20": {
+      "Busca Orgânica": 112,
+      "Social Orgânico": 46,
+      "Direto pelo Link": 53
+    },
+    "2026-03-21": {
+      "Busca Orgânica": 109,
+      "Social Orgânico": 61,
+      "Direto pelo Link": 38
+    },
+    "2026-03-22": {
+      "Busca Orgânica": 146,
+      "Social Orgânico": 67,
+      "Direto pelo Link": 44
+    },
+    "2026-03-23": {
+      "Busca Orgânica": 216,
+      "Social Orgânico": 76,
+      "Direto pelo Link": 79
+    },
+    "2026-03-24": {
+      "Busca Orgânica": 217,
+      "Social Orgânico": 55,
+      "Direto pelo Link": 80
+    },
+    "2026-03-25": {
+      "Social Orgânico": 441,
+      "Busca Orgânica": 258,
+      "Direto pelo Link": 138
+    },
+    "2026-03-26": {
+      "Social Orgânico": 621,
+      "Busca Orgânica": 288,
+      "Direto pelo Link": 167
+    },
+    "2026-03-27": {
+      "Social Orgânico": 471,
+      "Busca Orgânica": 324,
+      "Direto pelo Link": 164
+    },
+    "2026-03-28": {
+      "Social Orgânico": 359,
+      "Busca Orgânica": 191,
+      "Direto pelo Link": 130
+    },
+    "2026-03-29": {
+      "Social Orgânico": 501,
+      "Busca Orgânica": 279,
+      "Direto pelo Link": 141
+    },
+    "2026-03-30": {
+      "Busca Orgânica": 952,
+      "Social Orgânico": 846,
+      "Direto pelo Link": 318
+    },
+    "2026-03-31": {
+      "Busca Orgânica": 7667,
+      "Social Orgânico": 6341,
+      "Direto pelo Link": 3463
+    },
+    "2026-04-01": {
+      "Direto pelo Link": 5518,
+      "Busca Orgânica": 1953,
+      "Social Orgânico": 965
+    }
+  }
 }
