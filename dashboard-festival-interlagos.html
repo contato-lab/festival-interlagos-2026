@@ -291,10 +291,6 @@ tr:hover td{background:rgba(255,255,255,.018)}
   /* CHART FOOTNOTE */
   .chart-footnote{flex-direction:column;gap:4px;align-items:flex-start!important}
 
-  /* COMPARATIVO — scroll horizontal no mobile */
-  #chartCompWrap{overflow-x:auto;-webkit-overflow-scrolling:touch;height:auto;min-height:220px}
-  #chartCompWrap canvas{min-width:800px;height:220px!important}
-
   /* BADGES */
   .badge{font-size:.68rem;padding:3px 10px}
   .gen-date{font-size:.64rem}
@@ -1093,7 +1089,7 @@ function buildComp() {
         }
       },
       scales:{
-        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:7},autoSkip:false,maxRotation:0,callback:(v,i)=>{const dt=dToDate(i+1);const d=dt.getDate();return(i===0||d===1)?d+'/'+(dt.getMonth()+1):''+d;}}},
+        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:window.innerWidth<=768?6:7},autoSkip:window.innerWidth<=768,maxTicksLimit:window.innerWidth<=768?15:undefined,maxRotation:0,callback:(v,i)=>{const dt=dToDate(i+1);const d=dt.getDate();return(i===0||d===1)?d+'/'+(dt.getMonth()+1):''+d;}}},
         y:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:10},callback:v=>metricAtiva==='ingressos'?fmtN(v):fmtK(v)}}
       }
     }
