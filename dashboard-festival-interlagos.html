@@ -506,84 +506,6 @@ tr:hover td{background:rgba(255,255,255,.018)}
   </div>
 </div>
 
-<!-- ══ FONTES DE TRÁFEGO GA4 ══ -->
-<div class="chart-card">
-  <div class="section-header">
-    <div class="section-title">📊 Fontes de Tráfego — Google Analytics</div>
-    <span class="badge badge-ok" style="font-size:.68rem">✓ GA4 ao vivo</span>
-  </div>
-
-  <!-- KPI strip GA4 -->
-  <div class="ga4-kpi-strip">
-    <div class="ga4-kpi">
-      <div class="ga4-kpi-val" id="ga4Sessions">—</div>
-      <div class="ga4-kpi-label">Sessões</div>
-    </div>
-    <div class="ga4-kpi">
-      <div class="ga4-kpi-val" id="ga4Users">—</div>
-      <div class="ga4-kpi-label">Usuários</div>
-    </div>
-    <div class="ga4-kpi">
-      <div class="ga4-kpi-val" id="ga4Pageviews">—</div>
-      <div class="ga4-kpi-label">Pageviews</div>
-    </div>
-    <div class="ga4-kpi">
-      <div class="ga4-kpi-val" id="ga4PagesSession">—</div>
-      <div class="ga4-kpi-label">Pág./Sessão</div>
-    </div>
-    <div class="ga4-kpi">
-      <div class="ga4-kpi-val" id="ga4BounceRate">—</div>
-      <div class="ga4-kpi-label">Taxa Rejeição</div>
-    </div>
-    <div class="ga4-kpi">
-      <div class="ga4-kpi-val" id="ga4Conversions">—</div>
-      <div class="ga4-kpi-label">Conversões</div>
-    </div>
-  </div>
-
-  <!-- Tabela de fontes -->
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="min-width:150px">Canal</th>
-          <th>Sessões</th>
-          <th style="width:200px"></th>
-          <th>% Share</th>
-          <th>Conversões</th>
-          <th>Taxa Conv.</th>
-        </tr>
-      </thead>
-      <tbody id="ga4SourcesBody"></tbody>
-    </table>
-  </div>
-
-  <!-- Top Referrers -->
-  <div style="margin-top:22px">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:#AAA;margin-bottom:10px;display:flex;align-items:center;gap:8px">
-      <span style="color:var(--lime)">✱</span> Top Influenciadores
-    </div>
-    <div class="referrer-grid" id="ga4Referrers"></div>
-  </div>
-
-  <div style="font-size:.66rem;color:var(--text3);margin-top:14px;display:flex;align-items:center;gap:6px">
-    <span style="color:var(--lime);font-size:.7rem">●</span>
-    Dados reais via GA4 Data API · Propriedade #378336436 · Período: <span id="ga4Period">—</span>
-  </div>
-</div>
-
-<!-- ══ FUNIL DE CONVERSÃO ══ -->
-<div class="chart-card">
-  <div class="section-header">
-    <div class="section-title">🔻 Funil de Conversão — Jornada do Usuário</div>
-  </div>
-  <div class="funnel-wrap" id="funnelContainer"></div>
-  <div style="font-size:.66rem;color:var(--text3);margin-top:14px;display:flex;align-items:center;gap:6px">
-    <span style="color:var(--lime);font-size:.7rem">●</span>
-    Sessões por etapa do funil · Fonte: GA4 Top Pages · De pageview até a compra
-  </div>
-</div>
-
 <!-- ══ MÍDIA PAGA ══ -->
 <div>
   <div class="media-section-head">
@@ -660,6 +582,84 @@ TikTok Ads
     <div class="mt-item"><div class="mt-label">Cliques Total</div><div class="mt-val" id="total-clicks">—</div></div>
     <div class="mt-item"><div class="mt-label">Compras Total</div><div class="mt-val" id="total-compras">—</div></div>
     <div class="mt-item"><div class="mt-label">CPP Médio</div><div class="mt-val" style="color:var(--warn)" id="total-cpp">—</div></div>
+  </div>
+</div>
+
+<!-- ══ FONTES DE TRÁFEGO GA4 ══ -->
+<div class="chart-card">
+  <div class="section-header">
+    <div class="section-title">📊 Fontes de Tráfego — Google Analytics</div>
+    <span class="badge badge-ok" style="font-size:.68rem">✓ GA4 ao vivo</span>
+  </div>
+
+  <!-- KPI strip GA4 -->
+  <div class="ga4-kpi-strip">
+    <div class="ga4-kpi">
+      <div class="ga4-kpi-val" id="ga4Sessions">—</div>
+      <div class="ga4-kpi-label">Sessões</div>
+    </div>
+    <div class="ga4-kpi">
+      <div class="ga4-kpi-val" id="ga4Users">—</div>
+      <div class="ga4-kpi-label">Usuários</div>
+    </div>
+    <div class="ga4-kpi">
+      <div class="ga4-kpi-val" id="ga4Pageviews">—</div>
+      <div class="ga4-kpi-label">Pageviews</div>
+    </div>
+    <div class="ga4-kpi">
+      <div class="ga4-kpi-val" id="ga4PagesSession">—</div>
+      <div class="ga4-kpi-label">Pág./Sessão</div>
+    </div>
+    <div class="ga4-kpi">
+      <div class="ga4-kpi-val" id="ga4BounceRate">—</div>
+      <div class="ga4-kpi-label">Taxa Rejeição</div>
+    </div>
+    <div class="ga4-kpi">
+      <div class="ga4-kpi-val" id="ga4Conversions">—</div>
+      <div class="ga4-kpi-label">Conversões</div>
+    </div>
+  </div>
+
+  <!-- Tabela de fontes -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="min-width:150px">Canal</th>
+          <th>Sessões</th>
+          <th style="width:200px"></th>
+          <th>% Share</th>
+          <th>Conversões</th>
+          <th>Taxa Conv.</th>
+        </tr>
+      </thead>
+      <tbody id="ga4SourcesBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Top Referrers -->
+  <div style="margin-top:22px">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:#AAA;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      <span style="color:var(--lime)">✱</span> Top Influenciadores
+    </div>
+    <div class="referrer-grid" id="ga4Referrers"></div>
+  </div>
+
+  <div style="font-size:.66rem;color:var(--text3);margin-top:14px;display:flex;align-items:center;gap:6px">
+    <span style="color:var(--lime);font-size:.7rem">●</span>
+    Dados reais via GA4 Data API · Propriedade #378336436 · Período: <span id="ga4Period">—</span>
+  </div>
+</div>
+
+<!-- ══ FUNIL DE CONVERSÃO ══ -->
+<div class="chart-card">
+  <div class="section-header">
+    <div class="section-title">🔻 Funil de Conversão — Jornada do Usuário</div>
+  </div>
+  <div class="funnel-wrap" id="funnelContainer"></div>
+  <div style="font-size:.66rem;color:var(--text3);margin-top:14px;display:flex;align-items:center;gap:6px">
+    <span style="color:var(--lime);font-size:.7rem">●</span>
+    Sessões por etapa do funil · Fonte: GA4 Top Pages · De pageview até a compra
   </div>
 </div>
 
