@@ -291,6 +291,10 @@ tr:hover td{background:rgba(255,255,255,.018)}
   /* CHART FOOTNOTE */
   .chart-footnote{flex-direction:column;gap:4px;align-items:flex-start!important}
 
+  /* COMPARATIVO — scroll horizontal no mobile */
+  #chartCompWrap{overflow-x:auto;-webkit-overflow-scrolling:touch;height:auto;min-height:220px}
+  #chartCompWrap canvas{min-width:800px;height:220px!important}
+
   /* BADGES */
   .badge{font-size:.68rem;padding:3px 10px}
   .gen-date{font-size:.64rem}
@@ -425,7 +429,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
   <!-- Legenda de tipos de ação -->
   <div class="acoes-legend" id="acoesLegend"></div>
 
-  <div style="position:relative;height:300px"><canvas id="chartComp"></canvas></div>
+  <div id="chartCompWrap" style="position:relative;height:300px"><canvas id="chartComp"></canvas></div>
 
   <!-- Timeline de ações abaixo do gráfico -->
   <div id="acoesTimeline" class="acoes-timeline"></div>
