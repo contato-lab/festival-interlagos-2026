@@ -930,7 +930,10 @@ function initFiltro(){
 function calcKPIs() {
   const n = D26.length;
   const s26 = D26.reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq,mp:a.mp+r.mp,mt:a.mt+r.mt,ap:a.ap+r.ap,at:a.at+r.at,mpQ:a.mpQ+(r.mpQ||0),mtQ:a.mtQ+(r.mtQ||0),apQ:a.apQ+(r.apQ||0),atQ:a.atQ+(r.atQ||0)}),{mv:0,mq:0,av:0,aq:0,mp:0,mt:0,ap:0,at:0,mpQ:0,mtQ:0,apQ:0,atQ:0});
-  const s25 = D25.slice(0,n).reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
+  // Usa os mesmos D-days do D26 para comparar corretamente com 2025
+  const d26Min = D26.length ? D26[0].d : 1;
+  const d26Max = D26.length ? D26[D26.length-1].d : n;
+  const s25 = D25.filter(r=>r.d>=d26Min&&r.d<=d26Max).reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
   const rec26=s26.mv+s26.av, rec25=s25.mv+s25.av;
   const ing26=s26.mq+s26.aq, ing25=s25.mq+s25.aq;
   const tkt26=ing26?rec26/ing26:0, tkt25=(s25.mq+s25.aq)?rec25/(s25.mq+s25.aq):0;
