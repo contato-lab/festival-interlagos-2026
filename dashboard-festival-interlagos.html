@@ -1066,11 +1066,13 @@ function buildComp() {
               const is26 = ctx.dataset.label.includes('2026');
               const row = is26 ? D26[idx] : D25[idx];
               if (!row) return null;
-              const ing = (row.mq||0) + (row.aq||0);
-              const rec = (row.mv||0) + (row.av||0);
+              const mq=row.mq||0, aq=row.aq||0, mv=row.mv||0, av=row.av||0;
+              const ing = edicaoAtiva==='motos' ? mq : edicaoAtiva==='autos' ? aq : mq+aq;
+              const rec = edicaoAtiva==='motos' ? mv : edicaoAtiva==='autos' ? av : mv+av;
               const year = is26 ? '2026' : '2025';
+              const edLabel = edicaoAtiva==='motos' ? ' Motos' : edicaoAtiva==='autos' ? ' Autos' : ' Total';
               return [
-                `${year}`,
+                `${year}${edLabel}`,
                 `  Ingressos : ${fmtN(ing)}`,
                 `  Receita   : ${fmtR(rec)}`
               ];
