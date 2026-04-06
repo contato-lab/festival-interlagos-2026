@@ -753,7 +753,7 @@ const ACAO_CONFIG = {
 };
 
 // Estado de visibilidade por tipo (toggle na legenda)
-const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k => [k, false]));
+const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv']));
 // Ex: 'https://docs.google.com/spreadsheets/d/SEU_ID/export?format=csv&gid=0'
 
 // ═══════════════════════════════════════════════
@@ -1108,7 +1108,7 @@ function buildAcoesLegend() {
     const count = ACOES.filter(a => a.tipo === tipo).length;
     if (!count) return;
     const div = document.createElement('div');
-    div.className = 'acao-leg-item inactive';
+    div.className = 'acao-leg-item' + (acoesVisiveis[tipo] ? '' : ' inactive');
     div.innerHTML = `<span style="font-size:.9rem">${cfg.icone}</span>
       <div class="acao-leg-line" style="background:${cfg.cor};width:18px;height:2px;border-radius:1px"></div>
       <span>${cfg.label}</span>
