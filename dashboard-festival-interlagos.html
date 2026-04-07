@@ -2336,27 +2336,81 @@ function buildExecInvestChart() {
 
 /* ═══ Conversões ═══ */
 function renderExecConversoes() {
-  const invest = buildExecD26Invest();
-  const metaConv  = invest.reduce((s,r)=>s+r.metaConv,0);
-  const gadsConv  = invest.reduce((s,r)=>s+r.gadsConv,0);
-  const totalConv = metaConv+gadsConv;
-  const totalInv  = invest.reduce((s,r)=>s+(r.meta+r.gads),0);
-  const cpa = totalConv>0 ? totalInv/totalConv : null;
+  const invest    = buildExecD26Invest();
+  const metaConv  = invest.reduce((s,r)=>s+r.metaConv, 0);
+  const gadsConv  = invest.reduce((s,r)=>s+r.gadsConv, 0);
+  const adsConv   = metaConv + gadsConv;
+  const totalInv  = invest.reduce((s,r)=>s+(r.meta+r.gads), 0);
+
+  // GA4: total de conversões no período de campanha (a partir de 31/03/2026)
+  // Reutiliza GA4_DATA — mesma fonte do Dashboard Completo
+  const campStart = '2026-03-31';
+  const ga4Total = Math.round(
+    (GA4_DATA?.daily_series || [])
+      .filter(d => d.date >= campStart)
+      .reduce((s,d) => s + (d.conversions||0), 0)
+  );
+
+  // Orgânico = GA4 total − conversões de ADS (estimativa)
+  const orgConv   = Math.max(0, ga4Total - adsConv);
+  const cpaAds    = adsConv > 0 ? totalInv / adsConv  : null;
+  const cpaTotal  = ga4Total > 0 ? totalInv / ga4Total : null;
 
   document.getElementById('exec-conv-digital').innerHTML = `
-    <div class="section-title" style="margin-bottom:14px">Conversões Digitais</div>
-    <div class="exec-conv-row"><span class="exec-conv-label">Meta Ads</span><span class="exec-conv-val">${metaConv.toLocaleString('pt-BR')}</span></div>
-    <div class="exec-conv-row"><span class="exec-conv-label">Google Ads</span><span class="exec-conv-val">${gadsConv.toLocaleString('pt-BR')}</span></div>
-    <div class="exec-conv-row"><span class="exec-conv-label"><strong>Total Digital</strong></span><span class="exec-conv-val" style="color:var(--lime)">${totalConv.toLocaleString('pt-BR')}</span></div>
-    <div class="exec-conv-row"><span class="exec-conv-label">Custo por Conversão</span><span class="exec-conv-val">${cpa?execFmtFull(cpa):'—'}</span></div>
+    <div class="section-title" style="margin-bottom:14px">Conversões por Origem</div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">Meta Ads</span>
+      <span class="exec-conv-val">${metaConv.toLocaleString('pt-BR')}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">Google Ads</span>
+      <span class="exec-conv-val">${gadsConv.toLocaleString('pt-BR')}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">Orgânico / Outros <span style="font-size:.6rem;color:#666">(GA4 − ADS)</span></span>
+      <span class="exec-conv-val" style="color:var(--text2)">${ga4Total>0 ? orgConv.toLocaleString('pt-BR') : '—'}</span>
+    </div>
+    <div class="exec-conv-row" style="border-top:1px solid rgba(200,255,0,.15);margin-top:4px;padding-top:10px">
+      <span class="exec-conv-label"><strong>Total GA4</strong> <span style="font-size:.6rem;color:#666">mesma fonte do dash</span></span>
+      <span class="exec-conv-val" style="color:var(--lime)">${ga4Total>0 ? ga4Total.toLocaleString('pt-BR') : '—'}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">CPA (somente ADS)</span>
+      <span class="exec-conv-val">${cpaAds ? execFmtFull(cpaAds) : '—'}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">CPA (total GA4)</span>
+      <span class="exec-conv-val">${cpaTotal ? execFmtFull(cpaTotal) : '—'}</span>
+    </div>
   `;
 
   const s26 = D26_FULL.reduce((a,r)=>({mq:a.mq+r.mq,aq:a.aq+r.aq}),{mq:0,aq:0});
+  const ing = s26.mq + s26.aq;
+  // Taxa de conversão: ingressos vendidos / total GA4 conversions
+  const txConv = ga4Total > 0 ? (ing / ga4Total * 100) : null;
+
   document.getElementById('exec-conv-totals').innerHTML = `
     <div class="section-title" style="margin-bottom:14px">Ingressos Vendidos</div>
-    <div class="exec-conv-row"><span class="exec-conv-label">🏍️ Motos</span><span class="exec-conv-val">${s26.mq.toLocaleString('pt-BR')}</span></div>
-    <div class="exec-conv-row"><span class="exec-conv-label">🚗 Autos</span><span class="exec-conv-val">${s26.aq.toLocaleString('pt-BR')}</span></div>
-    <div class="exec-conv-row"><span class="exec-conv-label"><strong>Total</strong></span><span class="exec-conv-val" style="color:var(--lime)">${(s26.mq+s26.aq).toLocaleString('pt-BR')}</span></div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">🏍️ Motos</span>
+      <span class="exec-conv-val">${s26.mq.toLocaleString('pt-BR')}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">🚗 Autos</span>
+      <span class="exec-conv-val">${s26.aq.toLocaleString('pt-BR')}</span>
+    </div>
+    <div class="exec-conv-row" style="border-top:1px solid rgba(200,255,0,.15);margin-top:4px;padding-top:10px">
+      <span class="exec-conv-label"><strong>Total</strong></span>
+      <span class="exec-conv-val" style="color:var(--lime)">${ing.toLocaleString('pt-BR')}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">Taxa conv. GA4 → Ingresso</span>
+      <span class="exec-conv-val">${txConv !== null ? txConv.toFixed(1)+'%' : '—'}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">Ticket Médio</span>
+      <span class="exec-conv-val">${ing > 0 ? execFmtFull((s26.mq>0||s26.aq>0) ? (D26_FULL.reduce((s,r)=>s+r.mv+r.av,0)/ing) : 0) : '—'}</span>
+    </div>
   `;
 }
 
