@@ -360,6 +360,20 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .exec-filter-period{font-size:.72rem;color:#666;margin-left:auto;font-style:italic}
 @media(max-width:1024px){.exec-hoje-ontem{grid-template-columns:1fr 1fr}.exec-kpi-strip{grid-template-columns:repeat(2,1fr)}.exec-charts-grid{grid-template-columns:1fr}.exec-conv-grid{grid-template-columns:1fr}.tab-bar{padding:0 18px}}
 @media(max-width:768px){.exec-hoje-ontem{grid-template-columns:1fr}.exec-main{padding:16px 10px}.tab-btn{font-size:.78rem;padding:10px 14px}}
+/* ── Botões métrica vendas exec ── */
+.exec-metric-pill{background:#1C1C1C;border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:6px 16px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;transition:.2s;color:#CCC}
+.exec-metric-pill:hover{border-color:var(--lime-border);color:var(--lime)}
+.exec-metric-pill.active{background:var(--lime-dim);border-color:var(--lime);color:var(--lime)}
+.exec-metric-pill.moto{border-color:rgba(200,255,0,.3);color:#C8FF00}
+.exec-metric-pill.moto.active{background:rgba(200,255,0,.18);border-color:var(--lime);color:var(--lime)}
+.exec-metric-pill.auto{border-color:rgba(123,45,139,.5);color:#C07ADB}
+.exec-metric-pill.auto.active{background:rgba(123,45,139,.2);border-color:#9B3DAB;color:#C07ADB}
+/* ── Filtro D+N ── */
+.exec-dplus-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--rad-sm);padding:8px 14px}
+.exec-dplus-label{font-size:.62rem;color:#888;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-right:4px;white-space:nowrap}
+.exec-dplus-btn{background:transparent;border:1px solid rgba(255,255,255,.12);color:#AAA;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.03em;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.exec-dplus-btn:hover{border-color:rgba(200,255,0,.4);color:var(--lime)}
+.exec-dplus-btn.active{background:rgba(200,255,0,.15);border-color:var(--lime);color:var(--lime)}
 /* ── Modal TikTok ── */
 .tt-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .tt-modal{background:#141414;border:1px solid rgba(0,191,255,.3);border-radius:16px;padding:28px 32px;width:100%;max-width:480px;box-shadow:0 0 40px rgba(0,191,255,.1)}
@@ -808,6 +822,12 @@ Google Ads
     <span class="exec-filter-period" id="exec-filter-period-label"></span>
   </div>
 
+  <!-- Atalhos D+N -->
+  <div class="exec-dplus-bar" id="exec-dplus-bar">
+    <span class="exec-dplus-label">Dia exato:</span>
+    <!-- gerado dinamicamente por buildExecDplusBar() -->
+  </div>
+
   <!-- Hoje / Ontem / Campanha -->
   <div class="exec-hoje-ontem">
     <div class="exec-card" id="exec-card-ontem">
@@ -859,10 +879,10 @@ Google Ads
           <div class="section-title">Vendas — 2025 vs 2026</div>
           <div style="font-size:.7rem;color:#666;margin-top:3px">por dia de campanha</div>
         </div>
-        <div class="pill-group">
-          <button class="pill active" onclick="execSetVendasMetric('total',this)">Total</button>
-          <button class="pill" onclick="execSetVendasMetric('motos',this)">🏍️ Motos</button>
-          <button class="pill" onclick="execSetVendasMetric('autos',this)">🚗 Autos</button>
+        <div class="pill-group" id="execVendasPills">
+          <button class="exec-metric-pill active" onclick="execSetVendasMetric('total',this)">Total</button>
+          <button class="exec-metric-pill moto" onclick="execSetVendasMetric('motos',this)">🏍️ Motos</button>
+          <button class="exec-metric-pill auto" onclick="execSetVendasMetric('autos',this)">🚗 Autos</button>
         </div>
       </div>
       <div class="exec-leg">
@@ -2329,30 +2349,43 @@ function buildExecVendasChart() {
   const days = execGetAllDays(invest); if(!days.length) return;
   const metric = execCurrentVendasMetric;
   const labels = days.map(d => 'D+'+d);
-  const get26 = d => { const r=D26_FULL.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
-  const get25 = d => { const r=D25.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
+  const getRec26 = d => { const r=D26_FULL.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
+  const getRec25 = d => { const r=D25.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
+  const getQtd26 = d => { const r=D26_FULL.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mq:metric==='autos'?r.aq:r.mq+r.aq; };
+  const getQtd25 = d => { const r=D25.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mq:metric==='autos'?r.aq:r.mq+r.aq; };
 
   if(execChartVendas) execChartVendas.destroy();
   const ctx = document.getElementById('exec-chartVendas')?.getContext('2d');
   if(!ctx) return;
   execChartVendas = new Chart(ctx, {
-    type:'line',
+    type:'bar',
     data:{labels, datasets:[
-      {label:'2026',data:days.map(get26),borderColor:'#C8FF00',backgroundColor:'rgba(200,255,0,0.07)',borderWidth:2.5,pointRadius:3,fill:true,tension:.35,spanGaps:false},
-      {label:'2025',data:days.map(get25),borderColor:'#555',borderWidth:1.5,pointRadius:2,fill:false,tension:.35,borderDash:[5,3]}
+      // Barras qty (eixo direito, fundo)
+      {type:'bar',label:'Ing. 2026',data:days.map(getQtd26),yAxisID:'yQtd',backgroundColor:'rgba(200,255,0,0.10)',borderColor:'rgba(200,255,0,0.25)',borderWidth:1,order:3},
+      {type:'bar',label:'Ing. 2025',data:days.map(getQtd25),yAxisID:'yQtd',backgroundColor:'rgba(255,255,255,0.04)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,order:4},
+      // Linhas receita (eixo esquerdo, frente)
+      {type:'line',label:'Receita 2026',data:days.map(getRec26),yAxisID:'yRec',borderColor:'#C8FF00',backgroundColor:'rgba(200,255,0,0.06)',borderWidth:2.5,pointRadius:3,fill:true,tension:.35,spanGaps:false,order:1},
+      {type:'line',label:'Receita 2025',data:days.map(getRec25),yAxisID:'yRec',borderColor:'rgba(255,255,255,.3)',borderWidth:1.5,pointRadius:2,fill:false,tension:.35,borderDash:[5,3],order:2}
     ]},
     options:{
       responsive:true,maintainAspectRatio:false,animation:false,
       interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{display:false},
-        tooltip:{backgroundColor:'#1C1C1C',borderColor:'rgba(200,255,0,.25)',borderWidth:1,padding:10,cornerRadius:8,titleColor:'#C8FF00',bodyColor:'#DDD',
-          callbacks:{label:i=>' '+i.dataset.label+': R$ '+Math.round(i.raw||0).toLocaleString('pt-BR')}},
+        tooltip:{backgroundColor:'#1C1C1C',borderColor:'rgba(200,255,0,.25)',borderWidth:1,padding:12,cornerRadius:8,titleColor:'#C8FF00',bodyColor:'#DDD',
+          callbacks:{
+            label: i => {
+              if(i.dataset.label.startsWith('Receita')) return '  ' + i.dataset.label + ': R$ ' + Math.round(i.raw||0).toLocaleString('pt-BR');
+              return '  ' + i.dataset.label + ': ' + Math.round(i.raw||0).toLocaleString('pt-BR') + ' ingressos';
+            }
+          }
+        },
         annotation:{annotations:execGetTvAnnotations(days)}
       },
       scales:{
-        x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#555',maxTicksLimit:12,font:{size:10}}},
-        y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#666',callback:v=>v>=1000000?'R$'+(v/1000000).toFixed(1)+'M':v>=1000?'R$'+(v/1000).toFixed(0)+'K':'R$'+v}}
+        x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#AAA',maxTicksLimit:14,font:{size:10}}},
+        yRec:{position:'left',grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#AAA',callback:v=>v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':v>=1000?'R$'+(v/1000).toFixed(0)+'K':'R$'+v}},
+        yQtd:{position:'right',grid:{display:false},ticks:{color:'#555',font:{size:9},callback:v=>v>=1000?Math.round(v/1000)+'K ing':v+' ing'}}
       }
     }
   });
@@ -2523,6 +2556,7 @@ function setExecPreset(id) {
 function renderPainelExecutivo() {
   renderExecHojeOntem();
   renderExecKPIs();
+  buildExecDplusBar();
   buildExecVendasChart();
   buildExecInvestChart();
   renderExecConversoes();
@@ -2540,12 +2574,44 @@ function switchTab(tabId) {
   if(tabId === 'tab-exec') renderPainelExecutivo();
 }
 function execSetVendasMetric(metric, btn) {
-  btn.closest('.pill-group').querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.exec-metric-pill').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active'); execCurrentVendasMetric=metric; buildExecVendasChart();
 }
 function execSetInvestView(view, btn) {
   btn.closest('.pill-group').querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active'); execCurrentInvestView=view; buildExecInvestChart();
+}
+
+/* ═══ D+N shortcuts ═══ */
+function buildExecDplusBar() {
+  const bar = document.getElementById('exec-dplus-bar');
+  if(!bar) return;
+  const allDays = D26_FULL.map(r=>r.d).filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b);
+  if(!allDays.length) { bar.innerHTML='<span class="exec-dplus-label">Dia exato: sem dados</span>'; return; }
+  bar.innerHTML = '<span class="exec-dplus-label">Dia exato:</span>' +
+    allDays.map(d => {
+      const dt = execDateOf26Day(d);
+      const iso = dt.toISOString().slice(0,10);
+      const lbl = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+      return `<button class="exec-dplus-btn" id="exec-dplus-${d}" onclick="setExecDayPreset(${d},'${iso}')" title="D+${d} · ${lbl}">D+${d}</button>`;
+    }).join('');
+  // mark active if current filter is a single day
+  if(execFiltFrom && execFiltFrom === execFiltTo) {
+    allDays.forEach(d => {
+      const iso = execDateOf26Day(d).toISOString().slice(0,10);
+      if(iso === execFiltFrom) { const b=document.getElementById('exec-dplus-'+d); if(b) b.classList.add('active'); }
+    });
+  }
+}
+function setExecDayPreset(d, iso) {
+  execFiltFrom = iso; execFiltTo = iso;
+  document.querySelectorAll('.exec-btn-filter').forEach(b=>b.classList.remove('active'));
+  document.getElementById('execFiltDE').value  = iso;
+  document.getElementById('execFiltATE').value = iso;
+  const dt = execDateOf26Day(d);
+  const lbl = document.getElementById('exec-filter-period-label');
+  if(lbl) lbl.textContent = 'D+'+d+' · '+dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','');
+  renderPainelExecutivo();
 }
 
 /* ═══════════════════════════════════════════════
