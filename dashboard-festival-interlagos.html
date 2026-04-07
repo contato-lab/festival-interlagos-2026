@@ -348,6 +348,16 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .exec-conv-row:last-child{border-bottom:none}
 .exec-conv-label{font-size:.78rem;color:#CCC}
 .exec-conv-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;color:var(--lime)}
+/* Exec filter bar */
+.exec-filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px}
+.exec-filter-label{font-size:.65rem;color:#666;text-transform:uppercase;letter-spacing:.08em;margin-right:4px}
+.exec-btn-filter{background:transparent;border:1px solid rgba(255,255,255,.12);color:#999;font-size:.72rem;font-weight:600;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .15s}
+.exec-btn-filter:hover{border-color:rgba(200,255,0,.4);color:#CCC}
+.exec-btn-filter.active{background:rgba(200,255,0,.12);border-color:rgba(200,255,0,.5);color:var(--lime)}
+.exec-filter-sep{width:1px;height:20px;background:rgba(255,255,255,.08);margin:0 4px}
+.exec-date-input{background:#1C1C1C;border:1px solid rgba(255,255,255,.12);color:#CCC;font-size:.72rem;padding:5px 8px;border-radius:6px;outline:none}
+.exec-date-input:focus{border-color:rgba(200,255,0,.4)}
+.exec-filter-period{font-size:.72rem;color:#666;margin-left:auto;font-style:italic}
 @media(max-width:1024px){.exec-hoje-ontem{grid-template-columns:1fr 1fr}.exec-kpi-strip{grid-template-columns:repeat(2,1fr)}.exec-charts-grid{grid-template-columns:1fr}.exec-conv-grid{grid-template-columns:1fr}.tab-bar{padding:0 18px}}
 @media(max-width:768px){.exec-hoje-ontem{grid-template-columns:1fr}.exec-main{padding:16px 10px}.tab-btn{font-size:.78rem;padding:10px 14px}}
 </style>
@@ -762,6 +772,20 @@ TikTok Ads
 <!-- ══ TAB: PAINEL EXECUTIVO ══ -->
 <div id="tab-exec" class="tab-panel">
 <div class="exec-main">
+
+  <!-- Filtro de período executivo -->
+  <div class="exec-filter-bar">
+    <span class="exec-filter-label">Período:</span>
+    <button class="exec-btn-filter" id="exec-btn-7d"  onclick="setExecPreset('7d')">7 dias</button>
+    <button class="exec-btn-filter" id="exec-btn-14d" onclick="setExecPreset('14d')">14 dias</button>
+    <button class="exec-btn-filter" id="exec-btn-30d" onclick="setExecPreset('30d')">30 dias</button>
+    <button class="exec-btn-filter active" id="exec-btn-camp" onclick="setExecPreset('camp')">Toda a campanha</button>
+    <div class="exec-filter-sep"></div>
+    <input type="date" id="execFiltDE"  class="exec-date-input" onchange="applyExecFilter()">
+    <span style="color:#555;font-size:.72rem">→</span>
+    <input type="date" id="execFiltATE" class="exec-date-input" onchange="applyExecFilter()">
+    <span class="exec-filter-period" id="exec-filter-period-label"></span>
+  </div>
 
   <!-- Hoje / Ontem / Campanha -->
   <div class="exec-hoje-ontem">
@@ -2099,6 +2123,7 @@ const EXEC_D25_INVEST = (() => {
 
 let execChartVendas = null, execChartInvest = null;
 let execCurrentVendasMetric = 'total', execCurrentInvestView = 'diario';
+let execFiltFrom = null, execFiltTo = null; // null = toda a campanha
 
 /* ═══ helpers ═══ */
 function execDayOf26(dateStr) {
@@ -2123,15 +2148,17 @@ function execFmtK(n) {
 }
 
 /* Constrói D26_INVEST a partir de META_DATA + GADS_DATA (reutiliza os fetches do dashboard principal) */
-function buildExecD26Invest() {
+function buildExecD26Invest(from, to) {
   const map = {};
   const add = (series, field) => {
     (series||[]).forEach(d => {
+      if(from && d.date < from) return;
+      if(to   && d.date > to)   return;
       const day = execDayOf26(d.date);
       if(day < 1) return;
       if(!map[day]) map[day] = {d:day, meta:0, gads:0, metaConv:0, gadsConv:0};
       map[day][field] += d.cost||0;
-      if(field==='meta') map[day].metaConv += d.conversions||0;
+      if(field==='meta') map[day].metaConv += d.purchases||d.conversions||0;
       if(field==='gads') map[day].gadsConv += d.conversions||0;
     });
   };
@@ -2141,9 +2168,12 @@ function buildExecD26Invest() {
 }
 
 /* Dias de campanha disponíveis (união invest + vendas) */
-function execGetAllDays() {
-  const invest = buildExecD26Invest();
-  const set = new Set([...invest.map(r=>r.d), ...D26_FULL.map(r=>r.d)]);
+function execGetAllDays(invest) {
+  const inv = invest || buildExecD26Invest(execFiltFrom, execFiltTo);
+  const d26 = execFiltFrom
+    ? D26_FULL.filter(r => { const dt=execDateOf26Day(r.d); return dt>=new Date(execFiltFrom+'T00:00:00') && dt<=new Date(execFiltTo+'T00:00:00'); })
+    : D26_FULL;
+  const set = new Set([...inv.map(r=>r.d), ...d26.map(r=>r.d)]);
   return Array.from(set).filter(d=>d>=1).sort((a,b)=>a-b);
 }
 
@@ -2224,10 +2254,13 @@ function renderExecHojeOntem() {
 
 /* ═══ KPIs de Vendas ═══ */
 function renderExecKPIs() {
-  const invest = buildExecD26Invest();
+  const invest = buildExecD26Invest(execFiltFrom, execFiltTo);
+  const days = execGetAllDays(invest);
+  const minDay = days.length ? days[0] : 1;
+  const maxDay = days.length ? days[days.length-1] : 1;
   const dias = invest.length || 1;
-  const s26 = D26_FULL.reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
-  const s25 = D25.filter(r=>r.d<=dias).reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
+  const s26 = D26_FULL.filter(r=>r.d>=minDay&&r.d<=maxDay).reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
+  const s25 = D25.filter(r=>r.d>=minDay&&r.d<=maxDay).reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
 
   const setKpi = (id, v26, v25) => {
     const el = document.getElementById(id); if(!el) return;
@@ -2262,9 +2295,10 @@ function renderExecKPIs() {
 
 /* ═══ Gráfico Vendas ═══ */
 function buildExecVendasChart() {
-  const days = execGetAllDays(); if(!days.length) return;
+  const invest = buildExecD26Invest(execFiltFrom, execFiltTo);
+  const days = execGetAllDays(invest); if(!days.length) return;
   const metric = execCurrentVendasMetric;
-  const labels = days.map(d => execFmtDate(execDateOf26Day(d)));
+  const labels = days.map(d => 'D+'+d);
   const get26 = d => { const r=D26_FULL.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
   const get25 = d => { const r=D25.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
 
@@ -2298,10 +2332,10 @@ function buildExecVendasChart() {
 
 /* ═══ Gráfico Investimento ═══ */
 function buildExecInvestChart() {
-  const days = execGetAllDays(); if(!days.length) return;
+  const invest = buildExecD26Invest(execFiltFrom, execFiltTo);
+  const days = execGetAllDays(invest); if(!days.length) return;
   const view = execCurrentInvestView;
-  const invest = buildExecD26Invest();
-  const labels = days.map(d => execFmtDate(execDateOf26Day(d)));
+  const labels = days.map(d => 'D+'+d);
   const inv26 = d => { const r=invest.find(x=>x.d===d); return r?(r.meta+r.gads):0; };
   const inv25 = d => { const r=EXEC_D25_INVEST.find(x=>x.d===d); return r?r.v:0; };
   let d26,d25;
@@ -2336,18 +2370,18 @@ function buildExecInvestChart() {
 
 /* ═══ Conversões ═══ */
 function renderExecConversoes() {
-  const invest    = buildExecD26Invest();
+  const invest    = buildExecD26Invest(execFiltFrom, execFiltTo);
   const metaConv  = invest.reduce((s,r)=>s+r.metaConv, 0);
   const gadsConv  = invest.reduce((s,r)=>s+r.gadsConv, 0);
   const adsConv   = metaConv + gadsConv;
   const totalInv  = invest.reduce((s,r)=>s+(r.meta+r.gads), 0);
 
-  // GA4: total de conversões no período de campanha (a partir de 31/03/2026)
-  // Reutiliza GA4_DATA — mesma fonte do Dashboard Completo
-  const campStart = '2026-03-31';
+  // GA4: total de conversões no período filtrado (ou desde o início da campanha)
+  const ga4Start = execFiltFrom || '2026-03-31';
+  const ga4End   = execFiltTo   || '9999-12-31';
   const ga4Total = Math.round(
     (GA4_DATA?.daily_series || [])
-      .filter(d => d.date >= campStart)
+      .filter(d => d.date >= ga4Start && d.date <= ga4End)
       .reduce((s,d) => s + (d.conversions||0), 0)
   );
 
@@ -2384,9 +2418,11 @@ function renderExecConversoes() {
     </div>
   `;
 
-  const s26 = D26_FULL.reduce((a,r)=>({mq:a.mq+r.mq,aq:a.aq+r.aq}),{mq:0,aq:0});
+  const days = execGetAllDays(invest);
+  const minDay = days.length ? days[0] : 1;
+  const maxDay = days.length ? days[days.length-1] : Infinity;
+  const s26 = D26_FULL.filter(r=>r.d>=minDay&&r.d<=maxDay).reduce((a,r)=>({mq:a.mq+r.mq,aq:a.aq+r.aq}),{mq:0,aq:0});
   const ing = s26.mq + s26.aq;
-  // Taxa de conversão: ingressos vendidos / total GA4 conversions
   const txConv = ga4Total > 0 ? (ing / ga4Total * 100) : null;
 
   document.getElementById('exec-conv-totals').innerHTML = `
@@ -2412,6 +2448,45 @@ function renderExecConversoes() {
       <span class="exec-conv-val">${ing > 0 ? execFmtFull((s26.mq>0||s26.aq>0) ? (D26_FULL.reduce((s,r)=>s+r.mv+r.av,0)/ing) : 0) : '—'}</span>
     </div>
   `;
+}
+
+/* ═══ Filtro executivo ═══ */
+function applyExecFilter() {
+  const de  = document.getElementById('execFiltDE')?.value;
+  const ate = document.getElementById('execFiltATE')?.value;
+  if(!de || !ate || de > ate) return;
+  execFiltFrom = de; execFiltTo = ate;
+  document.querySelectorAll('.exec-btn-filter').forEach(b=>b.classList.remove('active'));
+  const lbl = document.getElementById('exec-filter-period-label');
+  if(lbl) {
+    const f = new Date(de+'T12:00:00'), t = new Date(ate+'T12:00:00');
+    lbl.textContent = f.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','')+' – '+t.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','');
+  }
+  renderPainelExecutivo();
+}
+
+function setExecPreset(id) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const iso = d => d.toISOString().slice(0,10);
+  const daysAgo = n => { const d=new Date(today); d.setDate(d.getDate()-n); return d; };
+  let from, to = today;
+  if(id==='7d')   from = daysAgo(6);
+  if(id==='14d')  from = daysAgo(13);
+  if(id==='30d')  from = daysAgo(29);
+  if(id==='camp') { execFiltFrom=null; execFiltTo=null; }
+  else            { execFiltFrom=iso(from); execFiltTo=iso(to); }
+  document.querySelectorAll('.exec-btn-filter').forEach(b=>b.classList.remove('active'));
+  const btn = document.getElementById('exec-btn-'+id); if(btn) btn.classList.add('active');
+  if(execFiltFrom) {
+    document.getElementById('execFiltDE').value  = execFiltFrom;
+    document.getElementById('execFiltATE').value = execFiltTo;
+  } else {
+    document.getElementById('execFiltDE').value  = '';
+    document.getElementById('execFiltATE').value = '';
+  }
+  const lbl = document.getElementById('exec-filter-period-label');
+  if(lbl) lbl.textContent = id==='camp' ? 'Toda a campanha (31/03 →)' : '';
+  renderPainelExecutivo();
 }
 
 /* ═══ Render completo do Painel Executivo ═══ */
