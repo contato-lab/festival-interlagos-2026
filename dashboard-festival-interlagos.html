@@ -369,11 +369,15 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .exec-metric-pill.auto{border-color:rgba(123,45,139,.5);color:#C07ADB}
 .exec-metric-pill.auto.active{background:rgba(123,45,139,.2);border-color:#9B3DAB;color:#C07ADB}
 /* ── Filtro D+N ── */
-.exec-dplus-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--rad-sm);padding:8px 14px}
-.exec-dplus-label{font-size:.62rem;color:#888;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-right:4px;white-space:nowrap}
-.exec-dplus-btn{background:transparent;border:1px solid rgba(255,255,255,.12);color:#AAA;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.03em;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.exec-dplus-bar{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--rad-sm);padding:10px 14px}
+.exec-dplus-label{font-size:.62rem;color:#888;text-transform:uppercase;letter-spacing:.08em;font-weight:600;display:block;margin-bottom:8px}
+.exec-dplus-weeks{display:flex;flex-direction:column;gap:3px}
+.exec-dplus-week{display:flex;align-items:center;gap:3px}
+.exec-dplus-week-lbl{font-size:.58rem;color:#555;font-family:'Barlow Condensed',sans-serif;font-weight:700;width:36px;text-align:right;padding-right:6px;flex-shrink:0}
+.exec-dplus-btn{background:transparent;border:1px solid rgba(255,255,255,.12);color:#AAA;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.03em;padding:3px 0;border-radius:4px;cursor:pointer;transition:all .15s;width:44px;text-align:center}
 .exec-dplus-btn:hover{border-color:rgba(200,255,0,.4);color:var(--lime)}
 .exec-dplus-btn.active{background:rgba(200,255,0,.15);border-color:var(--lime);color:var(--lime)}
+.exec-dplus-btn.empty{border-color:transparent;color:transparent;cursor:default;pointer-events:none}
 /* ── Modal TikTok ── */
 .tt-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .tt-modal{background:#141414;border:1px solid rgba(0,191,255,.3);border-radius:16px;padding:28px 32px;width:100%;max-width:480px;box-shadow:0 0 40px rgba(0,191,255,.1)}
@@ -2588,21 +2592,33 @@ function buildExecDplusBar() {
   const bar = document.getElementById('exec-dplus-bar');
   if(!bar) return;
   const allDays = D26_FULL.map(r=>r.d).filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b);
-  if(!allDays.length) { bar.innerHTML='<span class="exec-dplus-label">Dia exato: sem dados</span>'; return; }
-  bar.innerHTML = '<span class="exec-dplus-label">Dia exato:</span>' +
-    allDays.map(d => {
-      const dt = execDateOf26Day(d);
+  if(!allDays.length) { bar.innerHTML='<span class="exec-dplus-label">Dia exato:</span><span style="font-size:.72rem;color:#555">sem dados ainda</span>'; return; }
+
+  const maxDay = allDays[allDays.length-1];
+  // Organiza em semanas de 7 dias a partir do D+1
+  const weeks = [];
+  for(let w=0; w*7+1 <= maxDay; w++) {
+    const start = w*7+1;
+    weeks.push({ w, days: Array.from({length:7}, (_,i)=>start+i) });
+  }
+
+  const activeIso = (execFiltFrom && execFiltFrom===execFiltTo) ? execFiltFrom : null;
+
+  const weeksHtml = weeks.map(({w, days}) => {
+    const btns = days.map(d => {
+      if(d > maxDay || !allDays.includes(d)) {
+        return `<button class="exec-dplus-btn empty">—</button>`;
+      }
+      const dt  = execDateOf26Day(d);
       const iso = dt.toISOString().slice(0,10);
       const lbl = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-      return `<button class="exec-dplus-btn" id="exec-dplus-${d}" onclick="setExecDayPreset(${d},'${iso}')" title="D+${d} · ${lbl}">D+${d}</button>`;
+      const isActive = activeIso === iso ? ' active' : '';
+      return `<button class="exec-dplus-btn${isActive}" id="exec-dplus-${d}" onclick="setExecDayPreset(${d},'${iso}')" title="${lbl}">D+${d}</button>`;
     }).join('');
-  // mark active if current filter is a single day
-  if(execFiltFrom && execFiltFrom === execFiltTo) {
-    allDays.forEach(d => {
-      const iso = execDateOf26Day(d).toISOString().slice(0,10);
-      if(iso === execFiltFrom) { const b=document.getElementById('exec-dplus-'+d); if(b) b.classList.add('active'); }
-    });
-  }
+    return `<div class="exec-dplus-week"><span class="exec-dplus-week-lbl">S${w+1}</span>${btns}</div>`;
+  }).join('');
+
+  bar.innerHTML = `<span class="exec-dplus-label">Dia exato</span><div class="exec-dplus-weeks">${weeksHtml}</div>`;
 }
 function setExecDayPreset(d, iso) {
   execFiltFrom = iso; execFiltTo = iso;
