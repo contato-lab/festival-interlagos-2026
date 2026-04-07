@@ -2204,7 +2204,7 @@ function execFmtFull(n) {
 }
 function execFmtK(n) {
   if(n == null || isNaN(n) || n === 0) return '—';
-  return n>=1000000?'R$'+(n/1000000).toFixed(1)+'M':n>=1000?'R$'+(n/1000).toFixed(0)+'K':'R$'+Math.round(n);
+  return 'R$ ' + Math.round(n).toLocaleString('pt-BR');
 }
 
 /* Constrói D26_INVEST a partir de META_DATA + GADS_DATA (reutiliza os fetches do dashboard principal) */
