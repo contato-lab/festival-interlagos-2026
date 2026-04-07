@@ -2465,19 +2465,16 @@ function renderExecConversoes() {
   const adsConv   = metaConv + gadsConv + tiktokConv;
   const totalInv  = invest.reduce((s,r)=>s+(r.meta+r.gads), 0);
 
-  // GA4: total de conversões no período filtrado (ou desde o início da campanha)
-  const ga4Start = execFiltFrom || '2026-03-31';
-  const ga4End   = execFiltTo   || '9999-12-31';
-  const ga4Total = Math.round(
-    (GA4_DATA?.daily_series || [])
-      .filter(d => d.date >= ga4Start && d.date <= ga4End)
-      .reduce((s,d) => s + (d.conversions||0), 0)
-  );
+  // Total ingressos vendidos (planilha) no período
+  const days2  = execGetAllDays(invest);
+  const minD   = days2.length ? days2[0] : 1;
+  const maxD   = days2.length ? days2[days2.length-1] : 1;
+  const ingTot = D26_FULL.filter(r=>r.d>=minD&&r.d<=maxD).reduce((s,r)=>s+r.mq+r.aq, 0);
 
-  // Orgânico = GA4 total − conversões de ADS (estimativa)
-  const orgConv   = Math.max(0, ga4Total - adsConv);
-  const cpaAds    = adsConv > 0 ? totalInv / adsConv  : null;
-  const cpaTotal  = ga4Total > 0 ? totalInv / ga4Total : null;
+  // Orgânico = ingressos totais − ADS (Meta + Google + TikTok)
+  const orgConv  = Math.max(0, ingTot - adsConv);
+  const cpaAds   = adsConv > 0 ? totalInv / adsConv : null;
+  const cpaTot   = ingTot  > 0 ? totalInv / ingTot  : null;
 
   document.getElementById('exec-conv-digital').innerHTML = `
     <div class="section-title" style="margin-bottom:14px">Conversões por Origem</div>
@@ -2494,20 +2491,20 @@ function renderExecConversoes() {
       <span class="exec-conv-val" style="color:rgba(0,191,255,.9)">${tiktokConv > 0 ? tiktokConv.toLocaleString('pt-BR') : '—'}</span>
     </div>
     <div class="exec-conv-row">
-      <span class="exec-conv-label">Orgânico / Outros <span style="font-size:.6rem;color:#666">(GA4 − ADS)</span></span>
-      <span class="exec-conv-val" style="color:var(--text2)">${ga4Total>0 ? orgConv.toLocaleString('pt-BR') : '—'}</span>
+      <span class="exec-conv-label">Orgânico / Direto / Outros <span style="font-size:.6rem;color:#666">(ingressos − ADS)</span></span>
+      <span class="exec-conv-val" style="color:var(--text2)">${ingTot>0 ? orgConv.toLocaleString('pt-BR') : '—'}</span>
     </div>
     <div class="exec-conv-row" style="border-top:1px solid rgba(200,255,0,.15);margin-top:4px;padding-top:10px">
-      <span class="exec-conv-label"><strong>Total GA4</strong> <span style="font-size:.6rem;color:#666">mesma fonte do dash</span></span>
-      <span class="exec-conv-val" style="color:var(--lime)">${ga4Total>0 ? ga4Total.toLocaleString('pt-BR') : '—'}</span>
+      <span class="exec-conv-label"><strong>Total Ingressos</strong> <span style="font-size:.6rem;color:#666">planilha</span></span>
+      <span class="exec-conv-val" style="color:var(--lime)">${ingTot>0 ? ingTot.toLocaleString('pt-BR') : '—'}</span>
     </div>
     <div class="exec-conv-row">
       <span class="exec-conv-label">CPA (somente ADS)</span>
       <span class="exec-conv-val">${cpaAds ? execFmtFull(cpaAds) : '—'}</span>
     </div>
     <div class="exec-conv-row">
-      <span class="exec-conv-label">CPA (total GA4)</span>
-      <span class="exec-conv-val">${cpaTotal ? execFmtFull(cpaTotal) : '—'}</span>
+      <span class="exec-conv-label">CPA (total ingressos)</span>
+      <span class="exec-conv-val">${cpaTot ? execFmtFull(cpaTot) : '—'}</span>
     </div>
   `;
 
