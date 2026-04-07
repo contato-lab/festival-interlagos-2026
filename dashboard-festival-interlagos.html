@@ -1612,35 +1612,28 @@ function buildGA4Sources(dateFrom, dateTo) {
   const refDiv = document.getElementById('ga4Referrers');
   refDiv.innerHTML = '';
   const referrers = (GA4_DATA?.influencer_breakdown?.length ? GA4_DATA.influencer_breakdown : GA4_REFERRERS.map(r=>({...r, source:r.name})));
-  const INFL_CONV_RATE = 0.015; // 1,5% — taxa padrão influenciadores eventos
   referrers.forEach(r => {
-    const tickets    = r.tickets || {};
+    const conv    = r.conversions || 0;
+    const tickets = r.tickets || {};
     const tktEntries = Object.entries(tickets).sort((a,b)=>b[1]-a[1]);
-    const totalTktViews = tktEntries.reduce((s,[,n])=>s+n, 0);
-    const estTotal   = Math.round((r.sessions||0) * INFL_CONV_RATE);
-    // Estimativa por ingresso (proporcional às páginas visitadas)
-    const estByTkt   = tktEntries.map(([name, n]) => {
-      const estN = totalTktViews > 0 ? Math.max(1, Math.round(estTotal * n / totalTktViews)) : 0;
-      return [name, estN];
-    });
     const card = document.createElement('div');
     card.className = 'referrer-card';
     card.innerHTML =
       '<span class="referrer-name">'+(r.source||r.name)+'</span>'+
       '<span style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">'+
         '<span style="display:flex;align-items:center;gap:10px">'+
-          '<span style="font-size:.6rem;color:var(--text3)">est.</span>'+
-          '<span class="referrer-val" title="Estimativa: '+r.sessions+' sessões × 1,5%">~'+estTotal+'</span>'+
+          '<span style="font-size:.65rem;color:'+(conv>0?'var(--green)':'var(--text3)')+'">'+(conv>0?conv+' conv':'—')+'</span>'+
+          '<span class="referrer-val">'+fmtN(r.sessions)+'</span>'+
         '</span>'+
-        (estByTkt.length
-          ? '<span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">'+
-              estByTkt.map(([name, n])=>
+        (tktEntries.length
+          ? '<span style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">'+
+              tktEntries.map(([name, n])=>
                 '<span style="font-size:.58rem;background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.18);color:#AAA;border-radius:4px;padding:1px 6px">'+
-                  name+' <strong style="color:var(--lime)">~'+n+'</strong>'+
+                  name+' <strong style="color:var(--lime)">'+n+'</strong>'+
                 '</span>'
               ).join('')+
             '</span>'
-          : '<span style="font-size:.58rem;color:var(--text3)">sem visitas a páginas de ingresso</span>'
+          : ''
         )+
       '</span>';
     refDiv.appendChild(card);
