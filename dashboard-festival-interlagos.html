@@ -958,6 +958,7 @@ function getCurrentWeek(){const n=new Date();n.setHours(0,0,0,0);return Math.max
 // Data de início das vendas (D+1). Ajuste para a data real quando disponível.
 const DATA_INICIO = new Date('2026-03-31T00:00:00'); // D+1 = abertura das vendas
 let D26_FULL = [];
+let TIKTOK_DATA = { daily_series: [] }; // declarado cedo para evitar TDZ
 
 // ═══════════════════════════════════════════════
 // AÇÕES DE MÍDIA — marque aqui cada ação
@@ -2619,8 +2620,6 @@ function setExecDayPreset(d, iso) {
    Dados em localStorage: 'tiktok_series'
    Estrutura: [{date:'YYYY-MM-DD', cost, impressions, clicks, add_to_cart, purchases}]
 ═══════════════════════════════════════════════ */
-let TIKTOK_DATA = { daily_series: [] };
-
 function tiktokLoad() {
   try {
     const raw = localStorage.getItem('tiktok_series');
