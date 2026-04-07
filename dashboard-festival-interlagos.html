@@ -2499,12 +2499,8 @@ function renderExecConversoes() {
       <span class="exec-conv-val" style="color:var(--lime)">${ingTot>0 ? ingTot.toLocaleString('pt-BR') : '—'}</span>
     </div>
     <div class="exec-conv-row">
-      <span class="exec-conv-label">CPA (somente ADS)</span>
+      <span class="exec-conv-label">CPA (ADS)</span>
       <span class="exec-conv-val">${cpaAds ? execFmtFull(cpaAds) : '—'}</span>
-    </div>
-    <div class="exec-conv-row">
-      <span class="exec-conv-label">CPA (total ingressos)</span>
-      <span class="exec-conv-val">${cpaTot ? execFmtFull(cpaTot) : '—'}</span>
     </div>
   `;
 
