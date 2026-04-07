@@ -2456,7 +2456,13 @@ function renderExecConversoes() {
   const invest    = buildExecD26Invest(execFiltFrom, execFiltTo);
   const metaConv  = invest.reduce((s,r)=>s+r.metaConv, 0);
   const gadsConv  = invest.reduce((s,r)=>s+r.gadsConv, 0);
-  const adsConv   = metaConv + gadsConv;
+  // TikTok: filtra pelo período
+  const ttSeries  = TIKTOK_DATA?.daily_series || [];
+  const ttFiltered = execFiltFrom
+    ? ttSeries.filter(d => d.date >= execFiltFrom && d.date <= (execFiltTo||'9999-12-31'))
+    : ttSeries;
+  const tiktokConv = ttFiltered.reduce((s,d)=>s+(d.purchases||0), 0);
+  const adsConv   = metaConv + gadsConv + tiktokConv;
   const totalInv  = invest.reduce((s,r)=>s+(r.meta+r.gads), 0);
 
   // GA4: total de conversões no período filtrado (ou desde o início da campanha)
@@ -2482,6 +2488,10 @@ function renderExecConversoes() {
     <div class="exec-conv-row">
       <span class="exec-conv-label">Google Ads</span>
       <span class="exec-conv-val">${gadsConv.toLocaleString('pt-BR')}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label" style="color:rgba(0,191,255,.8)">TikTok Ads <span style="font-size:.6rem;color:#555">manual</span></span>
+      <span class="exec-conv-val" style="color:rgba(0,191,255,.9)">${tiktokConv > 0 ? tiktokConv.toLocaleString('pt-BR') : '—'}</span>
     </div>
     <div class="exec-conv-row">
       <span class="exec-conv-label">Orgânico / Outros <span style="font-size:.6rem;color:#666">(GA4 − ADS)</span></span>
