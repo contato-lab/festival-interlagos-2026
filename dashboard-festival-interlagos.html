@@ -2504,12 +2504,9 @@ function renderExecConversoes() {
     </div>
   `;
 
-  const days = execGetAllDays(invest);
-  const minDay = days.length ? days[0] : 1;
-  const maxDay = days.length ? days[days.length-1] : Infinity;
-  const s26 = D26_FULL.filter(r=>r.d>=minDay&&r.d<=maxDay).reduce((a,r)=>({mq:a.mq+r.mq,aq:a.aq+r.aq}),{mq:0,aq:0});
+  const s26 = D26_FULL.filter(r=>r.d>=minD&&r.d<=maxD).reduce((a,r)=>({mq:a.mq+r.mq,aq:a.aq+r.aq,mv:a.mv+r.mv,av:a.av+r.av}),{mq:0,aq:0,mv:0,av:0});
   const ing = s26.mq + s26.aq;
-  const txConv = ga4Total > 0 ? (ing / ga4Total * 100) : null;
+  const tktMedio = ing > 0 ? (s26.mv + s26.av) / ing : 0;
 
   document.getElementById('exec-conv-totals').innerHTML = `
     <div class="section-title" style="margin-bottom:14px">Ingressos Vendidos</div>
@@ -2526,12 +2523,8 @@ function renderExecConversoes() {
       <span class="exec-conv-val" style="color:var(--lime)">${ing.toLocaleString('pt-BR')}</span>
     </div>
     <div class="exec-conv-row">
-      <span class="exec-conv-label">Taxa conv. GA4 → Ingresso</span>
-      <span class="exec-conv-val">${txConv !== null ? txConv.toFixed(1)+'%' : '—'}</span>
-    </div>
-    <div class="exec-conv-row">
       <span class="exec-conv-label">Ticket Médio</span>
-      <span class="exec-conv-val">${ing > 0 ? execFmtFull((s26.mq>0||s26.aq>0) ? (D26_FULL.reduce((s,r)=>s+r.mv+r.av,0)/ing) : 0) : '—'}</span>
+      <span class="exec-conv-val">${ing > 0 ? execFmtFull(tktMedio) : '—'}</span>
     </div>
   `;
 }
