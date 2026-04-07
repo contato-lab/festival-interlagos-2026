@@ -360,6 +360,28 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .exec-filter-period{font-size:.72rem;color:#666;margin-left:auto;font-style:italic}
 @media(max-width:1024px){.exec-hoje-ontem{grid-template-columns:1fr 1fr}.exec-kpi-strip{grid-template-columns:repeat(2,1fr)}.exec-charts-grid{grid-template-columns:1fr}.exec-conv-grid{grid-template-columns:1fr}.tab-bar{padding:0 18px}}
 @media(max-width:768px){.exec-hoje-ontem{grid-template-columns:1fr}.exec-main{padding:16px 10px}.tab-btn{font-size:.78rem;padding:10px 14px}}
+/* ── Modal TikTok ── */
+.tt-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.tt-modal{background:#141414;border:1px solid rgba(0,191,255,.3);border-radius:16px;padding:28px 32px;width:100%;max-width:480px;box-shadow:0 0 40px rgba(0,191,255,.1)}
+.tt-modal-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:#00BCD4;letter-spacing:.04em;margin-bottom:4px}
+.tt-modal-sub{font-size:.72rem;color:#888;margin-bottom:22px}
+.tt-field{margin-bottom:14px}
+.tt-field label{display:block;font-size:.65rem;color:#AAA;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:5px}
+.tt-field input{width:100%;background:#1C1C1C;border:1px solid rgba(255,255,255,.12);color:#EEE;font-size:.9rem;padding:9px 12px;border-radius:8px;outline:none;font-family:'Inter',sans-serif}
+.tt-field input:focus{border-color:rgba(0,191,255,.5)}
+.tt-fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tt-modal-actions{display:flex;gap:10px;margin-top:22px}
+.tt-btn-save{flex:1;background:rgba(0,191,255,.15);border:1px solid rgba(0,191,255,.4);color:#00BCD4;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.95rem;letter-spacing:.05em;padding:10px;border-radius:8px;cursor:pointer;transition:all .15s}
+.tt-btn-save:hover{background:rgba(0,191,255,.25)}
+.tt-btn-cancel{background:transparent;border:1px solid rgba(255,255,255,.1);color:#666;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.9rem;padding:10px 18px;border-radius:8px;cursor:pointer}
+.tt-history{margin-top:18px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px}
+.tt-history-title{font-size:.65rem;color:#666;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.tt-history-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.75rem}
+.tt-history-row:last-child{border-bottom:none}
+.tt-history-date{color:#AAA}
+.tt-history-vals{color:#CCC;display:flex;gap:12px}
+.tt-history-del{color:#444;cursor:pointer;font-size:.85rem;padding:0 4px;background:none;border:none}
+.tt-history-del:hover{color:var(--red)}
 </style>
 </head>
 <body>
@@ -610,25 +632,24 @@ Google Ads
       <div class="spk-wrap"><canvas id="spkGoogle"></canvas></div>
     </div>
 
-    <!-- TIKTOK — LOCKED -->
-    <div class="media-card locked" style="border-color:rgba(0,191,255,.15)">
-      <div class="media-platform" style="color:#00BCD4">
-TikTok Ads
+    <!-- TIKTOK — MANUAL -->
+    <div class="media-card" style="border-color:rgba(0,191,255,.25)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div class="media-platform" style="color:#00BCD4;margin-bottom:0">TikTok Ads</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge badge-tiktok" style="font-size:.6rem">Lançamento manual</span>
+          <button onclick="openTikTokModal()" style="background:rgba(0,191,255,.12);border:1px solid rgba(0,191,255,.3);color:#00BCD4;font-size:.68rem;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:.04em">✏️ LANÇAR</button>
+        </div>
       </div>
       <div class="media-kpis">
-        <div class="mk"><div class="mk-label">Impressões</div><div class="mk-val">—</div></div>
-        <div class="mk"><div class="mk-label">Cliques</div><div class="mk-val">—</div></div>
-        <div class="mk"><div class="mk-label">Pageview</div><div class="mk-val">—</div></div>
-        <div class="mk"><div class="mk-label">Add to Cart</div><div class="mk-val">—</div></div>
-        <div class="mk"><div class="mk-label">Checkout</div><div class="mk-val">—</div></div>
-        <div class="mk"><div class="mk-label">Compras</div><div class="mk-val">—</div></div>
-        <div class="mk" style="grid-column:1/-1"><div class="mk-label">Custo de Compra</div><div class="mk-val">—</div></div>
+        <div class="mk mk-warn"><div class="mk-label">Investimento</div><div class="mk-val" id="tiktok-invest">—</div></div>
+        <div class="mk"><div class="mk-label">Impressões</div><div class="mk-val" id="tiktok-imp">—</div></div>
+        <div class="mk"><div class="mk-label">Cliques</div><div class="mk-val" id="tiktok-clicks">—</div></div>
+        <div class="mk"><div class="mk-label">Add to Cart</div><div class="mk-val" id="tiktok-atc">—</div></div>
+        <div class="mk"><div class="mk-label">Compras</div><div class="mk-val" id="tiktok-compras">—</div></div>
+        <div class="mk mk-highlight"><div class="mk-label">Custo por Compra</div><div class="mk-val" id="tiktok-cpp">—</div></div>
       </div>
-      <div class="lock-overlay">
-        <div class="lock-icon">🔒</div>
-        <div class="lock-text">Aguardando<br>Token da API</div>
-        <span class="badge badge-tiktok">Em aprovação</span>
-      </div>
+      <div class="spk-wrap"><canvas id="spkTikTok"></canvas></div>
     </div>
 
   </div>
@@ -743,12 +764,12 @@ TikTok Ads
         <div class="org-val" style="color:#4285F4" id="googlePct">—%</div>
       </div>
       <div class="org-item">
-        <div class="org-label"><div class="dot" style="background:var(--blue)"></div>TikTok Ads</div>
-        <div class="org-val" style="color:var(--blue)">🔒</div>
+        <div class="org-label"><div class="dot" style="background:#00BCD4"></div>TikTok Ads</div>
+        <div class="org-val" style="color:#00BCD4" id="tiktokPct">—%</div>
       </div>
       <div class="note">
         <strong style="color:var(--lime)">Fórmula:</strong> Orgânico = Total Vendas (planilha) − Rastreado via UTM (GA4).<br>
-        Quando TikTok estiver integrado, o cálculo será atualizado automaticamente.
+        TikTok incluso via lançamento manual. Quando API estiver ativa, será atualizado automaticamente.
       </div>
     </div>
   </div>
@@ -1104,6 +1125,7 @@ function applyFiltro(){
   // Atualiza Mídia Paga com o mesmo range
   if(GADS_DATA) updateGAdsCard(GADS_DATA, deStr, ateStr);
   if(META_DATA) updateMetaCard(META_DATA, deStr, ateStr);
+  updateTikTokCard(deStr, ateStr);
   updateMediaTotals(deStr, ateStr);
   // Atualiza GA4 com o mesmo range
   if(GA4_DATA) { buildGA4Sources(deStr, ateStr); buildGA4Funnel(deStr, ateStr); }
@@ -1791,6 +1813,11 @@ function updateMediaTotals(dateFrom, dateTo) {
     if (dateFrom && dateTo) ms = ms.filter(d => d.date >= dateFrom && d.date <= dateTo);
     ms.forEach(d => { inv += d.cost||0; imp += d.impressions||0; clk += d.clicks||0; comp += d.purchases||0; });
   }
+  if (TIKTOK_DATA) {
+    let ts = TIKTOK_DATA.daily_series || [];
+    if (dateFrom && dateTo) ts = ts.filter(d => d.date >= dateFrom && d.date <= dateTo);
+    ts.forEach(d => { inv += d.cost||0; imp += d.impressions||0; clk += d.clicks||0; comp += d.purchases||0; });
+  }
   const fmtImp = v => v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e3 ? Math.round(v/1e3)+'K' : String(v);
   const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
   set('total-invest', fmtR(inv));
@@ -1828,31 +1855,34 @@ function buildOrg() {
 
   const metaCompras = META_DATA?.totals?.purchases || 0;
   const gadsConv = GADS_DATA?.totals?.conversions || 0;
+  const tiktokCompras = (TIKTOK_DATA?.daily_series||[]).reduce((s,d)=>s+(d.purchases||0),0);
 
-  let metaPct = 0, gadsPct = 0, orgPct = 100;
+  let metaPct = 0, gadsPct = 0, tiktokPct = 0, orgPct = 100;
   if (totalReceita > 0 && tktMedio > 0) {
-    const metaRec = metaCompras * tktMedio;
-    const gadsRec = gadsConv * tktMedio;
-    const orgRec = Math.max(totalReceita - metaRec - gadsRec, 0);
-    const soma = orgRec + metaRec + gadsRec;
-    orgPct = Math.round(orgRec / soma * 100);
-    metaPct = Math.round(metaRec / soma * 100);
-    gadsPct = Math.round(gadsRec / soma * 100);
-    // Ajusta arredondamento para somar 100
-    const diff = 100 - (orgPct + metaPct + gadsPct);
+    const metaRec   = metaCompras   * tktMedio;
+    const gadsRec   = gadsConv      * tktMedio;
+    const tiktokRec = tiktokCompras * tktMedio;
+    const orgRec = Math.max(totalReceita - metaRec - gadsRec - tiktokRec, 0);
+    const soma = orgRec + metaRec + gadsRec + tiktokRec;
+    orgPct    = Math.round(orgRec    / soma * 100);
+    metaPct   = Math.round(metaRec   / soma * 100);
+    gadsPct   = Math.round(gadsRec   / soma * 100);
+    tiktokPct = Math.round(tiktokRec / soma * 100);
+    const diff = 100 - (orgPct + metaPct + gadsPct + tiktokPct);
     orgPct += diff;
   }
 
-  // Atualiza labels
-  document.getElementById('orgPct').textContent = orgPct + '%';
-  document.getElementById('metaPct').textContent = metaPct + '%';
-  document.getElementById('googlePct').textContent = gadsPct + '%';
+  document.getElementById('orgPct').textContent    = orgPct    + '%';
+  document.getElementById('metaPct').textContent   = metaPct   + '%';
+  document.getElementById('googlePct').textContent = gadsPct   + '%';
+  const ttEl = document.getElementById('tiktokPct');
+  if (ttEl) ttEl.textContent = tiktokPct + '%';
 
   if(cOrg)cOrg.destroy();
   cOrg=new Chart(document.getElementById('chartOrg'),{
     type:'doughnut',
-    data:{labels:['Orgânico','Meta Ads','Google Ads'],
-      datasets:[{data:[orgPct,metaPct,gadsPct],backgroundColor:['rgba(200,255,0,0.82)','rgba(24,119,242,0.8)','rgba(66,133,244,0.75)'],borderColor:'#0A0A0A',borderWidth:3,hoverOffset:8}]},
+    data:{labels:['Orgânico','Meta Ads','Google Ads','TikTok Ads'],
+      datasets:[{data:[orgPct,metaPct,gadsPct,tiktokPct],backgroundColor:['rgba(200,255,0,0.82)','rgba(24,119,242,0.8)','rgba(66,133,244,0.75)','rgba(0,191,212,0.8)'],borderColor:'#0A0A0A',borderWidth:3,hoverOffset:8}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'72%',
       plugins:{legend:{display:false},tooltip:{backgroundColor:'#1A1A1A',borderColor:'rgba(255,255,255,0.08)',borderWidth:1,titleColor:'#888',bodyColor:'#FFF',padding:10,
         callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw}%`}}}}
@@ -2517,6 +2547,163 @@ function execSetInvestView(view, btn) {
   btn.closest('.pill-group').querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active'); execCurrentInvestView=view; buildExecInvestChart();
 }
+
+/* ═══════════════════════════════════════════════
+   TIKTOK — LANÇAMENTO MANUAL
+   Dados em localStorage: 'tiktok_series'
+   Estrutura: [{date:'YYYY-MM-DD', cost, impressions, clicks, add_to_cart, purchases}]
+═══════════════════════════════════════════════ */
+let TIKTOK_DATA = { daily_series: [] };
+
+function tiktokLoad() {
+  try {
+    const raw = localStorage.getItem('tiktok_series');
+    if (raw) TIKTOK_DATA.daily_series = JSON.parse(raw);
+  } catch(e) { TIKTOK_DATA.daily_series = []; }
+}
+
+function tiktokSave() {
+  localStorage.setItem('tiktok_series', JSON.stringify(TIKTOK_DATA.daily_series));
+}
+
+function updateTikTokCard(dateFrom, dateTo) {
+  let arr = TIKTOK_DATA.daily_series || [];
+  if (dateFrom && dateTo) arr = arr.filter(d => d.date >= dateFrom && d.date <= dateTo);
+  const tot = arr.reduce((a,d) => {
+    a.cost += d.cost || 0;
+    a.imp  += d.impressions || 0;
+    a.clk  += d.clicks || 0;
+    a.atc  += d.add_to_cart || 0;
+    a.comp += d.purchases || 0;
+    return a;
+  }, {cost:0, imp:0, clk:0, atc:0, comp:0});
+
+  const fmtImp = v => v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1e3)+'K':String(v);
+  const set = (id, v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('tiktok-invest',  tot.cost  > 0 ? fmtR(tot.cost)  : '—');
+  set('tiktok-imp',     tot.imp   > 0 ? fmtImp(tot.imp) : '—');
+  set('tiktok-clicks',  tot.clk   > 0 ? Math.round(tot.clk).toLocaleString('pt-BR') : '—');
+  set('tiktok-atc',     tot.atc   > 0 ? Math.round(tot.atc).toLocaleString('pt-BR') : '—');
+  set('tiktok-compras', tot.comp  > 0 ? Math.round(tot.comp).toLocaleString('pt-BR') : '—');
+  set('tiktok-cpp',     tot.comp  > 0 ? 'R$ '+(tot.cost/tot.comp).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—');
+
+  buildSpkTimeline('spkTikTok', arr.map(d=>({...d, cost:d.cost})), 'rgb(0,191,212)');
+}
+
+/* ── Modal ── */
+function openTikTokModal() {
+  const today = new Date().toISOString().slice(0,10);
+  const series = TIKTOK_DATA.daily_series;
+  const histRows = [...series].reverse().slice(0,7).map(d => `
+    <div class="tt-history-row">
+      <span class="tt-history-date">${new Date(d.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','')} </span>
+      <span class="tt-history-vals">
+        <span>R$${Math.round(d.cost).toLocaleString('pt-BR')}</span>
+        <span>${(d.impressions||0)>=1000?Math.round((d.impressions||0)/1000)+'K':d.impressions||0} imp</span>
+        <span>${d.purchases||0} compras</span>
+      </span>
+      <button class="tt-history-del" onclick="tiktokDeleteEntry('${d.date}')" title="Remover">✕</button>
+    </div>`).join('');
+
+  const overlay = document.createElement('div');
+  overlay.className = 'tt-modal-overlay';
+  overlay.id = 'ttModalOverlay';
+  overlay.innerHTML = `
+    <div class="tt-modal" onclick="event.stopPropagation()">
+      <div class="tt-modal-title">📱 TikTok Ads</div>
+      <div class="tt-modal-sub">Lançamento manual de dados diários</div>
+
+      <div class="tt-field">
+        <label>Data</label>
+        <input type="date" id="ttDate" value="${today}">
+      </div>
+      <div class="tt-fields-grid">
+        <div class="tt-field">
+          <label>Investimento (R$)</label>
+          <input type="number" id="ttCost" placeholder="0.00" step="0.01" min="0">
+        </div>
+        <div class="tt-field">
+          <label>Impressões</label>
+          <input type="number" id="ttImp" placeholder="0" min="0">
+        </div>
+        <div class="tt-field">
+          <label>Cliques</label>
+          <input type="number" id="ttClk" placeholder="0" min="0">
+        </div>
+        <div class="tt-field">
+          <label>Add to Cart</label>
+          <input type="number" id="ttAtc" placeholder="0" min="0">
+        </div>
+        <div class="tt-field">
+          <label>Compras</label>
+          <input type="number" id="ttComp" placeholder="0" min="0">
+        </div>
+      </div>
+
+      ${histRows ? `<div class="tt-history"><div class="tt-history-title">Últimos lançamentos</div>${histRows}</div>` : ''}
+
+      <div class="tt-modal-actions">
+        <button class="tt-btn-cancel" onclick="closeTikTokModal()">Cancelar</button>
+        <button class="tt-btn-save" onclick="saveTikTokEntry()">💾 SALVAR</button>
+      </div>
+    </div>`;
+  overlay.addEventListener('click', closeTikTokModal);
+  document.body.appendChild(overlay);
+
+  // Pre-preenche se já existe entrada para a data
+  const existing = series.find(d => d.date === today);
+  if (existing) {
+    document.getElementById('ttCost').value = existing.cost || '';
+    document.getElementById('ttImp').value  = existing.impressions || '';
+    document.getElementById('ttClk').value  = existing.clicks || '';
+    document.getElementById('ttAtc').value  = existing.add_to_cart || '';
+    document.getElementById('ttComp').value = existing.purchases || '';
+  }
+}
+
+function closeTikTokModal() {
+  const el = document.getElementById('ttModalOverlay');
+  if (el) el.remove();
+}
+
+function saveTikTokEntry() {
+  const date = document.getElementById('ttDate').value;
+  if (!date) return;
+  const entry = {
+    date,
+    cost:        parseFloat(document.getElementById('ttCost').value) || 0,
+    impressions: parseInt(document.getElementById('ttImp').value)    || 0,
+    clicks:      parseInt(document.getElementById('ttClk').value)    || 0,
+    add_to_cart: parseInt(document.getElementById('ttAtc').value)    || 0,
+    purchases:   parseInt(document.getElementById('ttComp').value)   || 0,
+  };
+  // Upsert por data
+  const idx = TIKTOK_DATA.daily_series.findIndex(d => d.date === date);
+  if (idx >= 0) TIKTOK_DATA.daily_series[idx] = entry;
+  else TIKTOK_DATA.daily_series.push(entry);
+  TIKTOK_DATA.daily_series.sort((a,b) => a.date.localeCompare(b.date));
+  tiktokSave();
+  closeTikTokModal();
+  const { de, ate } = getActiveDates();
+  updateTikTokCard(de, ate);
+  updateMediaTotals(de, ate);
+  buildOrg();
+}
+
+function tiktokDeleteEntry(date) {
+  TIKTOK_DATA.daily_series = TIKTOK_DATA.daily_series.filter(d => d.date !== date);
+  tiktokSave();
+  closeTikTokModal();
+  const { de, ate } = getActiveDates();
+  updateTikTokCard(de, ate);
+  updateMediaTotals(de, ate);
+  buildOrg();
+}
+
+// Carrega ao iniciar
+tiktokLoad();
 </script>
+
+<!-- Modal TikTok (renderizado dinamicamente por openTikTokModal) -->
 </body>
 </html>
