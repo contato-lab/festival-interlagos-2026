@@ -2571,13 +2571,26 @@ function renderPainelExecutivo() {
 }
 
 /* ═══ Controle de abas ═══ */
-function switchTab(tabId) {
+function switchTab(tabId, pushState=true) {
   document.querySelectorAll('.tab-panel').forEach(p => p.style.display='none');
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(tabId).style.display = 'block';
   document.getElementById('tbtn-'+tabId).classList.add('active');
   if(tabId === 'tab-exec') renderPainelExecutivo();
+  if(pushState) {
+    const hash = tabId === 'tab-exec' ? '#exec' : '#';
+    history.pushState({tabId}, '', hash || window.location.pathname);
+  }
 }
+// Navegar com o botão Voltar/Avançar do browser
+window.addEventListener('popstate', e => {
+  const tabId = e.state?.tabId || (location.hash==='#exec' ? 'tab-exec' : 'tab-dash');
+  switchTab(tabId, false);
+});
+// Abrir na aba certa se vier com hash na URL
+(function(){
+  if(location.hash === '#exec') switchTab('tab-exec', false);
+})();
 function execSetVendasMetric(metric, btn) {
   document.querySelectorAll('.exec-metric-pill').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active'); execCurrentVendasMetric=metric; buildExecVendasChart();
