@@ -180,14 +180,22 @@ def fetch_sessions_by_date_channel(client) -> dict:
 def fetch_influencer_breakdown(client) -> list:
     """
     Por influenciador (utm_source, utm_medium=influencer):
-    sessões, conversões e breakdown de página de ingresso (moto vs auto).
+    sessões totais, conversões e sessões por produto de ingresso.
     Retorna lista de dicts ordenada por conversions desc.
     """
     end   = datetime.now(timezone.utc) - timedelta(days=1)
     start = end - timedelta(days=CHANNEL_DAYS)
 
-    MOTO_PAGES = ("ride-pass", "edicao-moto", "interlagos-moto")
-    AUTO_PAGES = ("sport-pass", "drive-pass", "interlagos-auto", "edicao-auto")
+    # Mapeamento: slug da URL → nome do produto
+    TICKET_PAGES = {
+        "ride-pass":   "Ride Pass",
+        "sport-pass":  "Sport Pass",
+        "drive-pass":  "Drive Pass",
+        "street-pass": "Street Pass",
+        "fan-pass":    "Fan Pass",
+        "vip-pass":    "VIP Pass",
+        "pit-pass":    "Pit Pass",
+    }
 
     request = RunReportRequest(
         property=f"properties/{PROPERTY_ID}",
@@ -225,14 +233,15 @@ def fetch_influencer_breakdown(client) -> list:
         conv  = float(row.metric_values[1].value)
 
         if src not in sources:
-            sources[src] = {"source": src, "sessions": 0, "conversions": 0, "moto": 0, "auto": 0}
+            sources[src] = {"source": src, "sessions": 0, "conversions": 0, "tickets": {}}
         sources[src]["sessions"]    += sess
         sources[src]["conversions"] += conv
 
-        if any(k in page for k in MOTO_PAGES):
-            sources[src]["moto"] += sess
-        elif any(k in page for k in AUTO_PAGES):
-            sources[src]["auto"] += sess
+        # Identifica produto pelo slug na URL
+        for slug, name in TICKET_PAGES.items():
+            if slug in page:
+                sources[src]["tickets"][name] = sources[src]["tickets"].get(name, 0) + sess
+                break
 
     result = sorted(sources.values(), key=lambda x: x["conversions"], reverse=True)
     for r in result:
