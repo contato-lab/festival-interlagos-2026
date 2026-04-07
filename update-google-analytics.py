@@ -181,12 +181,25 @@ def fetch_influencer_breakdown(client) -> list:
     """
     Por influenciador (utm_source, utm_medium=influencer):
     sessões totais, conversões e sessões por produto de ingresso.
-    Retorna lista de dicts ordenada por conversions desc.
+    Usa duas queries separadas para contornar limitação do GA4.
     """
     end   = datetime.now(timezone.utc) - timedelta(days=1)
     start = end - timedelta(days=CHANNEL_DAYS)
+    date_range = DateRange(
+        start_date=start.strftime("%Y-%m-%d"),
+        end_date=end.strftime("%Y-%m-%d"),
+    )
+    medium_filter = FilterExpression(
+        filter=Filter(
+            field_name="sessionMedium",
+            string_filter=Filter.StringFilter(
+                match_type=Filter.StringFilter.MatchType.EXACT,
+                value="influencer",
+                case_sensitive=False,
+            ),
+        )
+    )
 
-    # Mapeamento: slug da URL → nome do produto
     TICKET_PAGES = {
         "ride-pass":   "Ride Pass",
         "sport-pass":  "Sport Pass",
@@ -197,56 +210,49 @@ def fetch_influencer_breakdown(client) -> list:
         "pit-pass":    "Pit Pass",
     }
 
-    request = RunReportRequest(
+    # Query 1: sessões + conversões por source
+    r1 = client.run_report(RunReportRequest(
         property=f"properties/{PROPERTY_ID}",
-        date_ranges=[DateRange(
-            start_date=start.strftime("%Y-%m-%d"),
-            end_date=end.strftime("%Y-%m-%d"),
-        )],
-        dimensions=[
-            Dimension(name="sessionSource"),
-            Dimension(name="pagePath"),
-        ],
-        metrics=[
-            Metric(name="sessions"),
-            Metric(name="conversions"),
-        ],
-        dimension_filter=FilterExpression(
-            filter=Filter(
-                field_name="sessionMedium",
-                string_filter=Filter.StringFilter(
-                    match_type=Filter.StringFilter.MatchType.EXACT,
-                    value="influencer",
-                    case_sensitive=False,
-                ),
-            )
-        ),
-        limit=2000,
-    )
-    response = client.run_report(request)
-
+        date_ranges=[date_range],
+        dimensions=[Dimension(name="sessionSource")],
+        metrics=[Metric(name="sessions"), Metric(name="conversions")],
+        dimension_filter=medium_filter,
+        limit=200,
+    ))
     sources: dict = {}
-    for row in response.rows:
-        src   = row.dimension_values[0].value
-        page  = row.dimension_values[1].value.lower()
-        sess  = int(row.metric_values[0].value)
-        conv  = float(row.metric_values[1].value)
+    for row in r1.rows:
+        src  = row.dimension_values[0].value
+        sources[src] = {
+            "source":      src,
+            "sessions":    int(row.metric_values[0].value),
+            "conversions": round(float(row.metric_values[1].value)),
+            "tickets":     {},
+        }
 
+    if not sources:
+        return []
+
+    # Query 2: sessões por source + pagePath (para mapear produto)
+    r2 = client.run_report(RunReportRequest(
+        property=f"properties/{PROPERTY_ID}",
+        date_ranges=[date_range],
+        dimensions=[Dimension(name="sessionSource"), Dimension(name="pagePath")],
+        metrics=[Metric(name="sessions")],
+        dimension_filter=medium_filter,
+        limit=2000,
+    ))
+    for row in r2.rows:
+        src  = row.dimension_values[0].value
+        page = row.dimension_values[1].value.lower()
+        sess = int(row.metric_values[0].value)
         if src not in sources:
-            sources[src] = {"source": src, "sessions": 0, "conversions": 0, "tickets": {}}
-        sources[src]["sessions"]    += sess
-        sources[src]["conversions"] += conv
-
-        # Identifica produto pelo slug na URL
+            continue
         for slug, name in TICKET_PAGES.items():
             if slug in page:
                 sources[src]["tickets"][name] = sources[src]["tickets"].get(name, 0) + sess
                 break
 
-    result = sorted(sources.values(), key=lambda x: x["conversions"], reverse=True)
-    for r in result:
-        r["conversions"] = round(r["conversions"])
-    return result
+    return sorted(sources.values(), key=lambda x: x["conversions"], reverse=True)
 
 
 def fetch_influencer_sessions(client) -> dict:
