@@ -310,6 +310,46 @@ tr:hover td{background:rgba(255,255,255,.018)}
   .filtro-bar{grid-template-columns:1fr}
   .filtro-date{width:calc(50% - 4px)}
 }
+
+/* ═══ TAB BAR ═══ */
+.tab-bar{display:flex;gap:0;border-bottom:2px solid var(--border);background:#0D0D0D;padding:0 32px}
+.tab-btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.88rem;text-transform:uppercase;letter-spacing:.06em;padding:12px 26px;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.2s;white-space:nowrap}
+.tab-btn:hover{color:var(--text2)}.tab-btn.active{color:var(--lime);border-bottom-color:var(--lime)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+/* ═══ EXEC PANEL ═══ */
+.exec-main{padding:24px 32px;display:flex;flex-direction:column;gap:20px;max-width:1500px;margin:0 auto}
+.exec-hoje-ontem{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.exec-card{background:var(--card);border:1px solid var(--lime-border);border-radius:var(--radius);padding:20px 22px}
+.exec-card-label{font-size:.68rem;color:#999;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:2px}
+.exec-card-date{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.9rem;color:var(--lime);margin-bottom:10px}
+.exec-val-big{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:2.1rem;color:var(--lime);line-height:1;margin-bottom:8px}
+.exec-val-big.partial{color:var(--warn)}
+.exec-meta-row{display:flex;gap:20px;flex-wrap:wrap;margin-top:6px}
+.exec-meta-item{display:flex;flex-direction:column;gap:1px}
+.exec-meta-label{font-size:.62rem;color:#666;text-transform:uppercase;letter-spacing:.06em}
+.exec-meta-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;color:var(--text2)}
+.exec-tv-row{font-size:.7rem;color:var(--warn);margin-top:8px;display:flex;align-items:center;gap:5px}
+.exec-kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.exec-kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+.exec-kpi-label{font-size:.68rem;color:#999;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.exec-kpi-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.7rem;color:var(--text);line-height:1;margin-bottom:4px}
+.exec-kpi-delta{font-size:.7rem;color:#888}
+.exec-kpi-delta.up{color:var(--green)}.exec-kpi-delta.down{color:var(--red)}
+.exec-context{background:var(--lime-dim);border:1px solid var(--lime-border);border-radius:var(--rad-sm);padding:14px 18px;font-size:.82rem;color:var(--text2);line-height:1.6;display:flex;gap:12px;align-items:flex-start}
+.exec-charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.exec-chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.exec-chart-wrap{position:relative;height:240px}
+.exec-leg{display:flex;gap:14px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+.exec-leg-item{display:flex;align-items:center;gap:5px;font-size:.72rem;color:#BBB}
+.exec-leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.exec-conv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.exec-conv-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+.exec-conv-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.exec-conv-row:last-child{border-bottom:none}
+.exec-conv-label{font-size:.78rem;color:#CCC}
+.exec-conv-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;color:var(--lime)}
+@media(max-width:1024px){.exec-hoje-ontem{grid-template-columns:1fr 1fr}.exec-kpi-strip{grid-template-columns:repeat(2,1fr)}.exec-charts-grid{grid-template-columns:1fr}.exec-conv-grid{grid-template-columns:1fr}.tab-bar{padding:0 18px}}
+@media(max-width:768px){.exec-hoje-ontem{grid-template-columns:1fr}.exec-main{padding:16px 10px}.tab-btn{font-size:.78rem;padding:10px 14px}}
 </style>
 </head>
 <body>
@@ -329,6 +369,14 @@ tr:hover td{background:rgba(255,255,255,.018)}
     <span class="gen-date" id="genDate" style="font-size:.72rem;color:#888"></span>
   </div>
 </header>
+
+<!-- ══ TAB BAR ══ -->
+<div class="tab-bar">
+  <button class="tab-btn active" id="tbtn-tab-dash" onclick="switchTab('tab-dash')">📊 Dashboard Completo</button>
+  <button class="tab-btn" id="tbtn-tab-exec" onclick="switchTab('tab-exec')">👔 Painel Executivo</button>
+</div>
+
+<div id="tab-dash" class="tab-panel active">
 
 <!-- ══ FILTRO DE DATA ══ -->
 <div class="filtro-bar">
@@ -708,6 +756,130 @@ TikTok Ads
     <div class="footer-tag" id="footerDate"></div>
   </div>
 </footer>
+
+</div><!-- /tab-dash -->
+
+<!-- ══ TAB: PAINEL EXECUTIVO ══ -->
+<div id="tab-exec" class="tab-panel">
+<div class="exec-main">
+
+  <!-- Hoje / Ontem / Campanha -->
+  <div class="exec-hoje-ontem">
+    <div class="exec-card" id="exec-card-ontem">
+      <div class="exec-card-label">Ontem</div>
+      <div class="exec-val-big">—</div>
+    </div>
+    <div class="exec-card" id="exec-card-hoje">
+      <div class="exec-card-label">Hoje <span style="color:var(--warn);font-size:.65rem">● PARCIAL</span></div>
+      <div class="exec-val-big partial">—</div>
+    </div>
+    <div class="exec-card" id="exec-card-campanha">
+      <div class="exec-card-label">Campanha</div>
+      <div class="exec-val-big">—</div>
+    </div>
+  </div>
+
+  <!-- KPIs de Vendas -->
+  <div class="exec-kpi-strip">
+    <div class="exec-kpi">
+      <div class="exec-kpi-label">Receita Total 2026</div>
+      <div id="exec-kpi-receita"><div class="exec-kpi-val">—</div></div>
+    </div>
+    <div class="exec-kpi">
+      <div class="exec-kpi-label">🏍️ Receita Motos</div>
+      <div id="exec-kpi-motos"><div class="exec-kpi-val">—</div></div>
+    </div>
+    <div class="exec-kpi">
+      <div class="exec-kpi-label">🚗 Receita Autos</div>
+      <div id="exec-kpi-autos"><div class="exec-kpi-val">—</div></div>
+    </div>
+    <div class="exec-kpi">
+      <div class="exec-kpi-label">🎟️ Ingressos Vendidos</div>
+      <div id="exec-kpi-ingressos"><div class="exec-kpi-val">—</div></div>
+    </div>
+  </div>
+
+  <!-- Contexto / insight -->
+  <div class="exec-context" id="exec-context">
+    <span>💡</span><span>Carregando dados...</span>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="exec-charts-grid">
+
+    <!-- Vendas -->
+    <div class="exec-chart-card">
+      <div class="section-header" style="margin-bottom:10px">
+        <div>
+          <div class="section-title">Vendas — 2025 vs 2026</div>
+          <div style="font-size:.7rem;color:#666;margin-top:3px">por dia de campanha</div>
+        </div>
+        <div class="pill-group">
+          <button class="pill active" onclick="execSetVendasMetric('total',this)">Total</button>
+          <button class="pill" onclick="execSetVendasMetric('motos',this)">🏍️ Motos</button>
+          <button class="pill" onclick="execSetVendasMetric('autos',this)">🚗 Autos</button>
+        </div>
+      </div>
+      <div class="exec-leg">
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>2026</div>
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#555"></span>2025</div>
+        <div class="exec-leg-item" id="exec-tvLegVendas" style="display:none">
+          <span style="display:inline-block;width:18px;height:2px;background:rgba(255,184,0,.8);border-top:2px dashed rgba(255,184,0,.8)"></span>
+          <span style="color:var(--warn)">TV Globo</span>
+        </div>
+      </div>
+      <div class="exec-chart-wrap"><canvas id="exec-chartVendas"></canvas></div>
+    </div>
+
+    <!-- Investimento ADS -->
+    <div class="exec-chart-card">
+      <div class="section-header" style="margin-bottom:10px">
+        <div>
+          <div class="section-title">Investimento ADS — 2025 vs 2026</div>
+          <div style="font-size:.7rem;color:#666;margin-top:3px">por dia de campanha · est. diária 2025</div>
+        </div>
+        <div class="pill-group">
+          <button class="pill active" onclick="execSetInvestView('diario',this)">Diário</button>
+          <button class="pill" onclick="execSetInvestView('acumulado',this)">Acumulado</button>
+        </div>
+      </div>
+      <div class="exec-leg">
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>2026</div>
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#555"></span>2025 (est.)</div>
+        <div class="exec-leg-item" id="exec-tvLegInvest">
+          <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,184,0,.8)"></span>
+          <span style="color:var(--warn)">TV Globo</span>
+        </div>
+      </div>
+      <div class="exec-chart-wrap"><canvas id="exec-chartInvest"></canvas></div>
+    </div>
+
+  </div><!-- /exec-charts-grid -->
+
+  <!-- Conversões -->
+  <div class="exec-conv-grid">
+    <div class="exec-conv-card" id="exec-conv-digital">
+      <div class="section-title" style="margin-bottom:14px">Conversões Digitais</div>
+      <div class="exec-conv-row"><span class="exec-conv-label">Carregando...</span></div>
+    </div>
+    <div class="exec-conv-card" id="exec-conv-totals">
+      <div class="section-title" style="margin-bottom:14px">Ingressos Vendidos</div>
+      <div class="exec-conv-row"><span class="exec-conv-label">Carregando...</span></div>
+    </div>
+  </div>
+
+</div><!-- /exec-main -->
+<footer class="footer">
+  <div>
+    <div class="footer-lime">✱ LIME — Transformamos caos em crescimento</div>
+    <div class="footer-tag">Branding · Performance · Conteúdo · Experiência</div>
+  </div>
+  <div style="text-align:right">
+    <div class="footer-tag">Painel Executivo — Festival Interlagos 2026</div>
+    <div class="footer-tag" id="execFooterDate"></div>
+  </div>
+</footer>
+</div><!-- /tab-exec -->
 
 <script>
 // ═══════════════════════════════════════════════
@@ -1891,7 +2063,331 @@ fetchGAdsData();
 fetchMetaData();
 
 // Auto-refresh a cada 30 segundos
-setInterval(() => { fetchGAdsData(); fetchMetaData(); fetchGA4Data(); updateLastRefreshTime(); }, 30000);
+setInterval(() => {
+  fetchGAdsData(); fetchMetaData(); fetchGA4Data(); updateLastRefreshTime();
+  if(document.getElementById('tab-exec').style.display !== 'none') renderPainelExecutivo();
+}, 30000);
+
+/* ═══════════════════════════════════════════════
+   PAINEL EXECUTIVO — constantes
+═══════════════════════════════════════════════ */
+const EXEC_CAMP_START_2026 = new Date(2026, 2, 31); // 31/03/2026
+const EXEC_CAMP_START_2025 = new Date(2025, 2, 14); // 14/03/2025
+
+const EXEC_TV_GLOBO = [
+  {date:'2026-04-01', day26:2, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  {date:'2026-04-02', day26:3, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  {date:'2026-04-03', day26:4, programs:['Bom Dia SP','Bom Dia Brasil']},
+  {date:'2026-04-05', day26:6, programs:['Auto Esporte','Esporte Espetacular']},
+  {date:'2026-04-06', day26:7, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+];
+
+const EXEC_D25_INVEST = (() => {
+  const semanas = [
+    {from:1, to:3,  daily:2679.88},{from:4, to:10, daily:4350.08},
+    {from:11,to:17, daily:4903.26},{from:18,to:24, daily:3429.32},
+    {from:25,to:31, daily:2697.07},{from:32,to:38, daily:4996.89},
+    {from:39,to:45, daily:5801.66},{from:46,to:52, daily:6824.98},
+    {from:53,to:59, daily:6120.89},{from:60,to:66, daily:5165.62},
+    {from:67,to:73, daily:5804.51},{from:74,to:80, daily:6619.04},
+    {from:81,to:87, daily:3830.10},{from:88,to:94, daily:3142.76},
+  ];
+  const arr = [];
+  semanas.forEach(s => { for(let d=s.from;d<=s.to;d++) arr.push({d, v:s.daily}); });
+  return arr;
+})();
+
+let execChartVendas = null, execChartInvest = null;
+let execCurrentVendasMetric = 'total', execCurrentInvestView = 'diario';
+
+/* ═══ helpers ═══ */
+function execDayOf26(dateStr) {
+  const dt = new Date(dateStr + 'T00:00:00');
+  return Math.round((dt - EXEC_CAMP_START_2026) / 86400000) + 1;
+}
+function execDateOf26Day(d) {
+  const dt = new Date(EXEC_CAMP_START_2026);
+  dt.setDate(dt.getDate() + d - 1);
+  return dt;
+}
+function execFmtDate(dt) {
+  return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+}
+function execFmtFull(n) {
+  if(n == null || isNaN(n)) return '—';
+  return 'R$ ' + n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function execFmtK(n) {
+  if(n == null || isNaN(n) || n === 0) return '—';
+  return n>=1000000?'R$'+(n/1000000).toFixed(1)+'M':n>=1000?'R$'+(n/1000).toFixed(0)+'K':'R$'+Math.round(n);
+}
+
+/* Constrói D26_INVEST a partir de META_DATA + GADS_DATA (reutiliza os fetches do dashboard principal) */
+function buildExecD26Invest() {
+  const map = {};
+  const add = (series, field) => {
+    (series||[]).forEach(d => {
+      const day = execDayOf26(d.date);
+      if(day < 1) return;
+      if(!map[day]) map[day] = {d:day, meta:0, gads:0, metaConv:0, gadsConv:0};
+      map[day][field] += d.cost||0;
+      if(field==='meta') map[day].metaConv += d.conversions||0;
+      if(field==='gads') map[day].gadsConv += d.conversions||0;
+    });
+  };
+  if(META_DATA) add(META_DATA.daily_series||META_DATA.data, 'meta');
+  if(GADS_DATA) add(GADS_DATA.daily_series, 'gads');
+  return Object.values(map).sort((a,b)=>a.d-b.d);
+}
+
+/* Dias de campanha disponíveis (união invest + vendas) */
+function execGetAllDays() {
+  const invest = buildExecD26Invest();
+  const set = new Set([...invest.map(r=>r.d), ...D26_FULL.map(r=>r.d)]);
+  return Array.from(set).filter(d=>d>=1).sort((a,b)=>a-b);
+}
+
+/* Anotações TV Globo (sem label — corrige bug annotation plugin) */
+function execGetTvAnnotations(days) {
+  const anns = {};
+  EXEC_TV_GLOBO.forEach(tv => {
+    const idx = days.indexOf(tv.day26);
+    if(idx === -1) return;
+    anns['tv_'+tv.day26] = {
+      type:'line', xMin:idx, xMax:idx,
+      borderColor:'rgba(255,184,0,0.7)', borderWidth:2, borderDash:[4,3]
+    };
+  });
+  return anns;
+}
+
+/* ═══ Hoje / Ontem / Campanha ═══ */
+function renderExecHojeOntem() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().slice(0,10);
+  const yStr = new Date(+today - 86400000).toISOString().slice(0,10);
+  const invest = buildExecD26Invest();
+
+  const getInv = day => {
+    const r = invest.find(x=>x.d===day);
+    return {total: r?(r.meta+r.gads):0, conv: r?(r.metaConv+r.gadsConv):0};
+  };
+  const ontem = getInv(execDayOf26(yStr));
+  const hoje  = getInv(execDayOf26(todayStr));
+  const total = invest.reduce((s,r)=>s+(r.meta+r.gads),0);
+  const totalConv = invest.reduce((s,r)=>s+(r.metaConv+r.gadsConv),0);
+  const dias = invest.length;
+  const media = dias>0 ? total/dias : 0;
+  const invest25Same = EXEC_D25_INVEST.filter(r=>r.d<=dias).reduce((s,r)=>s+r.v,0);
+
+  const tvOntem = EXEC_TV_GLOBO.find(t=>t.date===yStr);
+
+  document.getElementById('exec-card-ontem').innerHTML = `
+    <div class="exec-card-label">Ontem</div>
+    <div class="exec-card-date">${execFmtDate(new Date(yStr+'T12:00:00'))}</div>
+    <div class="exec-val-big">${execFmtFull(ontem.total)}</div>
+    <div class="exec-meta-row">
+      <div class="exec-meta-item"><span class="exec-meta-label">Investimento ADS</span></div>
+    </div>
+    <div class="exec-meta-row">
+      <div class="exec-meta-item"><span class="exec-meta-label">Conversões Digitais</span><span class="exec-meta-val">${ontem.conv}</span></div>
+      <div class="exec-meta-item"><span class="exec-meta-label">Custo / Conversão</span><span class="exec-meta-val">${ontem.conv>0?execFmtFull(ontem.total/ontem.conv):'—'}</span></div>
+    </div>
+    ${tvOntem?`<div class="exec-tv-row">📺 TV Globo: ${tvOntem.programs.join(' · ')}</div>`:''}
+  `;
+
+  document.getElementById('exec-card-hoje').innerHTML = `
+    <div class="exec-card-label">Hoje <span style="color:var(--warn);font-size:.65rem">● PARCIAL</span></div>
+    <div class="exec-card-date">${execFmtDate(today)}</div>
+    <div class="exec-val-big partial">${execFmtFull(hoje.total)}</div>
+    <div class="exec-meta-row">
+      <div class="exec-meta-item"><span class="exec-meta-label">Investimento ADS</span></div>
+    </div>
+    <div class="exec-meta-row">
+      <div class="exec-meta-item"><span class="exec-meta-label">Conversões Digitais</span><span class="exec-meta-val">${hoje.conv}</span></div>
+    </div>
+  `;
+
+  document.getElementById('exec-card-campanha').innerHTML = `
+    <div class="exec-card-label">Campanha</div>
+    <div class="exec-card-date">Investimento ADS acumulado</div>
+    <div class="exec-val-big">${execFmtFull(total)}</div>
+    <div class="exec-meta-row">
+      <div class="exec-meta-item"><span class="exec-meta-label">Média diária</span><span class="exec-meta-val">${execFmtFull(media)}</span></div>
+      <div class="exec-meta-item"><span class="exec-meta-label">Dias de campanha</span><span class="exec-meta-val">${dias}º dia</span></div>
+    </div>
+    <div class="exec-meta-row" style="margin-top:4px">
+      <div class="exec-meta-item"><span class="exec-meta-label" style="color:#666">2025 (mesmos ${dias} dias): ${execFmtFull(invest25Same)}</span></div>
+    </div>
+  `;
+}
+
+/* ═══ KPIs de Vendas ═══ */
+function renderExecKPIs() {
+  const invest = buildExecD26Invest();
+  const dias = invest.length || 1;
+  const s26 = D26_FULL.reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
+  const s25 = D25.filter(r=>r.d<=dias).reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
+
+  const setKpi = (id, v26, v25) => {
+    const el = document.getElementById(id); if(!el) return;
+    const pct = v25>0 ? ((v26-v25)/v25*100) : null;
+    const cls = pct===null?'':pct>=0?'up':'down';
+    const dStr = pct===null?'vs 2025: aguardando':(pct>=0?'▲':'▼')+Math.abs(pct).toFixed(1)+'% vs 2025';
+    el.innerHTML = `<div class="exec-kpi-val">${execFmtK(v26)}</div><div class="exec-kpi-delta ${cls}">${dStr}</div>`;
+  };
+  setKpi('exec-kpi-receita', s26.mv+s26.av, s25.mv+s25.av);
+  setKpi('exec-kpi-motos',   s26.mv,        s25.mv);
+  setKpi('exec-kpi-autos',   s26.av,        s25.av);
+
+  const ingEl = document.getElementById('exec-kpi-ingressos');
+  if(ingEl) {
+    const i26=s26.mq+s26.aq, i25=s25.mq+s25.aq;
+    const pct=i25>0?((i26-i25)/i25*100):null;
+    const cls=pct===null?'':pct>=0?'up':'down';
+    const dStr=pct===null?'vs 2025: aguardando':(pct>=0?'▲':'▼')+Math.abs(pct).toFixed(1)+'% vs 2025';
+    ingEl.innerHTML = `<div class="exec-kpi-val">${i26.toLocaleString('pt-BR')}</div><div class="exec-kpi-delta ${cls}">${dStr}</div>`;
+  }
+
+  // Contexto dinâmico
+  const total26 = invest.reduce((s,r)=>s+(r.meta+r.gads),0);
+  const total25 = EXEC_D25_INVEST.filter(r=>r.d<=dias).reduce((s,r)=>s+r.v,0);
+  const ctxEl = document.getElementById('exec-context');
+  if(ctxEl && total25>0) {
+    const ratio = total26/total25;
+    const abaixo = ratio < 1;
+    ctxEl.innerHTML = `<span>💡</span><span>O ritmo de investimento em ADS está <strong style="color:${abaixo?'var(--lime)':'var(--warn)'}">${abaixo?'abaixo':'acima'} do mesmo período de 2025</strong> (${(ratio*100).toFixed(0)}% do ritmo 2025). ${abaixo?'Isso é <strong>intencional</strong>: a campanha de 2026 tem mais dias de duração, distribuindo o budget de forma mais gradual.':'O investimento está acelerado em relação a 2025.'}</span>`;
+  }
+}
+
+/* ═══ Gráfico Vendas ═══ */
+function buildExecVendasChart() {
+  const days = execGetAllDays(); if(!days.length) return;
+  const metric = execCurrentVendasMetric;
+  const labels = days.map(d => execFmtDate(execDateOf26Day(d)));
+  const get26 = d => { const r=D26_FULL.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
+  const get25 = d => { const r=D25.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
+
+  if(execChartVendas) execChartVendas.destroy();
+  const ctx = document.getElementById('exec-chartVendas')?.getContext('2d');
+  if(!ctx) return;
+  execChartVendas = new Chart(ctx, {
+    type:'line',
+    data:{labels, datasets:[
+      {label:'2026',data:days.map(get26),borderColor:'#C8FF00',backgroundColor:'rgba(200,255,0,0.07)',borderWidth:2.5,pointRadius:3,fill:true,tension:.35,spanGaps:false},
+      {label:'2025',data:days.map(get25),borderColor:'#555',borderWidth:1.5,pointRadius:2,fill:false,tension:.35,borderDash:[5,3]}
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:'#1C1C1C',borderColor:'rgba(200,255,0,.25)',borderWidth:1,padding:10,cornerRadius:8,titleColor:'#C8FF00',bodyColor:'#DDD',
+          callbacks:{label:i=>' '+i.dataset.label+': R$ '+Math.round(i.raw||0).toLocaleString('pt-BR')}},
+        annotation:{annotations:execGetTvAnnotations(days)}
+      },
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#555',maxTicksLimit:12,font:{size:10}}},
+        y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#666',callback:v=>v>=1000000?'R$'+(v/1000000).toFixed(1)+'M':v>=1000?'R$'+(v/1000).toFixed(0)+'K':'R$'+v}}
+      }
+    }
+  });
+  const tvLeg = document.getElementById('exec-tvLegVendas');
+  if(tvLeg) tvLeg.style.display = days.some(d=>EXEC_TV_GLOBO.some(t=>t.day26===d))?'flex':'none';
+}
+
+/* ═══ Gráfico Investimento ═══ */
+function buildExecInvestChart() {
+  const days = execGetAllDays(); if(!days.length) return;
+  const view = execCurrentInvestView;
+  const invest = buildExecD26Invest();
+  const labels = days.map(d => execFmtDate(execDateOf26Day(d)));
+  const inv26 = d => { const r=invest.find(x=>x.d===d); return r?(r.meta+r.gads):0; };
+  const inv25 = d => { const r=EXEC_D25_INVEST.find(x=>x.d===d); return r?r.v:0; };
+  let d26,d25;
+  if(view==='acumulado'){let s26=0,s25=0; d26=days.map(d=>{s26+=inv26(d);return s26}); d25=days.map(d=>{s25+=inv25(d);return s25});}
+  else{d26=days.map(inv26); d25=days.map(inv25);}
+
+  if(execChartInvest) execChartInvest.destroy();
+  const ctx = document.getElementById('exec-chartInvest')?.getContext('2d');
+  if(!ctx) return;
+  execChartInvest = new Chart(ctx, {
+    type:'line',
+    data:{labels, datasets:[
+      {label:'2026',data:d26,borderColor:'#C8FF00',backgroundColor:'rgba(200,255,0,0.07)',borderWidth:2.5,pointRadius:3,fill:view==='acumulado',tension:.3},
+      {label:'2025 (est.)',data:d25,borderColor:'#555',borderWidth:1.5,pointRadius:2,fill:false,tension:.3,borderDash:[5,3]}
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:'#1C1C1C',borderColor:'rgba(200,255,0,.25)',borderWidth:1,padding:10,cornerRadius:8,titleColor:'#C8FF00',bodyColor:'#DDD',
+          callbacks:{label:i=>' '+i.dataset.label+': R$'+Math.round(i.raw||0).toLocaleString('pt-BR')}},
+        annotation:{annotations:execGetTvAnnotations(days)}
+      },
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#555',maxTicksLimit:12,font:{size:10}}},
+        y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#666',callback:v=>v>=1000?'R$'+(v/1000).toFixed(0)+'K':'R$'+v}}
+      }
+    }
+  });
+}
+
+/* ═══ Conversões ═══ */
+function renderExecConversoes() {
+  const invest = buildExecD26Invest();
+  const metaConv  = invest.reduce((s,r)=>s+r.metaConv,0);
+  const gadsConv  = invest.reduce((s,r)=>s+r.gadsConv,0);
+  const totalConv = metaConv+gadsConv;
+  const totalInv  = invest.reduce((s,r)=>s+(r.meta+r.gads),0);
+  const cpa = totalConv>0 ? totalInv/totalConv : null;
+
+  document.getElementById('exec-conv-digital').innerHTML = `
+    <div class="section-title" style="margin-bottom:14px">Conversões Digitais</div>
+    <div class="exec-conv-row"><span class="exec-conv-label">Meta Ads</span><span class="exec-conv-val">${metaConv.toLocaleString('pt-BR')}</span></div>
+    <div class="exec-conv-row"><span class="exec-conv-label">Google Ads</span><span class="exec-conv-val">${gadsConv.toLocaleString('pt-BR')}</span></div>
+    <div class="exec-conv-row"><span class="exec-conv-label"><strong>Total Digital</strong></span><span class="exec-conv-val" style="color:var(--lime)">${totalConv.toLocaleString('pt-BR')}</span></div>
+    <div class="exec-conv-row"><span class="exec-conv-label">Custo por Conversão</span><span class="exec-conv-val">${cpa?execFmtFull(cpa):'—'}</span></div>
+  `;
+
+  const s26 = D26_FULL.reduce((a,r)=>({mq:a.mq+r.mq,aq:a.aq+r.aq}),{mq:0,aq:0});
+  document.getElementById('exec-conv-totals').innerHTML = `
+    <div class="section-title" style="margin-bottom:14px">Ingressos Vendidos</div>
+    <div class="exec-conv-row"><span class="exec-conv-label">🏍️ Motos</span><span class="exec-conv-val">${s26.mq.toLocaleString('pt-BR')}</span></div>
+    <div class="exec-conv-row"><span class="exec-conv-label">🚗 Autos</span><span class="exec-conv-val">${s26.aq.toLocaleString('pt-BR')}</span></div>
+    <div class="exec-conv-row"><span class="exec-conv-label"><strong>Total</strong></span><span class="exec-conv-val" style="color:var(--lime)">${(s26.mq+s26.aq).toLocaleString('pt-BR')}</span></div>
+  `;
+}
+
+/* ═══ Render completo do Painel Executivo ═══ */
+function renderPainelExecutivo() {
+  renderExecHojeOntem();
+  renderExecKPIs();
+  buildExecVendasChart();
+  buildExecInvestChart();
+  renderExecConversoes();
+  const now = new Date();
+  const ds2 = now.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const el = document.getElementById('execFooterDate'); if(el) el.textContent = 'Gerado em '+ds2;
+}
+
+/* ═══ Controle de abas ═══ */
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.style.display='none');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).style.display = 'block';
+  document.getElementById('tbtn-'+tabId).classList.add('active');
+  if(tabId === 'tab-exec') renderPainelExecutivo();
+}
+function execSetVendasMetric(metric, btn) {
+  btn.closest('.pill-group').querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); execCurrentVendasMetric=metric; buildExecVendasChart();
+}
+function execSetInvestView(view, btn) {
+  btn.closest('.pill-group').querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); execCurrentInvestView=view; buildExecInvestChart();
+}
 </script>
 </body>
 </html>
