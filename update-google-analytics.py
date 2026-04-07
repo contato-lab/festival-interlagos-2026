@@ -179,26 +179,18 @@ def fetch_sessions_by_date_channel(client) -> dict:
 
 def fetch_influencer_breakdown(client) -> list:
     """
-    Por influenciador (utm_source, utm_medium=influencer):
-    sessões totais, conversões e sessões por produto de ingresso.
-    Usa duas queries separadas para contornar limitação do GA4.
+    Por influenciador via utm_campaign (sessionCampaignName).
+    Os links usam utm_medium=story/instagram, nao influencer.
+    Duas queries: (1) sessoes+conversoes por campanha, (2) sessoes por campanha+pagePath.
     """
-    end   = datetime.now(timezone.utc) - timedelta(days=1)
-    start = end - timedelta(days=CHANNEL_DAYS)
-    date_range = DateRange(
-        start_date=start.strftime("%Y-%m-%d"),
-        end_date=end.strftime("%Y-%m-%d"),
-    )
-    medium_filter = FilterExpression(
-        filter=Filter(
-            field_name="sessionMedium",
-            string_filter=Filter.StringFilter(
-                match_type=Filter.StringFilter.MatchType.EXACT,
-                value="influencer",
-                case_sensitive=False,
-            ),
-        )
-    )
+    INFLUENCER_CAMPAIGNS = {
+        "FelipeTitto", "KarinaSimoes", "LeandroMello",
+        "AmandaP", "DaianeGaia", "DanielD2", "DavidJensen", "DayMiguel",
+        "DurvalCareca", "EduardoBernasconi", "ElianaMalizia", "FANYRAINHA",
+        "GiseleFavaro", "RafaelTogni", "RodolfinhoZ", "RodrigoRateiro",
+        "SekuMello", "Vans", "lucasxaparral",
+        "dinamize", "perfilfestival", "fullpower", "duasrodas",
+    }
 
     TICKET_PAGES = {
         "ride-pass":   "Ride Pass",
@@ -210,20 +202,28 @@ def fetch_influencer_breakdown(client) -> list:
         "pit-pass":    "Pit Pass",
     }
 
-    # Query 1: sessões + conversões por source
+    end   = datetime.now(timezone.utc) - timedelta(days=1)
+    start = end - timedelta(days=CHANNEL_DAYS)
+    date_range = DateRange(
+        start_date=start.strftime("%Y-%m-%d"),
+        end_date=end.strftime("%Y-%m-%d"),
+    )
+
+    # Query 1: sessoes + conversoes por sessionCampaignName
     r1 = client.run_report(RunReportRequest(
         property=f"properties/{PROPERTY_ID}",
         date_ranges=[date_range],
-        dimensions=[Dimension(name="sessionSource")],
+        dimensions=[Dimension(name="sessionCampaignName")],
         metrics=[Metric(name="sessions"), Metric(name="conversions")],
-        dimension_filter=medium_filter,
-        limit=200,
+        limit=500,
     ))
     sources: dict = {}
     for row in r1.rows:
-        src  = row.dimension_values[0].value
-        sources[src] = {
-            "source":      src,
+        campaign = row.dimension_values[0].value
+        if campaign not in INFLUENCER_CAMPAIGNS:
+            continue
+        sources[campaign] = {
+            "source":      campaign,
             "sessions":    int(row.metric_values[0].value),
             "conversions": round(float(row.metric_values[1].value)),
             "tickets":     {},
@@ -232,29 +232,26 @@ def fetch_influencer_breakdown(client) -> list:
     if not sources:
         return []
 
-    # Query 2: sessões por source + pagePath (para mapear produto)
+    # Query 2: sessoes por sessionCampaignName + pagePath
     r2 = client.run_report(RunReportRequest(
         property=f"properties/{PROPERTY_ID}",
         date_ranges=[date_range],
-        dimensions=[Dimension(name="sessionSource"), Dimension(name="pagePath")],
+        dimensions=[Dimension(name="sessionCampaignName"), Dimension(name="pagePath")],
         metrics=[Metric(name="sessions")],
-        dimension_filter=medium_filter,
-        limit=2000,
+        limit=5000,
     ))
     for row in r2.rows:
-        src  = row.dimension_values[0].value
-        page = row.dimension_values[1].value.lower()
-        sess = int(row.metric_values[0].value)
-        if src not in sources:
+        campaign = row.dimension_values[0].value
+        page     = row.dimension_values[1].value.lower()
+        sess     = int(row.metric_values[0].value)
+        if campaign not in sources:
             continue
         for slug, name in TICKET_PAGES.items():
             if slug in page:
-                sources[src]["tickets"][name] = sources[src]["tickets"].get(name, 0) + sess
+                sources[campaign]["tickets"][name] = sources[campaign]["tickets"].get(name, 0) + sess
                 break
 
     return sorted(sources.values(), key=lambda x: x["conversions"], reverse=True)
-
-
 def fetch_influencer_sessions(client) -> dict:
     """
     Sessões com utm_medium=influencer por data.
