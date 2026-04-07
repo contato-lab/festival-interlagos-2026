@@ -218,7 +218,7 @@ def fetch_influencer_breakdown(client) -> list:
         limit=500,
     ))
     print(f"[DEBUG influencer] Q1 rows: {len(r1.rows)}")
-    for row in r1.rows[:10]:
+    for row in r1.rows:
         print(f"  campaign={row.dimension_values[0].value!r} sess={row.metric_values[0].value} conv={row.metric_values[1].value}")
     sources: dict = {}
     for row in r1.rows:
