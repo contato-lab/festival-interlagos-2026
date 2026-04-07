@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Festival Interlagos 2026 — Painel Executivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<style>
+:root {
+  --lime:#C8FF00; --lime-dim:rgba(200,255,0,0.10); --lime-border:rgba(200,255,0,0.25);
+  --purple:#7B2D8B; --purple-dim:rgba(123,45,139,0.18);
+  --bg:#0A0A0A; --card:#141414; --card2:#1A1A1A; --card-hover:#1E1E1E;
+  --text:#FFFFFF; --text2:#CCCCCC; --text3:#888888;
+  --green:#00FF88; --red:#FF4444; --warn:#FFB800;
+  --border:rgba(255,255,255,0.07); --radius:14px; --rad-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+
+/* ── HEADER ── */
+.header{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  padding:12px 24px;
+  background:rgba(10,10,10,0.97);border-bottom:1px solid var(--border);
+  backdrop-filter:blur(12px);
+}
+.header-brand{display:flex;align-items:center;gap:12px}
+.header-logo{height:28px}
+.header-sep{color:var(--border);font-size:20px}
+.header-client{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:.5px;color:var(--text2)}
+.header-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;letter-spacing:.5px;color:var(--lime)}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{
+  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.8px;
+  padding:3px 10px;border-radius:20px;border:1px solid var(--border);color:var(--text3);
+  text-transform:uppercase;
+}
+.badge-live{border-color:rgba(0,255,136,0.4);color:var(--green);background:rgba(0,255,136,0.08)}
+.badge-live::before{content:'● ';font-size:9px}
+.gen-date{font-size:11px;color:var(--text3)}
+
+/* ── FILTER BAR ── */
+.filter-bar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 24px;background:#0D0D0D;border-bottom:1px solid var(--border);
+}
+.filter-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.8px;color:var(--text3);text-transform:uppercase}
+.filter-pills{display:flex;gap:6px;flex-wrap:wrap}
+.fpill{
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;
+  padding:4px 14px;border-radius:20px;border:1px solid var(--border);
+  background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;text-transform:uppercase;
+}
+.fpill:hover{border-color:rgba(200,255,0,0.3);color:var(--lime)}
+.fpill.active{background:var(--lime-dim);border-color:var(--lime-border);color:var(--lime)}
+.filter-sep{font-size:12px;color:var(--text3)}
+.filter-date{
+  background:#1A1A1A;border:1px solid var(--border);color:var(--text2);
+  font-size:12px;padding:4px 8px;border-radius:var(--rad-sm);outline:none;
+}
+.filter-date:focus{border-color:var(--lime-border)}
+.filter-apply{
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;
+  padding:4px 14px;border-radius:20px;border:1px solid var(--lime-border);
+  background:var(--lime-dim);color:var(--lime);cursor:pointer;text-transform:uppercase;transition:all .15s;
+}
+.filter-apply:hover{background:rgba(200,255,0,0.18)}
+
+/* ── MAIN ── */
+.main{padding:20px 24px;max-width:1400px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+
+/* ── HOJE / ONTEM ── */
+.hoje-ontem{
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;
+}
+.hcard{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px 24px;position:relative;overflow:hidden;transition:border-color .2s;
+}
+.hcard:hover{border-color:rgba(200,255,0,0.15)}
+.hcard.accent{
+  border-color:var(--lime-border);
+  background:linear-gradient(135deg,rgba(200,255,0,0.06) 0%,var(--card) 60%);
+}
+.hcard-eyebrow{
+  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;
+  display:flex;align-items:center;gap:6px;
+}
+.hcard-eyebrow .dot-live{
+  width:6px;height:6px;border-radius:50%;background:var(--green);
+  animation:pulse 1.5s infinite;display:inline-block;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hcard-label{font-size:13px;color:var(--text3);margin-bottom:4px}
+.hcard-value{
+  font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:42px;
+  color:var(--lime);letter-spacing:-1px;line-height:1;
+}
+.hcard.dim .hcard-value{color:var(--text2)}
+.hcard-sub{font-size:11px;color:var(--text3);margin-top:6px}
+.hcard-tag{
+  position:absolute;top:14px;right:14px;
+  font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;padding:3px 8px;border-radius:20px;
+}
+.hcard-tag.tv{background:rgba(255,184,0,0.15);color:var(--warn);border:1px solid rgba(255,184,0,0.3)}
+.hcard-row{display:flex;gap:24px;margin-top:12px}
+.hcard-mini{flex:1}
+.hcard-mini-label{font-size:11px;color:var(--text3);margin-bottom:2px}
+.hcard-mini-val{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:var(--text)}
+
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpi-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px 20px;transition:border-color .2s;
+}
+.kpi-card:hover{border-color:rgba(200,255,0,0.15)}
+.kpi-card.accent{border-color:var(--lime-border);background:linear-gradient(135deg,rgba(200,255,0,0.07) 0%,var(--card) 70%)}
+.kpi-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.kpi-value{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:30px;color:var(--text);letter-spacing:-.5px;line-height:1}
+.kpi-value.lime{color:var(--lime)}
+.kpi-delta{font-size:12px;margin-top:6px;font-weight:600}
+.kpi-delta.up{color:var(--green)}
+.kpi-delta.down{color:var(--red)}
+.kpi-delta.neu{color:var(--text3)}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* ── SECTION HEADER ── */
+.section-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--text)}
+.section-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.pill-group{display:flex;gap:6px}
+.pill{
+  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;
+  padding:4px 12px;border-radius:20px;border:1px solid var(--border);
+  background:transparent;color:var(--text3);cursor:pointer;text-transform:uppercase;transition:all .15s;
+}
+.pill.active,.pill:hover{background:var(--lime-dim);border-color:var(--lime-border);color:var(--lime)}
+
+/* ── CHARTS GRID ── */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chart-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px 20px 16px;
+}
+.chart-canvas-wrap{position:relative;height:260px}
+.legend{display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3)}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+.leg-line{width:20px;height:2px;border-radius:2px}
+
+/* ── TV GLOBO LEGEND ── */
+.tv-legend{
+  display:flex;align-items:center;gap:6px;margin-top:8px;
+  font-size:11px;color:var(--warn);
+}
+.tv-leg-line{width:2px;height:14px;background:rgba(255,184,0,0.7);border-radius:1px}
+
+/* ── CONVERSOES ── */
+.conv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.conv-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px}
+.conv-big{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:48px;color:var(--lime);line-height:1;margin:10px 0 4px}
+.conv-label{font-size:13px;color:var(--text3)}
+.conv-delta{font-size:13px;font-weight:600;margin-top:4px}
+.conv-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.conv-breakdown{display:flex;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.conv-b-item{}
+.conv-b-label{font-size:11px;color:var(--text3);margin-bottom:2px}
+.conv-b-val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:var(--text)}
+.influencer-list{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.inf-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--card2);border-radius:var(--rad-sm)}
+.inf-name{font-size:13px;color:var(--text2)}
+.inf-val{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--lime)}
+.inf-empty{font-size:13px;color:var(--text3);padding:20px 0;text-align:center}
+.nota-manual{
+  margin-top:12px;font-size:11px;color:var(--text3);
+  padding:8px 12px;border-radius:var(--rad-sm);background:rgba(255,255,255,0.03);
+  border:1px dashed rgba(255,255,255,0.1);
+}
+
+/* ── NOTA DE CONTEXTO ── */
+.context-box{
+  background:var(--lime-dim);border:1px solid var(--lime-border);border-radius:var(--radius);
+  padding:16px 20px;display:flex;align-items:flex-start;gap:12px;
+}
+.context-icon{font-size:18px;margin-top:1px}
+.context-text{font-size:13px;color:var(--text2);line-height:1.6}
+.context-text strong{color:var(--lime)}
+
+/* ── FOOTER ── */
+footer{
+  margin-top:40px;padding:20px 24px;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.footer-brand{display:flex;align-items:center;gap:10px}
+.footer-lime{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:16px;color:var(--lime);letter-spacing:2px}
+.footer-sep{color:var(--border);margin:0 4px}
+.footer-text{font-size:11px;color:var(--text3)}
+.footer-date{font-size:11px;color:var(--text3)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1024px){
+  .charts-grid{grid-template-columns:1fr}
+  .hoje-ontem{grid-template-columns:1fr 1fr}
+  .kpi-strip{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  .header{padding:10px 16px}
+  .main{padding:14px 16px}
+  .hoje-ontem{grid-template-columns:1fr}
+  .kpi-strip{grid-template-columns:1fr 1fr}
+  .conv-grid{grid-template-columns:1fr}
+  .hcard-value{font-size:34px}
+  .filter-bar{padding:8px 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <svg class="header-logo" viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="110" height="44" rx="10" ry="10" fill="#0A0A0A"/>
+      <text x="55" y="32" font-family="'Barlow Condensed',Arial Black,sans-serif" font-weight="900" font-size="28" fill="#C8FF00" text-anchor="middle" letter-spacing="3">LIME</text>
+    </svg>
+    <span class="header-sep">|</span>
+    <span class="header-client">Festival Interlagos</span>
+  </div>
+  <div class="header-title">Painel Executivo 2026</div>
+  <div class="header-right">
+    <span class="badge badge-live">Ao Vivo</span>
+    <span class="gen-date" id="genDate">—</span>
+  </div>
+</header>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <span class="filter-label">Período</span>
+  <div class="filter-pills">
+    <button class="fpill" id="fpill-7d"  onclick="setFiltro('7d',this)">7 Dias</button>
+    <button class="fpill" id="fpill-14d" onclick="setFiltro('14d',this)">14 Dias</button>
+    <button class="fpill" id="fpill-30d" onclick="setFiltro('30d',this)">30 Dias</button>
+    <button class="fpill active" id="fpill-tudo" onclick="setFiltro('tudo',this)">Desde o início</button>
+  </div>
+  <span class="filter-sep">De</span>
+  <input type="date" id="filtroDE" class="filter-date" onchange="applyFiltro()">
+  <span class="filter-sep">Até</span>
+  <input type="date" id="filtroATE" class="filter-date" onchange="applyFiltro()">
+  <button class="filter-apply" onclick="applyFiltro()">Aplicar</button>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HOJE / ONTEM -->
+  <div class="hoje-ontem">
+
+    <!-- Ontem -->
+    <div class="hcard accent" id="hcard-ontem">
+      <div class="hcard-eyebrow">Ontem <span id="dataOntem" style="color:var(--text2);font-weight:600"></span></div>
+      <div class="hcard-label">Investimento ADS</div>
+      <div class="hcard-value" id="investOntem">—</div>
+      <div class="hcard-row">
+        <div class="hcard-mini">
+          <div class="hcard-mini-label">Conversões Digitais</div>
+          <div class="hcard-mini-val" id="convOntem">—</div>
+        </div>
+        <div class="hcard-mini">
+          <div class="hcard-mini-label">Custo / Conversão</div>
+          <div class="hcard-mini-val" id="cpaOntem">—</div>
+        </div>
+      </div>
+      <div class="hcard-sub" id="tvOntem"></div>
+    </div>
+
+    <!-- Hoje -->
+    <div class="hcard dim" id="hcard-hoje">
+      <div class="hcard-eyebrow">
+        Hoje <span id="dataHoje" style="color:var(--text2);font-weight:600"></span>
+        <span class="dot-live"></span> <span style="font-size:10px;color:var(--green)">parcial</span>
+      </div>
+      <div class="hcard-label">Investimento ADS</div>
+      <div class="hcard-value" id="investHoje">—</div>
+      <div class="hcard-row">
+        <div class="hcard-mini">
+          <div class="hcard-mini-label">Conversões Digitais</div>
+          <div class="hcard-mini-val" id="convHoje">—</div>
+        </div>
+        <div class="hcard-mini">
+          <div class="hcard-mini-label">Atualizado às</div>
+          <div class="hcard-mini-val" id="hojeUpdateTime">—</div>
+        </div>
+      </div>
+      <div class="hcard-sub" id="tvHoje"></div>
+    </div>
+
+    <!-- Ritmo da campanha -->
+    <div class="hcard">
+      <div class="hcard-eyebrow">Campanha</div>
+      <div class="hcard-label">Investimento ADS acumulado</div>
+      <div class="hcard-value" id="investTotal">—</div>
+      <div class="hcard-row">
+        <div class="hcard-mini">
+          <div class="hcard-mini-label">Média diária</div>
+          <div class="hcard-mini-val" id="mediaDaily">—</div>
+        </div>
+        <div class="hcard-mini">
+          <div class="hcard-mini-label">Dias de campanha</div>
+          <div class="hcard-mini-val" id="diasCamp">—</div>
+        </div>
+      </div>
+      <div class="hcard-sub" id="investVs25">—</div>
+    </div>
+  </div>
+
+  <!-- KPI STRIP -->
+  <div class="kpi-strip">
+    <div class="kpi-card accent">
+      <div class="kpi-label">Receita Total 2026</div>
+      <div class="kpi-value lime" id="kpiReceita">—</div>
+      <div class="kpi-delta neu" id="kpiReceitaDelta">vs 2025</div>
+      <div class="kpi-sub">Auto + Moto</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">🏍️ Receita Motos</div>
+      <div class="kpi-value" id="kpiMotos">—</div>
+      <div class="kpi-delta neu" id="kpiMotosDelta">vs 2025</div>
+      <div class="kpi-sub">acumulado no período</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">🚗 Receita Autos</div>
+      <div class="kpi-value" id="kpiAutos">—</div>
+      <div class="kpi-delta neu" id="kpiAutosDelta">vs 2025</div>
+      <div class="kpi-sub">acumulado no período</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ingressos Vendidos</div>
+      <div class="kpi-value" id="kpiIngressos">—</div>
+      <div class="kpi-delta neu" id="kpiIngressosDelta">vs 2025</div>
+      <div class="kpi-sub">total no período</div>
+    </div>
+  </div>
+
+  <!-- CONTEXTO -->
+  <div class="context-box">
+    <div class="context-icon">💡</div>
+    <div class="context-text" id="contextText">
+      O ritmo de investimento em ADS está <strong>abaixo do mesmo período de 2025</strong>.
+      Isso é <strong>intencional</strong>: a campanha de 2026 tem mais dias de duração, então o budget está sendo distribuído de forma mais gradual para não ultrapassar o total do ano passado antes do evento.
+    </div>
+  </div>
+
+  <!-- GRÁFICOS -->
+  <div class="charts-grid">
+
+    <!-- Gráfico: Vendas -->
+    <div class="chart-card">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Vendas — 2025 vs 2026</div>
+          <div class="section-sub" id="vendasSub">por dia de campanha</div>
+        </div>
+        <div class="pill-group">
+          <button class="pill active" onclick="setVendasMetric('total',this)">Total</button>
+          <button class="pill" onclick="setVendasMetric('motos',this)">🏍️ Motos</button>
+          <button class="pill" onclick="setVendasMetric('autos',this)">🚗 Autos</button>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="leg-dot" style="background:#C8FF00"></span>2026</div>
+        <div class="legend-item"><span class="leg-dot" style="background:#555"></span>2025</div>
+        <div class="legend-item" id="tvLegVendas" style="display:none">
+          <span class="tv-leg-line"></span><span style="color:var(--warn);font-size:11px">📺 TV Globo</span>
+        </div>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="chartVendas"></canvas></div>
+    </div>
+
+    <!-- Gráfico: Investimento ADS -->
+    <div class="chart-card">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Investimento ADS — 2025 vs 2026</div>
+          <div class="section-sub">por dia de campanha · estimativa diária 2025</div>
+        </div>
+        <div class="pill-group">
+          <button class="pill active" onclick="setInvestView('diario',this)">Diário</button>
+          <button class="pill" onclick="setInvestView('acumulado',this)">Acumulado</button>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="leg-dot" style="background:#C8FF00"></span>2026</div>
+        <div class="legend-item"><span class="leg-dot" style="background:#555"></span>2025</div>
+        <div class="legend-item" id="tvLegInvest">
+          <span class="tv-leg-line"></span><span style="color:var(--warn);font-size:11px">📺 TV Globo</span>
+        </div>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="chartInvest"></canvas></div>
+    </div>
+
+  </div>
+
+  <!-- CONVERSOES -->
+  <div class="conv-grid">
+
+    <!-- Conversões Digitais -->
+    <div class="conv-card">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Conversões Digitais</div>
+          <div class="section-sub">Meta Ads + Google Ads</div>
+        </div>
+      </div>
+      <div class="conv-big" id="convDigitalTotal">—</div>
+      <div class="conv-label">compras digitais no período selecionado</div>
+      <div class="conv-delta neu" id="convDigitalDelta">—</div>
+      <div class="conv-breakdown">
+        <div class="conv-b-item">
+          <div class="conv-b-label">Invest. ADS</div>
+          <div class="conv-b-val" id="convInvestTotal">—</div>
+        </div>
+        <div class="conv-b-item">
+          <div class="conv-b-label">Custo / Conversão</div>
+          <div class="conv-b-val" id="convCPA">—</div>
+        </div>
+        <div class="conv-b-item">
+          <div class="conv-b-label">Total período 2025</div>
+          <div class="conv-b-val" id="conv25">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversões Influenciadores -->
+    <div class="conv-card">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Conversões — Influenciadores</div>
+          <div class="section-sub">atualização manual</div>
+        </div>
+      </div>
+      <div class="conv-big" id="convInfluTotal" style="color:var(--text2)">—</div>
+      <div class="conv-label">conversões via influenciadores</div>
+      <div class="influencer-list" id="influencerList">
+        <div class="inf-empty">Dados de influenciadores serão adicionados em breve.</div>
+      </div>
+      <div class="nota-manual">📋 Esta seção é atualizada manualmente. Solicitar dados ao time de influência.</div>
+    </div>
+
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg" style="height:22px">
+      <rect x="0" y="0" width="110" height="44" rx="10" fill="#0A0A0A"/>
+      <text x="55" y="32" font-family="'Barlow Condensed',sans-serif" font-weight="900" font-size="28" fill="#C8FF00" text-anchor="middle" letter-spacing="3">LIME</text>
+    </svg>
+    <span class="footer-sep">|</span>
+    <span class="footer-text">Agência Lime · Festival Interlagos 2026</span>
+  </div>
+  <span class="footer-date" id="footerDate">—</span>
+</footer>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════
+   CONFIGURAÇÕES
+═══════════════════════════════════════════ */
+const META_URL   = 'meta-data.json';
+const GADS_URL   = 'google-ads-data.json';
+
+// Google Sheets — mesma planilha do dashboard principal
+const SHEET_ID   = '1jk7jjYB6n-IjkdmBUv54QEerujL_iAAP';
+const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=';
+const SEMANA_START_M = new Date('2026-03-30T00:00:00'); // Segunda-feira da SEMANA 0
+function getCurrentWeekM() { const n=new Date(); n.setHours(0,0,0,0); return Math.max(0,Math.floor((n-SEMANA_START_M)/604800000)); }
+
+// Data de início da campanha 2026 (para cálculo de dia)
+const CAMP_START_2026 = new Date(2026, 2, 31); // 31/03/2026
+const CAMP_START_2025 = new Date(2025, 2, 14); // 14/03/2025
+
+/* ═══════════════════════════════════════════
+   TV GLOBO — INSERÇÕES ABRIL 2026
+   (Fonte: Autorização TV Globo SP – Duas Rodas, Abril 2026)
+═══════════════════════════════════════════ */
+const TV_GLOBO = [
+  {date:'2026-04-01', day26:2, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  {date:'2026-04-02', day26:3, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  {date:'2026-04-03', day26:4, programs:['Bom Dia SP','Bom Dia Brasil']},
+  {date:'2026-04-05', day26:6, programs:['Auto Esporte','Esporte Espetacular']},
+  {date:'2026-04-06', day26:7, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+];
+
+/* ═══════════════════════════════════════════
+   DADOS 2025 — VENDAS DIÁRIAS
+   Fonte: [FESTIVAL INTERLAGOS 2025] LINHA DO TEMPO – RESUMO
+   d=dia da campanha, mv=receita motos(R$), mq=qtd motos, av=receita autos(R$), aq=qtd autos
+═══════════════════════════════════════════ */
+const D25 = [
+  {d:1,mv:520012,mq:1236,av:179545,aq:380},{d:2,mv:171212,mq:430,av:82678,aq:153},
+  {d:3,mv:92004,mq:279,av:27577,aq:71},{d:4,mv:81187,mq:239,av:32147,aq:69},
+  {d:5,mv:70161,mq:222,av:23345,aq:49},{d:6,mv:51338,mq:163,av:26621,aq:84},
+  {d:7,mv:44665,mq:166,av:25742,aq:53},{d:8,mv:36376,mq:127,av:26335,aq:71},
+  {d:9,mv:20913,mq:69,av:13460,aq:63},{d:10,mv:36451,mq:156,av:16062,aq:62},
+  {d:11,mv:34776,mq:138,av:26061,aq:56},{d:12,mv:28490,mq:114,av:25398,aq:53},
+  {d:13,mv:27827,mq:118,av:25650,aq:56},{d:14,mv:24028,mq:95,av:20656,aq:47},
+  {d:15,mv:39681,mq:155,av:28248,aq:67},{d:16,mv:17987,mq:67,av:14662,aq:40},
+  {d:17,mv:19713,mq:84,av:16986,aq:48},{d:18,mv:35226,mq:148,av:24041,aq:57},
+  {d:19,mv:45187,mq:181,av:16938,aq:41},{d:20,mv:38180,mq:211,av:17671,aq:42},
+  {d:21,mv:24979,mq:95,av:26698,aq:60},{d:22,mv:32801,mq:102,av:17424,aq:39},
+  {d:23,mv:18001,mq:64,av:19327,aq:47},{d:24,mv:27130,mq:107,av:19232,aq:47},
+  {d:25,mv:33398,mq:115,av:21427,aq:55},{d:26,mv:20803,mq:72,av:11892,aq:28},
+  {d:27,mv:14918,mq:55,av:19029,aq:46},{d:28,mv:16985,mq:65,av:14936,aq:39},
+  {d:29,mv:24742,mq:90,av:18026,aq:47},{d:30,mv:39079,mq:136,av:22780,aq:52},
+  {d:31,mv:22568,mq:76,av:20204,aq:47},{d:32,mv:22178,mq:74,av:14625,aq:38},
+  {d:33,mv:15814,mq:59,av:18843,aq:43},{d:34,mv:15065,mq:53,av:13756,aq:34},
+  {d:35,mv:29193,mq:104,av:18015,aq:47},{d:36,mv:17736,mq:62,av:14044,aq:33},
+  {d:37,mv:11927,mq:44,av:12887,aq:30},{d:38,mv:17568,mq:59,av:12705,aq:28},
+  {d:39,mv:22090,mq:78,av:17052,aq:38},{d:40,mv:26386,mq:94,av:17720,aq:40},
+  {d:41,mv:16768,mq:61,av:17026,aq:41},{d:42,mv:15063,mq:55,av:13285,aq:33},
+  {d:43,mv:12908,mq:46,av:17131,aq:40},{d:44,mv:10773,mq:37,av:15302,aq:34},
+  {d:45,mv:22088,mq:77,av:22183,aq:51},{d:46,mv:14095,mq:52,av:17756,aq:39},
+  {d:47,mv:10196,mq:36,av:12900,aq:30},{d:48,mv:13268,mq:48,av:14064,aq:32},
+  {d:49,mv:22089,mq:77,av:19087,aq:42},{d:50,mv:26042,mq:95,av:20034,aq:45},
+  {d:51,mv:17099,mq:64,av:19025,aq:43},{d:52,mv:15340,mq:56,av:14808,aq:32},
+  {d:53,mv:13487,mq:48,av:15649,aq:34},{d:54,mv:11264,mq:42,av:12843,aq:28},
+  {d:55,mv:21882,mq:78,av:20194,aq:43},{d:56,mv:15643,mq:59,av:18021,aq:40},
+  {d:57,mv:11021,mq:39,av:13482,aq:29},{d:58,mv:14826,mq:55,av:16127,aq:36},
+  {d:59,mv:19874,mq:71,av:19834,aq:44},{d:60,mv:38162,mq:142,av:28071,aq:64},
+  {d:61,mv:19823,mq:72,av:21430,aq:47},{d:62,mv:17604,mq:64,av:16240,aq:35},
+  {d:63,mv:15208,mq:57,av:19021,aq:41},{d:64,mv:13842,mq:49,av:17583,aq:38},
+  {d:65,mv:26451,mq:92,av:25841,aq:55},{d:66,mv:21039,mq:79,av:24157,aq:53},
+  {d:67,mv:14327,mq:51,av:19682,aq:44},{d:68,mv:16894,mq:62,av:23415,aq:53},
+  {d:69,mv:28756,mq:105,av:30482,aq:67},{d:70,mv:52341,mq:189,av:42183,aq:91},
+  {d:71,mv:31425,mq:116,av:36928,aq:82},{d:72,mv:26872,mq:98,av:31562,aq:69},
+  {d:73,mv:22451,mq:82,av:28941,aq:63},{d:74,mv:19832,mq:72,av:26173,aq:57},
+  {d:75,mv:38451,mq:141,av:39872,aq:87},{d:76,mv:29184,mq:107,av:36521,aq:79},
+  {d:77,mv:20973,mq:77,av:32184,aq:70},{d:78,mv:24518,mq:88,av:38421,aq:84},
+  {d:79,mv:41283,mq:152,av:58472,aq:128},{d:80,mv:68452,mq:251,av:84631,aq:184},
+  {d:81,mv:49821,mq:182,av:72483,aq:157},{d:82,mv:40173,mq:147,av:64821,aq:142},
+  {d:83,mv:34518,mq:127,av:59274,aq:130},{d:84,mv:30284,mq:111,av:53841,aq:118},
+  {d:85,mv:58732,mq:216,av:82451,aq:181},{d:86,mv:0,mq:0,av:72483,aq:593},
+  {d:87,mv:0,mq:0,av:84291,aq:694},{d:88,mv:0,mq:0,av:94182,aq:782},
+  {d:89,mv:0,mq:0,av:98473,aq:819},{d:90,mv:0,mq:0,av:107572,aq:876},
+  {d:91,mv:0,mq:0,av:116842,aq:1028},{d:92,mv:0,mq:0,av:174146,aq:1567},
+  {d:93,mv:0,mq:0,av:226794,aq:2025},{d:94,mv:0,mq:0,av:128185,aq:1222}
+];
+
+/* ═══════════════════════════════════════════
+   DADOS 2025 — INVESTIMENTO ADS (estimativa diária)
+   Fonte: SEMANA 0–13 da planilha 2025 (total semanal ÷ 7 dias)
+═══════════════════════════════════════════ */
+const D25_INVEST = (() => {
+  const semanas = [
+    {from:1, to:3,  daily:2679.88}, // SEMANA 0 (14–16/03, 3 dias)
+    {from:4, to:10, daily:4350.08}, // SEMANA 01
+    {from:11,to:17, daily:4903.26}, // SEMANA 02
+    {from:18,to:24, daily:3429.32}, // SEMANA 03
+    {from:25,to:31, daily:2697.07}, // SEMANA 04
+    {from:32,to:38, daily:4996.89}, // SEMANA 05
+    {from:39,to:45, daily:5801.66}, // SEMANA 06
+    {from:46,to:52, daily:6824.98}, // SEMANA 07
+    {from:53,to:59, daily:6120.89}, // SEMANA 08
+    {from:60,to:66, daily:5165.62}, // SEMANA 09
+    {from:67,to:73, daily:5804.51}, // SEMANA 10
+    {from:74,to:80, daily:6619.04}, // SEMANA 11
+    {from:81,to:87, daily:3830.10}, // SEMANA 12
+    {from:88,to:94, daily:3142.76}, // SEMANA 13
+  ];
+  const arr = [];
+  semanas.forEach(s => {
+    for (let d = s.from; d <= s.to; d++) arr.push({d, v:s.daily});
+  });
+  return arr;
+})();
+
+/* ═══════════════════════════════════════════
+   ESTADO DO DASHBOARD
+═══════════════════════════════════════════ */
+let D26_SALES  = [];  // populado por fetchSheets()
+let D26_INVEST = [];  // populado por fetchMeta() + fetchGAds()
+let D26_CONV   = [];  // conversões digitais por dia
+let metaUpdatedAt = null;
+
+let chartVendas  = null;
+let chartInvest  = null;
+let currentVendasMetric = 'total';  // 'total' | 'motos' | 'autos'
+let currentInvestView   = 'diario'; // 'diario' | 'acumulado'
+let currentFiltroFrom   = null;
+let currentFiltroTo     = null;
+
+/* ═══════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════ */
+function dayOf26(dateStr) {
+  // dateStr = 'YYYY-MM-DD' → retorna número do dia de campanha 2026
+  const d = new Date(dateStr + 'T00:00:00');
+  return Math.round((d - CAMP_START_2026) / 86400000) + 1;
+}
+function dateOf26Day(dayNum) {
+  // Retorna Date do dia de campanha 2026
+  const d = new Date(CAMP_START_2026);
+  d.setDate(d.getDate() + dayNum - 1);
+  return d;
+}
+function fmt(n, prefix='R$') {
+  if (n == null || isNaN(n)) return '—';
+  if (n >= 1000000) return prefix + ' ' + (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return prefix + ' ' + (n/1000).toFixed(0) + 'K';
+  return prefix + ' ' + n.toFixed(0);
+}
+function fmtFull(n) {
+  if (n == null || isNaN(n)) return '—';
+  return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function fmtInt(n) {
+  if (n == null || isNaN(n)) return '—';
+  return n.toLocaleString('pt-BR');
+}
+function fmtDate(d) {
+  return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+}
+function setDelta(id, v26, v25) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (!v25 || v25 === 0) { el.className='kpi-delta neu'; el.textContent='sem dado 2025'; return; }
+  const pct = ((v26-v25)/Math.abs(v25)*100).toFixed(1);
+  const up = parseFloat(pct) >= 0;
+  el.className = 'kpi-delta ' + (up ? 'up' : 'down');
+  el.textContent = (up ? '▲ +' : '▼ ') + pct + '% vs 2025';
+}
+function tvProgramsForDay26(day26) {
+  const tv = TV_GLOBO.find(t => t.day26 === day26);
+  return tv ? tv.programs : null;
+}
+function getTvAnnotations(filteredDays26) {
+  // Retorna config de anotações Chart.js para dias com TV Globo
+  const annotations = {};
+  TV_GLOBO.forEach(tv => {
+    const idx = filteredDays26.indexOf(tv.day26);
+    if (idx === -1) return;
+    annotations['tv_'+tv.day26] = {
+      type:'line', xMin:idx, xMax:idx,
+      borderColor:'rgba(255,184,0,0.7)',
+      borderWidth:2, borderDash:[4,3],
+    };
+  });
+  return annotations;
+}
+
+/* ═══════════════════════════════════════════
+   FETCH DOS DADOS
+═══════════════════════════════════════════ */
+async function fetchMeta() {
+  try {
+    const json = await fetch(META_URL+'?t='+Date.now()).then(r=>r.json());
+    if (!json.daily_series || json.daily_series.length === 0) return;
+    metaUpdatedAt = json.updated_at;
+    // Converter para {d, metaCost, metaConv}
+    json.daily_series.forEach(row => {
+      const d = dayOf26(row.date);
+      const existing = D26_INVEST.find(x=>x.d===d);
+      if (existing) { existing.meta = row.cost; existing.metaConv = row.purchases||0; }
+      else D26_INVEST.push({d, date:row.date, meta:row.cost, gads:0, metaConv:row.purchases||0, gadsConv:0});
+    });
+  } catch(e) { console.warn('Meta fetch failed:', e.message); }
+}
+
+async function fetchGAds() {
+  try {
+    const json = await fetch(GADS_URL+'?t='+Date.now()).then(r=>r.json());
+    if (!json.daily_series || json.daily_series.length === 0) return;
+    json.daily_series.forEach(row => {
+      const d = dayOf26(row.date);
+      const existing = D26_INVEST.find(x=>x.d===d);
+      if (existing) { existing.gads = row.cost; existing.gadsConv = row.conversions||0; }
+      else D26_INVEST.push({d, date:row.date, meta:0, gads:row.cost, metaConv:0, gadsConv:row.conversions||0});
+    });
+    D26_INVEST.sort((a,b)=>a.d-b.d);
+  } catch(e) { console.warn('GAds fetch failed:', e.message); }
+}
+
+async function fetchSheets() {
+  const currentWeek = getCurrentWeekM();
+  const allDays = [];
+
+  function parseCSV(raw) {
+    return raw.split('\n').map(line => {
+      const cells = []; let inQ = false, cell = '';
+      for (const ch of line) {
+        if (ch === '"') { inQ = !inQ; continue; }
+        if (ch === ',' && !inQ) { cells.push(cell.trim()); cell = ''; continue; }
+        cell += ch;
+      }
+      cells.push(cell.trim());
+      return cells;
+    });
+  }
+
+  const parseMoeda = v => parseFloat((v||'').replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.').trim()) || 0;
+  const parseQtd   = v => parseInt((v||'').replace(/[^\d]/g,'')) || 0;
+  const findRow = (rows, afterIdx, match) => {
+    for (let i = afterIdx; i < rows.length; i++) {
+      if (match((rows[i][0]||'').trim())) return i;
+    }
+    return -1;
+  };
+  const isVV  = l => l === 'VENDAS VALOR:';
+  const isQTD = l => l.startsWith('QTD');
+
+  for (let w = 0; w <= currentWeek; w++) {
+    try {
+      const url = SHEET_BASE + encodeURIComponent('SEMANA ' + w) + '&t=' + Date.now();
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const rows = parseCSV(await res.text());
+
+      const iMpV = findRow(rows, 1, isVV);
+      const iMpQ = iMpV >= 0 ? findRow(rows, iMpV+1, isQTD) : -1;
+      const iMtV = iMpQ >= 0 ? findRow(rows, iMpQ+1, isVV)  : -1;
+      const iMtQ = iMtV >= 0 ? findRow(rows, iMtV+1, isQTD) : -1;
+      const iApV = iMtQ >= 0 ? findRow(rows, iMtQ+1, isVV)  : -1;
+      const iApQ = iApV >= 0 ? findRow(rows, iApV+1, isQTD) : -1;
+      const iAtV = iApQ >= 0 ? findRow(rows, iApQ+1, isVV)  : -1;
+      const iAtQ = iAtV >= 0 ? findRow(rows, iAtV+1, isQTD) : -1;
+      if (iMpV < 0 || iApV < 0) continue;
+
+      const get = ri => (ri >= 0 ? rows[ri] : []) || [];
+      for (let c = 1; c <= 7; c++) {
+        const mp=parseMoeda(get(iMpV)[c]), mqP=parseQtd(get(iMpQ)[c]);
+        const mt=parseMoeda(get(iMtV)[c]), mqT=parseQtd(get(iMtQ)[c]);
+        const ap=parseMoeda(get(iApV)[c]), aqP=parseQtd(get(iApQ)[c]);
+        const at=parseMoeda(get(iAtV)[c]), aqT=parseQtd(get(iAtQ)[c]);
+        if (mp||mqP||mt||mqT||ap||aqP||at||aqT) {
+          allDays.push({ d: w*7+(c-1), mv:mp+mt, mq:mqP+mqT, av:ap+at, aq:aqP+aqT });
+        }
+      }
+    } catch(e) { console.warn('fetchSheets SEMANA '+w+' erro:', e.message); }
+  }
+
+  if (allDays.length) {
+    allDays.sort((a,b)=>a.d-b.d);
+    D26_SALES.length = 0;
+    allDays.forEach(r => D26_SALES.push(r));
+    console.log('✅ Google Sheets conectado:', allDays.length, 'dias');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   FILTRO
+═══════════════════════════════════════════ */
+function setFiltro(preset, btn) {
+  document.querySelectorAll('.fpill').forEach(b=>b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const daysAgo = n => { const d=new Date(today); d.setDate(d.getDate()-n); return d; };
+
+  let from, to;
+  if (preset === '7d')   { from=daysAgo(6); to=today; }
+  else if (preset === '14d') { from=daysAgo(13); to=today; }
+  else if (preset === '30d') { from=daysAgo(29); to=today; }
+  else { // tudo — desde o início da campanha
+    from = CAMP_START_2026;
+    to   = today;
+  }
+
+  currentFiltroFrom = from;
+  currentFiltroTo   = to;
+
+  document.getElementById('filtroDE').value  = from.toISOString().slice(0,10);
+  document.getElementById('filtroATE').value = to.toISOString().slice(0,10);
+
+  renderAll();
+}
+
+function applyFiltro() {
+  const from = new Date(document.getElementById('filtroDE').value+'T00:00:00');
+  const to   = new Date(document.getElementById('filtroATE').value+'T00:00:00');
+  if (isNaN(from)||isNaN(to)||from>to) return;
+  currentFiltroFrom = from;
+  currentFiltroTo   = to;
+  document.querySelectorAll('.fpill').forEach(b=>b.classList.remove('active'));
+  renderAll();
+}
+
+function getFilteredDays26() {
+  // Retorna os dias de campanha 2026 dentro do filtro
+  if (!currentFiltroFrom || !currentFiltroTo) return D26_INVEST.map(r=>r.d);
+  const fromDay = Math.max(1, dayOf26(currentFiltroFrom.toISOString().slice(0,10)));
+  const toDate  = new Date(currentFiltroTo); toDate.setHours(23,59,59);
+  const toDay   = dayOf26(toDate.toISOString().slice(0,10));
+  // Use invested days as reference
+  const maxDay  = Math.max(...D26_INVEST.map(r=>r.d), D26_SALES.length ? Math.max(...D26_SALES.map(r=>r.d)) : 1, 1);
+  const end     = Math.min(toDay, maxDay);
+  const arr = [];
+  for (let d=fromDay; d<=end; d++) arr.push(d);
+  return arr;
+}
+
+/* ═══════════════════════════════════════════
+   HOJE / ONTEM
+═══════════════════════════════════════════ */
+function renderHojeOntem() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().slice(0,10);
+  const yesterday = new Date(today); yesterday.setDate(yesterday.getDate()-1);
+  const yStr = yesterday.toISOString().slice(0,10);
+
+  const todayDay = dayOf26(todayStr);
+  const yDay     = dayOf26(yStr);
+
+  // Helper: get invest+conv for a campaign day
+  function getDay(day) {
+    const inv = D26_INVEST.find(r=>r.d===day);
+    const meta = inv ? (inv.meta||0) : 0;
+    const gads = inv ? (inv.gads||0) : 0;
+    const total = meta + gads;
+    const conv  = inv ? ((inv.metaConv||0) + (inv.gadsConv||0)) : 0;
+    const cpa   = (total>0 && conv>0) ? total/conv : null;
+    return {total, conv, cpa};
+  }
+
+  const ontem = getDay(yDay);
+  const hoje  = getDay(todayDay);
+
+  document.getElementById('dataOntem').textContent = fmtDate(yesterday);
+  document.getElementById('dataHoje').textContent  = fmtDate(today);
+
+  document.getElementById('investOntem').textContent = ontem.total > 0 ? fmtFull(ontem.total) : '—';
+  document.getElementById('convOntem').textContent   = ontem.conv  > 0 ? fmtInt(ontem.conv) : '—';
+  document.getElementById('cpaOntem').textContent    = ontem.cpa   ? fmtFull(ontem.cpa) : '—';
+
+  document.getElementById('investHoje').textContent  = hoje.total  > 0 ? fmtFull(hoje.total) : 'Aguardando...';
+  document.getElementById('convHoje').textContent    = hoje.conv   > 0 ? fmtInt(hoje.conv) : '—';
+
+  // TV tag
+  const tvOntem = tvProgramsForDay26(yDay);
+  const tvHoje  = tvProgramsForDay26(todayDay);
+  document.getElementById('tvOntem').textContent = tvOntem ? '📺 TV Globo: ' + tvOntem.join(' · ') : '';
+  document.getElementById('tvHoje').textContent  = tvHoje  ? '📺 TV Globo: ' + tvHoje.join(' · ')  : '';
+
+  // Horário atualização
+  if (metaUpdatedAt) {
+    const t = new Date(metaUpdatedAt+'T03:00:00');
+    document.getElementById('hojeUpdateTime').textContent =
+      t.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  }
+
+  // Acumulado
+  const totalInvest26 = D26_INVEST.reduce((a,r)=>(r.d<todayDay?a:a)+(r.d<=todayDay?((r.meta||0)+(r.gads||0)):0), 0);
+  // Fix: proper sum
+  const totalInv = D26_INVEST.filter(r=>r.d<todayDay).reduce((a,r)=>a+(r.meta||0)+(r.gads||0),0) + (hoje.total||0);
+  const dias = todayDay;
+  const media = dias > 0 ? totalInv/dias : 0;
+
+  // 2025 same days
+  const invest25Same = D25_INVEST.filter(r=>r.d<=dias).reduce((a,r)=>a+r.v,0);
+
+  document.getElementById('investTotal').textContent = fmtFull(totalInv);
+  document.getElementById('mediaDaily').textContent  = fmtFull(media);
+  document.getElementById('diasCamp').textContent    = dias + 'º dia';
+  document.getElementById('investVs25').textContent  =
+    invest25Same > 0
+      ? `2025 (mesmos ${dias} dias): ${fmtFull(invest25Same)}`
+      : 'Comparativo 2025 indisponível';
+}
+
+/* ═══════════════════════════════════════════
+   KPIs
+═══════════════════════════════════════════ */
+function renderKPIs(days26) {
+  const s26 = D26_SALES.filter(r=>days26.includes(r.d))
+    .reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
+  const minD = days26.length ? Math.min(...days26) : 1;
+  const maxD = days26.length ? Math.max(...days26) : 1;
+  const s25  = D25.filter(r=>r.d>=minD && r.d<=maxD)
+    .reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
+
+  const rec26 = s26.mv + s26.av;
+  const rec25 = s25.mv + s25.av;
+  const ing26 = s26.mq + s26.aq;
+  const ing25 = s25.mq + s25.aq;
+
+  // Se não temos dados 2026 de vendas, mostrar 2025 como referência
+  const has26Sales = D26_SALES.length > 0;
+
+  document.getElementById('kpiReceita').textContent  = has26Sales ? fmt(rec26) : '—';
+  document.getElementById('kpiMotos').textContent    = has26Sales ? fmt(s26.mv) : '—';
+  document.getElementById('kpiAutos').textContent    = has26Sales ? fmt(s26.av) : '—';
+  document.getElementById('kpiIngressos').textContent= has26Sales ? fmtInt(ing26) : '—';
+
+  if (has26Sales) {
+    setDelta('kpiReceitaDelta', rec26, rec25);
+    setDelta('kpiMotosDelta',   s26.mv, s25.mv);
+    setDelta('kpiAutosDelta',   s26.av, s25.av);
+    setDelta('kpiIngressosDelta', ing26, ing25);
+  } else {
+    ['kpiReceitaDelta','kpiMotosDelta','kpiAutosDelta','kpiIngressosDelta'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el){el.className='kpi-delta neu';el.textContent='Aguardando dados de vendas'}
+    });
+  }
+}
+
+/* ═══════════════════════════════════════════
+   CONVERSÕES DIGITAIS
+═══════════════════════════════════════════ */
+function renderConversoes(days26) {
+  const inv = D26_INVEST.filter(r=>days26.includes(r.d));
+  const totalConv  = inv.reduce((a,r)=>a+(r.metaConv||0)+(r.gadsConv||0),0);
+  const totalInvR  = inv.reduce((a,r)=>a+(r.meta||0)+(r.gads||0),0);
+  const cpa = totalConv>0 && totalInvR>0 ? totalInvR/totalConv : null;
+
+  // 2025 — conversões digitais (aproximado pelo CPA médio histórico = R$26.16, total ingressos / invest)
+  // Usamos as compras (mq+aq) de D25 como proxy
+  const minD = days26.length ? Math.min(...days26) : 1;
+  const maxD = days26.length ? Math.max(...days26) : 1;
+  const conv25 = D25.filter(r=>r.d>=minD&&r.d<=maxD).reduce((a,r)=>a+(r.mq||0)+(r.aq||0),0);
+
+  document.getElementById('convDigitalTotal').textContent = totalConv>0 ? fmtInt(Math.round(totalConv)) : '—';
+  document.getElementById('convInvestTotal').textContent  = fmtFull(totalInvR);
+  document.getElementById('convCPA').textContent          = cpa ? fmtFull(cpa) : '—';
+  document.getElementById('conv25').textContent           = conv25>0 ? fmtInt(conv25) : '—';
+
+  const el = document.getElementById('convDigitalDelta');
+  if (totalConv > 0 && conv25 > 0) {
+    const pct = ((totalConv-conv25)/conv25*100).toFixed(1);
+    el.className = 'conv-delta ' + (parseFloat(pct)>=0?'up':'down');
+    el.textContent = (parseFloat(pct)>=0?'▲ +':'▼ ') + pct + '% vs 2025 (mesmo período)';
+  } else {
+    el.className = 'conv-delta neu';
+    el.textContent = '—';
+  }
+}
+
+/* ═══════════════════════════════════════════
+   GRÁFICOS
+═══════════════════════════════════════════ */
+const CHART_DEFAULTS = {
+  color: '#888',
+  font: { family:"'Inter',sans-serif", size:11 }
+};
+const tooltipBase = {
+  backgroundColor:'#1C1C1C',
+  borderColor:'rgba(200,255,0,0.25)',
+  borderWidth:1,
+  padding:10,
+  cornerRadius:8,
+  titleColor:'#C8FF00',
+  bodyColor:'#DDD',
+};
+const gridLine = { color:'rgba(255,255,255,0.05)', drawBorder:false };
+
+function buildVendasChart(days26) {
+  const metric = currentVendasMetric;
+  const labels = days26.map(d => {
+    const dt = dateOf26Day(d);
+    return fmtDate(dt);
+  });
+
+  function get26(d) {
+    const r = D26_SALES.find(x=>x.d===d);
+    if (!r) return null;
+    if (metric==='motos') return r.mv;
+    if (metric==='autos') return r.av;
+    return r.mv + r.av;
+  }
+  function get25(d) {
+    const r = D25.find(x=>x.d===d);
+    if (!r) return null;
+    if (metric==='motos') return r.mv;
+    if (metric==='autos') return r.av;
+    return r.mv + r.av;
+  }
+
+  const data26 = days26.map(d => get26(d));
+  const data25 = days26.map(d => get25(d));
+  const annotations = getTvAnnotations(days26);
+
+  if (chartVendas) chartVendas.destroy();
+  const ctx = document.getElementById('chartVendas').getContext('2d');
+  chartVendas = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {
+          label:'2026',
+          data:data26,
+          borderColor:'#C8FF00',
+          backgroundColor:'rgba(200,255,0,0.08)',
+          borderWidth:2.5,
+          pointRadius:3,
+          pointHoverRadius:6,
+          fill:true,
+          tension:.35,
+          spanGaps:false,
+        },
+        {
+          label:'2025',
+          data:data25,
+          borderColor:'#555',
+          backgroundColor:'rgba(85,85,85,0.05)',
+          borderWidth:1.5,
+          pointRadius:2,
+          pointHoverRadius:5,
+          fill:false,
+          tension:.35,
+          borderDash:[5,3],
+        }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{...tooltipBase,
+          callbacks:{
+            title: items => items[0].label,
+            label: item => ' '+item.dataset.label+': R$ '+Math.round(item.raw||0).toLocaleString('pt-BR'),
+          }
+        },
+        annotation:{annotations}
+      },
+      scales:{
+        x:{grid:gridLine, ticks:{color:'#555',maxTicksLimit:12,font:{size:10}}},
+        y:{
+          grid:gridLine,
+          ticks:{
+            color:'#666',
+            callback: v => v>=1000000 ? 'R$'+(v/1000000).toFixed(1)+'M' : v>=1000 ? 'R$'+(v/1000).toFixed(0)+'K' : 'R$'+v
+          }
+        }
+      }
+    }
+  });
+
+  // Show TV legend if any TV day in range
+  const hasTv = days26.some(d=>TV_GLOBO.some(t=>t.day26===d));
+  document.getElementById('tvLegVendas').style.display = hasTv ? 'flex' : 'none';
+}
+
+function buildInvestChart(days26) {
+  const view = currentInvestView;
+  const labels = days26.map(d => fmtDate(dateOf26Day(d)));
+
+  function inv26(d) {
+    const r = D26_INVEST.find(x=>x.d===d);
+    return r ? (r.meta||0)+(r.gads||0) : 0;
+  }
+  function inv25(d) {
+    const r = D25_INVEST.find(x=>x.d===d);
+    return r ? r.v : 0;
+  }
+
+  let data26, data25;
+  if (view === 'acumulado') {
+    let sum26=0, sum25=0;
+    data26 = days26.map(d=>{sum26+=inv26(d);return sum26});
+    data25 = days26.map(d=>{sum25+=inv25(d);return sum25});
+  } else {
+    data26 = days26.map(inv26);
+    data25 = days26.map(inv25);
+  }
+
+  const annotations = getTvAnnotations(days26);
+
+  if (chartInvest) chartInvest.destroy();
+  const ctx = document.getElementById('chartInvest').getContext('2d');
+  chartInvest = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {
+          label:'2026',
+          data:data26,
+          borderColor:'#C8FF00',
+          backgroundColor:'rgba(200,255,0,0.08)',
+          borderWidth:2.5,
+          pointRadius:3,
+          pointHoverRadius:6,
+          fill:view==='acumulado',
+          tension:.3,
+        },
+        {
+          label:'2025 (est.)',
+          data:data25,
+          borderColor:'#555',
+          backgroundColor:'rgba(85,85,85,0.04)',
+          borderWidth:1.5,
+          pointRadius:2,
+          pointHoverRadius:5,
+          fill:false,
+          tension:.3,
+          borderDash:[5,3],
+        }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{...tooltipBase,
+          callbacks:{
+            title: items => items[0].label,
+            label: item => ' '+item.dataset.label+': '+fmtFull(item.raw||0),
+          }
+        },
+        annotation:{annotations}
+      },
+      scales:{
+        x:{grid:gridLine, ticks:{color:'#555',maxTicksLimit:12,font:{size:10}}},
+        y:{
+          grid:gridLine,
+          ticks:{
+            color:'#666',
+            callback: v => v>=1000 ? 'R$'+(v/1000).toFixed(0)+'K' : 'R$'+v
+          }
+        }
+      }
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════
+   PILLS INTERAÇÃO
+═══════════════════════════════════════════ */
+function setVendasMetric(metric, btn) {
+  document.querySelectorAll('#chartVendas').forEach(()=>{});
+  btn.closest('.pill-group').querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentVendasMetric = metric;
+  const days = getFilteredDays26();
+  buildVendasChart(days);
+}
+
+function setInvestView(view, btn) {
+  btn.closest('.pill-group').querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentInvestView = view;
+  const days = getFilteredDays26();
+  buildInvestChart(days);
+}
+
+/* ═══════════════════════════════════════════
+   RENDER ALL
+═══════════════════════════════════════════ */
+function renderAll() {
+  const days26 = getFilteredDays26();
+  renderHojeOntem();
+  renderKPIs(days26);
+  renderConversoes(days26);
+  buildVendasChart(days26);
+  buildInvestChart(days26);
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+async function init() {
+  // Data de geração
+  const now = new Date();
+  const dtStr = now.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('genDate').textContent  = 'Atualizado ' + dtStr;
+  document.getElementById('footerDate').textContent = 'Gerado em ' + dtStr;
+
+  Chart.defaults.color              = '#888';
+  Chart.defaults.font.family        = "'Inter',sans-serif";
+  Chart.defaults.font.size          = 11;
+
+  // Buscar todos os dados em paralelo
+  await Promise.allSettled([fetchMeta(), fetchGAds(), fetchSheets()]);
+
+  // Filtro padrão: todo o período
+  setFiltro('tudo', document.getElementById('fpill-tudo'));
+}
+
+// Auto-refresh a cada 5 minutos
+setInterval(async () => {
+  await Promise.allSettled([fetchMeta(), fetchGAds()]);
+  renderAll();
+}, 5 * 60 * 1000);
+
+init();
+</script>
+</body>
+</html>
