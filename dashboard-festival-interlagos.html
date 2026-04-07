@@ -1612,10 +1612,13 @@ function buildGA4Sources(dateFrom, dateTo) {
   const refDiv = document.getElementById('ga4Referrers');
   refDiv.innerHTML = '';
   const referrers = (GA4_DATA?.influencer_breakdown?.length ? GA4_DATA.influencer_breakdown : GA4_REFERRERS.map(r=>({...r, source:r.name})));
+  const INFL_CONV_RATE = 0.015;
   referrers.forEach(r => {
     const conv    = r.conversions || 0;
     const tickets = r.tickets || {};
     const tktEntries = Object.entries(tickets).sort((a,b)=>b[1]-a[1]);
+    const totalTktViews = tktEntries.reduce((s,[,n])=>s+n, 0);
+    const estTotal = Math.round((r.sessions||0) * INFL_CONV_RATE);
     const card = document.createElement('div');
     card.className = 'referrer-card';
     card.innerHTML =
@@ -1627,11 +1630,13 @@ function buildGA4Sources(dateFrom, dateTo) {
         '</span>'+
         (tktEntries.length
           ? '<span style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">'+
-              tktEntries.map(([name, n])=>
-                '<span style="font-size:.58rem;background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.18);color:#AAA;border-radius:4px;padding:1px 6px">'+
+              tktEntries.map(([name, n])=>{
+                const estN = totalTktViews>0 ? Math.max(1,Math.round(estTotal*n/totalTktViews)) : 0;
+                return '<span style="font-size:.58rem;background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.18);color:#AAA;border-radius:4px;padding:1px 6px">'+
                   name+' <strong style="color:var(--lime)">'+n+'</strong>'+
-                '</span>'
-              ).join('')+
+                  (estN>0 ? ' <span style="color:#4dff91;font-size:.55rem">~'+estN+'</span>' : '')+
+                '</span>';
+              }).join('')+
             '</span>'
           : ''
         )+
