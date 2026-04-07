@@ -2136,10 +2136,11 @@ buildSpk('spkMeta',[320,890,1240,780,1050,1380,960,1120,840,1290,1480,1060,920,1
 buildSpk('spkGoogle',[180,420,680,390,510,720,480,560,420,640,740,530,460,680,790,560,440,820],'rgb(200,255,0)');
 
 _upd2026Lbl();
-fetchSheet();
-fetchGA4Data();
-fetchGAdsData();
-fetchMetaData();
+// Carrega todos os dados e re-renderiza o painel executivo ao terminar
+Promise.allSettled([fetchSheet(), fetchGA4Data(), fetchGAdsData(), fetchMetaData()])
+  .then(() => {
+    if(document.getElementById('tab-exec').style.display !== 'none') renderPainelExecutivo();
+  });
 
 // Auto-refresh a cada 30 segundos
 setInterval(() => {
