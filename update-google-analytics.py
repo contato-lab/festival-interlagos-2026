@@ -177,6 +177,69 @@ def fetch_sessions_by_date_channel(client) -> dict:
     return result
 
 
+def fetch_influencer_breakdown(client) -> list:
+    """
+    Por influenciador (utm_source, utm_medium=influencer):
+    sessões, conversões e breakdown de página de ingresso (moto vs auto).
+    Retorna lista de dicts ordenada por conversions desc.
+    """
+    end   = datetime.now(timezone.utc) - timedelta(days=1)
+    start = end - timedelta(days=CHANNEL_DAYS)
+
+    MOTO_PAGES = ("ride-pass", "edicao-moto", "interlagos-moto")
+    AUTO_PAGES = ("sport-pass", "drive-pass", "interlagos-auto", "edicao-auto")
+
+    request = RunReportRequest(
+        property=f"properties/{PROPERTY_ID}",
+        date_ranges=[DateRange(
+            start_date=start.strftime("%Y-%m-%d"),
+            end_date=end.strftime("%Y-%m-%d"),
+        )],
+        dimensions=[
+            Dimension(name="sessionSource"),
+            Dimension(name="pagePath"),
+        ],
+        metrics=[
+            Metric(name="sessions"),
+            Metric(name="conversions"),
+        ],
+        dimension_filter=FilterExpression(
+            filter=Filter(
+                field_name="sessionMedium",
+                string_filter=Filter.StringFilter(
+                    match_type=Filter.StringFilter.MatchType.EXACT,
+                    value="influencer",
+                    case_sensitive=False,
+                ),
+            )
+        ),
+        limit=2000,
+    )
+    response = client.run_report(request)
+
+    sources: dict = {}
+    for row in response.rows:
+        src   = row.dimension_values[0].value
+        page  = row.dimension_values[1].value.lower()
+        sess  = int(row.metric_values[0].value)
+        conv  = float(row.metric_values[1].value)
+
+        if src not in sources:
+            sources[src] = {"source": src, "sessions": 0, "conversions": 0, "moto": 0, "auto": 0}
+        sources[src]["sessions"]    += sess
+        sources[src]["conversions"] += conv
+
+        if any(k in page for k in MOTO_PAGES):
+            sources[src]["moto"] += sess
+        elif any(k in page for k in AUTO_PAGES):
+            sources[src]["auto"] += sess
+
+    result = sorted(sources.values(), key=lambda x: x["conversions"], reverse=True)
+    for r in result:
+        r["conversions"] = round(r["conversions"])
+    return result
+
+
 def fetch_influencer_sessions(client) -> dict:
     """
     Sessões com utm_medium=influencer por data.
@@ -277,8 +340,9 @@ def main():
     totals          = compute_totals(daily_series)
 
     print(f"Buscando sessões por canal (últimos {CHANNEL_DAYS} dias)…")
-    sessions_by_channel = fetch_sessions_by_date_channel(client)
-    influencer_sessions = fetch_influencer_sessions(client)
+    sessions_by_channel  = fetch_sessions_by_date_channel(client)
+    influencer_sessions  = fetch_influencer_sessions(client)
+    influencer_breakdown = fetch_influencer_breakdown(client)
 
     # Injeta Influenciadores no mapa de canais
     for date, count in influencer_sessions.items():
@@ -296,7 +360,9 @@ def main():
         "traffic_sources": traffic_sources,
         "top_pages":       top_pages,
         # ↓ Consumido pela tabela Menções Gerais no dashboard
-        "sessions_by_date": sessions_by_channel,
+        "sessions_by_date":    sessions_by_channel,
+        # ↓ Top influenciadores com breakdown moto/auto
+        "influencer_breakdown": influencer_breakdown,
     }
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:

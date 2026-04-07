@@ -1608,18 +1608,31 @@ function buildGA4Sources(dateFrom, dateTo) {
     tbody.appendChild(tr);
   });
 
-  // Influenciadores
+  // Influenciadores — usa breakdown do GA4 quando disponível
   const refDiv = document.getElementById('ga4Referrers');
   refDiv.innerHTML = '';
-  GA4_REFERRERS.forEach(r => {
-    const conv = r.conversions || 0;
+  const referrers = (GA4_DATA?.influencer_breakdown?.length ? GA4_DATA.influencer_breakdown : GA4_REFERRERS.map(r=>({...r, source:r.name})));
+  referrers.forEach(r => {
+    const conv  = r.conversions || 0;
+    const moto  = r.moto  || 0;
+    const auto  = r.auto  || 0;
+    const hasTkt = moto > 0 || auto > 0;
     const card = document.createElement('div');
     card.className = 'referrer-card';
     card.innerHTML =
-      '<span class="referrer-name">'+r.name+'</span>'+
-      '<span style="display:flex;align-items:center;gap:10px">'+
-        '<span style="font-size:.65rem;color:'+(conv>0?'var(--green)':'var(--text3)')+'">'+(conv>0?conv+' conv':'—')+'</span>'+
-        '<span class="referrer-val">'+fmtN(r.sessions)+'</span>'+
+      '<span class="referrer-name">'+(r.source||r.name)+'</span>'+
+      '<span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">'+
+        '<span style="display:flex;align-items:center;gap:10px">'+
+          '<span style="font-size:.65rem;color:'+(conv>0?'var(--green)':'var(--text3)')+'">'+(conv>0?conv+' conv':'—')+'</span>'+
+          '<span class="referrer-val">'+fmtN(r.sessions)+'</span>'+
+        '</span>'+
+        (hasTkt
+          ? '<span style="display:flex;gap:6px;font-size:.62rem;margin-top:1px">'+
+              (moto>0 ? '<span style="color:#C8FF00">🏍️ '+moto+'</span>' : '')+
+              (auto>0 ? '<span style="color:#C07ADB">🚗 '+auto+'</span>' : '')+
+            '</span>'
+          : ''
+        )+
       '</span>';
     refDiv.appendChild(card);
   });
