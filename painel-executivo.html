@@ -791,7 +791,7 @@ function buildExecVendasChart() {
       {type:'bar',label:'Ing. 2025',data:days.map(getQtd25),yAxisID:'yQtd',backgroundColor:'rgba(255,255,255,0.04)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,order:4},
       // Linhas receita (eixo esquerdo, frente)
       {type:'line',label:'Receita 2026',data:days.map(getRec26),yAxisID:'yRec',borderColor:'#C8FF00',backgroundColor:'rgba(200,255,0,0.06)',borderWidth:2.5,pointRadius:3,fill:true,tension:.35,spanGaps:false,order:1},
-      {type:'line',label:'Receita 2025',data:days.map(getRec25),yAxisID:'yRec',borderColor:'rgba(255,255,255,.3)',borderWidth:1.5,pointRadius:2,fill:false,tension:.35,borderDash:[5,3],order:2}
+      {type:'line',label:'Receita 2025',data:days.map(getRec25),yAxisID:'yRec',borderColor:'rgba(255,255,255,.65)',borderWidth:2,pointRadius:2.5,fill:false,tension:.35,borderDash:[5,3],order:2}
     ]},
     options:{
       responsive:true,maintainAspectRatio:false,animation:false,
@@ -840,7 +840,7 @@ function buildExecInvestChart() {
     type:'line',
     data:{labels, datasets:[
       {label:'2026',data:d26,borderColor:'#C8FF00',backgroundColor:'rgba(200,255,0,0.07)',borderWidth:2.5,pointRadius:3,fill:view==='acumulado',tension:.3},
-      {label:'2025 (est.)',data:d25,borderColor:'#555',borderWidth:1.5,pointRadius:2,fill:false,tension:.3,borderDash:[5,3]}
+      {label:'2025 (est.)',data:d25,borderColor:'rgba(255,255,255,.55)',borderWidth:2,pointRadius:2.5,fill:false,tension:.3,borderDash:[5,3]}
     ]},
     options:{
       responsive:true,maintainAspectRatio:false,animation:false,
