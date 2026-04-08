@@ -2301,7 +2301,7 @@ function renderExecHojeOntem() {
       <div class="exec-meta-item"><span class="exec-meta-label">Investimento ADS</span></div>
     </div>
     <div class="exec-meta-row">
-      <div class="exec-meta-item"><span class="exec-meta-label">Conversões Digitais</span><span class="exec-meta-val">${ontem.conv}</span></div>
+      <div class="exec-meta-item"><span class="exec-meta-label">Conversões Digitais</span><span class="exec-meta-val">${Math.round(ontem.conv)}</span></div>
       <div class="exec-meta-item"><span class="exec-meta-label">Custo / Conversão</span><span class="exec-meta-val">${ontem.conv>0?execFmtFull(ontem.total/ontem.conv):'—'}</span></div>
     </div>
     ${tvOntem?`<div class="exec-tv-row">📺 TV Globo: ${tvOntem.programs.join(' · ')}</div>`:''}
@@ -2315,7 +2315,7 @@ function renderExecHojeOntem() {
       <div class="exec-meta-item"><span class="exec-meta-label">Investimento ADS</span></div>
     </div>
     <div class="exec-meta-row">
-      <div class="exec-meta-item"><span class="exec-meta-label">Conversões Digitais</span><span class="exec-meta-val">${hoje.conv}</span></div>
+      <div class="exec-meta-item"><span class="exec-meta-label">Conversões Digitais</span><span class="exec-meta-val">${Math.round(hoje.conv)}</span></div>
     </div>
   `;
 
@@ -2501,11 +2501,11 @@ function renderExecConversoes() {
     <div class="section-title" style="margin-bottom:14px">Conversões por Origem</div>
     <div class="exec-conv-row">
       <span class="exec-conv-label">Meta Ads</span>
-      <span class="exec-conv-val">${metaConv.toLocaleString('pt-BR')}</span>
+      <span class="exec-conv-val">${Math.round(metaConv).toLocaleString('pt-BR')}</span>
     </div>
     <div class="exec-conv-row">
       <span class="exec-conv-label">Google Ads</span>
-      <span class="exec-conv-val">${gadsConv.toLocaleString('pt-BR')}</span>
+      <span class="exec-conv-val">${Math.round(gadsConv).toLocaleString('pt-BR')}</span>
     </div>
     <div class="exec-conv-row">
       <span class="exec-conv-label" style="color:rgba(0,191,255,.8)">TikTok Ads <span style="font-size:.6rem;color:#555">manual</span></span>
