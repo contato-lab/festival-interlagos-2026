@@ -6,7 +6,6 @@
 <title>Festival Interlagos 2026 — Edição Automóveis</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <style>
 :root {
   --lime:#C8FF00; --lime-dim:rgba(200,255,0,0.12); --lime-border:rgba(200,255,0,0.25);
@@ -456,16 +455,9 @@ tr:hover td{background:rgba(255,255,255,.018)}
     </button>
     <span style="font-size:.7rem;color:var(--text3);margin-left:4px">clique para mostrar/ocultar cada ano</span>
   </div>
-  <!-- Legenda de tipos de ação -->
-  <div class="acoes-legend" id="acoesLegend"></div>
-
   <div id="chartCompWrap" style="position:relative;height:300px"><canvas id="chartComp"></canvas></div>
 
-  <!-- Timeline de ações abaixo do gráfico -->
-  <div id="acoesTimeline" class="acoes-timeline"></div>
-
   <div class="chart-footnote" style="font-size:.68rem;color:var(--text3);margin-top:10px;display:flex;justify-content:space-between;align-items:center">
-    <span>💡 Passe o mouse sobre as linhas do gráfico para ver detalhes de cada ação</span>
     <span>* Eixo X = dia relativo de vendas &nbsp;|&nbsp; D+1 = primeiro dia da temporada</span>
   </div>
 </div>
@@ -729,32 +721,6 @@ function getSeries(data, met) {
 }
 
 // ─── Gera as anotações de linha vertical para o Chart.js ───────────────────
-function getAnnotations() {
-  const annotations = {};
-  ACOES.forEach((a, i) => {
-    if (!acoesVisiveis[a.tipo]) return;
-    const cfg = ACAO_CONFIG[a.tipo];
-    const xIndex = a.dia - 1; // D+1 = index 0
-    annotations[`acao_${i}`] = {
-      type: 'line',
-      xMin: xIndex, xMax: xIndex,
-      borderColor: cfg.cor,
-      borderWidth: 1.5,
-      borderDash: cfg.dash,
-      label: {
-        display: true,
-        content: cfg.icone,
-        position: 'start',
-        yAdjust: -4,
-        backgroundColor: 'transparent',
-        font: { size: 13 },
-        color: cfg.cor,
-      }
-    };
-  });
-  return annotations;
-}
-
 function buildComp() {
   const n=D25.length;
   const labels=Array.from({length:n},(_,i)=>{
@@ -806,7 +772,6 @@ function buildComp() {
       interaction:{mode:'index', intersect:false},
       plugins:{
         legend:{display:false},
-        annotation:{ annotations: getAnnotations() },
         tooltip:{
           backgroundColor:'#161616', borderColor:'rgba(200,255,0,0.25)', borderWidth:1,
           titleColor:'#C8FF00', bodyColor:'#FFF', padding:13, usePointStyle:true,
@@ -815,11 +780,6 @@ function buildComp() {
               const dia = items[0].dataIndex + 1;
               const dt = dToDate(dia);
               const dateStr = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-              const acoesNoDia = ACOES.filter(a => a.dia === dia && acoesVisiveis[a.tipo]);
-              if (acoesNoDia.length) {
-                const label = acoesNoDia.map(a=>`${ACAO_CONFIG[a.tipo].icone} ${a.titulo}`).join(' · ');
-                return `${dateStr} · ${label}`;
-              }
               return `${dateStr} · D+${dia}`;
             },
             label: ctx => {
@@ -838,20 +798,6 @@ function buildComp() {
                 `  Receita   : ${fmtR(rec)}`
               ];
             },
-            afterBody: items => {
-              const idx = items[0].dataIndex;
-              const dia = idx + 1;
-              const dateStr = dToDate(dia).toISOString().split('T')[0];
-              const gastoG = getGadsSpend(dateStr);
-              const gastoM = getMetaSpend(dateStr);
-              if (gastoG === null && gastoM === null) return [];
-              const lines = ['─────────────────────'];
-              if (gastoG !== null) lines.push(`G  Gasto Google: ${fmtR(gastoG)}`);
-              if (gastoM !== null) lines.push(`f  Gasto Meta  : ${fmtR(gastoM)}`);
-              const total = (gastoG||0) + (gastoM||0);
-              if (gastoG !== null && gastoM !== null) lines.push(`   Total Mídia : ${fmtR(total)}`);
-              return lines;
-            }
           }
         }
       },
@@ -860,54 +806,6 @@ function buildComp() {
         y:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:10},callback:v=>metricAtiva==='ingressos'?fmtN(v):fmtK(v)}}
       }
     }
-  });
-}
-
-// ─── Legenda de tipos de ação (com toggle) ──────────────────────────────────
-function buildAcoesLegend() {
-  const el = document.getElementById('acoesLegend');
-  el.innerHTML = '';
-  Object.entries(ACAO_CONFIG).forEach(([tipo, cfg]) => {
-    const count = ACOES.filter(a => a.tipo === tipo).length;
-    if (!count) return;
-    const div = document.createElement('div');
-    div.className = 'acao-leg-item' + (acoesVisiveis[tipo] ? '' : ' inactive');
-    div.innerHTML = `<span style="font-size:.9rem">${cfg.icone}</span>
-      <div class="acao-leg-line" style="background:${cfg.cor};width:18px;height:2px;border-radius:1px"></div>
-      <span>${cfg.label}</span>
-      <span style="background:rgba(255,255,255,0.07);border-radius:10px;padding:1px 6px;font-size:.68rem;color:var(--text3)">${count}</span>`;
-    div.onclick = () => {
-      acoesVisiveis[tipo] = !acoesVisiveis[tipo];
-      div.classList.toggle('inactive');
-      buildComp();         // re-render gráfico com/sem as anotações
-      buildAcoesTimeline();
-    };
-    el.appendChild(div);
-  });
-}
-
-// ─── Timeline de ações abaixo do gráfico ────────────────────────────────────
-function buildAcoesTimeline() {
-  const el = document.getElementById('acoesTimeline');
-  el.innerHTML = '';
-  const visiveis = ACOES
-    .filter(a => acoesVisiveis[a.tipo])
-    .sort((a,b) => a.dia - b.dia);
-
-  visiveis.forEach(a => {
-    const cfg = ACAO_CONFIG[a.tipo];
-    const div = document.createElement('div');
-    div.className = 'acao-marker';
-    div.title = a.desc;
-    div.innerHTML = `
-      <div style="width:2px;height:12px;background:${cfg.cor};border-radius:1px;opacity:.7"></div>
-      <div class="acao-marker-icon">${cfg.icone}</div>
-      <div class="acao-marker-dia" style="color:${cfg.cor}">D+${a.dia}</div>
-      <div class="acao-marker-label">${a.titulo}</div>`;
-    div.style.cssText=`min-width:64px;padding:4px;border-radius:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:.2s`;
-    div.onmouseenter=()=>div.style.background='rgba(255,255,255,0.04)';
-    div.onmouseleave=()=>div.style.background='transparent';
-    el.appendChild(div);
   });
 }
 
@@ -1133,7 +1031,7 @@ if(localStorage.getItem(_AUTH_KEY)==='1'){
   document.getElementById('loginOverlay').style.display='none';
   initDashboard();
 }
-
+</script>
 
 </body>
 </html>
