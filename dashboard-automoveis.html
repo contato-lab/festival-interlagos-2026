@@ -603,7 +603,7 @@ const _AUTH_PWD = 'auto2026';
 const _AUTH_KEY = 'dash_auth_auto';
 function checkLogin(){
   if(document.getElementById('loginPwd').value===_AUTH_PWD){
-    sessionStorage.setItem(_AUTH_KEY,'1');
+    localStorage.setItem(_AUTH_KEY,'1');
     document.getElementById('loginOverlay').style.display='none';
     initDashboard();
   } else {
@@ -1129,7 +1129,7 @@ function initDashboard(){
   }, 30000);
 }
 
-if(sessionStorage.getItem(_AUTH_KEY)==='1'){
+if(localStorage.getItem(_AUTH_KEY)==='1'){
   document.getElementById('loginOverlay').style.display='none';
   initDashboard();
 }
