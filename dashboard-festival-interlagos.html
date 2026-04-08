@@ -311,73 +311,6 @@ tr:hover td{background:rgba(255,255,255,.018)}
   .filtro-date{width:calc(50% - 4px)}
 }
 
-/* ═══ TAB BAR ═══ */
-.tab-bar{display:flex;gap:0;border-bottom:2px solid var(--border);background:#0D0D0D;padding:0 32px}
-.tab-btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.88rem;text-transform:uppercase;letter-spacing:.06em;padding:12px 26px;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.2s;white-space:nowrap}
-.tab-btn:hover{color:var(--text2)}.tab-btn.active{color:var(--lime);border-bottom-color:var(--lime)}
-.tab-panel{display:none}.tab-panel.active{display:block}
-/* ═══ EXEC PANEL ═══ */
-.exec-main{padding:24px 32px;display:flex;flex-direction:column;gap:20px;max-width:1500px;margin:0 auto}
-.exec-hoje-ontem{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.exec-card{background:var(--card);border:1px solid var(--lime-border);border-radius:var(--radius);padding:20px 22px}
-.exec-card-label{font-size:.68rem;color:#999;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:2px}
-.exec-card-date{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.9rem;color:var(--lime);margin-bottom:10px}
-.exec-val-big{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:2.1rem;color:var(--lime);line-height:1;margin-bottom:8px}
-.exec-val-big.partial{color:var(--warn)}
-.exec-meta-row{display:flex;gap:20px;flex-wrap:wrap;margin-top:6px}
-.exec-meta-item{display:flex;flex-direction:column;gap:1px}
-.exec-meta-label{font-size:.62rem;color:#666;text-transform:uppercase;letter-spacing:.06em}
-.exec-meta-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;color:var(--text2)}
-.exec-tv-row{font-size:.7rem;color:var(--warn);margin-top:8px;display:flex;align-items:center;gap:5px}
-.exec-kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
-.exec-kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
-.exec-kpi-label{font-size:.68rem;color:#999;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:5px}
-.exec-kpi-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.7rem;color:var(--text);line-height:1;margin-bottom:4px}
-.exec-kpi-delta{font-size:.7rem;color:#888}
-.exec-kpi-delta.up{color:var(--green)}.exec-kpi-delta.down{color:var(--red)}
-.exec-context{background:var(--lime-dim);border:1px solid var(--lime-border);border-radius:var(--rad-sm);padding:14px 18px;font-size:.82rem;color:var(--text2);line-height:1.6;display:flex;gap:12px;align-items:flex-start}
-.exec-charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.exec-chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
-.exec-chart-wrap{position:relative;height:240px}
-.exec-leg{display:flex;gap:14px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
-.exec-leg-item{display:flex;align-items:center;gap:5px;font-size:.72rem;color:#BBB}
-.exec-leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-.exec-conv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.exec-conv-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
-.exec-conv-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-.exec-conv-row:last-child{border-bottom:none}
-.exec-conv-label{font-size:.78rem;color:#CCC}
-.exec-conv-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;color:var(--lime)}
-/* Exec filter bar */
-.exec-filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px}
-.exec-filter-label{font-size:.65rem;color:#666;text-transform:uppercase;letter-spacing:.08em;margin-right:4px}
-.exec-btn-filter{background:transparent;border:1px solid rgba(255,255,255,.12);color:#999;font-size:.72rem;font-weight:600;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .15s}
-.exec-btn-filter:hover{border-color:rgba(200,255,0,.4);color:#CCC}
-.exec-btn-filter.active{background:rgba(200,255,0,.12);border-color:rgba(200,255,0,.5);color:var(--lime)}
-.exec-filter-sep{width:1px;height:20px;background:rgba(255,255,255,.08);margin:0 4px}
-.exec-date-input{background:#1C1C1C;border:1px solid rgba(255,255,255,.12);color:#CCC;font-size:.72rem;padding:5px 8px;border-radius:6px;outline:none}
-.exec-date-input:focus{border-color:rgba(200,255,0,.4)}
-.exec-filter-period{font-size:.72rem;color:#666;margin-left:auto;font-style:italic}
-@media(max-width:1024px){.exec-hoje-ontem{grid-template-columns:1fr 1fr}.exec-kpi-strip{grid-template-columns:repeat(3,1fr)}.exec-charts-grid{grid-template-columns:1fr}.exec-conv-grid{grid-template-columns:1fr}.tab-bar{padding:0 18px}}
-@media(max-width:768px){.exec-hoje-ontem{grid-template-columns:1fr}.exec-main{padding:16px 10px}.tab-btn{font-size:.78rem;padding:10px 14px}}
-/* ── Botões métrica vendas exec ── */
-.exec-metric-pill{background:#1C1C1C;border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:6px 16px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;transition:.2s;color:#CCC}
-.exec-metric-pill:hover{border-color:var(--lime-border);color:var(--lime)}
-.exec-metric-pill.active{background:var(--lime-dim);border-color:var(--lime);color:var(--lime)}
-.exec-metric-pill.moto{border-color:rgba(200,255,0,.3);color:#C8FF00}
-.exec-metric-pill.moto.active{background:rgba(200,255,0,.18);border-color:var(--lime);color:var(--lime)}
-.exec-metric-pill.auto{border-color:rgba(123,45,139,.5);color:#C07ADB}
-.exec-metric-pill.auto.active{background:rgba(123,45,139,.2);border-color:#9B3DAB;color:#C07ADB}
-/* ── Filtro D+N ── */
-.exec-dplus-bar{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--rad-sm);padding:10px 14px}
-.exec-dplus-label{font-size:.62rem;color:#888;text-transform:uppercase;letter-spacing:.08em;font-weight:600;display:block;margin-bottom:8px}
-.exec-dplus-weeks{display:flex;flex-direction:column;gap:3px}
-.exec-dplus-week{display:flex;align-items:center;gap:3px}
-.exec-dplus-week-lbl{font-size:.58rem;color:#555;font-family:'Barlow Condensed',sans-serif;font-weight:700;width:36px;text-align:right;padding-right:6px;flex-shrink:0}
-.exec-dplus-btn{background:transparent;border:1px solid rgba(255,255,255,.12);color:#AAA;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.03em;padding:3px 0;border-radius:4px;cursor:pointer;transition:all .15s;width:44px;text-align:center}
-.exec-dplus-btn:hover{border-color:rgba(200,255,0,.4);color:var(--lime)}
-.exec-dplus-btn.active{background:rgba(200,255,0,.15);border-color:var(--lime);color:var(--lime)}
-.exec-dplus-btn.empty{border-color:transparent;color:transparent;cursor:default;pointer-events:none}
 /* ── Modal TikTok ── */
 .tt-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .tt-modal{background:#141414;border:1px solid rgba(0,191,255,.3);border-radius:16px;padding:28px 32px;width:100%;max-width:480px;box-shadow:0 0 40px rgba(0,191,255,.1)}
@@ -400,9 +333,30 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .tt-history-vals{color:#CCC;display:flex;gap:12px}
 .tt-history-del{color:#444;cursor:pointer;font-size:.85rem;padding:0 4px;background:none;border:none}
 .tt-history-del:hover{color:var(--red)}
+/* -- LOGIN OVERLAY -- */
+.login-overlay{position:fixed;inset:0;background:#0A0A0A;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.login-box{background:var(--card);border:1px solid var(--lime-border);border-radius:var(--radius);padding:40px;text-align:center;max-width:380px;width:90%}
+.login-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.6rem;color:var(--lime);margin-bottom:8px;letter-spacing:.06em}
+.login-sub{font-size:.8rem;color:var(--text3);margin-bottom:24px}
+.login-input{width:100%;background:#1C1C1C;border:1px solid rgba(255,255,255,.12);color:#EEE;font-size:1rem;padding:12px 16px;border-radius:8px;outline:none;margin-bottom:16px;text-align:center;font-family:'Inter',sans-serif}
+.login-input:focus{border-color:var(--lime-border)}
+.login-btn{width:100%;background:var(--lime);border:none;border-radius:8px;padding:12px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;text-transform:uppercase;letter-spacing:.06em;color:#000;cursor:pointer}
+.login-btn:hover{background:#d4ff1a}
+.login-error{color:var(--red);font-size:.78rem;margin-top:8px;display:none}
 </style>
 </head>
 <body>
+
+<div id="loginOverlay" class="login-overlay">
+  <div class="login-box">
+    <div class="login-title">FESTIVAL INTERLAGOS 2026</div>
+    <div class="login-sub">Dashboard Completo · Acesso Restrito</div>
+    <input type="password" id="loginPwd" class="login-input" placeholder="Digite a senha" onkeydown="if(event.key==='Enter')checkLogin()">
+    <button class="login-btn" onclick="checkLogin()">ENTRAR</button>
+    <div class="login-error" id="loginError">Senha incorreta</div>
+  </div>
+</div>
+
 
 <!-- ══ HEADER ══ -->
 <header class="header">
@@ -420,13 +374,6 @@ tr:hover td{background:rgba(255,255,255,.018)}
   </div>
 </header>
 
-<!-- ══ TAB BAR ══ -->
-<div class="tab-bar">
-  <button class="tab-btn active" id="tbtn-tab-dash" onclick="switchTab('tab-dash')">📊 Dashboard Completo</button>
-  <button class="tab-btn" id="tbtn-tab-exec" onclick="switchTab('tab-exec')">👔 Painel Executivo</button>
-</div>
-
-<div id="tab-dash" class="tab-panel active">
 
 <!-- ══ FILTRO DE DATA ══ -->
 <div class="filtro-bar">
@@ -807,155 +754,23 @@ Google Ads
   </div>
 </footer>
 
-</div><!-- /tab-dash -->
 
-<!-- ══ TAB: PAINEL EXECUTIVO ══ -->
-<div id="tab-exec" class="tab-panel">
-<div class="exec-main">
-
-  <!-- Filtro de período executivo -->
-  <div class="exec-filter-bar">
-    <span class="exec-filter-label">Período:</span>
-    <button class="exec-btn-filter" id="exec-btn-7d"  onclick="setExecPreset('7d')">7 dias</button>
-    <button class="exec-btn-filter" id="exec-btn-14d" onclick="setExecPreset('14d')">14 dias</button>
-    <button class="exec-btn-filter" id="exec-btn-30d" onclick="setExecPreset('30d')">30 dias</button>
-    <button class="exec-btn-filter active" id="exec-btn-camp" onclick="setExecPreset('camp')">Toda a campanha</button>
-    <div class="exec-filter-sep"></div>
-    <input type="date" id="execFiltDE"  class="exec-date-input" onchange="applyExecFilter()">
-    <span style="color:#555;font-size:.72rem">→</span>
-    <input type="date" id="execFiltATE" class="exec-date-input" onchange="applyExecFilter()">
-    <span class="exec-filter-period" id="exec-filter-period-label"></span>
-  </div>
-
-  <!-- Atalhos D+N -->
-  <div class="exec-dplus-bar" id="exec-dplus-bar">
-    <span class="exec-dplus-label">Dia exato:</span>
-    <!-- gerado dinamicamente por buildExecDplusBar() -->
-  </div>
-
-  <!-- Hoje / Ontem / Campanha -->
-  <div class="exec-hoje-ontem">
-    <div class="exec-card" id="exec-card-ontem">
-      <div class="exec-card-label">Ontem</div>
-      <div class="exec-val-big">—</div>
-    </div>
-    <div class="exec-card" id="exec-card-hoje">
-      <div class="exec-card-label">Hoje <span style="color:var(--warn);font-size:.65rem">● PARCIAL</span></div>
-      <div class="exec-val-big partial">—</div>
-    </div>
-    <div class="exec-card" id="exec-card-campanha">
-      <div class="exec-card-label">Campanha</div>
-      <div class="exec-val-big">—</div>
-    </div>
-  </div>
-
-  <!-- KPIs de Vendas -->
-  <div class="exec-kpi-strip">
-    <div class="exec-kpi">
-      <div class="exec-kpi-label">Receita Total 2026</div>
-      <div id="exec-kpi-receita"><div class="exec-kpi-val">—</div></div>
-    </div>
-    <div class="exec-kpi">
-      <div class="exec-kpi-label">🏍️ Receita Motos</div>
-      <div id="exec-kpi-motos"><div class="exec-kpi-val">—</div></div>
-    </div>
-    <div class="exec-kpi">
-      <div class="exec-kpi-label">🚗 Receita Autos</div>
-      <div id="exec-kpi-autos"><div class="exec-kpi-val">—</div></div>
-    </div>
-    <div class="exec-kpi">
-      <div class="exec-kpi-label">🎟️ Ingressos Vendidos</div>
-      <div id="exec-kpi-ingressos"><div class="exec-kpi-val">—</div></div>
-    </div>
-    <div class="exec-kpi" style="border-color:rgba(200,255,0,.15)">
-      <div class="exec-kpi-label">💸 Investimento ADS</div>
-      <div id="exec-kpi-invest"><div class="exec-kpi-val">—</div></div>
-    </div>
-  </div>
-
-  <!-- Contexto / insight -->
-  <div class="exec-context" id="exec-context">
-    <span>💡</span><span>Carregando dados...</span>
-  </div>
-
-  <!-- Gráficos -->
-  <div class="exec-charts-grid">
-
-    <!-- Vendas -->
-    <div class="exec-chart-card">
-      <div class="section-header" style="margin-bottom:10px">
-        <div>
-          <div class="section-title">Vendas — 2025 vs 2026</div>
-          <div style="font-size:.7rem;color:#666;margin-top:3px">por dia de campanha</div>
-        </div>
-        <div class="pill-group" id="execVendasPills">
-          <button class="exec-metric-pill active" onclick="execSetVendasMetric('total',this)">Total</button>
-          <button class="exec-metric-pill moto" onclick="execSetVendasMetric('motos',this)">🏍️ Motos</button>
-          <button class="exec-metric-pill auto" onclick="execSetVendasMetric('autos',this)">🚗 Autos</button>
-        </div>
-      </div>
-      <div class="exec-leg">
-        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>2026</div>
-        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#555"></span>2025</div>
-        <div class="exec-leg-item" id="exec-tvLegVendas" style="display:none">
-          <span style="display:inline-block;width:18px;height:2px;background:rgba(255,184,0,.8);border-top:2px dashed rgba(255,184,0,.8)"></span>
-          <span style="color:var(--warn)">TV Globo</span>
-        </div>
-      </div>
-      <div class="exec-chart-wrap"><canvas id="exec-chartVendas"></canvas></div>
-    </div>
-
-    <!-- Investimento ADS -->
-    <div class="exec-chart-card">
-      <div class="section-header" style="margin-bottom:10px">
-        <div>
-          <div class="section-title">Investimento ADS — 2025 vs 2026</div>
-          <div style="font-size:.7rem;color:#666;margin-top:3px">por dia de campanha · est. diária 2025</div>
-        </div>
-        <div class="pill-group">
-          <button class="pill active" onclick="execSetInvestView('diario',this)">Diário</button>
-          <button class="pill" onclick="execSetInvestView('acumulado',this)">Acumulado</button>
-        </div>
-      </div>
-      <div class="exec-leg">
-        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>2026</div>
-        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#555"></span>2025 (est.)</div>
-        <div class="exec-leg-item" id="exec-tvLegInvest">
-          <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,184,0,.8)"></span>
-          <span style="color:var(--warn)">TV Globo</span>
-        </div>
-      </div>
-      <div class="exec-chart-wrap"><canvas id="exec-chartInvest"></canvas></div>
-    </div>
-
-  </div><!-- /exec-charts-grid -->
-
-  <!-- Conversões -->
-  <div class="exec-conv-grid">
-    <div class="exec-conv-card" id="exec-conv-digital">
-      <div class="section-title" style="margin-bottom:14px">Conversões Digitais</div>
-      <div class="exec-conv-row"><span class="exec-conv-label">Carregando...</span></div>
-    </div>
-    <div class="exec-conv-card" id="exec-conv-totals">
-      <div class="section-title" style="margin-bottom:14px">Ingressos Vendidos</div>
-      <div class="exec-conv-row"><span class="exec-conv-label">Carregando...</span></div>
-    </div>
-  </div>
-
-</div><!-- /exec-main -->
-<footer class="footer">
-  <div>
-    <div class="footer-lime">✱ LIME — Transformamos caos em crescimento</div>
-    <div class="footer-tag">Branding · Performance · Conteúdo · Experiência</div>
-  </div>
-  <div style="text-align:right">
-    <div class="footer-tag">Painel Executivo — Festival Interlagos 2026</div>
-    <div class="footer-tag" id="execFooterDate"></div>
-  </div>
-</footer>
-</div><!-- /tab-exec -->
 
 <script>
+// === PASSWORD PROTECTION ===
+const _AUTH_PWD = 'lime2026';
+const _AUTH_KEY = 'dash_auth_lime';
+function checkLogin(){
+  if(document.getElementById('loginPwd').value===_AUTH_PWD){
+    sessionStorage.setItem(_AUTH_KEY,'1');
+    document.getElementById('loginOverlay').style.display='none';
+    initDashboard();
+  } else {
+    document.getElementById('loginError').style.display='block';
+    setTimeout(()=>document.getElementById('loginError').style.display='none',2000);
+  }
+}
+
 // ═══════════════════════════════════════════════
 // CONFIG — Google Sheets (gviz CSV — leitura pública)
 // ═══════════════════════════════════════════════
@@ -2146,534 +1961,37 @@ function updateLastRefreshTime() {
   const m = String(now.getMinutes()).padStart(2,'0');
   document.getElementById('genDate').textContent = 'Dados atualizados pela última vez às ' + h + 'h' + m;
 }
-updateLastRefreshTime();
-const ds=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
-document.getElementById('footerDate').textContent='Gerado em '+ds;
-
-initFiltro();
-calcKPIs();
-buildAcoesLegend();
-buildComp();
-buildAcoesTimeline();
-buildEdicao();
-buildOrg();
-buildSpk('spkMeta',[320,890,1240,780,1050,1380,960,1120,840,1290,1480,1060,920,1350,1580,1120,880,1640],'rgb(200,255,0)');
-buildSpk('spkGoogle',[180,420,680,390,510,720,480,560,420,640,740,530,460,680,790,560,440,820],'rgb(200,255,0)');
-
-_upd2026Lbl();
-// Carrega todos os dados e re-renderiza o painel executivo ao terminar
-Promise.allSettled([fetchSheet(), fetchGA4Data(), fetchGAdsData(), fetchMetaData()])
-  .then(() => {
-    if(document.getElementById('tab-exec').style.display !== 'none') renderPainelExecutivo();
-  });
-
-// Auto-refresh a cada 30 segundos
-setInterval(() => {
-  fetchGAdsData(); fetchMetaData(); fetchGA4Data(); updateLastRefreshTime();
-  if(document.getElementById('tab-exec').style.display !== 'none') renderPainelExecutivo();
-}, 30000);
-
-/* ═══════════════════════════════════════════════
-   PAINEL EXECUTIVO — constantes
-═══════════════════════════════════════════════ */
-const EXEC_CAMP_START_2026 = new Date(2026, 2, 31); // 31/03/2026
-const EXEC_CAMP_START_2025 = new Date(2025, 2, 14); // 14/03/2025
-
-const EXEC_TV_GLOBO = [
-  {date:'2026-04-01', day26:2, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
-  {date:'2026-04-02', day26:3, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
-  {date:'2026-04-03', day26:4, programs:['Bom Dia SP','Bom Dia Brasil']},
-  {date:'2026-04-05', day26:6, programs:['Auto Esporte','Esporte Espetacular']},
-  {date:'2026-04-06', day26:7, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
-];
-
-const EXEC_D25_INVEST = (() => {
-  const semanas = [
-    {from:1, to:3,  daily:2679.88},{from:4, to:10, daily:4350.08},
-    {from:11,to:17, daily:4903.26},{from:18,to:24, daily:3429.32},
-    {from:25,to:31, daily:2697.07},{from:32,to:38, daily:4996.89},
-    {from:39,to:45, daily:5801.66},{from:46,to:52, daily:6824.98},
-    {from:53,to:59, daily:6120.89},{from:60,to:66, daily:5165.62},
-    {from:67,to:73, daily:5804.51},{from:74,to:80, daily:6619.04},
-    {from:81,to:87, daily:3830.10},{from:88,to:94, daily:3142.76},
-  ];
-  const arr = [];
-  semanas.forEach(s => { for(let d=s.from;d<=s.to;d++) arr.push({d, v:s.daily}); });
-  return arr;
-})();
-
-let execChartVendas = null, execChartInvest = null;
-let execCurrentVendasMetric = 'total', execCurrentInvestView = 'diario';
-let execFiltFrom = null, execFiltTo = null; // null = toda a campanha
-
-/* ═══ helpers ═══ */
-function execDayOf26(dateStr) {
-  const dt = new Date(dateStr + 'T00:00:00');
-  return Math.round((dt - EXEC_CAMP_START_2026) / 86400000) + 1;
-}
-function execDateOf26Day(d) {
-  const dt = new Date(EXEC_CAMP_START_2026);
-  dt.setDate(dt.getDate() + d - 1);
-  return dt;
-}
-function execFmtDate(dt) {
-  return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-}
-function execFmtFull(n) {
-  if(n == null || isNaN(n)) return '—';
-  return 'R$ ' + n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-}
-function execFmtK(n) {
-  if(n == null || isNaN(n) || n === 0) return '—';
-  return 'R$ ' + Math.round(n).toLocaleString('pt-BR');
-}
-
-/* Constrói D26_INVEST a partir de META_DATA + GADS_DATA (reutiliza os fetches do dashboard principal) */
-function buildExecD26Invest(from, to) {
-  const map = {};
-  const add = (series, field) => {
-    (series||[]).forEach(d => {
-      if(from && d.date < from) return;
-      if(to   && d.date > to)   return;
-      const day = execDayOf26(d.date);
-      if(day < 1) return;
-      if(!map[day]) map[day] = {d:day, meta:0, gads:0, metaConv:0, gadsConv:0};
-      map[day][field] += d.cost||0;
-      if(field==='meta') map[day].metaConv += d.purchases||d.conversions||0;
-      if(field==='gads') map[day].gadsConv += d.conversions||0;
+function initDashboard(){
+  tiktokLoad();
+  updateLastRefreshTime();
+  const ds=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('footerDate').textContent='Gerado em '+ds;
+  
+  initFiltro();
+  calcKPIs();
+  buildAcoesLegend();
+  buildComp();
+  buildAcoesTimeline();
+  buildEdicao();
+  buildOrg();
+  buildSpk('spkMeta',[320,890,1240,780,1050,1380,960,1120,840,1290,1480,1060,920,1350,1580,1120,880,1640],'rgb(200,255,0)');
+  buildSpk('spkGoogle',[180,420,680,390,510,720,480,560,420,640,740,530,460,680,790,560,440,820],'rgb(200,255,0)');
+  
+  _upd2026Lbl();
+  Promise.allSettled([fetchSheet(), fetchGA4Data(), fetchGAdsData(), fetchMetaData()])
+    .then(() => {
     });
-  };
-  if(META_DATA) add(META_DATA.daily_series||META_DATA.data, 'meta');
-  if(GADS_DATA) add(GADS_DATA.daily_series, 'gads');
-  return Object.values(map).sort((a,b)=>a.d-b.d);
+  
+  // Auto-refresh a cada 30 segundos
+  setInterval(() => {
+    fetchGAdsData(); fetchMetaData(); fetchGA4Data(); updateLastRefreshTime();
+  }, 30000);
 }
 
-/* Dias de campanha disponíveis (união invest + vendas) */
-function execGetAllDays(invest) {
-  const inv = invest || buildExecD26Invest(execFiltFrom, execFiltTo);
-  const d26 = execFiltFrom
-    ? D26_FULL.filter(r => { const dt=execDateOf26Day(r.d); return dt>=new Date(execFiltFrom+'T00:00:00') && dt<=new Date(execFiltTo+'T00:00:00'); })
-    : D26_FULL;
-  const set = new Set([...inv.map(r=>r.d), ...d26.map(r=>r.d)]);
-  return Array.from(set).filter(d=>d>=1).sort((a,b)=>a-b);
-}
-
-/* Anotações TV Globo (sem label — corrige bug annotation plugin) */
-function execGetTvAnnotations(days) {
-  const anns = {};
-  EXEC_TV_GLOBO.forEach(tv => {
-    const idx = days.indexOf(tv.day26);
-    if(idx === -1) return;
-    anns['tv_'+tv.day26] = {
-      type:'line', xMin:idx, xMax:idx,
-      borderColor:'rgba(255,184,0,0.7)', borderWidth:2, borderDash:[4,3]
-    };
-  });
-  return anns;
-}
-
-/* ═══ Hoje / Ontem / Campanha ═══ */
-function renderExecHojeOntem() {
-  const today = new Date(); today.setHours(0,0,0,0);
-  const todayStr = today.toISOString().slice(0,10);
-  const yStr = new Date(+today - 86400000).toISOString().slice(0,10);
-  const invest = buildExecD26Invest();
-
-  const getInv = day => {
-    const r = invest.find(x=>x.d===day);
-    return {total: r?(r.meta+r.gads):0, conv: r?(r.metaConv+r.gadsConv):0};
-  };
-  const ontem = getInv(execDayOf26(yStr));
-  const hoje  = getInv(execDayOf26(todayStr));
-  const total = invest.reduce((s,r)=>s+(r.meta+r.gads),0);
-  const totalConv = invest.reduce((s,r)=>s+(r.metaConv+r.gadsConv),0);
-  const dias = invest.length;
-  const media = dias>0 ? total/dias : 0;
-  const invest25Same = EXEC_D25_INVEST.filter(r=>r.d<=dias).reduce((s,r)=>s+r.v,0);
-
-  const tvOntem = EXEC_TV_GLOBO.find(t=>t.date===yStr);
-
-  document.getElementById('exec-card-ontem').innerHTML = `
-    <div class="exec-card-label">Ontem</div>
-    <div class="exec-card-date">${execFmtDate(new Date(yStr+'T12:00:00'))}</div>
-    <div class="exec-val-big">${execFmtFull(ontem.total)}</div>
-    <div class="exec-meta-row">
-      <div class="exec-meta-item"><span class="exec-meta-label">Investimento ADS</span></div>
-    </div>
-    <div class="exec-meta-row">
-      <div class="exec-meta-item"><span class="exec-meta-label">Conversões Digitais</span><span class="exec-meta-val">${Math.round(ontem.conv)}</span></div>
-      <div class="exec-meta-item"><span class="exec-meta-label">Custo / Conversão</span><span class="exec-meta-val">${ontem.conv>0?execFmtFull(ontem.total/ontem.conv):'—'}</span></div>
-    </div>
-    ${tvOntem?`<div class="exec-tv-row">📺 TV Globo: ${tvOntem.programs.join(' · ')}</div>`:''}
-  `;
-
-  document.getElementById('exec-card-hoje').innerHTML = `
-    <div class="exec-card-label">Hoje <span style="color:var(--warn);font-size:.65rem">● PARCIAL</span></div>
-    <div class="exec-card-date">${execFmtDate(today)}</div>
-    <div class="exec-val-big partial">${execFmtFull(hoje.total)}</div>
-    <div class="exec-meta-row">
-      <div class="exec-meta-item"><span class="exec-meta-label">Investimento ADS</span></div>
-    </div>
-    <div class="exec-meta-row">
-      <div class="exec-meta-item"><span class="exec-meta-label">Conversões Digitais</span><span class="exec-meta-val">${Math.round(hoje.conv)}</span></div>
-    </div>
-  `;
-
-  document.getElementById('exec-card-campanha').innerHTML = `
-    <div class="exec-card-label">Campanha</div>
-    <div class="exec-card-date">Investimento ADS acumulado</div>
-    <div class="exec-val-big">${execFmtFull(total)}</div>
-    <div class="exec-meta-row">
-      <div class="exec-meta-item"><span class="exec-meta-label">Média diária</span><span class="exec-meta-val">${execFmtFull(media)}</span></div>
-      <div class="exec-meta-item"><span class="exec-meta-label">Dias de campanha</span><span class="exec-meta-val">${dias}º dia</span></div>
-    </div>
-    <div class="exec-meta-row" style="margin-top:4px">
-      <div class="exec-meta-item"><span class="exec-meta-label" style="color:#666">2025 (mesmos ${dias} dias): ${execFmtFull(invest25Same)}</span></div>
-    </div>
-  `;
-}
-
-/* ═══ KPIs de Vendas ═══ */
-function renderExecKPIs() {
-  const invest = buildExecD26Invest(execFiltFrom, execFiltTo);
-  const days = execGetAllDays(invest);
-  const minDay = days.length ? days[0] : 1;
-  const maxDay = days.length ? days[days.length-1] : 1;
-  const dias = invest.length || 1;
-  const s26 = D26_FULL.filter(r=>r.d>=minDay&&r.d<=maxDay).reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
-  const s25 = D25.filter(r=>r.d>=minDay&&r.d<=maxDay).reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
-
-  const setKpi = (id, v26, v25) => {
-    const el = document.getElementById(id); if(!el) return;
-    const pct = v25>0 ? ((v26-v25)/v25*100) : null;
-    const cls = pct===null?'':pct>=0?'up':'down';
-    const dStr = pct===null?'vs 2025: aguardando':(pct>=0?'▲':'▼')+Math.abs(pct).toFixed(1)+'% vs 2025';
-    el.innerHTML = `<div class="exec-kpi-val">${execFmtK(v26)}</div><div class="exec-kpi-delta ${cls}">${dStr}</div>`;
-  };
-  setKpi('exec-kpi-receita', s26.mv+s26.av, s25.mv+s25.av);
-  setKpi('exec-kpi-motos',   s26.mv,        s25.mv);
-  setKpi('exec-kpi-autos',   s26.av,        s25.av);
-
-  const ingEl = document.getElementById('exec-kpi-ingressos');
-  if(ingEl) {
-    const i26=s26.mq+s26.aq, i25=s25.mq+s25.aq;
-    const pct=i25>0?((i26-i25)/i25*100):null;
-    const cls=pct===null?'':pct>=0?'up':'down';
-    const dStr=pct===null?'vs 2025: aguardando':(pct>=0?'▲':'▼')+Math.abs(pct).toFixed(1)+'% vs 2025';
-    ingEl.innerHTML = `<div class="exec-kpi-val">${i26.toLocaleString('pt-BR')}</div><div class="exec-kpi-delta ${cls}">${dStr}</div>`;
-  }
-
-  // KPI Investimento ADS com vs 2025
-  const total26 = invest.reduce((s,r)=>s+(r.meta+r.gads),0);
-  const total25 = EXEC_D25_INVEST.filter(r=>r.d>=minDay&&r.d<=maxDay).reduce((s,r)=>s+r.v,0);
-  const invEl = document.getElementById('exec-kpi-invest');
-  if(invEl) {
-    const pct = total25>0 ? ((total26-total25)/total25*100) : null;
-    const cls = pct===null?'':pct>=0?'up':'down';
-    const dStr = pct===null?'vs 2025: aguardando':(pct>=0?'▲':'▼')+Math.abs(pct).toFixed(1)+'% vs 2025';
-    invEl.innerHTML = `<div class="exec-kpi-val">${execFmtK(total26)}</div><div class="exec-kpi-delta ${cls}">${dStr}</div>`;
-  }
-
-  // Contexto dinâmico
-  const total25ctx = EXEC_D25_INVEST.filter(r=>r.d<=dias).reduce((s,r)=>s+r.v,0);
-  const ctxEl = document.getElementById('exec-context');
-  if(ctxEl && total25ctx>0) {
-    const ratio = total26/total25ctx;
-    const abaixo = ratio < 1;
-    ctxEl.innerHTML = `<span>💡</span><span>O ritmo de investimento em ADS está <strong style="color:${abaixo?'var(--lime)':'var(--warn)'}">${abaixo?'abaixo':'acima'} do mesmo período de 2025</strong> (${(ratio*100).toFixed(0)}% do ritmo 2025). ${abaixo?'Isso é <strong>intencional</strong>: a campanha de 2026 tem mais dias de duração, distribuindo o budget de forma mais gradual.':'O investimento está acelerado em relação a 2025.'}</span>`;
-  }
-}
-
-/* ═══ Gráfico Vendas ═══ */
-function buildExecVendasChart() {
-  const invest = buildExecD26Invest(execFiltFrom, execFiltTo);
-  const days = execGetAllDays(invest); if(!days.length) return;
-  const metric = execCurrentVendasMetric;
-  const labels = days.map(d => 'D+'+d);
-  const getRec26 = d => { const r=D26_FULL.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
-  const getRec25 = d => { const r=D25.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
-  const getQtd26 = d => { const r=D26_FULL.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mq:metric==='autos'?r.aq:r.mq+r.aq; };
-  const getQtd25 = d => { const r=D25.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mq:metric==='autos'?r.aq:r.mq+r.aq; };
-
-  if(execChartVendas) execChartVendas.destroy();
-  const ctx = document.getElementById('exec-chartVendas')?.getContext('2d');
-  if(!ctx) return;
-  execChartVendas = new Chart(ctx, {
-    type:'bar',
-    data:{labels, datasets:[
-      // Barras qty (eixo direito, fundo)
-      {type:'bar',label:'Ing. 2026',data:days.map(getQtd26),yAxisID:'yQtd',backgroundColor:'rgba(200,255,0,0.10)',borderColor:'rgba(200,255,0,0.25)',borderWidth:1,order:3},
-      {type:'bar',label:'Ing. 2025',data:days.map(getQtd25),yAxisID:'yQtd',backgroundColor:'rgba(255,255,255,0.04)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,order:4},
-      // Linhas receita (eixo esquerdo, frente)
-      {type:'line',label:'Receita 2026',data:days.map(getRec26),yAxisID:'yRec',borderColor:'#C8FF00',backgroundColor:'rgba(200,255,0,0.06)',borderWidth:2.5,pointRadius:3,fill:true,tension:.35,spanGaps:false,order:1},
-      {type:'line',label:'Receita 2025',data:days.map(getRec25),yAxisID:'yRec',borderColor:'rgba(255,255,255,.3)',borderWidth:1.5,pointRadius:2,fill:false,tension:.35,borderDash:[5,3],order:2}
-    ]},
-    options:{
-      responsive:true,maintainAspectRatio:false,animation:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{
-        legend:{display:false},
-        tooltip:{backgroundColor:'#1C1C1C',borderColor:'rgba(200,255,0,.25)',borderWidth:1,padding:12,cornerRadius:8,titleColor:'#C8FF00',bodyColor:'#DDD',
-          callbacks:{
-            label: i => {
-              if(i.dataset.label.startsWith('Receita')) return '  ' + i.dataset.label + ': R$ ' + Math.round(i.raw||0).toLocaleString('pt-BR');
-              return '  ' + i.dataset.label + ': ' + Math.round(i.raw||0).toLocaleString('pt-BR') + ' ingressos';
-            }
-          }
-        },
-        annotation:{annotations:execGetTvAnnotations(days)}
-      },
-      scales:{
-        x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#AAA',maxTicksLimit:14,font:{size:10}}},
-        yRec:{position:'left',grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#AAA',callback:v=>v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':v>=1000?'R$'+(v/1000).toFixed(0)+'K':'R$'+v}},
-        yQtd:{position:'right',grid:{display:false},ticks:{color:'#555',font:{size:9},callback:v=>v>=1000?Math.round(v/1000)+'K ing':v+' ing'}}
-      }
-    }
-  });
-  const tvLeg = document.getElementById('exec-tvLegVendas');
-  if(tvLeg) tvLeg.style.display = days.some(d=>EXEC_TV_GLOBO.some(t=>t.day26===d))?'flex':'none';
-}
-
-/* ═══ Gráfico Investimento ═══ */
-function buildExecInvestChart() {
-  const invest = buildExecD26Invest(execFiltFrom, execFiltTo);
-  const days = execGetAllDays(invest); if(!days.length) return;
-  const view = execCurrentInvestView;
-  const labels = days.map(d => 'D+'+d);
-  const inv26 = d => { const r=invest.find(x=>x.d===d); return r?(r.meta+r.gads):0; };
-  const inv25 = d => { const r=EXEC_D25_INVEST.find(x=>x.d===d); return r?r.v:0; };
-  let d26,d25;
-  if(view==='acumulado'){let s26=0,s25=0; d26=days.map(d=>{s26+=inv26(d);return s26}); d25=days.map(d=>{s25+=inv25(d);return s25});}
-  else{d26=days.map(inv26); d25=days.map(inv25);}
-
-  if(execChartInvest) execChartInvest.destroy();
-  const ctx = document.getElementById('exec-chartInvest')?.getContext('2d');
-  if(!ctx) return;
-  execChartInvest = new Chart(ctx, {
-    type:'line',
-    data:{labels, datasets:[
-      {label:'2026',data:d26,borderColor:'#C8FF00',backgroundColor:'rgba(200,255,0,0.07)',borderWidth:2.5,pointRadius:3,fill:view==='acumulado',tension:.3},
-      {label:'2025 (est.)',data:d25,borderColor:'#555',borderWidth:1.5,pointRadius:2,fill:false,tension:.3,borderDash:[5,3]}
-    ]},
-    options:{
-      responsive:true,maintainAspectRatio:false,animation:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{
-        legend:{display:false},
-        tooltip:{backgroundColor:'#1C1C1C',borderColor:'rgba(200,255,0,.25)',borderWidth:1,padding:10,cornerRadius:8,titleColor:'#C8FF00',bodyColor:'#DDD',
-          callbacks:{label:i=>' '+i.dataset.label+': R$'+Math.round(i.raw||0).toLocaleString('pt-BR')}},
-        annotation:{annotations:execGetTvAnnotations(days)}
-      },
-      scales:{
-        x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#555',maxTicksLimit:12,font:{size:10}}},
-        y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#666',callback:v=>v>=1000?'R$'+(v/1000).toFixed(0)+'K':'R$'+v}}
-      }
-    }
-  });
-}
-
-/* ═══ Conversões ═══ */
-function renderExecConversoes() {
-  const invest    = buildExecD26Invest(execFiltFrom, execFiltTo);
-  const metaConv  = invest.reduce((s,r)=>s+r.metaConv, 0);
-  const gadsConv  = invest.reduce((s,r)=>s+r.gadsConv, 0);
-  // TikTok: filtra pelo período
-  const ttSeries  = TIKTOK_DATA?.daily_series || [];
-  const ttFiltered = execFiltFrom
-    ? ttSeries.filter(d => d.date >= execFiltFrom && d.date <= (execFiltTo||'9999-12-31'))
-    : ttSeries;
-  const tiktokConv = ttFiltered.reduce((s,d)=>s+(d.purchases||0), 0);
-  const adsConv   = metaConv + gadsConv + tiktokConv;
-  const totalInv  = invest.reduce((s,r)=>s+(r.meta+r.gads), 0);
-
-  // Total ingressos vendidos (planilha) no período
-  const days2  = execGetAllDays(invest);
-  const minD   = days2.length ? days2[0] : 1;
-  const maxD   = days2.length ? days2[days2.length-1] : 1;
-  const ingTot = D26_FULL.filter(r=>r.d>=minD&&r.d<=maxD).reduce((s,r)=>s+r.mq+r.aq, 0);
-
-  // Orgânico = ingressos totais − ADS (Meta + Google + TikTok)
-  const orgConv  = Math.max(0, ingTot - adsConv);
-  const cpaAds   = adsConv > 0 ? totalInv / adsConv : null;
-  const cpaTot   = ingTot  > 0 ? totalInv / ingTot  : null;
-
-  document.getElementById('exec-conv-digital').innerHTML = `
-    <div class="section-title" style="margin-bottom:14px">Conversões por Origem</div>
-    <div class="exec-conv-row">
-      <span class="exec-conv-label">Meta Ads</span>
-      <span class="exec-conv-val">${Math.round(metaConv).toLocaleString('pt-BR')}</span>
-    </div>
-    <div class="exec-conv-row">
-      <span class="exec-conv-label">Google Ads</span>
-      <span class="exec-conv-val">${Math.round(gadsConv).toLocaleString('pt-BR')}</span>
-    </div>
-    <div class="exec-conv-row">
-      <span class="exec-conv-label" style="color:rgba(0,191,255,.8)">TikTok Ads <span style="font-size:.6rem;color:#555">manual</span></span>
-      <span class="exec-conv-val" style="color:rgba(0,191,255,.9)">${tiktokConv > 0 ? tiktokConv.toLocaleString('pt-BR') : '—'}</span>
-    </div>
-    <div class="exec-conv-row">
-      <span class="exec-conv-label">Orgânico / Direto / Outros <span style="font-size:.6rem;color:#666">(ingressos − ADS)</span></span>
-      <span class="exec-conv-val" style="color:var(--text2)">${ingTot>0 ? orgConv.toLocaleString('pt-BR') : '—'}</span>
-    </div>
-    <div class="exec-conv-row" style="border-top:1px solid rgba(200,255,0,.15);margin-top:4px;padding-top:10px">
-      <span class="exec-conv-label"><strong>Total Ingressos</strong> <span style="font-size:.6rem;color:#666">planilha</span></span>
-      <span class="exec-conv-val" style="color:var(--lime)">${ingTot>0 ? ingTot.toLocaleString('pt-BR') : '—'}</span>
-    </div>
-    <div class="exec-conv-row">
-      <span class="exec-conv-label">CPA (ADS)</span>
-      <span class="exec-conv-val">${cpaAds ? execFmtFull(cpaAds) : '—'}</span>
-    </div>
-  `;
-
-  const s26 = D26_FULL.filter(r=>r.d>=minD&&r.d<=maxD).reduce((a,r)=>({mq:a.mq+r.mq,aq:a.aq+r.aq,mv:a.mv+r.mv,av:a.av+r.av}),{mq:0,aq:0,mv:0,av:0});
-  const ing = s26.mq + s26.aq;
-  const tktMedio = ing > 0 ? (s26.mv + s26.av) / ing : 0;
-
-  document.getElementById('exec-conv-totals').innerHTML = `
-    <div class="section-title" style="margin-bottom:14px">Ingressos Vendidos</div>
-    <div class="exec-conv-row">
-      <span class="exec-conv-label">🏍️ Motos</span>
-      <span class="exec-conv-val">${s26.mq.toLocaleString('pt-BR')}</span>
-    </div>
-    <div class="exec-conv-row">
-      <span class="exec-conv-label">🚗 Autos</span>
-      <span class="exec-conv-val">${s26.aq.toLocaleString('pt-BR')}</span>
-    </div>
-    <div class="exec-conv-row" style="border-top:1px solid rgba(200,255,0,.15);margin-top:4px;padding-top:10px">
-      <span class="exec-conv-label"><strong>Total</strong></span>
-      <span class="exec-conv-val" style="color:var(--lime)">${ing.toLocaleString('pt-BR')}</span>
-    </div>
-    <div class="exec-conv-row">
-      <span class="exec-conv-label">Ticket Médio</span>
-      <span class="exec-conv-val">${ing > 0 ? execFmtFull(tktMedio) : '—'}</span>
-    </div>
-  `;
-}
-
-/* ═══ Filtro executivo ═══ */
-function applyExecFilter() {
-  const de  = document.getElementById('execFiltDE')?.value;
-  const ate = document.getElementById('execFiltATE')?.value;
-  if(!de || !ate || de > ate) return;
-  execFiltFrom = de; execFiltTo = ate;
-  document.querySelectorAll('.exec-btn-filter').forEach(b=>b.classList.remove('active'));
-  const lbl = document.getElementById('exec-filter-period-label');
-  if(lbl) {
-    const f = new Date(de+'T12:00:00'), t = new Date(ate+'T12:00:00');
-    lbl.textContent = f.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','')+' – '+t.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','');
-  }
-  renderPainelExecutivo();
-}
-
-function setExecPreset(id) {
-  const today = new Date(); today.setHours(0,0,0,0);
-  const iso = d => d.toISOString().slice(0,10);
-  const daysAgo = n => { const d=new Date(today); d.setDate(d.getDate()-n); return d; };
-  let from, to = today;
-  if(id==='7d')   from = daysAgo(6);
-  if(id==='14d')  from = daysAgo(13);
-  if(id==='30d')  from = daysAgo(29);
-  if(id==='camp') { execFiltFrom=null; execFiltTo=null; }
-  else            { execFiltFrom=iso(from); execFiltTo=iso(to); }
-  document.querySelectorAll('.exec-btn-filter').forEach(b=>b.classList.remove('active'));
-  const btn = document.getElementById('exec-btn-'+id); if(btn) btn.classList.add('active');
-  if(execFiltFrom) {
-    document.getElementById('execFiltDE').value  = execFiltFrom;
-    document.getElementById('execFiltATE').value = execFiltTo;
-  } else {
-    document.getElementById('execFiltDE').value  = '';
-    document.getElementById('execFiltATE').value = '';
-  }
-  const lbl = document.getElementById('exec-filter-period-label');
-  if(lbl) lbl.textContent = id==='camp' ? 'Toda a campanha (31/03 →)' : '';
-  renderPainelExecutivo();
-}
-
-/* ═══ Render completo do Painel Executivo ═══ */
-function renderPainelExecutivo() {
-  renderExecHojeOntem();
-  renderExecKPIs();
-  buildExecDplusBar();
-  buildExecVendasChart();
-  buildExecInvestChart();
-  renderExecConversoes();
-  const now = new Date();
-  const ds2 = now.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  const el = document.getElementById('execFooterDate'); if(el) el.textContent = 'Gerado em '+ds2;
-}
-
-/* ═══ Controle de abas ═══ */
-function switchTab(tabId, pushState=true) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.style.display='none');
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(tabId).style.display = 'block';
-  document.getElementById('tbtn-'+tabId).classList.add('active');
-  if(tabId === 'tab-exec') renderPainelExecutivo();
-  if(pushState) {
-    const hash = tabId === 'tab-exec' ? '#exec' : '#';
-    history.pushState({tabId}, '', hash || window.location.pathname);
-  }
-}
-// Navegar com o botão Voltar/Avançar do browser
-window.addEventListener('popstate', e => {
-  const tabId = e.state?.tabId || (location.hash==='#exec' ? 'tab-exec' : 'tab-dash');
-  switchTab(tabId, false);
-});
-// Abrir na aba certa se vier com hash na URL
-(function(){
-  if(location.hash === '#exec') switchTab('tab-exec', false);
-})();
-function execSetVendasMetric(metric, btn) {
-  document.querySelectorAll('.exec-metric-pill').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); execCurrentVendasMetric=metric; buildExecVendasChart();
-}
-function execSetInvestView(view, btn) {
-  btn.closest('.pill-group').querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); execCurrentInvestView=view; buildExecInvestChart();
-}
-
-/* ═══ D+N shortcuts ═══ */
-function buildExecDplusBar() {
-  const bar = document.getElementById('exec-dplus-bar');
-  if(!bar) return;
-  const allDays = D26_FULL.map(r=>r.d).filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b);
-  if(!allDays.length) { bar.innerHTML='<span class="exec-dplus-label">Dia exato:</span><span style="font-size:.72rem;color:#555">sem dados ainda</span>'; return; }
-
-  const maxDay = allDays[allDays.length-1];
-  // Organiza em semanas de 7 dias a partir do D+1
-  const weeks = [];
-  for(let w=0; w*7+1 <= maxDay; w++) {
-    const start = w*7+1;
-    weeks.push({ w, days: Array.from({length:7}, (_,i)=>start+i) });
-  }
-
-  const activeIso = (execFiltFrom && execFiltFrom===execFiltTo) ? execFiltFrom : null;
-
-  const weeksHtml = weeks.map(({w, days}) => {
-    const btns = days.map(d => {
-      if(d > maxDay || !allDays.includes(d)) {
-        return `<button class="exec-dplus-btn empty">—</button>`;
-      }
-      const dt  = execDateOf26Day(d);
-      const iso = dt.toISOString().slice(0,10);
-      const lbl = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-      const isActive = activeIso === iso ? ' active' : '';
-      return `<button class="exec-dplus-btn${isActive}" id="exec-dplus-${d}" onclick="setExecDayPreset(${d},'${iso}')" title="${lbl}">D+${d}</button>`;
-    }).join('');
-    return `<div class="exec-dplus-week"><span class="exec-dplus-week-lbl">S${w+1}</span>${btns}</div>`;
-  }).join('');
-
-  bar.innerHTML = `<span class="exec-dplus-label">Dia exato</span><div class="exec-dplus-weeks">${weeksHtml}</div>`;
-}
-function setExecDayPreset(d, iso) {
-  execFiltFrom = iso; execFiltTo = iso;
-  document.querySelectorAll('.exec-btn-filter').forEach(b=>b.classList.remove('active'));
-  document.getElementById('execFiltDE').value  = iso;
-  document.getElementById('execFiltATE').value = iso;
-  const dt = execDateOf26Day(d);
-  const lbl = document.getElementById('exec-filter-period-label');
-  if(lbl) lbl.textContent = 'D+'+d+' · '+dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','');
-  renderPainelExecutivo();
+// Auto-start if already authenticated
+if(sessionStorage.getItem(_AUTH_KEY)==='1'){
+  document.getElementById('loginOverlay').style.display='none';
+  initDashboard();
 }
 
 /* ═══════════════════════════════════════════════
@@ -2826,8 +2144,6 @@ function tiktokDeleteEntry(date) {
   buildOrg();
 }
 
-// Carrega ao iniciar
-tiktokLoad();
 </script>
 
 <!-- Modal TikTok (renderizado dinamicamente por openTikTokModal) -->

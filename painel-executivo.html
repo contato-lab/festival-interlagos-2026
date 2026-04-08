@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Festival Interlagos 2026 — Painel Executivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<style>
+:root {
+  --lime:#C8FF00; --lime-dim:rgba(200,255,0,0.12); --lime-border:rgba(200,255,0,0.25);
+  --purple:#7B2D8B; --purple-dim:rgba(123,45,139,0.18);
+  --bg:#0A0A0A; --card:#141414; --card2:#1A1A1A; --card-hover:#1E1E1E;
+  --text:#FFFFFF; --text2:#CCCCCC; --text3:#888888;
+  --green:#00FF88; --red:#FF4444; --warn:#FFB800; --blue:#00BFFF;
+  --border:rgba(255,255,255,0.07); --radius:14px; --rad-sm:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;min-height:100vh}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);background:#0D0D0D;position:sticky;top:0;z-index:100}
+.header-brand{display:flex;align-items:center;gap:12px}
+.lime-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.6rem;color:var(--lime);letter-spacing:.08em}
+.sep{color:var(--text3)}
+.client-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.1rem;color:var(--text2);letter-spacing:.04em}
+.header-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.3rem;text-transform:uppercase;letter-spacing:.06em;text-align:center}
+.header-right{display:flex;align-items:center;gap:10px}
+.badge{background:var(--lime-dim);border:1px solid var(--lime-border);border-radius:20px;color:var(--lime);padding:4px 14px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
+.gen-date{font-size:.72rem;color:#888}
+
+/* SECTION */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.15rem;text-transform:uppercase;letter-spacing:.06em;border-left:3px solid var(--lime);padding-left:11px}
+.pill-group{display:flex;gap:6px;flex-wrap:wrap}
+.pill{background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;transition:.2s;color:var(--text2)}
+.pill:hover{border-color:var(--lime-border);color:var(--lime)}
+.pill.active{background:var(--lime-dim);border-color:var(--lime-border);color:var(--lime)}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.footer-lime{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.9rem;color:var(--lime);letter-spacing:.06em}
+.footer-tag{font-size:.72rem;color:var(--text3);margin-top:2px}
+
+/* ═══ EXEC PANEL ═══ */
+.exec-main{padding:24px 32px;display:flex;flex-direction:column;gap:20px;max-width:1500px;margin:0 auto}
+.exec-hoje-ontem{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.exec-card{background:var(--card);border:1px solid var(--lime-border);border-radius:var(--radius);padding:20px 22px}
+.exec-card-label{font-size:.68rem;color:#999;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:2px}
+.exec-card-date{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.9rem;color:var(--lime);margin-bottom:10px}
+.exec-val-big{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:2.1rem;color:var(--lime);line-height:1;margin-bottom:8px}
+.exec-val-big.partial{color:var(--warn)}
+.exec-meta-row{display:flex;gap:20px;flex-wrap:wrap;margin-top:6px}
+.exec-meta-item{display:flex;flex-direction:column;gap:1px}
+.exec-meta-label{font-size:.62rem;color:#666;text-transform:uppercase;letter-spacing:.06em}
+.exec-meta-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;color:var(--text2)}
+.exec-tv-row{font-size:.7rem;color:var(--warn);margin-top:8px;display:flex;align-items:center;gap:5px}
+.exec-kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.exec-kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+.exec-kpi-label{font-size:.68rem;color:#999;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.exec-kpi-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.7rem;color:var(--text);line-height:1;margin-bottom:4px}
+.exec-kpi-delta{font-size:.7rem;color:#888}
+.exec-kpi-delta.up{color:var(--green)}.exec-kpi-delta.down{color:var(--red)}
+.exec-context{background:var(--lime-dim);border:1px solid var(--lime-border);border-radius:var(--rad-sm);padding:14px 18px;font-size:.82rem;color:var(--text2);line-height:1.6;display:flex;gap:12px;align-items:flex-start}
+.exec-charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.exec-chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.exec-chart-wrap{position:relative;height:240px}
+.exec-leg{display:flex;gap:14px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+.exec-leg-item{display:flex;align-items:center;gap:5px;font-size:.72rem;color:#BBB}
+.exec-leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.exec-conv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.exec-conv-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+.exec-conv-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.exec-conv-row:last-child{border-bottom:none}
+.exec-conv-label{font-size:.78rem;color:#CCC}
+.exec-conv-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;color:var(--lime)}
+/* Exec filter bar */
+.exec-filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px}
+.exec-filter-label{font-size:.65rem;color:#666;text-transform:uppercase;letter-spacing:.08em;margin-right:4px}
+.exec-btn-filter{background:transparent;border:1px solid rgba(255,255,255,.12);color:#999;font-size:.72rem;font-weight:600;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .15s}
+.exec-btn-filter:hover{border-color:rgba(200,255,0,.4);color:#CCC}
+.exec-btn-filter.active{background:rgba(200,255,0,.12);border-color:rgba(200,255,0,.5);color:var(--lime)}
+.exec-filter-sep{width:1px;height:20px;background:rgba(255,255,255,.08);margin:0 4px}
+.exec-date-input{background:#1C1C1C;border:1px solid rgba(255,255,255,.12);color:#CCC;font-size:.72rem;padding:5px 8px;border-radius:6px;outline:none}
+.exec-date-input:focus{border-color:rgba(200,255,0,.4)}
+.exec-filter-period{font-size:.72rem;color:#666;margin-left:auto;font-style:italic}
+/* ── Botoes metrica vendas exec ── */
+.exec-metric-pill{background:#1C1C1C;border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:6px 16px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;transition:.2s;color:#CCC}
+.exec-metric-pill:hover{border-color:var(--lime-border);color:var(--lime)}
+.exec-metric-pill.active{background:var(--lime-dim);border-color:var(--lime);color:var(--lime)}
+.exec-metric-pill.moto{border-color:rgba(200,255,0,.3);color:#C8FF00}
+.exec-metric-pill.moto.active{background:rgba(200,255,0,.18);border-color:var(--lime);color:var(--lime)}
+.exec-metric-pill.auto{border-color:rgba(123,45,139,.5);color:#C07ADB}
+.exec-metric-pill.auto.active{background:rgba(123,45,139,.2);border-color:#9B3DAB;color:#C07ADB}
+/* ── Filtro D+N ── */
+.exec-dplus-bar{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--rad-sm);padding:10px 14px}
+.exec-dplus-label{font-size:.62rem;color:#888;text-transform:uppercase;letter-spacing:.08em;font-weight:600;display:block;margin-bottom:8px}
+.exec-dplus-weeks{display:flex;flex-direction:column;gap:3px}
+.exec-dplus-week{display:flex;align-items:center;gap:3px}
+.exec-dplus-week-lbl{font-size:.58rem;color:#555;font-family:'Barlow Condensed',sans-serif;font-weight:700;width:36px;text-align:right;padding-right:6px;flex-shrink:0}
+.exec-dplus-btn{background:transparent;border:1px solid rgba(255,255,255,.12);color:#AAA;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.03em;padding:3px 0;border-radius:4px;cursor:pointer;transition:all .15s;width:44px;text-align:center}
+.exec-dplus-btn:hover{border-color:rgba(200,255,0,.4);color:var(--lime)}
+.exec-dplus-btn.active{background:rgba(200,255,0,.15);border-color:var(--lime);color:var(--lime)}
+.exec-dplus-btn.empty{border-color:transparent;color:transparent;cursor:default;pointer-events:none}
+
+/* LOGIN */
+.login-overlay{position:fixed;inset:0;background:#0A0A0A;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.login-box{background:var(--card);border:1px solid var(--lime-border);border-radius:var(--radius);padding:40px;text-align:center;max-width:380px;width:90%}
+.login-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.6rem;color:var(--lime);margin-bottom:8px;letter-spacing:.06em}
+.login-sub{font-size:.8rem;color:var(--text3);margin-bottom:24px}
+.login-input{width:100%;background:#1C1C1C;border:1px solid rgba(255,255,255,.12);color:#EEE;font-size:1rem;padding:12px 16px;border-radius:8px;outline:none;margin-bottom:16px;text-align:center;font-family:'Inter',sans-serif}
+.login-input:focus{border-color:var(--lime-border)}
+.login-btn{width:100%;background:var(--lime);border:none;border-radius:8px;padding:12px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;text-transform:uppercase;letter-spacing:.06em;color:#000;cursor:pointer}
+.login-btn:hover{background:#d4ff1a}
+.login-error{color:var(--red);font-size:.78rem;margin-top:8px;display:none}
+
+/* RESPONSIVE — TABLET */
+@media(max-width:1024px){
+  .exec-hoje-ontem{grid-template-columns:1fr 1fr}
+  .exec-kpi-strip{grid-template-columns:repeat(3,1fr)}
+  .exec-charts-grid{grid-template-columns:1fr}
+  .exec-conv-grid{grid-template-columns:1fr}
+  .header{padding:14px 18px}
+  .footer{padding:14px 18px}
+}
+/* RESPONSIVE — MOBILE */
+@media(max-width:768px){
+  .header{position:relative;flex-direction:column;gap:6px;padding:10px 14px;text-align:center}
+  .header-brand{justify-content:center}
+  .header-title{font-size:.9rem;order:2;margin:0}
+  .header-right{flex-wrap:wrap;justify-content:center;order:3;gap:5px}
+  .exec-hoje-ontem{grid-template-columns:1fr}
+  .exec-main{padding:16px 10px}
+  .footer{flex-direction:column;text-align:center;gap:10px;padding:14px}
+  .footer-lime{font-size:.8rem}
+  .badge{font-size:.68rem;padding:3px 10px}
+  .gen-date{font-size:.64rem}
+  .section-header{flex-direction:column;gap:8px;align-items:flex-start}
+  .section-title{font-size:1rem}
+  .pill-group{width:100%;justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay" class="login-overlay">
+  <div class="login-box">
+    <div class="login-title">FESTIVAL INTERLAGOS 2026</div>
+    <div class="login-sub">Painel Executivo &middot; Acesso Restrito</div>
+    <input type="password" id="loginPwd" class="login-input" placeholder="Digite a senha" onkeydown="if(event.key==='Enter')checkLogin()">
+    <button class="login-btn" onclick="checkLogin()">ENTRAR</button>
+    <div class="login-error" id="loginError">Senha incorreta</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <span class="lime-logo">LIME</span><span class="sep">|</span><span class="client-name">Festival Interlagos</span>
+  </div>
+  <div class="header-title">Painel Executivo</div>
+  <div class="header-right">
+    <span class="badge">Diretoria</span>
+    <span class="gen-date" id="genDate"></span>
+  </div>
+</header>
+
+<!-- EXEC MAIN -->
+<div class="exec-main">
+
+  <!-- Filtro de periodo executivo -->
+  <div class="exec-filter-bar">
+    <span class="exec-filter-label">Periodo:</span>
+    <button class="exec-btn-filter" id="exec-btn-7d"  onclick="setExecPreset('7d')">7 dias</button>
+    <button class="exec-btn-filter" id="exec-btn-14d" onclick="setExecPreset('14d')">14 dias</button>
+    <button class="exec-btn-filter" id="exec-btn-30d" onclick="setExecPreset('30d')">30 dias</button>
+    <button class="exec-btn-filter active" id="exec-btn-camp" onclick="setExecPreset('camp')">Toda a campanha</button>
+    <div class="exec-filter-sep"></div>
+    <input type="date" id="execFiltDE"  class="exec-date-input" onchange="applyExecFilter()">
+    <span style="color:#555;font-size:.72rem">&rarr;</span>
+    <input type="date" id="execFiltATE" class="exec-date-input" onchange="applyExecFilter()">
+    <span class="exec-filter-period" id="exec-filter-period-label"></span>
+  </div>
+
+  <!-- Atalhos D+N -->
+  <div class="exec-dplus-bar" id="exec-dplus-bar">
+    <span class="exec-dplus-label">Dia exato:</span>
+    <!-- gerado dinamicamente por buildExecDplusBar() -->
+  </div>
+
+  <!-- Hoje / Ontem / Campanha -->
+  <div class="exec-hoje-ontem">
+    <div class="exec-card" id="exec-card-ontem">
+      <div class="exec-card-label">Ontem</div>
+      <div class="exec-val-big">&mdash;</div>
+    </div>
+    <div class="exec-card" id="exec-card-hoje">
+      <div class="exec-card-label">Hoje <span style="color:var(--warn);font-size:.65rem">&#9679; PARCIAL</span></div>
+      <div class="exec-val-big partial">&mdash;</div>
+    </div>
+    <div class="exec-card" id="exec-card-campanha">
+      <div class="exec-card-label">Campanha</div>
+      <div class="exec-val-big">&mdash;</div>
+    </div>
+  </div>
+
+  <!-- KPIs de Vendas -->
+  <div class="exec-kpi-strip">
+    <div class="exec-kpi">
+      <div class="exec-kpi-label">Receita Total 2026</div>
+      <div id="exec-kpi-receita"><div class="exec-kpi-val">&mdash;</div></div>
+    </div>
+    <div class="exec-kpi">
+      <div class="exec-kpi-label">&#127949;&#65039; Receita Motos</div>
+      <div id="exec-kpi-motos"><div class="exec-kpi-val">&mdash;</div></div>
+    </div>
+    <div class="exec-kpi">
+      <div class="exec-kpi-label">&#128663; Receita Autos</div>
+      <div id="exec-kpi-autos"><div class="exec-kpi-val">&mdash;</div></div>
+    </div>
+    <div class="exec-kpi">
+      <div class="exec-kpi-label">&#127915;&#65039; Ingressos Vendidos</div>
+      <div id="exec-kpi-ingressos"><div class="exec-kpi-val">&mdash;</div></div>
+    </div>
+    <div class="exec-kpi" style="border-color:rgba(200,255,0,.15)">
+      <div class="exec-kpi-label">&#128184; Investimento ADS</div>
+      <div id="exec-kpi-invest"><div class="exec-kpi-val">&mdash;</div></div>
+    </div>
+  </div>
+
+  <!-- Contexto / insight -->
+  <div class="exec-context" id="exec-context">
+    <span>&#128161;</span><span>Carregando dados...</span>
+  </div>
+
+  <!-- Graficos -->
+  <div class="exec-charts-grid">
+
+    <!-- Vendas -->
+    <div class="exec-chart-card">
+      <div class="section-header" style="margin-bottom:10px">
+        <div>
+          <div class="section-title">Vendas — 2025 vs 2026</div>
+          <div style="font-size:.7rem;color:#666;margin-top:3px">por dia de campanha</div>
+        </div>
+        <div class="pill-group" id="execVendasPills">
+          <button class="exec-metric-pill active" onclick="execSetVendasMetric('total',this)">Total</button>
+          <button class="exec-metric-pill moto" onclick="execSetVendasMetric('motos',this)">&#127949;&#65039; Motos</button>
+          <button class="exec-metric-pill auto" onclick="execSetVendasMetric('autos',this)">&#128663; Autos</button>
+        </div>
+      </div>
+      <div class="exec-leg">
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>2026</div>
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#555"></span>2025</div>
+        <div class="exec-leg-item" id="exec-tvLegVendas" style="display:none">
+          <span style="display:inline-block;width:18px;height:2px;background:rgba(255,184,0,.8);border-top:2px dashed rgba(255,184,0,.8)"></span>
+          <span style="color:var(--warn)">TV Globo</span>
+        </div>
+      </div>
+      <div class="exec-chart-wrap"><canvas id="exec-chartVendas"></canvas></div>
+    </div>
+
+    <!-- Investimento ADS -->
+    <div class="exec-chart-card">
+      <div class="section-header" style="margin-bottom:10px">
+        <div>
+          <div class="section-title">Investimento ADS — 2025 vs 2026</div>
+          <div style="font-size:.7rem;color:#666;margin-top:3px">por dia de campanha &middot; est. diaria 2025</div>
+        </div>
+        <div class="pill-group">
+          <button class="pill active" onclick="execSetInvestView('diario',this)">Diario</button>
+          <button class="pill" onclick="execSetInvestView('acumulado',this)">Acumulado</button>
+        </div>
+      </div>
+      <div class="exec-leg">
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>2026</div>
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#555"></span>2025 (est.)</div>
+        <div class="exec-leg-item" id="exec-tvLegInvest">
+          <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,184,0,.8)"></span>
+          <span style="color:var(--warn)">TV Globo</span>
+        </div>
+      </div>
+      <div class="exec-chart-wrap"><canvas id="exec-chartInvest"></canvas></div>
+    </div>
+
+  </div><!-- /exec-charts-grid -->
+
+  <!-- Conversoes -->
+  <div class="exec-conv-grid">
+    <div class="exec-conv-card" id="exec-conv-digital">
+      <div class="section-title" style="margin-bottom:14px">Conversoes Digitais</div>
+      <div class="exec-conv-row"><span class="exec-conv-label">Carregando...</span></div>
+    </div>
+    <div class="exec-conv-card" id="exec-conv-totals">
+      <div class="section-title" style="margin-bottom:14px">Ingressos Vendidos</div>
+      <div class="exec-conv-row"><span class="exec-conv-label">Carregando...</span></div>
+    </div>
+  </div>
+
+</div><!-- /exec-main -->
+
+<footer class="footer">
+  <div>
+    <div class="footer-lime">&#10033; LIME — Transformamos caos em crescimento</div>
+    <div class="footer-tag">Branding &middot; Performance &middot; Conteudo &middot; Experiencia</div>
+  </div>
+  <div style="text-align:right">
+    <div class="footer-tag">Painel Executivo — Festival Interlagos 2026</div>
+    <div class="footer-tag" id="execFooterDate"></div>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════
+const _AUTH_PWD = 'exec2026';
+const _AUTH_KEY = 'dash_auth_exec';
+function checkLogin(){
+  if(document.getElementById('loginPwd').value===_AUTH_PWD){
+    sessionStorage.setItem(_AUTH_KEY,'1');
+    document.getElementById('loginOverlay').style.display='none';
+    initDashboard();
+  } else {
+    document.getElementById('loginError').style.display='block';
+    setTimeout(()=>document.getElementById('loginError').style.display='none',2000);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// CONFIG — Google Sheets (gviz CSV — leitura publica)
+// ═══════════════════════════════════════════════
+const SHEET_ID = '1jk7jjYB6n-IjkdmBUv54QEerujL_iAAP';
+const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=';
+const SEMANA_START = new Date('2026-03-30T00:00:00'); // Segunda-feira da SEMANA 0
+function getCurrentWeek(){const n=new Date();n.setHours(0,0,0,0);return Math.max(0,Math.floor((n-SEMANA_START)/604800000));}
+
+// Data de inicio das vendas (D+1). Ajuste para a data real quando disponivel.
+const DATA_INICIO = new Date('2026-03-31T00:00:00'); // D+1 = abertura das vendas
+let D26_FULL = [];
+let TIKTOK_DATA = { daily_series: [] }; // declarado cedo para evitar TDZ
+
+// ═══════════════════════════════════════════════
+// DADOS 2025 — reais (94 dias de vendas)
+// ═══════════════════════════════════════════════
+const D25 = [
+  {d:1,mv:520012,mq:1236,av:179545,aq:380},{d:2,mv:171212,mq:430,av:82678,aq:153},
+  {d:3,mv:92004,mq:279,av:27577,aq:71},{d:4,mv:81187,mq:239,av:32147,aq:69},
+  {d:5,mv:70161,mq:222,av:23345,aq:49},{d:6,mv:51338,mq:163,av:26621,aq:84},
+  {d:7,mv:44665,mq:166,av:25742,aq:53},{d:8,mv:36376,mq:127,av:26335,aq:71},
+  {d:9,mv:20913,mq:69,av:13460,aq:63},{d:10,mv:36451,mq:156,av:16062,aq:62},
+  {d:11,mv:34776,mq:138,av:26061,aq:56},{d:12,mv:28490,mq:114,av:25398,aq:53},
+  {d:13,mv:27827,mq:118,av:25650,aq:56},{d:14,mv:24028,mq:95,av:20656,aq:47},
+  {d:15,mv:39681,mq:155,av:28248,aq:67},{d:16,mv:17987,mq:67,av:14662,aq:40},
+  {d:17,mv:19713,mq:84,av:16986,aq:48},{d:18,mv:35226,mq:148,av:24041,aq:57},
+  {d:19,mv:45187,mq:181,av:16938,aq:41},{d:20,mv:38180,mq:211,av:17671,aq:42},
+  {d:21,mv:24979,mq:95,av:26698,aq:60},{d:22,mv:32801,mq:102,av:17424,aq:39},
+  {d:23,mv:18001,mq:64,av:19327,aq:47},{d:24,mv:27130,mq:107,av:19232,aq:47},
+  {d:25,mv:33398,mq:115,av:21427,aq:55},{d:26,mv:20803,mq:72,av:11892,aq:28},
+  {d:27,mv:14918,mq:55,av:19029,aq:46},{d:28,mv:16985,mq:65,av:14936,aq:39},
+  {d:29,mv:24742,mq:90,av:18026,aq:47},{d:30,mv:39079,mq:136,av:22780,aq:52},
+  {d:31,mv:22568,mq:76,av:20204,aq:47},{d:32,mv:22178,mq:74,av:14625,aq:38},
+  {d:33,mv:15814,mq:59,av:18843,aq:43},{d:34,mv:15065,mq:53,av:13756,aq:34},
+  {d:35,mv:29193,mq:104,av:18015,aq:47},{d:36,mv:17736,mq:62,av:14044,aq:33},
+  {d:37,mv:11927,mq:44,av:12887,aq:30},{d:38,mv:17568,mq:59,av:12705,aq:28},
+  {d:39,mv:22090,mq:78,av:17052,aq:38},{d:40,mv:26386,mq:94,av:17720,aq:40},
+  {d:41,mv:16768,mq:61,av:17026,aq:41},{d:42,mv:15063,mq:55,av:13285,aq:33},
+  {d:43,mv:12908,mq:46,av:17131,aq:40},{d:44,mv:10773,mq:37,av:15302,aq:34},
+  {d:45,mv:22088,mq:77,av:22183,aq:51},{d:46,mv:14095,mq:52,av:17756,aq:39},
+  {d:47,mv:10196,mq:36,av:12900,aq:30},{d:48,mv:13268,mq:48,av:14064,aq:32},
+  {d:49,mv:22089,mq:77,av:19087,aq:42},{d:50,mv:26042,mq:95,av:20034,aq:45},
+  {d:51,mv:17099,mq:64,av:19025,aq:43},{d:52,mv:15340,mq:56,av:14808,aq:32},
+  {d:53,mv:13487,mq:48,av:15649,aq:34},{d:54,mv:11264,mq:42,av:12843,aq:28},
+  {d:55,mv:21882,mq:78,av:20194,aq:43},{d:56,mv:15643,mq:59,av:18021,aq:40},
+  {d:57,mv:11021,mq:39,av:13482,aq:29},{d:58,mv:14826,mq:55,av:16127,aq:36},
+  {d:59,mv:19874,mq:71,av:19834,aq:44},{d:60,mv:38162,mq:142,av:28071,aq:64},
+  {d:61,mv:19823,mq:72,av:21430,aq:47},{d:62,mv:17604,mq:64,av:16240,aq:35},
+  {d:63,mv:15208,mq:57,av:19021,aq:41},{d:64,mv:13842,mq:49,av:17583,aq:38},
+  {d:65,mv:26451,mq:92,av:25841,aq:55},{d:66,mv:21039,mq:79,av:24157,aq:53},
+  {d:67,mv:14327,mq:51,av:19682,aq:44},{d:68,mv:16894,mq:62,av:23415,aq:53},
+  {d:69,mv:28756,mq:105,av:30482,aq:67},{d:70,mv:52341,mq:189,av:42183,aq:91},
+  {d:71,mv:31425,mq:116,av:36928,aq:82},{d:72,mv:26872,mq:98,av:31562,aq:69},
+  {d:73,mv:22451,mq:82,av:28941,aq:63},{d:74,mv:19832,mq:72,av:26173,aq:57},
+  {d:75,mv:38451,mq:141,av:39872,aq:87},{d:76,mv:29184,mq:107,av:36521,aq:79},
+  {d:77,mv:20973,mq:77,av:32184,aq:70},{d:78,mv:24518,mq:88,av:38421,aq:84},
+  {d:79,mv:41283,mq:152,av:58472,aq:128},{d:80,mv:68452,mq:251,av:84631,aq:184},
+  {d:81,mv:49821,mq:182,av:72483,aq:157},{d:82,mv:40173,mq:147,av:64821,aq:142},
+  {d:83,mv:34518,mq:127,av:59274,aq:130},{d:84,mv:30284,mq:111,av:53841,aq:118},
+  {d:85,mv:58732,mq:216,av:82451,aq:181},{d:86,mv:0,mq:0,av:72483,aq:593},
+  {d:87,mv:0,mq:0,av:84291,aq:694},{d:88,mv:0,mq:0,av:94182,aq:782},
+  {d:89,mv:0,mq:0,av:98473,aq:819},{d:90,mv:0,mq:0,av:107572,aq:876},
+  {d:91,mv:0,mq:0,av:116842,aq:1028},{d:92,mv:0,mq:0,av:174146,aq:1567},
+  {d:93,mv:0,mq:0,av:226794,aq:2025},{d:94,mv:0,mq:0,av:128185,aq:1222}
+];
+
+// ═══════════════════════════════════════════════
+// DADOS 2026 — preenchidos via Google Sheets
+// ═══════════════════════════════════════════════
+let D26 = [];
+
+// ═══════════════════════════════════════════════
+// STATE — data globals
+// ═══════════════════════════════════════════════
+let META_DATA = null;
+let GADS_DATA = null;
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+const fmtR = v => 'R$ '+v.toLocaleString('pt-BR',{maximumFractionDigits:0});
+const fmtK = v => fmtR(v);
+const fmtN = v => v.toLocaleString('pt-BR');
+
+// ═══════════════════════════════════════════════
+// GOOGLE SHEETS — fetch automatico
+// ═══════════════════════════════════════════════
+async function fetchSheet() {
+  if(!SHEET_ID) return;
+  const currentWeek = getCurrentWeek();
+  const allDays = [];
+
+  // Parse CSV com suporte a campos entre aspas
+  function parseCSV(raw) {
+    return raw.split('\n').map(line => {
+      const cells = []; let inQ = false, cell = '';
+      for (const ch of line) {
+        if (ch === '"') { inQ = !inQ; continue; }
+        if (ch === ',' && !inQ) { cells.push(cell.trim()); cell = ''; continue; }
+        cell += ch;
+      }
+      cells.push(cell.trim());
+      return cells;
+    });
+  }
+
+  const parseMoeda = v => parseFloat((v||'').replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.').trim()) || 0;
+  const parseQtd   = v => parseInt((v||'').replace(/[^\d]/g,'')) || 0;
+  const findRow = (rows, afterIdx, match) => {
+    for (let i = afterIdx; i < rows.length; i++) {
+      if (match((rows[i][0]||'').trim())) return i;
+    }
+    return -1;
+  };
+  const isVV  = l => l === 'VENDAS VALOR:';
+  const isQTD = l => l.startsWith('QTD');
+
+  // Busca todas as semanas (SEMANA 0 ate semana atual)
+  for (let w = 0; w <= currentWeek; w++) {
+    try {
+      const url = SHEET_BASE + encodeURIComponent('SEMANA ' + w) + '&t=' + Date.now();
+      const res = await fetch(url);
+      if (!res.ok) { console.warn('fetchSheet: SEMANA ' + w + ' nao encontrada'); continue; }
+      const text = await res.text();
+      const rows = parseCSV(text);
+
+      const iMpV = findRow(rows, 1, isVV);
+      const iMpQ = iMpV >= 0 ? findRow(rows, iMpV + 1, isQTD) : -1;
+      const iMtV = iMpQ >= 0 ? findRow(rows, iMpQ + 1, isVV)  : -1;
+      const iMtQ = iMtV >= 0 ? findRow(rows, iMtV + 1, isQTD) : -1;
+      const iApV = iMtQ >= 0 ? findRow(rows, iMtQ + 1, isVV)  : -1;
+      const iApQ = iApV >= 0 ? findRow(rows, iApV + 1, isQTD) : -1;
+      const iAtV = iApQ >= 0 ? findRow(rows, iApQ + 1, isVV)  : -1;
+      const iAtQ = iAtV >= 0 ? findRow(rows, iAtV + 1, isQTD) : -1;
+
+      if (iMpV < 0 || iApV < 0) {
+        console.warn('fetchSheet: SEMANA ' + w + ' estrutura nao reconhecida');
+        continue;
+      }
+
+      const get = ri => (ri >= 0 ? rows[ri] : []) || [];
+      for (let c = 1; c <= 7; c++) {
+        const mp  = parseMoeda(get(iMpV)[c]);
+        const mqP = parseQtd  (get(iMpQ)[c]);
+        const mt  = parseMoeda(get(iMtV)[c]);
+        const mqT = parseQtd  (get(iMtQ)[c]);
+        const ap  = parseMoeda(get(iApV)[c]);
+        const aqP = parseQtd  (get(iApQ)[c]);
+        const at  = parseMoeda(get(iAtV)[c]);
+        const aqT = parseQtd  (get(iAtQ)[c]);
+        if (mp || mqP || mt || mqT || ap || aqP || at || aqT) {
+          allDays.push({
+            d: w * 7 + (c - 1),  // SEMANA 0 col1=d0, col2=d1(DATA_INICIO)... SEMANA 1 col1=d7...
+            mp, mt, ap, at,
+            mv: mp + mt, mq: mqP + mqT,
+            av: ap + at, aq: aqP + aqT,
+            mpQ: mqP, mtQ: mqT, apQ: aqP, atQ: aqT
+          });
+        }
+      }
+      console.log('fetchSheet SEMANA ' + w + ' carregada');
+    } catch(e) { console.warn('fetchSheet SEMANA ' + w + ' erro:', e.message); }
+  }
+
+  if (allDays.length) {
+    allDays.sort((a, b) => a.d - b.d);
+    D26.length = 0; allDays.forEach(r => D26.push(r));
+    D26_FULL = [...D26];
+    console.log('Google Sheets conectado:', allDays.length, 'dias de ' + (currentWeek + 1) + ' semana(s)');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// GOOGLE ADS — fetch google-ads-data.json
+// ═══════════════════════════════════════════════
+async function fetchGAdsData() {
+  try {
+    const res = await fetch('google-ads-data.json?t=' + Date.now());
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.totals) return;
+    GADS_DATA = data;
+  } catch(e) {
+    console.warn('fetchGAdsData:', e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// META ADS — fetch meta-data.json
+// ═══════════════════════════════════════════════
+async function fetchMetaData() {
+  try {
+    const res = await fetch('meta-data.json?t=' + Date.now());
+    if (!res.ok) return;
+    const data = await res.json();
+    const arr = data.daily_series || data.data || [];
+    if (!arr.length) return;
+    META_DATA = data;
+  } catch(e) {
+    // silencioso — meta-data.json ainda nao existe
+  }
+}
+
+// ═══════════════════════════════════════════════
+// TIKTOK — leitura de localStorage
+// ═══════════════════════════════════════════════
+function tiktokLoad() {
+  try {
+    const raw = localStorage.getItem('tiktok_series');
+    if (raw) TIKTOK_DATA.daily_series = JSON.parse(raw);
+  } catch(e) { TIKTOK_DATA.daily_series = []; }
+}
+
+/* ═══════════════════════════════════════════════
+   PAINEL EXECUTIVO — constantes
+═══════════════════════════════════════════════ */
+const EXEC_CAMP_START_2026 = new Date(2026, 2, 31); // 31/03/2026
+const EXEC_CAMP_START_2025 = new Date(2025, 2, 14); // 14/03/2025
+
+const EXEC_TV_GLOBO = [
+  {date:'2026-04-01', day26:2, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  {date:'2026-04-02', day26:3, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  {date:'2026-04-03', day26:4, programs:['Bom Dia SP','Bom Dia Brasil']},
+  {date:'2026-04-05', day26:6, programs:['Auto Esporte','Esporte Espetacular']},
+  {date:'2026-04-06', day26:7, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+];
+
+const EXEC_D25_INVEST = (() => {
+  const semanas = [
+    {from:1, to:3,  daily:2679.88},{from:4, to:10, daily:4350.08},
+    {from:11,to:17, daily:4903.26},{from:18,to:24, daily:3429.32},
+    {from:25,to:31, daily:2697.07},{from:32,to:38, daily:4996.89},
+    {from:39,to:45, daily:5801.66},{from:46,to:52, daily:6824.98},
+    {from:53,to:59, daily:6120.89},{from:60,to:66, daily:5165.62},
+    {from:67,to:73, daily:5804.51},{from:74,to:80, daily:6619.04},
+    {from:81,to:87, daily:3830.10},{from:88,to:94, daily:3142.76},
+  ];
+  const arr = [];
+  semanas.forEach(s => { for(let d=s.from;d<=s.to;d++) arr.push({d, v:s.daily}); });
+  return arr;
+})();
+
+let execChartVendas = null, execChartInvest = null;
+let execCurrentVendasMetric = 'total', execCurrentInvestView = 'diario';
+let execFiltFrom = null, execFiltTo = null; // null = toda a campanha
+
+/* ═══ helpers ═══ */
+function execDayOf26(dateStr) {
+  const dt = new Date(dateStr + 'T00:00:00');
+  return Math.round((dt - EXEC_CAMP_START_2026) / 86400000) + 1;
+}
+function execDateOf26Day(d) {
+  const dt = new Date(EXEC_CAMP_START_2026);
+  dt.setDate(dt.getDate() + d - 1);
+  return dt;
+}
+function execFmtDate(dt) {
+  return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+}
+function execFmtFull(n) {
+  if(n == null || isNaN(n)) return '\u2014';
+  return 'R$ ' + n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function execFmtK(n) {
+  if(n == null || isNaN(n) || n === 0) return '\u2014';
+  return 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+}
+
+/* Constroi D26_INVEST a partir de META_DATA + GADS_DATA (reutiliza os fetches do dashboard principal) */
+function buildExecD26Invest(from, to) {
+  const map = {};
+  const add = (series, field) => {
+    (series||[]).forEach(d => {
+      if(from && d.date < from) return;
+      if(to   && d.date > to)   return;
+      const day = execDayOf26(d.date);
+      if(day < 1) return;
+      if(!map[day]) map[day] = {d:day, meta:0, gads:0, metaConv:0, gadsConv:0};
+      map[day][field] += d.cost||0;
+      if(field==='meta') map[day].metaConv += d.purchases||d.conversions||0;
+      if(field==='gads') map[day].gadsConv += d.conversions||0;
+    });
+  };
+  if(META_DATA) add(META_DATA.daily_series||META_DATA.data, 'meta');
+  if(GADS_DATA) add(GADS_DATA.daily_series, 'gads');
+  return Object.values(map).sort((a,b)=>a.d-b.d);
+}
+
+/* Dias de campanha disponiveis (uniao invest + vendas) */
+function execGetAllDays(invest) {
+  const inv = invest || buildExecD26Invest(execFiltFrom, execFiltTo);
+  const d26 = execFiltFrom
+    ? D26_FULL.filter(r => { const dt=execDateOf26Day(r.d); return dt>=new Date(execFiltFrom+'T00:00:00') && dt<=new Date(execFiltTo+'T00:00:00'); })
+    : D26_FULL;
+  const set = new Set([...inv.map(r=>r.d), ...d26.map(r=>r.d)]);
+  return Array.from(set).filter(d=>d>=1).sort((a,b)=>a-b);
+}
+
+/* Anotacoes TV Globo (sem label — corrige bug annotation plugin) */
+function execGetTvAnnotations(days) {
+  const anns = {};
+  EXEC_TV_GLOBO.forEach(tv => {
+    const idx = days.indexOf(tv.day26);
+    if(idx === -1) return;
+    anns['tv_'+tv.day26] = {
+      type:'line', xMin:idx, xMax:idx,
+      borderColor:'rgba(255,184,0,0.7)', borderWidth:2, borderDash:[4,3]
+    };
+  });
+  return anns;
+}
+
+/* ═══ Hoje / Ontem / Campanha ═══ */
+function renderExecHojeOntem() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().slice(0,10);
+  const yStr = new Date(+today - 86400000).toISOString().slice(0,10);
+  const invest = buildExecD26Invest();
+
+  const getInv = day => {
+    const r = invest.find(x=>x.d===day);
+    return {total: r?(r.meta+r.gads):0, conv: r?(r.metaConv+r.gadsConv):0};
+  };
+  const ontem = getInv(execDayOf26(yStr));
+  const hoje  = getInv(execDayOf26(todayStr));
+  const total = invest.reduce((s,r)=>s+(r.meta+r.gads),0);
+  const totalConv = invest.reduce((s,r)=>s+(r.metaConv+r.gadsConv),0);
+  const dias = invest.length;
+  const media = dias>0 ? total/dias : 0;
+  const invest25Same = EXEC_D25_INVEST.filter(r=>r.d<=dias).reduce((s,r)=>s+r.v,0);
+
+  const tvOntem = EXEC_TV_GLOBO.find(t=>t.date===yStr);
+
+  document.getElementById('exec-card-ontem').innerHTML = `
+    <div class="exec-card-label">Ontem</div>
+    <div class="exec-card-date">${execFmtDate(new Date(yStr+'T12:00:00'))}</div>
+    <div class="exec-val-big">${execFmtFull(ontem.total)}</div>
+    <div class="exec-meta-row">
+      <div class="exec-meta-item"><span class="exec-meta-label">Investimento ADS</span></div>
+    </div>
+    <div class="exec-meta-row">
+      <div class="exec-meta-item"><span class="exec-meta-label">Convers\u00f5es Digitais</span><span class="exec-meta-val">${Math.round(ontem.conv)}</span></div>
+      <div class="exec-meta-item"><span class="exec-meta-label">Custo / Convers\u00e3o</span><span class="exec-meta-val">${ontem.conv>0?execFmtFull(ontem.total/ontem.conv):'\u2014'}</span></div>
+    </div>
+    ${tvOntem?`<div class="exec-tv-row">\ud83d\udcfa TV Globo: ${tvOntem.programs.join(' \u00b7 ')}</div>`:''}
+  `;
+
+  document.getElementById('exec-card-hoje').innerHTML = `
+    <div class="exec-card-label">Hoje <span style="color:var(--warn);font-size:.65rem">\u25cf PARCIAL</span></div>
+    <div class="exec-card-date">${execFmtDate(today)}</div>
+    <div class="exec-val-big partial">${execFmtFull(hoje.total)}</div>
+    <div class="exec-meta-row">
+      <div class="exec-meta-item"><span class="exec-meta-label">Investimento ADS</span></div>
+    </div>
+    <div class="exec-meta-row">
+      <div class="exec-meta-item"><span class="exec-meta-label">Convers\u00f5es Digitais</span><span class="exec-meta-val">${Math.round(hoje.conv)}</span></div>
+    </div>
+  `;
+
+  document.getElementById('exec-card-campanha').innerHTML = `
+    <div class="exec-card-label">Campanha</div>
+    <div class="exec-card-date">Investimento ADS acumulado</div>
+    <div class="exec-val-big">${execFmtFull(total)}</div>
+    <div class="exec-meta-row">
+      <div class="exec-meta-item"><span class="exec-meta-label">M\u00e9dia di\u00e1ria</span><span class="exec-meta-val">${execFmtFull(media)}</span></div>
+      <div class="exec-meta-item"><span class="exec-meta-label">Dias de campanha</span><span class="exec-meta-val">${dias}\u00ba dia</span></div>
+    </div>
+    <div class="exec-meta-row" style="margin-top:4px">
+      <div class="exec-meta-item"><span class="exec-meta-label" style="color:#666">2025 (mesmos ${dias} dias): ${execFmtFull(invest25Same)}</span></div>
+    </div>
+  `;
+}
+
+/* ═══ KPIs de Vendas ═══ */
+function renderExecKPIs() {
+  const invest = buildExecD26Invest(execFiltFrom, execFiltTo);
+  const days = execGetAllDays(invest);
+  const minDay = days.length ? days[0] : 1;
+  const maxDay = days.length ? days[days.length-1] : 1;
+  const dias = invest.length || 1;
+  const s26 = D26_FULL.filter(r=>r.d>=minDay&&r.d<=maxDay).reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
+  const s25 = D25.filter(r=>r.d>=minDay&&r.d<=maxDay).reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
+
+  const setKpi = (id, v26, v25) => {
+    const el = document.getElementById(id); if(!el) return;
+    const pct = v25>0 ? ((v26-v25)/v25*100) : null;
+    const cls = pct===null?'':pct>=0?'up':'down';
+    const dStr = pct===null?'vs 2025: aguardando':(pct>=0?'\u25b2':'\u25bc')+Math.abs(pct).toFixed(1)+'% vs 2025';
+    el.innerHTML = `<div class="exec-kpi-val">${execFmtK(v26)}</div><div class="exec-kpi-delta ${cls}">${dStr}</div>`;
+  };
+  setKpi('exec-kpi-receita', s26.mv+s26.av, s25.mv+s25.av);
+  setKpi('exec-kpi-motos',   s26.mv,        s25.mv);
+  setKpi('exec-kpi-autos',   s26.av,        s25.av);
+
+  const ingEl = document.getElementById('exec-kpi-ingressos');
+  if(ingEl) {
+    const i26=s26.mq+s26.aq, i25=s25.mq+s25.aq;
+    const pct=i25>0?((i26-i25)/i25*100):null;
+    const cls=pct===null?'':pct>=0?'up':'down';
+    const dStr=pct===null?'vs 2025: aguardando':(pct>=0?'\u25b2':'\u25bc')+Math.abs(pct).toFixed(1)+'% vs 2025';
+    ingEl.innerHTML = `<div class="exec-kpi-val">${i26.toLocaleString('pt-BR')}</div><div class="exec-kpi-delta ${cls}">${dStr}</div>`;
+  }
+
+  // KPI Investimento ADS com vs 2025
+  const total26 = invest.reduce((s,r)=>s+(r.meta+r.gads),0);
+  const total25 = EXEC_D25_INVEST.filter(r=>r.d>=minDay&&r.d<=maxDay).reduce((s,r)=>s+r.v,0);
+  const invEl = document.getElementById('exec-kpi-invest');
+  if(invEl) {
+    const pct = total25>0 ? ((total26-total25)/total25*100) : null;
+    const cls = pct===null?'':pct>=0?'up':'down';
+    const dStr = pct===null?'vs 2025: aguardando':(pct>=0?'\u25b2':'\u25bc')+Math.abs(pct).toFixed(1)+'% vs 2025';
+    invEl.innerHTML = `<div class="exec-kpi-val">${execFmtK(total26)}</div><div class="exec-kpi-delta ${cls}">${dStr}</div>`;
+  }
+
+  // Contexto dinamico
+  const total25ctx = EXEC_D25_INVEST.filter(r=>r.d<=dias).reduce((s,r)=>s+r.v,0);
+  const ctxEl = document.getElementById('exec-context');
+  if(ctxEl && total25ctx>0) {
+    const ratio = total26/total25ctx;
+    const abaixo = ratio < 1;
+    ctxEl.innerHTML = `<span>\ud83d\udca1</span><span>O ritmo de investimento em ADS est\u00e1 <strong style="color:${abaixo?'var(--lime)':'var(--warn)'}">${abaixo?'abaixo':'acima'} do mesmo per\u00edodo de 2025</strong> (${(ratio*100).toFixed(0)}% do ritmo 2025). ${abaixo?'Isso \u00e9 <strong>intencional</strong>: a campanha de 2026 tem mais dias de dura\u00e7\u00e3o, distribuindo o budget de forma mais gradual.':'O investimento est\u00e1 acelerado em rela\u00e7\u00e3o a 2025.'}</span>`;
+  }
+}
+
+/* ═══ Grafico Vendas ═══ */
+function buildExecVendasChart() {
+  const invest = buildExecD26Invest(execFiltFrom, execFiltTo);
+  const days = execGetAllDays(invest); if(!days.length) return;
+  const metric = execCurrentVendasMetric;
+  const labels = days.map(d => 'D+'+d);
+  const getRec26 = d => { const r=D26_FULL.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
+  const getRec25 = d => { const r=D25.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
+  const getQtd26 = d => { const r=D26_FULL.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mq:metric==='autos'?r.aq:r.mq+r.aq; };
+  const getQtd25 = d => { const r=D25.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mq:metric==='autos'?r.aq:r.mq+r.aq; };
+
+  if(execChartVendas) execChartVendas.destroy();
+  const ctx = document.getElementById('exec-chartVendas')?.getContext('2d');
+  if(!ctx) return;
+  execChartVendas = new Chart(ctx, {
+    type:'bar',
+    data:{labels, datasets:[
+      // Barras qty (eixo direito, fundo)
+      {type:'bar',label:'Ing. 2026',data:days.map(getQtd26),yAxisID:'yQtd',backgroundColor:'rgba(200,255,0,0.10)',borderColor:'rgba(200,255,0,0.25)',borderWidth:1,order:3},
+      {type:'bar',label:'Ing. 2025',data:days.map(getQtd25),yAxisID:'yQtd',backgroundColor:'rgba(255,255,255,0.04)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,order:4},
+      // Linhas receita (eixo esquerdo, frente)
+      {type:'line',label:'Receita 2026',data:days.map(getRec26),yAxisID:'yRec',borderColor:'#C8FF00',backgroundColor:'rgba(200,255,0,0.06)',borderWidth:2.5,pointRadius:3,fill:true,tension:.35,spanGaps:false,order:1},
+      {type:'line',label:'Receita 2025',data:days.map(getRec25),yAxisID:'yRec',borderColor:'rgba(255,255,255,.3)',borderWidth:1.5,pointRadius:2,fill:false,tension:.35,borderDash:[5,3],order:2}
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:'#1C1C1C',borderColor:'rgba(200,255,0,.25)',borderWidth:1,padding:12,cornerRadius:8,titleColor:'#C8FF00',bodyColor:'#DDD',
+          callbacks:{
+            label: i => {
+              if(i.dataset.label.startsWith('Receita')) return '  ' + i.dataset.label + ': R$ ' + Math.round(i.raw||0).toLocaleString('pt-BR');
+              return '  ' + i.dataset.label + ': ' + Math.round(i.raw||0).toLocaleString('pt-BR') + ' ingressos';
+            }
+          }
+        },
+        annotation:{annotations:execGetTvAnnotations(days)}
+      },
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#AAA',maxTicksLimit:14,font:{size:10}}},
+        yRec:{position:'left',grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#AAA',callback:v=>v>=1e6?'R$'+(v/1e6).toFixed(1)+'M':v>=1000?'R$'+(v/1000).toFixed(0)+'K':'R$'+v}},
+        yQtd:{position:'right',grid:{display:false},ticks:{color:'#555',font:{size:9},callback:v=>v>=1000?Math.round(v/1000)+'K ing':v+' ing'}}
+      }
+    }
+  });
+  const tvLeg = document.getElementById('exec-tvLegVendas');
+  if(tvLeg) tvLeg.style.display = days.some(d=>EXEC_TV_GLOBO.some(t=>t.day26===d))?'flex':'none';
+}
+
+/* ═══ Grafico Investimento ═══ */
+function buildExecInvestChart() {
+  const invest = buildExecD26Invest(execFiltFrom, execFiltTo);
+  const days = execGetAllDays(invest); if(!days.length) return;
+  const view = execCurrentInvestView;
+  const labels = days.map(d => 'D+'+d);
+  const inv26 = d => { const r=invest.find(x=>x.d===d); return r?(r.meta+r.gads):0; };
+  const inv25 = d => { const r=EXEC_D25_INVEST.find(x=>x.d===d); return r?r.v:0; };
+  let d26,d25;
+  if(view==='acumulado'){let s26=0,s25=0; d26=days.map(d=>{s26+=inv26(d);return s26}); d25=days.map(d=>{s25+=inv25(d);return s25});}
+  else{d26=days.map(inv26); d25=days.map(inv25);}
+
+  if(execChartInvest) execChartInvest.destroy();
+  const ctx = document.getElementById('exec-chartInvest')?.getContext('2d');
+  if(!ctx) return;
+  execChartInvest = new Chart(ctx, {
+    type:'line',
+    data:{labels, datasets:[
+      {label:'2026',data:d26,borderColor:'#C8FF00',backgroundColor:'rgba(200,255,0,0.07)',borderWidth:2.5,pointRadius:3,fill:view==='acumulado',tension:.3},
+      {label:'2025 (est.)',data:d25,borderColor:'#555',borderWidth:1.5,pointRadius:2,fill:false,tension:.3,borderDash:[5,3]}
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:'#1C1C1C',borderColor:'rgba(200,255,0,.25)',borderWidth:1,padding:10,cornerRadius:8,titleColor:'#C8FF00',bodyColor:'#DDD',
+          callbacks:{label:i=>' '+i.dataset.label+': R$'+Math.round(i.raw||0).toLocaleString('pt-BR')}},
+        annotation:{annotations:execGetTvAnnotations(days)}
+      },
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#555',maxTicksLimit:12,font:{size:10}}},
+        y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#666',callback:v=>v>=1000?'R$'+(v/1000).toFixed(0)+'K':'R$'+v}}
+      }
+    }
+  });
+}
+
+/* ═══ Conversoes ═══ */
+function renderExecConversoes() {
+  const invest    = buildExecD26Invest(execFiltFrom, execFiltTo);
+  const metaConv  = invest.reduce((s,r)=>s+r.metaConv, 0);
+  const gadsConv  = invest.reduce((s,r)=>s+r.gadsConv, 0);
+  // TikTok: filtra pelo periodo
+  const ttSeries  = TIKTOK_DATA?.daily_series || [];
+  const ttFiltered = execFiltFrom
+    ? ttSeries.filter(d => d.date >= execFiltFrom && d.date <= (execFiltTo||'9999-12-31'))
+    : ttSeries;
+  const tiktokConv = ttFiltered.reduce((s,d)=>s+(d.purchases||0), 0);
+  const adsConv   = metaConv + gadsConv + tiktokConv;
+  const totalInv  = invest.reduce((s,r)=>s+(r.meta+r.gads), 0);
+
+  // Total ingressos vendidos (planilha) no periodo
+  const days2  = execGetAllDays(invest);
+  const minD   = days2.length ? days2[0] : 1;
+  const maxD   = days2.length ? days2[days2.length-1] : 1;
+  const ingTot = D26_FULL.filter(r=>r.d>=minD&&r.d<=maxD).reduce((s,r)=>s+r.mq+r.aq, 0);
+
+  // Organico = ingressos totais - ADS (Meta + Google + TikTok)
+  const orgConv  = Math.max(0, ingTot - adsConv);
+  const cpaAds   = adsConv > 0 ? totalInv / adsConv : null;
+  const cpaTot   = ingTot  > 0 ? totalInv / ingTot  : null;
+
+  document.getElementById('exec-conv-digital').innerHTML = `
+    <div class="section-title" style="margin-bottom:14px">Convers\u00f5es por Origem</div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">Meta Ads</span>
+      <span class="exec-conv-val">${Math.round(metaConv).toLocaleString('pt-BR')}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">Google Ads</span>
+      <span class="exec-conv-val">${Math.round(gadsConv).toLocaleString('pt-BR')}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label" style="color:rgba(0,191,255,.8)">TikTok Ads <span style="font-size:.6rem;color:#555">manual</span></span>
+      <span class="exec-conv-val" style="color:rgba(0,191,255,.9)">${tiktokConv > 0 ? tiktokConv.toLocaleString('pt-BR') : '\u2014'}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">Org\u00e2nico / Direto / Outros <span style="font-size:.6rem;color:#666">(ingressos \u2212 ADS)</span></span>
+      <span class="exec-conv-val" style="color:var(--text2)">${ingTot>0 ? orgConv.toLocaleString('pt-BR') : '\u2014'}</span>
+    </div>
+    <div class="exec-conv-row" style="border-top:1px solid rgba(200,255,0,.15);margin-top:4px;padding-top:10px">
+      <span class="exec-conv-label"><strong>Total Ingressos</strong> <span style="font-size:.6rem;color:#666">planilha</span></span>
+      <span class="exec-conv-val" style="color:var(--lime)">${ingTot>0 ? ingTot.toLocaleString('pt-BR') : '\u2014'}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">CPA (ADS)</span>
+      <span class="exec-conv-val">${cpaAds ? execFmtFull(cpaAds) : '\u2014'}</span>
+    </div>
+  `;
+
+  const s26 = D26_FULL.filter(r=>r.d>=minD&&r.d<=maxD).reduce((a,r)=>({mq:a.mq+r.mq,aq:a.aq+r.aq,mv:a.mv+r.mv,av:a.av+r.av}),{mq:0,aq:0,mv:0,av:0});
+  const ing = s26.mq + s26.aq;
+  const tktMedio = ing > 0 ? (s26.mv + s26.av) / ing : 0;
+
+  document.getElementById('exec-conv-totals').innerHTML = `
+    <div class="section-title" style="margin-bottom:14px">Ingressos Vendidos</div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">\ud83c\udfcd\ufe0f Motos</span>
+      <span class="exec-conv-val">${s26.mq.toLocaleString('pt-BR')}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">\ud83d\ude97 Autos</span>
+      <span class="exec-conv-val">${s26.aq.toLocaleString('pt-BR')}</span>
+    </div>
+    <div class="exec-conv-row" style="border-top:1px solid rgba(200,255,0,.15);margin-top:4px;padding-top:10px">
+      <span class="exec-conv-label"><strong>Total</strong></span>
+      <span class="exec-conv-val" style="color:var(--lime)">${ing.toLocaleString('pt-BR')}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">Ticket M\u00e9dio</span>
+      <span class="exec-conv-val">${ing > 0 ? execFmtFull(tktMedio) : '\u2014'}</span>
+    </div>
+  `;
+}
+
+/* ═══ Filtro executivo ═══ */
+function applyExecFilter() {
+  const de  = document.getElementById('execFiltDE')?.value;
+  const ate = document.getElementById('execFiltATE')?.value;
+  if(!de || !ate || de > ate) return;
+  execFiltFrom = de; execFiltTo = ate;
+  document.querySelectorAll('.exec-btn-filter').forEach(b=>b.classList.remove('active'));
+  const lbl = document.getElementById('exec-filter-period-label');
+  if(lbl) {
+    const f = new Date(de+'T12:00:00'), t = new Date(ate+'T12:00:00');
+    lbl.textContent = f.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','')+' \u2013 '+t.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','');
+  }
+  renderPainelExecutivo();
+}
+
+function setExecPreset(id) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const iso = d => d.toISOString().slice(0,10);
+  const daysAgo = n => { const d=new Date(today); d.setDate(d.getDate()-n); return d; };
+  let from, to = today;
+  if(id==='7d')   from = daysAgo(6);
+  if(id==='14d')  from = daysAgo(13);
+  if(id==='30d')  from = daysAgo(29);
+  if(id==='camp') { execFiltFrom=null; execFiltTo=null; }
+  else            { execFiltFrom=iso(from); execFiltTo=iso(to); }
+  document.querySelectorAll('.exec-btn-filter').forEach(b=>b.classList.remove('active'));
+  const btn = document.getElementById('exec-btn-'+id); if(btn) btn.classList.add('active');
+  if(execFiltFrom) {
+    document.getElementById('execFiltDE').value  = execFiltFrom;
+    document.getElementById('execFiltATE').value = execFiltTo;
+  } else {
+    document.getElementById('execFiltDE').value  = '';
+    document.getElementById('execFiltATE').value = '';
+  }
+  const lbl = document.getElementById('exec-filter-period-label');
+  if(lbl) lbl.textContent = id==='camp' ? 'Toda a campanha (31/03 \u2192)' : '';
+  renderPainelExecutivo();
+}
+
+/* ═══ Render completo do Painel Executivo ═══ */
+function renderPainelExecutivo() {
+  renderExecHojeOntem();
+  renderExecKPIs();
+  buildExecDplusBar();
+  buildExecVendasChart();
+  buildExecInvestChart();
+  renderExecConversoes();
+  const now = new Date();
+  const ds2 = now.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const el = document.getElementById('execFooterDate'); if(el) el.textContent = 'Gerado em '+ds2;
+}
+
+function execSetVendasMetric(metric, btn) {
+  document.querySelectorAll('.exec-metric-pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); execCurrentVendasMetric=metric; buildExecVendasChart();
+}
+function execSetInvestView(view, btn) {
+  btn.closest('.pill-group').querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); execCurrentInvestView=view; buildExecInvestChart();
+}
+
+/* ═══ D+N shortcuts ═══ */
+function buildExecDplusBar() {
+  const bar = document.getElementById('exec-dplus-bar');
+  if(!bar) return;
+  const allDays = D26_FULL.map(r=>r.d).filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b);
+  if(!allDays.length) { bar.innerHTML='<span class="exec-dplus-label">Dia exato:</span><span style="font-size:.72rem;color:#555">sem dados ainda</span>'; return; }
+
+  const maxDay = allDays[allDays.length-1];
+  // Organiza em semanas de 7 dias a partir do D+1
+  const weeks = [];
+  for(let w=0; w*7+1 <= maxDay; w++) {
+    const start = w*7+1;
+    weeks.push({ w, days: Array.from({length:7}, (_,i)=>start+i) });
+  }
+
+  const activeIso = (execFiltFrom && execFiltFrom===execFiltTo) ? execFiltFrom : null;
+
+  const weeksHtml = weeks.map(({w, days}) => {
+    const btns = days.map(d => {
+      if(d > maxDay || !allDays.includes(d)) {
+        return `<button class="exec-dplus-btn empty">\u2014</button>`;
+      }
+      const dt  = execDateOf26Day(d);
+      const iso = dt.toISOString().slice(0,10);
+      const lbl = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+      const isActive = activeIso === iso ? ' active' : '';
+      return `<button class="exec-dplus-btn${isActive}" id="exec-dplus-${d}" onclick="setExecDayPreset(${d},'${iso}')" title="${lbl}">D+${d}</button>`;
+    }).join('');
+    return `<div class="exec-dplus-week"><span class="exec-dplus-week-lbl">S${w+1}</span>${btns}</div>`;
+  }).join('');
+
+  bar.innerHTML = `<span class="exec-dplus-label">Dia exato</span><div class="exec-dplus-weeks">${weeksHtml}</div>`;
+}
+function setExecDayPreset(d, iso) {
+  execFiltFrom = iso; execFiltTo = iso;
+  document.querySelectorAll('.exec-btn-filter').forEach(b=>b.classList.remove('active'));
+  document.getElementById('execFiltDE').value  = iso;
+  document.getElementById('execFiltATE').value = iso;
+  const dt = execDateOf26Day(d);
+  const lbl = document.getElementById('exec-filter-period-label');
+  if(lbl) lbl.textContent = 'D+'+d+' \u00b7 '+dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','');
+  renderPainelExecutivo();
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+Chart.defaults.color='#555';
+Chart.defaults.font.family="'Inter',sans-serif";
+
+function initDashboard(){
+  Promise.allSettled([fetchSheet(), fetchGAdsData(), fetchMetaData()])
+    .then(()=>{
+      tiktokLoad();
+      renderPainelExecutivo();
+      const dt=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      document.getElementById('genDate').textContent=dt;
+      document.getElementById('execFooterDate').textContent=dt;
+    });
+  setInterval(()=>{
+    Promise.allSettled([fetchGAdsData(), fetchMetaData()])
+      .then(()=>{ renderPainelExecutivo(); });
+  },30000);
+}
+
+// Auto-start if already authenticated
+if(sessionStorage.getItem(_AUTH_KEY)==='1'){
+  document.getElementById('loginOverlay').style.display='none';
+  initDashboard();
+}
+</script>
+</body>
+</html>
