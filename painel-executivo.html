@@ -56,7 +56,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .exec-meta-label{font-size:.62rem;color:#666;text-transform:uppercase;letter-spacing:.06em}
 .exec-meta-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;color:var(--text2)}
 .exec-tv-row{font-size:.7rem;color:var(--warn);margin-top:8px;display:flex;align-items:center;gap:5px}
-.exec-kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:6px}
+.exec-kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:6px}
 .exec-kpi{background:var(--card);border:1px solid var(--lime-border);border-radius:var(--radius);padding:20px 22px;box-shadow:0 0 0 1px rgba(200,255,0,0.08)}
 .exec-kpi-label{font-size:.68rem;color:#999;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:5px}
 .exec-kpi-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:2rem;color:var(--text);line-height:1;margin-bottom:4px}
@@ -776,6 +776,8 @@ function renderExecKPIs() {
     const abaixo = ratio < 1;
     ctxEl.innerHTML = `<span>\ud83d\udca1</span><span>O ritmo de investimento em ADS est\u00e1 <strong style="color:${abaixo?'var(--lime)':'var(--warn)'}">${abaixo?'abaixo':'acima'} do mesmo per\u00edodo de 2025</strong> (${(ratio*100).toFixed(0)}% do ritmo 2025). ${abaixo?'Isso \u00e9 <strong>intencional</strong>: a campanha de 2026 tem mais dias de dura\u00e7\u00e3o, distribuindo o budget de forma mais gradual.':'O investimento est\u00e1 acelerado em rela\u00e7\u00e3o a 2025.'}</span>`;
   }
+  const receitaTotalCamp = D26.reduce((s,r)=>s+(r.mv||0)+(r.av||0),0);
+  document.getElementById('exec-kpi-receita-total').textContent = receitaTotalCamp>0 ? 'R$ '+receitaTotalCamp.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) : '—';
 }
 
 /* ═══ Grafico Vendas ═══ */
