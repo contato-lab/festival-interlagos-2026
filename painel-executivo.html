@@ -670,8 +670,11 @@ function renderExecHojeOntem() {
     const r = invest.find(x=>x.d===day);
     return {total: r?(r.meta+r.gads):0, conv: r?(r.metaConv+r.gadsConv):0};
   };
+  const getReceita = day => { const r = D26.find(x=>x.d===day); return r ? (r.mv||0)+(r.av||0) : 0; };
   const ontem = getInv(execDayOf26(yStr));
   const hoje  = getInv(execDayOf26(todayStr));
+  const receitaOntem = getReceita(execDayOf26(yStr));
+  const receitaHoje  = getReceita(execDayOf26(todayStr));
   const total = invest.reduce((s,r)=>s+(r.meta+r.gads),0);
   const totalConv = invest.reduce((s,r)=>s+(r.metaConv+r.gadsConv),0);
   const dias = invest.length;
@@ -683,6 +686,7 @@ function renderExecHojeOntem() {
   document.getElementById('exec-card-ontem').innerHTML = `
     <div class="exec-card-label">Ontem</div>
     <div class="exec-card-date">${execFmtDate(new Date(yStr+'T12:00:00'))}</div>
+    ${receitaOntem>0?`<div style="font-size:.65rem;color:#aaa;text-transform:uppercase;letter-spacing:.07em;margin-bottom:1px">Receita Total</div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#4dff91;line-height:1;margin-bottom:8px">${execFmtFull(receitaOntem)}</div>`:''}
     <div class="exec-val-big">${execFmtFull(ontem.total)}</div>
     <div class="exec-meta-row">
       <div class="exec-meta-item"><span class="exec-meta-label">Investimento ADS</span></div>
@@ -697,6 +701,7 @@ function renderExecHojeOntem() {
   document.getElementById('exec-card-hoje').innerHTML = `
     <div class="exec-card-label">Hoje <span style="color:var(--warn);font-size:.65rem">\u25cf PARCIAL</span></div>
     <div class="exec-card-date">${execFmtDate(today)}</div>
+    ${receitaHoje>0?`<div style="font-size:.65rem;color:#aaa;text-transform:uppercase;letter-spacing:.07em;margin-bottom:1px">Receita Total</div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#4dff91;line-height:1;margin-bottom:8px">${execFmtFull(receitaHoje)}</div>`:''}
     <div class="exec-val-big partial">${execFmtFull(hoje.total)}</div>
     <div class="exec-meta-row">
       <div class="exec-meta-item"><span class="exec-meta-label">Investimento ADS</span></div>
