@@ -974,8 +974,8 @@ function setExecPreset(id) {
     document.getElementById('execFiltDE').value  = execFiltFrom;
     document.getElementById('execFiltATE').value = execFiltTo;
   } else {
-    document.getElementById('execFiltDE').value  = '';
-    document.getElementById('execFiltATE').value = '';
+    document.getElementById('execFiltDE').value  = '2026-03-30';
+    document.getElementById('execFiltATE').value = new Date().toISOString().slice(0,10);
   }
   const lbl = document.getElementById('exec-filter-period-label');
   if(lbl) lbl.textContent = id==='camp' ? 'Toda a campanha (31/03 \u2192)' : '';
