@@ -175,6 +175,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   <!-- Filtro de periodo executivo -->
   <div class="exec-filter-bar">
     <span class="exec-filter-label">Periodo:</span>
+    <button class="exec-btn-filter" id="exec-btn-hoje"  onclick="setExecPreset('hoje')">Hoje</button>
+    <button class="exec-btn-filter" id="exec-btn-ontem" onclick="setExecPreset('ontem')">Ontem</button>
     <button class="exec-btn-filter" id="exec-btn-7d"  onclick="setExecPreset('7d')">7 dias</button>
     <button class="exec-btn-filter" id="exec-btn-14d" onclick="setExecPreset('14d')">14 dias</button>
     <button class="exec-btn-filter" id="exec-btn-30d" onclick="setExecPreset('30d')">30 dias</button>
@@ -959,6 +961,8 @@ function setExecPreset(id) {
   const iso = d => d.toISOString().slice(0,10);
   const daysAgo = n => { const d=new Date(today); d.setDate(d.getDate()-n); return d; };
   let from, to = today;
+  if(id==='hoje')  { from = today; to = today; }
+  if(id==='ontem') { from = daysAgo(1); to = daysAgo(1); }
   if(id==='7d')   from = daysAgo(6);
   if(id==='14d')  from = daysAgo(13);
   if(id==='30d')  from = daysAgo(29);
