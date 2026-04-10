@@ -1,32 +1,21 @@
 {
-  "updated_at": "2026-04-09T23:56:34.082924+00:00",
+  "updated_at": "2026-04-10T02:00:38.298550+00:00",
   "property_id": "378336436",
   "period": {
-    "start": "2026-01-09",
-    "end": "2026-04-08"
+    "start": "2026-01-10",
+    "end": "2026-04-09"
   },
   "totals": {
-    "sessions": 130617,
-    "users": 108798,
-    "new_users": 85913,
-    "pageviews": 434637,
-    "events": 985535,
-    "conversions": 1228.0,
-    "pages_per_session": 3.33,
-    "avg_bounce_rate": 55.16
+    "sessions": 136994,
+    "users": 114671,
+    "new_users": 90988,
+    "pageviews": 448459,
+    "events": 1022447,
+    "conversions": 1343.0,
+    "pages_per_session": 3.27,
+    "avg_bounce_rate": 55.09
   },
   "daily_series": [
-    {
-      "date": "2026-01-09",
-      "sessions": 113,
-      "users": 105,
-      "new_users": 82,
-      "pageviews": 125,
-      "events": 396,
-      "conversions": 0.0,
-      "bounce_rate": 52.21,
-      "avg_session_s": 106.9
-    },
     {
       "date": "2026-01-10",
       "sessions": 69,
@@ -1005,52 +994,63 @@
       "conversions": 161.0,
       "bounce_rate": 43.81,
       "avg_session_s": 159.8
+    },
+    {
+      "date": "2026-04-09",
+      "sessions": 6490,
+      "users": 5978,
+      "new_users": 5157,
+      "pageviews": 13947,
+      "events": 37308,
+      "conversions": 115.0,
+      "bounce_rate": 46.16,
+      "avg_session_s": 154.0
     }
   ],
   "traffic_sources": [
     {
       "channel": "Direct",
-      "sessions": 27891,
-      "conversions": 606.0
+      "sessions": 31127,
+      "conversions": 691.0
     },
     {
       "channel": "Paid Social",
-      "sessions": 27749,
-      "conversions": 0.0
+      "sessions": 28494,
+      "conversions": 1.0
     },
     {
       "channel": "Organic Search",
-      "sessions": 22622,
+      "sessions": 22700,
       "conversions": 12.0
     },
     {
       "channel": "Unassigned",
-      "sessions": 16681,
-      "conversions": 5.0
+      "sessions": 17039,
+      "conversions": 6.0
     },
     {
       "channel": "Organic Social",
-      "sessions": 15243,
+      "sessions": 16649,
       "conversions": 2.0
     },
     {
       "channel": "Paid Search",
-      "sessions": 11062,
+      "sessions": 11769,
       "conversions": 5.0
     },
     {
       "channel": "Referral",
-      "sessions": 7823,
-      "conversions": 598.0
+      "sessions": 8178,
+      "conversions": 626.0
     },
     {
       "channel": "Paid Other",
-      "sessions": 190,
+      "sessions": 203,
       "conversions": 0.0
     },
     {
       "channel": "Cross-network",
-      "sessions": 109,
+      "sessions": 111,
       "conversions": 0.0
     },
     {
@@ -1067,61 +1067,56 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 200627,
-      "sessions": 100730
+      "pageviews": 204409,
+      "sessions": 103370
     },
     {
       "page": "/ingressos/",
-      "pageviews": 38403,
-      "sessions": 19455
+      "pageviews": 38509,
+      "sessions": 19781
     },
     {
       "page": "/vendas/ingressos/ride-pass",
-      "pageviews": 28575,
-      "sessions": 9313
+      "pageviews": 28633,
+      "sessions": 9489
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-moto",
-      "pageviews": 17618,
-      "sessions": 11419
+      "pageviews": 19378,
+      "sessions": 12931
     },
     {
       "page": "/vendas/ingressos/sport-pass",
-      "pageviews": 13413,
-      "sessions": 6291
-    },
-    {
-      "page": "/conta/informacoes/",
-      "pageviews": 12735,
-      "sessions": 5133
-    },
-    {
-      "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 12697,
-      "sessions": 5567
-    },
-    {
-      "page": "/cadastro.php",
-      "pageviews": 12120,
-      "sessions": 8103
-    },
-    {
-      "page": "/carrinho/index",
-      "pageviews": 11732,
-      "sessions": 3653
+      "pageviews": 12998,
+      "sessions": 6325
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026",
-      "pageviews": 11329,
-      "sessions": 10365
+      "pageviews": 12879,
+      "sessions": 12180
+    },
+    {
+      "page": "/vendas/ingressos/drive-pass",
+      "pageviews": 12566,
+      "sessions": 5661
+    },
+    {
+      "page": "(other)",
+      "pageviews": 12525,
+      "sessions": 11009
+    },
+    {
+      "page": "/conta/informacoes/",
+      "pageviews": 12322,
+      "sessions": 5032
+    },
+    {
+      "page": "/cadastro.php",
+      "pageviews": 12019,
+      "sessions": 8086
     }
   ],
   "sessions_by_date": {
-    "2026-02-22": {
-      "Busca Orgânica": 60,
-      "Social Orgânico": 28,
-      "Direto pelo Link": 6
-    },
     "2026-02-23": {
       "Busca Orgânica": 101,
       "Social Orgânico": 36,
@@ -1346,32 +1341,37 @@
       "Direto pelo Link": 5094,
       "Social Orgânico": 387,
       "Busca Orgânica": 334
+    },
+    "2026-04-09": {
+      "Direto pelo Link": 3286,
+      "Social Orgânico": 1299,
+      "Busca Orgânica": 154
     }
   },
   "influencer_breakdown": [
     {
       "source": "perfilfestival",
-      "sessions": 15167,
+      "sessions": 15501,
       "conversions": 0,
       "tickets": {
-        "Ride Pass": 1508,
-        "Sport Pass": 1646,
-        "Drive Pass": 1099
+        "Ride Pass": 1530,
+        "Sport Pass": 1666,
+        "Drive Pass": 1124
       }
     },
     {
       "source": "dinamize",
-      "sessions": 434,
+      "sessions": 438,
       "conversions": 0,
       "tickets": {
         "Ride Pass": 76,
-        "Sport Pass": 43,
-        "Drive Pass": 28
+        "Sport Pass": 46,
+        "Drive Pass": 29
       }
     },
     {
       "source": "ElianaMalizia",
-      "sessions": 263,
+      "sessions": 264,
       "conversions": 0,
       "tickets": {
         "Ride Pass": 29,
@@ -1381,7 +1381,7 @@
     },
     {
       "source": "fullpower",
-      "sessions": 208,
+      "sessions": 214,
       "conversions": 0,
       "tickets": {
         "Drive Pass": 12,
@@ -1391,11 +1391,20 @@
     },
     {
       "source": "Vans",
-      "sessions": 192,
+      "sessions": 193,
       "conversions": 0,
       "tickets": {
         "Ride Pass": 16,
         "Sport Pass": 11
+      }
+    },
+    {
+      "source": "AmandaP",
+      "sessions": 153,
+      "conversions": 0,
+      "tickets": {
+        "Ride Pass": 9,
+        "Sport Pass": 3
       }
     },
     {
@@ -1409,20 +1418,11 @@
     },
     {
       "source": "RodrigoRateiro",
-      "sessions": 130,
+      "sessions": 133,
       "conversions": 0,
       "tickets": {
         "Sport Pass": 8,
         "Ride Pass": 7
-      }
-    },
-    {
-      "source": "AmandaP",
-      "sessions": 113,
-      "conversions": 0,
-      "tickets": {
-        "Ride Pass": 7,
-        "Sport Pass": 1
       }
     },
     {
@@ -1436,11 +1436,11 @@
     },
     {
       "source": "RafaelTogni",
-      "sessions": 67,
+      "sessions": 75,
       "conversions": 0,
       "tickets": {
         "Ride Pass": 10,
-        "Sport Pass": 4
+        "Sport Pass": 5
       }
     },
     {
@@ -1467,20 +1467,20 @@
       }
     },
     {
+      "source": "DaianeGaia",
+      "sessions": 36,
+      "conversions": 0,
+      "tickets": {
+        "Ride Pass": 5,
+        "Sport Pass": 2
+      }
+    },
+    {
       "source": "EduardoBernasconi",
       "sessions": 33,
       "conversions": 0,
       "tickets": {
         "Drive Pass": 2,
-        "Sport Pass": 1
-      }
-    },
-    {
-      "source": "DaianeGaia",
-      "sessions": 29,
-      "conversions": 0,
-      "tickets": {
-        "Ride Pass": 4,
         "Sport Pass": 1
       }
     },
@@ -1495,7 +1495,7 @@
     },
     {
       "source": "RodolfinhoZ",
-      "sessions": 26,
+      "sessions": 29,
       "conversions": 0,
       "tickets": {
         "Ride Pass": 6,
@@ -1504,7 +1504,7 @@
     },
     {
       "source": "DanielD2",
-      "sessions": 20,
+      "sessions": 26,
       "conversions": 0,
       "tickets": {
         "Ride Pass": 6,
@@ -1513,7 +1513,7 @@
     },
     {
       "source": "lucasxaparral",
-      "sessions": 9,
+      "sessions": 14,
       "conversions": 0,
       "tickets": {}
     },
