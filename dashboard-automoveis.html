@@ -1070,6 +1070,7 @@ function initDashboard(){
 
   _upd2026Lbl();
   fetchSheet().then(() => fetchTicketmaster());
+  setInterval(fetchTicketmaster, 60000);
 
   setInterval(() => {
     fetchSheet().then(() => fetchTicketmaster()); updateLastRefreshTime();

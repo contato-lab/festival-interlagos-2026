@@ -2029,6 +2029,7 @@ function initDashboard(){
   _upd2026Lbl();
   Promise.allSettled([fetchSheet(), fetchGA4Data(), fetchGAdsData(), fetchMetaData()])
     .then(() => { fetchTicketmaster(); });
+  setInterval(fetchTicketmaster, 60000);
   
   // Auto-refresh a cada 30 segundos
   setInterval(() => {
