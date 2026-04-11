@@ -875,8 +875,11 @@ function renderExecKPIs() {
   // Total 2025 (faturamento full do festival inteiro — 94 dias)
   const tot2025El = document.getElementById('exec-kpi-receita-total-2025');
   if (tot2025El && typeof D25 !== 'undefined') {
-    const total2025 = D25.reduce((s,r)=>s+(r.mv||0)+(r.av||0),0);
-    tot2025El.textContent = 'Total 2025: R$ ' + total2025.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+    const total2025   = D25.reduce((s,r)=>s+(r.mv||0)+(r.av||0),0);
+    const ingr2025    = D25.reduce((s,r)=>s+(r.mq||0)+(r.aq||0),0);
+    tot2025El.innerHTML =
+      'Total 2025: R$ ' + total2025.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) +
+      ' &middot; ' + ingr2025.toLocaleString('pt-BR') + ' ingressos';
   }
 }
 
