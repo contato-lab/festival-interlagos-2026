@@ -645,7 +645,11 @@ function setFiltro(tipo,btn){
   else if(tipo==='7d'){de=new Date(hoje.getTime()-6*86400000);ate=new Date(hoje);}
   else if(tipo==='14d'){de=new Date(hoje.getTime()-13*86400000);ate=new Date(hoje);}
   else if(tipo==='30d'){de=new Date(hoje.getTime()-29*86400000);ate=new Date(hoje);}
-  else if(tipo==='tudo'){de=dToDate(D26_FULL[0]?.d||1);ate=dToDate(D26_FULL[D26_FULL.length-1]?.d||1);}
+  else if(tipo==='tudo'){
+    de=dToDate(D26_FULL[0]?.d||1);
+    const ultimoD=D26_FULL[D26_FULL.length-1]?.d;
+    ate=ultimoD?dToDate(ultimoD):new Date(hoje);
+  }
   if(tipo!=='custom'&&de&&ate){
     document.getElementById('filtroDE').value=dateToIso(de);
     document.getElementById('filtroATE').value=dateToIso(ate);
@@ -667,13 +671,13 @@ function applyFiltro(){
 
 function initFiltro(){
   D26_FULL=[...D26];
-  const dMin=D26_FULL[0]?.d||1;
-  const dMax=D26_FULL[D26_FULL.length-1]?.d||1;
-  const dateMax=dToDate(dMax);
-  const dateMin=dToDate(dMin);
-  document.getElementById('filtroATE').value=dateToIso(dateMax);
+  // Defaults baseados na data de HOJE (14 dias até hoje), limitado a DATA_INICIO
+  const hoje=new Date();hoje.setHours(0,0,0,0);
+  const minDate=new Date(DATA_INICIO);
+  const dateMax=hoje<minDate?minDate:hoje;
   const de14=new Date(dateMax.getTime()-13*86400000);
-  document.getElementById('filtroDE').value=dateToIso(de14<dateMin?dateMin:de14);
+  document.getElementById('filtroATE').value=dateToIso(dateMax);
+  document.getElementById('filtroDE').value=dateToIso(de14<minDate?minDate:de14);
 }
 
 // ═══════════════════════════════════════════════
@@ -730,8 +734,16 @@ function buildComp() {
     return`${d}/${m}`;
   });
   const s25=getSeries(D25,metricAtiva);
-  const s26raw=getSeries(D26,metricAtiva);
-  const s26=Array(n).fill(null).map((_,i)=>i<s26raw.length?s26raw[i]:null);
+  // Posiciona cada ponto de D26 no indice correto do grafico (d-1),
+  // respeitando filtro (dias nao contidos ficam null)
+  const s26=Array(n).fill(null);
+  D26.forEach(r=>{
+    const i=r.d-1;
+    if(i<0||i>=n)return;
+    if(metricAtiva==='receita')        s26[i]=r.av||0;
+    else if(metricAtiva==='ingressos') s26[i]=r.aq||0;
+    else if(metricAtiva==='tkt')       s26[i]=(r.aq>0)?(r.av/r.aq):null;
+  });
   const datasets = [];
   if (anoVisivel['2025']) datasets.push({
     label:'2025', data:s25,
@@ -742,7 +754,7 @@ function buildComp() {
     pointHoverBackgroundColor:'#FFF', pointHoverBorderColor:'#C8FF00', pointHoverBorderWidth:2
   });
   if (anoVisivel['2026']) datasets.push({
-    label:'2026 (demo)', data:s26,
+    label:'2026', data:s26,
     borderColor:'#7B2D8B', backgroundColor:'rgba(123,45,139,0.08)',
     borderWidth:2.5, tension:0.35, fill:true,
     pointRadius:3, pointHoverRadius:7,
@@ -785,7 +797,8 @@ function buildComp() {
             label: ctx => {
               const idx = ctx.dataIndex;
               const is26 = ctx.dataset.label.includes('2026');
-              const row = is26 ? D26[idx] : D25[idx];
+              // D26 pode ter gaps por filtro: busca pela d=idx+1 (D+1 = index 0)
+              const row = is26 ? D26.find(r=>r.d===idx+1) : D25[idx];
               if (!row) return null;
               const mq=row.mq||0, aq=row.aq||0, mv=row.mv||0, av=row.av||0;
               const ing = aq;
@@ -950,7 +963,7 @@ async function fetchTicketmaster() {
 
     D26_FULL.sort((a,b) => a.d - b.d);
     if (document.getElementById('demoBadge')) document.getElementById('demoBadge').style.display = 'none';
-    applyFiltro(); buildEdicao();
+    applyFiltro();
     console.log('TM conectada:', data.daily.length, 'dias');
   } catch(e) { console.warn('fetchTicketmaster erro:', e.message); }
 }
@@ -1039,7 +1052,7 @@ async function fetchSheet() {
     D26.length = 0; allDays.forEach(r => D26.push(r));
     D26_FULL = [...D26];
     document.getElementById('demoBadge').style.display = 'none';
-    calcKPIs(); buildComp(); buildEdicao();
+    applyFiltro();
     console.log('✅ Google Sheets conectado:', allDays.length, 'dias de ' + (currentWeek + 1) + ' semana(s)');
   }
 }
