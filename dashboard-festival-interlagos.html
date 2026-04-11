@@ -1882,7 +1882,7 @@ async function fetchTicketmaster() {
       };
     });
 
-    D26.forEach(r => {
+    D26_FULL.forEach(r => {
       const tm = tmByDay[r.d] || {mt:0, at:0, mtQ:0, atQ:0};
       r.mt  = tm.mt;  r.at  = tm.at;
       r.mtQ = tm.mtQ; r.atQ = tm.atQ;
@@ -1894,17 +1894,16 @@ async function fetchTicketmaster() {
 
     Object.entries(tmByDay).forEach(([dayStr, tm]) => {
       const d = parseInt(dayStr);
-      if (!D26.find(r => r.d === d) && (tm.mt || tm.at)) {
-        D26.push({ d, mp:0, mt:tm.mt, ap:0, at:tm.at,
+      if (!D26_FULL.find(r => r.d === d) && (tm.mt || tm.at)) {
+        D26_FULL.push({ d, mp:0, mt:tm.mt, ap:0, at:tm.at,
           mv:tm.mt, av:tm.at, mq:tm.mtQ, aq:tm.atQ,
           mpQ:0, mtQ:tm.mtQ, apQ:0, atQ:tm.atQ });
       }
     });
 
-    D26.sort((a,b) => a.d - b.d);
-    D26_FULL = [...D26];
+    D26_FULL.sort((a,b) => a.d - b.d);
     if (document.getElementById('demoBadge')) document.getElementById('demoBadge').style.display = 'none';
-    calcKPIs(); buildComp(); buildEdicao(); buildOrg();
+    applyFiltro();
     console.log('TM conectada:', data.daily.length, 'dias');
   } catch(e) { console.warn('fetchTicketmaster erro:', e.message); }
 }

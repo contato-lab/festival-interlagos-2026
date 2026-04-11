@@ -444,17 +444,17 @@ async function fetchTicketmaster() {
       const d = Math.round((new Date(row.date + 'T00:00:00') - SEMANA_START) / 86400000);
       tmByDay[d] = { mt: row.moto_receita||0, at: row.auto_receita||0, mtQ: row.moto_ingressos||0, atQ: row.auto_ingressos||0 };
     });
-    D26.forEach(r => {
+    D26_FULL.forEach(r => {
       const tm = tmByDay[r.d] || {mt:0,at:0,mtQ:0,atQ:0};
       r.mt=tm.mt; r.at=tm.at; r.mtQ=tm.mtQ; r.atQ=tm.atQ;
       r.mv=r.mp+r.mt; r.av=r.ap+r.at; r.mq=r.mpQ+r.mtQ; r.aq=r.apQ+r.atQ;
     });
     Object.entries(tmByDay).forEach(([dayStr, tm]) => {
       const d = parseInt(dayStr);
-      if (!D26.find(r => r.d===d) && (tm.mt||tm.at))
-        D26.push({d,mp:0,mt:tm.mt,ap:0,at:tm.at,mv:tm.mt,av:tm.at,mq:tm.mtQ,aq:tm.atQ,mpQ:0,mtQ:tm.mtQ,apQ:0,atQ:tm.atQ});
+      if (!D26_FULL.find(r => r.d===d) && (tm.mt||tm.at))
+        D26_FULL.push({d,mp:0,mt:tm.mt,ap:0,at:tm.at,mv:tm.mt,av:tm.at,mq:tm.mtQ,aq:tm.atQ,mpQ:0,mtQ:tm.mtQ,apQ:0,atQ:tm.atQ});
     });
-    D26.sort((a,b)=>a.d-b.d); D26_FULL=[...D26];
+    D26_FULL.sort((a,b)=>a.d-b.d);
     renderPainelExecutivo();
     console.log('TM conectada:', data.daily.length, 'dias');
   } catch(e) { console.warn('fetchTicketmaster erro:', e.message); }
