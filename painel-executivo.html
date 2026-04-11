@@ -882,12 +882,16 @@ function renderExecKPIs() {
       'Total 2025: R$ ' + total2025.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) +
       ' &middot; ' + ingr2025.toLocaleString('pt-BR') + ' ingressos';
 
-    // % do acumulado 2026 vs total 2025
+    // % do acumulado 2026 vs total 2025 (com contexto de dias decorridos)
     const pctEl = document.getElementById('exec-kpi-receita-total-pct');
     if (pctEl && total2025>0 && receitaTotalCamp>0) {
       const pct = (receitaTotalCamp/total2025*100);
-      pctEl.innerHTML = '<span style="color:var(--lime)">' + pct.toFixed(1).replace('.',',') + '%</span>' +
-        '<span style="color:var(--text3);font-weight:400"> do total 2025</span>';
+      // Quantos dias de campanha 2026 ja se passaram
+      const diasDecorridos = D26.length;
+      pctEl.innerHTML =
+        '<span style="color:var(--text3);font-weight:400">Em ' + diasDecorridos + ' dias, ja atingiu </span>' +
+        '<span style="color:var(--lime)">' + pct.toFixed(1).replace('.',',') + '%</span>' +
+        '<span style="color:var(--text3);font-weight:400"> do total 2025 (94 dias)</span>';
     } else if (pctEl) {
       pctEl.textContent = '—';
     }
