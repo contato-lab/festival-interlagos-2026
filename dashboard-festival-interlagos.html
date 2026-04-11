@@ -1499,7 +1499,7 @@ function buildGA4Funnel(dateFrom, dateTo) {
 
   const maxVal = funnel[0].val || 1;
   // Gradiente lime → purple → green
-  const colors = ['#C8FF00','#A8E600','#8BBF5E','#7B2D8B','#FF6B35','#00FF88'];
+  const colors = ['#4FC3F7','#29B6F6','#8BBF5E','#7B2D8B','#FF6B35','#00FF88'];
 
   funnel.forEach((step, i) => {
     const pctWidth = Math.max((step.val / maxVal * 100), 5);
