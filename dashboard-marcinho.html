@@ -326,6 +326,7 @@ footer{
       <div class="kpi-value lime" id="kpiReceita">—</div>
       <div class="kpi-delta neu" id="kpiReceitaDelta">vs 2025</div>
       <div class="kpi-sub">Auto + Moto</div>
+      <div class="kpi-sub" id="kpiReceita2025Total" style="margin-top:4px;font-size:.68rem;color:var(--text3);opacity:.75">Total 2025: —</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">🏍️ Receita Motos</div>
@@ -942,6 +943,13 @@ function renderKPIs(days26) {
   document.getElementById('kpiMotos').textContent    = has26Sales ? fmt(s26.mv) : '—';
   document.getElementById('kpiAutos').textContent    = has26Sales ? fmt(s26.av) : '—';
   document.getElementById('kpiIngressos').textContent= has26Sales ? fmtInt(ing26) : '—';
+
+  // Total 2025 (faturamento full do festival inteiro — 94 dias)
+  const total2025El = document.getElementById('kpiReceita2025Total');
+  if (total2025El) {
+    const total2025 = D25.reduce((a,r)=>a+(r.mv||0)+(r.av||0),0);
+    total2025El.textContent = 'Total 2025: ' + fmt(total2025);
+  }
 
   if (has26Sales) {
     setDelta('kpiReceitaDelta', rec26, rec25);
