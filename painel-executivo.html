@@ -209,7 +209,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="exec-kpi-label">Receita Acumulada</div>
       <div id="exec-kpi-receita-total" class="exec-kpi-val">&mdash;</div>
       <div id="exec-kpi-receita-total-2025" style="margin-top:6px;font-size:.7rem;color:var(--text3);opacity:.75;letter-spacing:.02em">Total 2025: &mdash;</div>
-      <div id="exec-kpi-receita-total-pct" style="margin-top:4px;font-size:.72rem;font-weight:600;letter-spacing:.02em">&mdash;</div>
+      <div id="exec-kpi-receita-total-pct" class="exec-kpi-delta" style="margin-top:4px">&mdash;</div>
     </div>
     <div class="exec-kpi">
       <div class="exec-kpi-label">&#127949;&#65039; Receita Motos</div>
@@ -892,15 +892,15 @@ function renderExecKPIs() {
       if (rec25Periodo>0) {
         const pct = ((receitaTotalCamp-rec25Periodo)/rec25Periodo*100);
         const up = pct>=0;
-        const cor = up?'#00FF88':'#FF4444';
         const seta = up?'\u25b2':'\u25bc';
-        pctEl.innerHTML =
-          '<span style="color:' + cor + '">' + seta + ' ' +
-          (up?'+':'') + pct.toFixed(1).replace('.',',') + '% vs 2025</span>';
+        pctEl.className = 'exec-kpi-delta ' + (up?'up':'down');
+        pctEl.textContent = seta + Math.abs(pct).toFixed(1) + '% vs 2025';
       } else {
+        pctEl.className = 'exec-kpi-delta';
         pctEl.textContent = '—';
       }
     } else if (pctEl) {
+      pctEl.className = 'exec-kpi-delta';
       pctEl.textContent = '—';
     }
   }
