@@ -245,7 +245,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 
   <!-- Graficos -->
   <!-- ══ VENDAS MOTOS + AUTOS — Sistema Próprio vs Ticketmaster ══ -->
-  <div class="exec-charts-grid" style="margin-top:24px" id="exec-tm-section">
+  <div class="exec-charts-grid" style="margin-top:12px" id="exec-tm-section">
 
     <!-- Motos -->
     <div class="exec-chart-card">
@@ -263,17 +263,17 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
         <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>Sistema Próprio</div>
         <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#2196F3"></span>Ticket Master</div>
       </div>
-      <canvas id="exec-chartMoto" height="180"></canvas>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
-        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px">
-          <div style="font-size:.62rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:4px">Sistema Próprio</div>
-          <div id="exec-moto-sp-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.25rem;color:#C8FF00">&mdash;</div>
-          <div id="exec-moto-sp-ing" style="font-size:.72rem;color:#666">&mdash;</div>
+      <canvas id="exec-chartMoto" height="100"></canvas>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:8px 12px">
+          <div style="font-size:.58rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:2px">Sistema Próprio</div>
+          <div id="exec-moto-sp-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#C8FF00">&mdash;</div>
+          <div id="exec-moto-sp-ing" style="font-size:.65rem;color:#666">&mdash;</div>
         </div>
-        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px">
-          <div style="font-size:.62rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:4px">Ticket Master</div>
-          <div id="exec-moto-tm-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.25rem;color:#2196F3">&mdash;</div>
-          <div id="exec-moto-tm-ing" style="font-size:.72rem;color:#666">&mdash;</div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:8px 12px">
+          <div style="font-size:.58rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:2px">Ticket Master</div>
+          <div id="exec-moto-tm-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#2196F3">&mdash;</div>
+          <div id="exec-moto-tm-ing" style="font-size:.65rem;color:#666">&mdash;</div>
         </div>
       </div>
     </div>
@@ -290,17 +290,17 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
         <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>Sistema Próprio</div>
         <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#2196F3"></span>Ticket Master</div>
       </div>
-      <canvas id="exec-chartAuto" height="180"></canvas>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
-        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px">
-          <div style="font-size:.62rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:4px">Sistema Próprio</div>
-          <div id="exec-auto-sp-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.25rem;color:#C8FF00">&mdash;</div>
-          <div id="exec-auto-sp-ing" style="font-size:.72rem;color:#666">&mdash;</div>
+      <canvas id="exec-chartAuto" height="100"></canvas>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:8px 12px">
+          <div style="font-size:.58rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:2px">Sistema Próprio</div>
+          <div id="exec-auto-sp-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#C8FF00">&mdash;</div>
+          <div id="exec-auto-sp-ing" style="font-size:.65rem;color:#666">&mdash;</div>
         </div>
-        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px">
-          <div style="font-size:.62rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:4px">Ticket Master</div>
-          <div id="exec-auto-tm-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.25rem;color:#2196F3">&mdash;</div>
-          <div id="exec-auto-tm-ing" style="font-size:.72rem;color:#666">&mdash;</div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:8px 12px">
+          <div style="font-size:.58rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:2px">Ticket Master</div>
+          <div id="exec-auto-tm-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#2196F3">&mdash;</div>
+          <div id="exec-auto-tm-ing" style="font-size:.65rem;color:#666">&mdash;</div>
         </div>
       </div>
     </div>
