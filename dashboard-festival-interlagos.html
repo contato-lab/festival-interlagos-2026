@@ -1570,7 +1570,7 @@ function getMetaSpend(dateStr) {
 // ═══════════════════════════════════════════════
 async function fetchGA4Data() {
   try {
-    const res = await fetch('ga4-data.json?t=' + Date.now());
+    const res = await fetch('ga4-data.json?t=' + Date.now(), {cache:'no-store'});
     if (!res.ok) return;
     const data = await res.json();
     GA4_DATA = data;
