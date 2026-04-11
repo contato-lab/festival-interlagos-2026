@@ -209,6 +209,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="exec-kpi-label">Receita Acumulada</div>
       <div id="exec-kpi-receita-total" class="exec-kpi-val">&mdash;</div>
       <div id="exec-kpi-receita-total-2025" style="margin-top:6px;font-size:.7rem;color:var(--text3);opacity:.75;letter-spacing:.02em">Total 2025: &mdash;</div>
+      <div id="exec-kpi-receita-total-pct" style="margin-top:4px;font-size:.72rem;font-weight:600;letter-spacing:.02em">&mdash;</div>
     </div>
     <div class="exec-kpi">
       <div class="exec-kpi-label">&#127949;&#65039; Receita Motos</div>
@@ -880,6 +881,16 @@ function renderExecKPIs() {
     tot2025El.innerHTML =
       'Total 2025: R$ ' + total2025.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) +
       ' &middot; ' + ingr2025.toLocaleString('pt-BR') + ' ingressos';
+
+    // % do acumulado 2026 vs total 2025
+    const pctEl = document.getElementById('exec-kpi-receita-total-pct');
+    if (pctEl && total2025>0 && receitaTotalCamp>0) {
+      const pct = (receitaTotalCamp/total2025*100);
+      pctEl.innerHTML = '<span style="color:var(--lime)">' + pct.toFixed(1).replace('.',',') + '%</span>' +
+        '<span style="color:var(--text3);font-weight:400"> do total 2025</span>';
+    } else if (pctEl) {
+      pctEl.textContent = '—';
+    }
   }
 }
 
