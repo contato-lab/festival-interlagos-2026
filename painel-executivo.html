@@ -204,6 +204,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     <div class="exec-kpi">
       <div class="exec-kpi-label">Receita do Período</div>
       <div id="exec-kpi-receita"><div class="exec-kpi-val">&mdash;</div></div>
+      <div id="exec-kpi-receita-ingressos" style="margin-top:4px;font-size:.78rem;color:var(--text3);opacity:.85;letter-spacing:.02em">&mdash;</div>
     </div>
     <div class="exec-kpi" style="border:1px solid var(--lime-border)">
       <div class="exec-kpi-label">Receita Acumulada</div>
@@ -220,10 +221,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="exec-kpi-label">&#128663; Receita Autos</div>
       <div id="exec-kpi-autos"><div class="exec-kpi-val">&mdash;</div></div>
       <div id="exec-kpi-autos-2025" style="margin-top:6px;font-size:.7rem;color:var(--text3);opacity:.75;letter-spacing:.02em">Total 2025: &mdash;</div>
-    </div>
-    <div class="exec-kpi">
-      <div class="exec-kpi-label">&#127915;&#65039; Ingressos Vendidos</div>
-      <div id="exec-kpi-ingressos"><div class="exec-kpi-val">&mdash;</div></div>
     </div>
     <div class="exec-kpi" style="border-color:rgba(200,255,0,.15)">
       <div class="exec-kpi-label">&#128184; Investimento ADS</div>
@@ -845,13 +842,11 @@ function renderExecKPIs() {
   setKpi('exec-kpi-motos',   s26.mv,        s25.mv);
   setKpi('exec-kpi-autos',   s26.av,        s25.av);
 
-  const ingEl = document.getElementById('exec-kpi-ingressos');
-  if(ingEl) {
-    const i26=s26.mq+s26.aq, i25=s25.mq+s25.aq;
-    const pct=i25>0?((i26-i25)/i25*100):null;
-    const cls=pct===null?'':pct>=0?'up':'down';
-    const dStr=pct===null?'vs 2025: aguardando':(pct>=0?'\u25b2':'\u25bc')+Math.abs(pct).toFixed(1)+'% vs 2025';
-    ingEl.innerHTML = `<div class="exec-kpi-val">${i26.toLocaleString('pt-BR')}</div><div class="exec-kpi-delta ${cls}">${dStr}</div>`;
+  // Quantidade de ingressos do periodo (subtitulo do card "Receita do Periodo")
+  const ingPeriodoEl = document.getElementById('exec-kpi-receita-ingressos');
+  if(ingPeriodoEl) {
+    const i26 = s26.mq + s26.aq;
+    ingPeriodoEl.textContent = i26>0 ? i26.toLocaleString('pt-BR') + ' ingressos' : '—';
   }
 
   // KPI Investimento ADS com vs 2025
