@@ -302,7 +302,71 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="exec-chart-wrap"><canvas id="exec-chartInvest"></canvas></div>
     </div>
 
-  </div><!-- /exec-charts-grid -->
+  
+</div><!-- /exec-charts-grid -->
+
+  <!-- ══ VENDAS MOTOS + AUTOS — Sistema Próprio vs Ticketmaster ══ -->
+  <div class="exec-charts-grid" style="margin-top:24px" id="exec-tm-section">
+
+    <!-- Motos -->
+    <div class="exec-chart-card">
+      <div class="section-header" style="margin-bottom:10px">
+        <div>
+          <div class="section-title">&#127949;&#65039; Vendas Motos</div>
+          <div style="font-size:.7rem;color:#666;margin-top:3px">Sistema Próprio + Ticket Master</div>
+        </div>
+        <div class="pill-group" id="execMotoPills">
+          <button class="exec-metric-pill active" onclick="execSetTMView('receita',this)">&#128176; Faturamento</button>
+          <button class="exec-metric-pill"        onclick="execSetTMView('ingressos',this)">&#127915; Ingressos</button>
+        </div>
+      </div>
+      <div class="exec-leg">
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>Sistema Próprio</div>
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#2196F3"></span>Ticket Master</div>
+      </div>
+      <canvas id="exec-chartMoto" height="180"></canvas>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px">
+          <div style="font-size:.62rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:4px">Sistema Próprio</div>
+          <div id="exec-moto-sp-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.25rem;color:#C8FF00">&mdash;</div>
+          <div id="exec-moto-sp-ing" style="font-size:.72rem;color:#666">&mdash;</div>
+        </div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px">
+          <div style="font-size:.62rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:4px">Ticket Master</div>
+          <div id="exec-moto-tm-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.25rem;color:#2196F3">&mdash;</div>
+          <div id="exec-moto-tm-ing" style="font-size:.72rem;color:#666">&mdash;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Autos -->
+    <div class="exec-chart-card">
+      <div class="section-header" style="margin-bottom:10px">
+        <div>
+          <div class="section-title">&#128663; Vendas Autos</div>
+          <div style="font-size:.7rem;color:#666;margin-top:3px">Sistema Próprio + Ticket Master</div>
+        </div>
+      </div>
+      <div class="exec-leg">
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>Sistema Próprio</div>
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#2196F3"></span>Ticket Master</div>
+      </div>
+      <canvas id="exec-chartAuto" height="180"></canvas>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px">
+          <div style="font-size:.62rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:4px">Sistema Próprio</div>
+          <div id="exec-auto-sp-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.25rem;color:#C8FF00">&mdash;</div>
+          <div id="exec-auto-sp-ing" style="font-size:.72rem;color:#666">&mdash;</div>
+        </div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px">
+          <div style="font-size:.62rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:4px">Ticket Master</div>
+          <div id="exec-auto-tm-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.25rem;color:#2196F3">&mdash;</div>
+          <div id="exec-auto-tm-ing" style="font-size:.72rem;color:#666">&mdash;</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /exec-tm-section -->
 
   <!-- Conversoes -->
   <div class="exec-conv-grid">
@@ -1029,6 +1093,7 @@ function renderPainelExecutivo() {
   buildExecDplusBar();
   buildExecVendasChart();
   buildExecInvestChart();
+  buildExecTMCharts();
   renderExecConversoes();
   const now = new Date();
   const ds2 = now.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
@@ -1115,6 +1180,98 @@ if(localStorage.getItem(_AUTH_KEY)==='1'){
   document.getElementById('loginOverlay').style.display='none';
   initDashboard();
 }
+
+// ═══════════════════════════════════════════════
+// EXEC — VENDAS MOTOS + AUTOS (Sistema Próprio vs TM)
+// ═══════════════════════════════════════════════
+let execTMView = 'receita'; // 'receita' | 'ingressos'
+let _execChartMoto = null, _execChartAuto = null;
+
+function execSetTMView(view, btn) {
+  execTMView = view;
+  document.querySelectorAll('#execMotoPills .exec-metric-pill').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  buildExecTMCharts();
+}
+
+function buildExecTMCharts() {
+  const isRec = execTMView === 'receita';
+
+  // Filtrar D26_FULL pelo período ativo
+  let rows = D26_FULL;
+  if (execFiltFrom && execFiltTo) {
+    const dMin = execDayOf26(execFiltFrom);
+    const dMax = execDayOf26(execFiltTo);
+    rows = D26_FULL.filter(r => r.d >= dMin && r.d <= dMax);
+  }
+  if (!rows.length) return;
+
+  const labels = rows.map(r => 'D+' + r.d);
+
+  const spMoto = rows.map(r => isRec ? (r.mp||0) : (r.mpQ||0));
+  const tmMoto = rows.map(r => isRec ? (r.mt||0) : (r.mtQ||0));
+  const spAuto = rows.map(r => isRec ? (r.ap||0) : (r.apQ||0));
+  const tmAuto = rows.map(r => isRec ? (r.at||0) : (r.atQ||0));
+
+  const fmtTip = v => isRec ? 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) : v.toLocaleString('pt-BR') + ' ing';
+  const tickCb = v => isRec ? (v>=1000 ? 'R$'+(v/1000).toFixed(0)+'k' : 'R$'+v) : v;
+
+  const chartCfg = (spData, tmData) => ({
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label:'Sistema Próprio', data: spData, backgroundColor:'#C8FF00', stack:'s' },
+        { label:'Ticket Master',   data: tmData, backgroundColor:'#2196F3', stack:'s' }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: ctx => ' '+ctx.dataset.label+': '+fmtTip(ctx.raw) } } },
+      scales: {
+        x: { stacked:true, grid:{color:'rgba(255,255,255,.04)'}, ticks:{color:'#777',font:{size:10}} },
+        y: { stacked:true, grid:{color:'rgba(255,255,255,.06)'}, ticks:{color:'#777',font:{size:10}, callback: tickCb } }
+      }
+    }
+  });
+
+  // Moto
+  const cMoto = document.getElementById('exec-chartMoto');
+  if (cMoto) {
+    if (_execChartMoto) _execChartMoto.destroy();
+    _execChartMoto = new Chart(cMoto, chartCfg(spMoto, tmMoto));
+  }
+
+  // Auto
+  const cAuto = document.getElementById('exec-chartAuto');
+  if (cAuto) {
+    if (_execChartAuto) _execChartAuto.destroy();
+    _execChartAuto = new Chart(cAuto, chartCfg(spAuto, tmAuto));
+  }
+
+  // Totais — summary cards
+  const totSpMotoR = spMoto.reduce((a,v)=>a+v,0);
+  const totTmMotoR = tmMoto.reduce((a,v)=>a+v,0);
+  const totSpMotoI = rows.reduce((a,r)=>a+(r.mpQ||0),0);
+  const totTmMotoI = rows.reduce((a,r)=>a+(r.mtQ||0),0);
+  const totSpAutoR = spAuto.reduce((a,v)=>a+v,0);
+  const totTmAutoR = tmAuto.reduce((a,v)=>a+v,0);
+  const totSpAutoI = rows.reduce((a,r)=>a+(r.apQ||0),0);
+  const totTmAutoI = rows.reduce((a,r)=>a+(r.atQ||0),0);
+
+  const fmtR = v => 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  set('exec-moto-sp-val', fmtR(totSpMotoR));
+  set('exec-moto-sp-ing', totSpMotoI.toLocaleString('pt-BR') + ' ingressos');
+  set('exec-moto-tm-val', fmtR(totTmMotoR));
+  set('exec-moto-tm-ing', totTmMotoI.toLocaleString('pt-BR') + ' ingressos');
+  set('exec-auto-sp-val', fmtR(totSpAutoR));
+  set('exec-auto-sp-ing', totSpAutoI.toLocaleString('pt-BR') + ' ingressos');
+  set('exec-auto-tm-val', fmtR(totTmAutoR));
+  set('exec-auto-tm-ing', totTmAutoI.toLocaleString('pt-BR') + ' ingressos');
+}
+
 </script>
 </body>
 </html>
