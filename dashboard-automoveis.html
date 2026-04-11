@@ -634,7 +634,7 @@ function setDelta(id, v26, v25) {
 function dToDate(d){const dt=new Date(DATA_INICIO);dt.setDate(dt.getDate()+d-1);return dt;}
 function dateToD(dt){return Math.floor((dt-DATA_INICIO)/86400000)+1;}
 function isoToDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
-function dateToIso(dt){return dt.toISOString().slice(0,10);}
+function dateToIso(dt){const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,'0'),d=String(dt.getDate()).padStart(2,'0');return `${y}-${m}-${d}`;}
 
 function setFiltro(tipo,btn){
   if(btn){document.querySelectorAll('.fpill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}

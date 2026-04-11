@@ -998,7 +998,7 @@ function applyExecFilter() {
 
 function setExecPreset(id) {
   const today = new Date(); today.setHours(0,0,0,0);
-  const iso = d => d.toISOString().slice(0,10);
+  const iso = d => { const y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0'); return `${y}-${mo}-${dd}`; };
   const daysAgo = n => { const d=new Date(today); d.setDate(d.getDate()-n); return d; };
   let from, to = today;
   if(id==='hoje')  { from = today; to = today; }
