@@ -1424,11 +1424,19 @@ function buildGA4Sources(dateFrom, dateTo) {
     tbody.appendChild(tr);
   });
 
-  // Influenciadores — usa breakdown do GA4 quando disponível
+  // Influenciadores — usa breakdown do GA4 quando disponível, filtra pelo período ativo
   const refDiv = document.getElementById('ga4Referrers');
   refDiv.innerHTML = '';
-  const referrers = (GA4_DATA?.influencer_breakdown?.length ? GA4_DATA.influencer_breakdown : GA4_REFERRERS.map(r=>({...r, source:r.name})));
+  const rawReferrers = (GA4_DATA?.influencer_breakdown?.length ? GA4_DATA.influencer_breakdown : GA4_REFERRERS.map(r=>({...r, source:r.name})));
   const INFL_CONV_RATE = 0.015;
+  // Aplica filtro de datas se disponível
+  const referrers = rawReferrers.map(r => {
+    if (!hasFilter || !r.daily) return r;
+    const dailySess = Object.entries(r.daily)
+      .filter(([d]) => d >= dateFrom && d <= dateTo)
+      .reduce((s, [,n]) => s + n, 0);
+    return {...r, sessions: dailySess};
+  }).filter(r => r.sessions > 0).sort((a,b) => b.sessions - a.sessions);
   referrers.forEach(r => {
     const conv    = r.conversions || 0;
     const tickets = r.tickets || {};

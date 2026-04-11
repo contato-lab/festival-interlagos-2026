@@ -254,6 +254,25 @@ def fetch_influencer_breakdown(client) -> list:
                 sources[campaign]["tickets"][name] = sources[campaign]["tickets"].get(name, 0) + sess
                 break
 
+    # Query 3: sessoes por sessionCampaignName + date (para filtro de datas no dashboard)
+    r3 = client.run_report(RunReportRequest(
+        property=f"properties/{PROPERTY_ID}",
+        date_ranges=[date_range],
+        dimensions=[Dimension(name="sessionCampaignName"), Dimension(name="date")],
+        metrics=[Metric(name="sessions")],
+        limit=5000,
+    ))
+    for row in r3.rows:
+        campaign = row.dimension_values[0].value
+        raw_date = row.dimension_values[1].value  # "20260401"
+        sess     = int(row.metric_values[0].value)
+        if campaign not in sources:
+            continue
+        iso_date = f"{raw_date[:4]}-{raw_date[4:6]}-{raw_date[6:]}"
+        if "daily" not in sources[campaign]:
+            sources[campaign]["daily"] = {}
+        sources[campaign]["daily"][iso_date] = sources[campaign]["daily"].get(iso_date, 0) + sess
+
     return sorted(sources.values(), key=lambda x: x["conversions"], reverse=True)
 def fetch_influencer_sessions(client) -> dict:
     """
