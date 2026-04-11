@@ -208,6 +208,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     <div class="exec-kpi" style="border:1px solid var(--lime-border)">
       <div class="exec-kpi-label">Receita Acumulada</div>
       <div id="exec-kpi-receita-total" class="exec-kpi-val">&mdash;</div>
+      <div id="exec-kpi-receita-total-2025" style="margin-top:6px;font-size:.7rem;color:var(--text3);opacity:.75;letter-spacing:.02em">Total 2025: &mdash;</div>
     </div>
     <div class="exec-kpi">
       <div class="exec-kpi-label">&#127949;&#65039; Receita Motos</div>
@@ -871,6 +872,12 @@ function renderExecKPIs() {
   }
   const receitaTotalCamp = D26.reduce((s,r)=>s+(r.mv||0)+(r.av||0),0);
   document.getElementById('exec-kpi-receita-total').textContent = receitaTotalCamp>0 ? 'R$ '+receitaTotalCamp.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) : '—';
+  // Total 2025 (faturamento full do festival inteiro — 94 dias)
+  const tot2025El = document.getElementById('exec-kpi-receita-total-2025');
+  if (tot2025El && typeof D25 !== 'undefined') {
+    const total2025 = D25.reduce((s,r)=>s+(r.mv||0)+(r.av||0),0);
+    tot2025El.textContent = 'Total 2025: R$ ' + (total2025/1e6).toFixed(2).replace('.',',') + 'M';
+  }
 }
 
 /* ═══ Grafico Vendas ═══ */
