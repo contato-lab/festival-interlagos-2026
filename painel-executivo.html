@@ -210,16 +210,19 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="exec-kpi-label">Receita Acumulada</div>
       <div id="exec-kpi-receita-total" class="exec-kpi-val">&mdash;</div>
       <div id="exec-kpi-receita-total-pct" class="exec-kpi-delta">&mdash;</div>
+      <div id="exec-kpi-receita-total-ingressos" style="margin-top:4px;font-size:.72rem;font-weight:600;color:var(--text);opacity:.92;letter-spacing:.02em">&mdash;</div>
       <div id="exec-kpi-receita-total-2025" style="margin-top:6px;font-size:.7rem;color:var(--text3);opacity:.75;letter-spacing:.02em">Total 2025: &mdash;</div>
     </div>
     <div class="exec-kpi">
       <div class="exec-kpi-label">&#127949;&#65039; Receita Motos</div>
       <div id="exec-kpi-motos"><div class="exec-kpi-val">&mdash;</div></div>
+      <div id="exec-kpi-motos-ingressos" style="margin-top:4px;font-size:.72rem;font-weight:600;color:var(--text);opacity:.92;letter-spacing:.02em">&mdash;</div>
       <div id="exec-kpi-motos-2025" style="margin-top:6px;font-size:.7rem;color:var(--text3);opacity:.75;letter-spacing:.02em">Total 2025: &mdash;</div>
     </div>
     <div class="exec-kpi">
       <div class="exec-kpi-label">&#128663; Receita Autos</div>
       <div id="exec-kpi-autos"><div class="exec-kpi-val">&mdash;</div></div>
+      <div id="exec-kpi-autos-ingressos" style="margin-top:4px;font-size:.72rem;font-weight:600;color:var(--text);opacity:.92;letter-spacing:.02em">&mdash;</div>
       <div id="exec-kpi-autos-2025" style="margin-top:6px;font-size:.7rem;color:var(--text3);opacity:.75;letter-spacing:.02em">Total 2025: &mdash;</div>
     </div>
     <div class="exec-kpi" style="border-color:rgba(200,255,0,.15)">
@@ -854,11 +857,26 @@ function renderExecKPIs() {
   setKpi('exec-kpi-motos',   s26.mv,        s25.mv);
   setKpi('exec-kpi-autos',   s26.av,        s25.av);
 
-  // Quantidade de ingressos do periodo (subtitulo do card "Receita do Periodo")
+  // Quantidade de ingressos 2026 por card (subtitulo branco pequeno)
+  const fmtIng = q => q>0 ? q.toLocaleString('pt-BR') + ' ingressos' : '—';
+
+  // Card "Receita do Periodo" (filtrado)
   const ingPeriodoEl = document.getElementById('exec-kpi-receita-ingressos');
-  if(ingPeriodoEl) {
-    const i26 = s26.mq + s26.aq;
-    ingPeriodoEl.textContent = i26>0 ? i26.toLocaleString('pt-BR') + ' ingressos' : '—';
+  if(ingPeriodoEl) ingPeriodoEl.textContent = fmtIng(s26.mq + s26.aq);
+
+  // Card "Receita Motos" (filtrado)
+  const ingMotosEl = document.getElementById('exec-kpi-motos-ingressos');
+  if(ingMotosEl) ingMotosEl.textContent = fmtIng(s26.mq);
+
+  // Card "Receita Autos" (filtrado)
+  const ingAutosEl = document.getElementById('exec-kpi-autos-ingressos');
+  if(ingAutosEl) ingAutosEl.textContent = fmtIng(s26.aq);
+
+  // Card "Receita Acumulada" (total da campanha, nao filtrado)
+  const ingTotalEl = document.getElementById('exec-kpi-receita-total-ingressos');
+  if(ingTotalEl) {
+    const ingTotalCamp = D26_FULL.reduce((s,r)=>s+(r.mq||0)+(r.aq||0),0);
+    ingTotalEl.textContent = fmtIng(ingTotalCamp);
   }
 
   // KPI Investimento ADS com vs 2025 (Meta + Google + TikTok)
