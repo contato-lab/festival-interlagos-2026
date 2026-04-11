@@ -882,16 +882,24 @@ function renderExecKPIs() {
       'Total 2025: R$ ' + total2025.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) +
       ' &middot; ' + ingr2025.toLocaleString('pt-BR') + ' ingressos';
 
-    // % do acumulado 2026 vs total 2025 (com contexto de dias decorridos)
+    // Delta vs MESMO PERIODO de 2025 (compara o acumulado total da campanha 2026
+    // com os mesmos D-days correspondentes em 2025)
     const pctEl = document.getElementById('exec-kpi-receita-total-pct');
-    if (pctEl && total2025>0 && receitaTotalCamp>0) {
-      const pct = (receitaTotalCamp/total2025*100);
-      // Quantos dias de campanha 2026 ja se passaram
-      const diasDecorridos = D26.length;
-      pctEl.innerHTML =
-        '<span style="color:var(--text3);font-weight:400">Em ' + diasDecorridos + ' dias, ja atingiu </span>' +
-        '<span style="color:var(--lime)">' + pct.toFixed(1).replace('.',',') + '%</span>' +
-        '<span style="color:var(--text3);font-weight:400"> do total 2025 (94 dias)</span>';
+    if (pctEl && receitaTotalCamp>0 && D26.length>0) {
+      const dMin = D26[0].d, dMax = D26[D26.length-1].d;
+      const rec25Periodo = D25.filter(r=>r.d>=dMin&&r.d<=dMax)
+        .reduce((s,r)=>s+(r.mv||0)+(r.av||0),0);
+      if (rec25Periodo>0) {
+        const pct = ((receitaTotalCamp-rec25Periodo)/rec25Periodo*100);
+        const up = pct>=0;
+        const cor = up?'#00FF88':'#FF4444';
+        const seta = up?'\u25b2':'\u25bc';
+        pctEl.innerHTML =
+          '<span style="color:' + cor + '">' + seta + ' ' +
+          (up?'+':'') + pct.toFixed(1).replace('.',',') + '% vs 2025</span>';
+      } else {
+        pctEl.textContent = '—';
+      }
     } else if (pctEl) {
       pctEl.textContent = '—';
     }
