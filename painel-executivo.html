@@ -876,7 +876,7 @@ function renderExecKPIs() {
   const tot2025El = document.getElementById('exec-kpi-receita-total-2025');
   if (tot2025El && typeof D25 !== 'undefined') {
     const total2025 = D25.reduce((s,r)=>s+(r.mv||0)+(r.av||0),0);
-    tot2025El.textContent = 'Total 2025: R$ ' + (total2025/1e6).toFixed(2).replace('.',',') + 'M';
+    tot2025El.textContent = 'Total 2025: R$ ' + total2025.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
   }
 }
 
