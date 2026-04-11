@@ -640,13 +640,25 @@ async function fetchMetaData() {
 }
 
 // ═══════════════════════════════════════════════
-// TIKTOK — leitura de localStorage
+// TIKTOK — tiktok-data.json (manual ate API ser aprovada)
+// Fallback: localStorage
 // ═══════════════════════════════════════════════
-function tiktokLoad() {
+async function tiktokLoad() {
   try {
-    const raw = localStorage.getItem('tiktok_series');
-    if (raw) TIKTOK_DATA.daily_series = JSON.parse(raw);
-  } catch(e) { TIKTOK_DATA.daily_series = []; }
+    const res = await fetch('tiktok-data.json?t=' + Date.now(), {cache:'no-store'});
+    if (!res.ok) throw new Error('not found');
+    const data = await res.json();
+    if (!data.daily_series?.length) throw new Error('empty');
+    TIKTOK_DATA = data;
+    console.log('[Executivo] TikTok data carregado:', data.totals?.cost);
+    return;
+  } catch(e) {
+    // fallback localStorage
+    try {
+      const raw = localStorage.getItem('tiktok_series');
+      if (raw) TIKTOK_DATA.daily_series = JSON.parse(raw);
+    } catch(_) { TIKTOK_DATA.daily_series = []; }
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -849,8 +861,13 @@ function renderExecKPIs() {
     ingPeriodoEl.textContent = i26>0 ? i26.toLocaleString('pt-BR') + ' ingressos' : '—';
   }
 
-  // KPI Investimento ADS com vs 2025
-  const total26 = invest.reduce((s,r)=>s+(r.meta+r.gads),0);
+  // KPI Investimento ADS com vs 2025 (Meta + Google + TikTok)
+  const ttSeriesInv = TIKTOK_DATA?.daily_series || [];
+  const ttCostPeriodo = (execFiltFrom
+    ? ttSeriesInv.filter(d => d.date >= execFiltFrom && d.date <= (execFiltTo||'9999-12-31'))
+    : ttSeriesInv
+  ).reduce((s,d)=>s+(d.cost||0), 0);
+  const total26 = invest.reduce((s,r)=>s+(r.meta+r.gads),0) + ttCostPeriodo;
   const total25 = EXEC_D25_INVEST.filter(r=>r.d>=minDay&&r.d<=maxDay).reduce((s,r)=>s+r.v,0);
   const invEl = document.getElementById('exec-kpi-invest');
   if(invEl) {
@@ -1203,17 +1220,16 @@ Chart.defaults.color='#555';
 Chart.defaults.font.family="'Inter',sans-serif";
 
 function initDashboard(){
-  Promise.allSettled([fetchSheet(), fetchGAdsData(), fetchMetaData()])
+  Promise.allSettled([fetchSheet(), fetchGAdsData(), fetchMetaData(), tiktokLoad()])
     .then(()=>{ fetchTicketmaster();
   setInterval(fetchTicketmaster, 60000);
-      tiktokLoad();
       renderPainelExecutivo();
       const dt=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
       document.getElementById('genDate').textContent=dt;
       document.getElementById('execFooterDate').textContent=dt;
     });
   setInterval(()=>{
-    Promise.allSettled([fetchGAdsData(), fetchMetaData()])
+    Promise.allSettled([fetchGAdsData(), fetchMetaData(), tiktokLoad()])
       .then(()=>{ renderPainelExecutivo(); });
   },30000);
 }
