@@ -214,10 +214,12 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     <div class="exec-kpi">
       <div class="exec-kpi-label">&#127949;&#65039; Receita Motos</div>
       <div id="exec-kpi-motos"><div class="exec-kpi-val">&mdash;</div></div>
+      <div id="exec-kpi-motos-2025" style="margin-top:6px;font-size:.7rem;color:var(--text3);opacity:.75;letter-spacing:.02em">Total 2025: &mdash;</div>
     </div>
     <div class="exec-kpi">
       <div class="exec-kpi-label">&#128663; Receita Autos</div>
       <div id="exec-kpi-autos"><div class="exec-kpi-val">&mdash;</div></div>
+      <div id="exec-kpi-autos-2025" style="margin-top:6px;font-size:.7rem;color:var(--text3);opacity:.75;letter-spacing:.02em">Total 2025: &mdash;</div>
     </div>
     <div class="exec-kpi">
       <div class="exec-kpi-label">&#127915;&#65039; Ingressos Vendidos</div>
@@ -842,6 +844,19 @@ function renderExecKPIs() {
   setKpi('exec-kpi-receita', s26.mv+s26.av, s25.mv+s25.av);
   setKpi('exec-kpi-motos',   s26.mv,        s25.mv);
   setKpi('exec-kpi-autos',   s26.av,        s25.av);
+
+  // Total 2025 por edicao (faturamento full + ingressos do festival 2025 inteiro)
+  if (typeof D25 !== 'undefined') {
+    const totMv25 = D25.reduce((s,r)=>s+(r.mv||0),0);
+    const totMq25 = D25.reduce((s,r)=>s+(r.mq||0),0);
+    const totAv25 = D25.reduce((s,r)=>s+(r.av||0),0);
+    const totAq25 = D25.reduce((s,r)=>s+(r.aq||0),0);
+    const fmtBR = v => v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+    const motos25El = document.getElementById('exec-kpi-motos-2025');
+    if (motos25El) motos25El.innerHTML = 'Total 2025: R$ ' + fmtBR(totMv25) + ' &middot; ' + fmtBR(totMq25) + ' ingressos';
+    const autos25El = document.getElementById('exec-kpi-autos-2025');
+    if (autos25El) autos25El.innerHTML = 'Total 2025: R$ ' + fmtBR(totAv25) + ' &middot; ' + fmtBR(totAq25) + ' ingressos';
+  }
 
   const ingEl = document.getElementById('exec-kpi-ingressos');
   if(ingEl) {
