@@ -244,66 +244,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   </div>
 
   <!-- Graficos -->
-  <!-- Contexto / insight -->
-  <div class="exec-context" id="exec-context" style="margin-bottom:16px">
-    <span>&#128161;</span><span>Carregando dados...</span>
-  </div>
-  <div class="exec-charts-grid">
-
-    <!-- Vendas -->
-    <div class="exec-chart-card">
-      <div class="section-header" style="margin-bottom:10px">
-        <div>
-          <div class="section-title">Vendas — 2025 vs 2026</div>
-          <div style="font-size:.7rem;color:#666;margin-top:3px">por dia de campanha</div>
-        </div>
-        <div class="pill-group" id="execVendasPills">
-          <button class="exec-metric-pill active" onclick="execSetVendasMetric('total',this)">Total</button>
-          <button class="exec-metric-pill moto" onclick="execSetVendasMetric('motos',this)">&#127949;&#65039; Motos</button>
-          <button class="exec-metric-pill auto" onclick="execSetVendasMetric('autos',this)">&#128663; Autos</button>
-        </div>
-      </div>
-      <div class="exec-leg">
-        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>2026</div>
-        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#555"></span>2025</div>
-        <div class="exec-leg-item" id="exec-tvLegVendas" style="display:none">
-          <span style="display:inline-block;width:18px;height:2px;background:rgba(255,184,0,.8);border-top:2px dashed rgba(255,184,0,.8)"></span>
-          <span style="color:var(--warn)">TV Globo</span>
-        </div>
-        <div class="exec-leg-item" id="exec-inflLegVendas" style="display:none">
-          <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(123,45,139,.9)"></span>
-          <span style="color:#7B2D8B">Influenciadores</span>
-        </div>
-      </div>
-      <div class="exec-chart-wrap"><canvas id="exec-chartVendas"></canvas></div>
-    </div>
-
-    <!-- Investimento ADS -->
-    <div class="exec-chart-card">
-      <div class="section-header" style="margin-bottom:10px">
-        <div>
-          <div class="section-title">Investimento ADS — 2025 vs 2026</div>
-          <div style="font-size:.7rem;color:#666;margin-top:3px">por dia de campanha &middot; est. diaria 2025</div>
-        </div>
-        <div class="pill-group">
-          <button class="pill active" onclick="execSetInvestView('diario',this)">Diario</button>
-          <button class="pill" onclick="execSetInvestView('acumulado',this)">Acumulado</button>
-        </div>
-      </div>
-      <div class="exec-leg">
-        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>2026</div>
-        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#555"></span>2025 (est.)</div>
-        <div class="exec-leg-item" id="exec-tvLegInvest">
-          <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,184,0,.8)"></span>
-          <span style="color:var(--warn)">TV Globo</span>
-        </div>
-      </div>
-      <div class="exec-chart-wrap"><canvas id="exec-chartInvest"></canvas></div>
-    </div>
-
-  
-</div><!-- /exec-charts-grid -->
-
   <!-- ══ VENDAS MOTOS + AUTOS — Sistema Próprio vs Ticketmaster ══ -->
   <div class="exec-charts-grid" style="margin-top:24px" id="exec-tm-section">
 
@@ -366,6 +306,63 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     </div>
 
   </div><!-- /exec-tm-section -->
+
+  <div class="exec-charts-grid">
+
+    <!-- Vendas -->
+    <div class="exec-chart-card">
+      <div class="section-header" style="margin-bottom:10px">
+        <div>
+          <div class="section-title">Vendas — 2025 vs 2026</div>
+          <div style="font-size:.7rem;color:#666;margin-top:3px">por dia de campanha</div>
+        </div>
+        <div class="pill-group" id="execVendasPills">
+          <button class="exec-metric-pill active" onclick="execSetVendasMetric('total',this)">Total</button>
+          <button class="exec-metric-pill moto" onclick="execSetVendasMetric('motos',this)">&#127949;&#65039; Motos</button>
+          <button class="exec-metric-pill auto" onclick="execSetVendasMetric('autos',this)">&#128663; Autos</button>
+        </div>
+      </div>
+      <div class="exec-leg">
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>2026</div>
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#555"></span>2025</div>
+        <div class="exec-leg-item" id="exec-tvLegVendas" style="display:none">
+          <span style="display:inline-block;width:18px;height:2px;background:rgba(255,184,0,.8);border-top:2px dashed rgba(255,184,0,.8)"></span>
+          <span style="color:var(--warn)">TV Globo</span>
+        </div>
+        <div class="exec-leg-item" id="exec-inflLegVendas" style="display:none">
+          <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(123,45,139,.9)"></span>
+          <span style="color:#7B2D8B">Influenciadores</span>
+        </div>
+      </div>
+      <div class="exec-chart-wrap"><canvas id="exec-chartVendas"></canvas></div>
+    </div>
+
+    <!-- Investimento ADS -->
+    <div class="exec-chart-card">
+      <div class="section-header" style="margin-bottom:10px">
+        <div>
+          <div class="section-title">Investimento ADS — 2025 vs 2026</div>
+          <div style="font-size:.7rem;color:#666;margin-top:3px">por dia de campanha &middot; est. diaria 2025</div>
+        </div>
+        <div class="pill-group">
+          <button class="pill active" onclick="execSetInvestView('diario',this)">Diario</button>
+          <button class="pill" onclick="execSetInvestView('acumulado',this)">Acumulado</button>
+        </div>
+      </div>
+      <div class="exec-leg">
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>2026</div>
+        <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#555"></span>2025 (est.)</div>
+        <div class="exec-leg-item" id="exec-tvLegInvest">
+          <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,184,0,.8)"></span>
+          <span style="color:var(--warn)">TV Globo</span>
+        </div>
+      </div>
+      <div class="exec-chart-wrap"><canvas id="exec-chartInvest"></canvas></div>
+    </div>
+
+  
+</div><!-- /exec-charts-grid -->
+
 
   <!-- Conversoes -->
   <div class="exec-conv-grid">
