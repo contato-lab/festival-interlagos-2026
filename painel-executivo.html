@@ -845,19 +845,6 @@ function renderExecKPIs() {
   setKpi('exec-kpi-motos',   s26.mv,        s25.mv);
   setKpi('exec-kpi-autos',   s26.av,        s25.av);
 
-  // Total 2025 por edicao (faturamento full + ingressos do festival 2025 inteiro)
-  if (typeof D25 !== 'undefined') {
-    const totMv25 = D25.reduce((s,r)=>s+(r.mv||0),0);
-    const totMq25 = D25.reduce((s,r)=>s+(r.mq||0),0);
-    const totAv25 = D25.reduce((s,r)=>s+(r.av||0),0);
-    const totAq25 = D25.reduce((s,r)=>s+(r.aq||0),0);
-    const fmtBR = v => v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
-    const motos25El = document.getElementById('exec-kpi-motos-2025');
-    if (motos25El) motos25El.innerHTML = 'Total 2025: R$ ' + fmtBR(totMv25) + ' &middot; ' + fmtBR(totMq25) + ' ingressos';
-    const autos25El = document.getElementById('exec-kpi-autos-2025');
-    if (autos25El) autos25El.innerHTML = 'Total 2025: R$ ' + fmtBR(totAv25) + ' &middot; ' + fmtBR(totAq25) + ' ingressos';
-  }
-
   const ingEl = document.getElementById('exec-kpi-ingressos');
   if(ingEl) {
     const i26=s26.mq+s26.aq, i25=s25.mq+s25.aq;
@@ -888,11 +875,19 @@ function renderExecKPIs() {
   }
   const receitaTotalCamp = D26.reduce((s,r)=>s+(r.mv||0)+(r.av||0),0);
   document.getElementById('exec-kpi-receita-total').textContent = receitaTotalCamp>0 ? 'R$ '+receitaTotalCamp.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) : '—';
-  // Total 2025 (faturamento full do festival inteiro — 94 dias)
+  // Total 2025 — numeros REAIS da planilha (RELATORIO MARCINHO):
+  // Moto: R$ 4.389.207,28 | 26.897 ingressos
+  // Auto: R$ 2.710.598,14 | 14.082 ingressos
+  // Total: R$ 7.099.805,42 | 40.979 ingressos
+  const REAL_2025 = {
+    moto: { rec: 4389207.28, ing: 26897 },
+    auto: { rec: 2710598.14, ing: 14082 },
+    total: { rec: 7099805.42, ing: 40979 }
+  };
   const tot2025El = document.getElementById('exec-kpi-receita-total-2025');
-  if (tot2025El && typeof D25 !== 'undefined') {
-    const total2025   = D25.reduce((s,r)=>s+(r.mv||0)+(r.av||0),0);
-    const ingr2025    = D25.reduce((s,r)=>s+(r.mq||0)+(r.aq||0),0);
+  if (tot2025El) {
+    const total2025 = REAL_2025.total.rec;
+    const ingr2025  = REAL_2025.total.ing;
     tot2025El.innerHTML =
       'Total 2025: R$ ' + total2025.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) +
       ' &middot; ' + ingr2025.toLocaleString('pt-BR') + ' ingressos';
@@ -919,6 +914,15 @@ function renderExecKPIs() {
       pctEl.textContent = '—';
     }
   }
+
+  // Total 2025 por edicao (numeros REAIS)
+  const fmtBR = v => v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+  const motos25El = document.getElementById('exec-kpi-motos-2025');
+  if (motos25El) motos25El.innerHTML =
+    'Total 2025: R$ ' + fmtBR(REAL_2025.moto.rec) + ' &middot; ' + fmtBR(REAL_2025.moto.ing) + ' ingressos';
+  const autos25El = document.getElementById('exec-kpi-autos-2025');
+  if (autos25El) autos25El.innerHTML =
+    'Total 2025: R$ ' + fmtBR(REAL_2025.auto.rec) + ' &middot; ' + fmtBR(REAL_2025.auto.ing) + ' ingressos';
 }
 
 /* ═══ Grafico Vendas ═══ */
