@@ -1866,7 +1866,7 @@ function toggleAno(ano) {
 // ═══════════════════════════════════════════════
 async function fetchTicketmaster() {
   try {
-    const res = await fetch('ticketmaster-data.json?t=' + Date.now());
+    const res = await fetch('ticketmaster-data.json?t=' + Date.now(), {cache:'no-store'});
     if (!res.ok) throw new Error('ticketmaster-data.json nao encontrado');
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
