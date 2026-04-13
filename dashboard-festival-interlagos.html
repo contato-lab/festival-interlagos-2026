@@ -449,12 +449,12 @@ tr:hover td{background:rgba(255,255,255,.018)}
   </div>
   <!-- Botões de toggle por ano -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-    <button id="btn2025" onclick="toggleAno('2025')" class="ano-btn" style="
-      display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.04);
-      border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:5px 14px;
+    <button id="btn2025" onclick="toggleAno('2025')" class="ano-btn active-2025" style="
+      display:flex;align-items:center;gap:7px;background:rgba(200,255,0,0.1);
+      border:1px solid rgba(200,255,0,0.4);border-radius:20px;padding:5px 14px;
       cursor:pointer;transition:.2s;font-family:'Barlow Condensed',sans-serif;
-      font-weight:700;font-size:.85rem;letter-spacing:.04em;color:#444;opacity:.5">
-      <div style="width:22px;height:2px;background:#333;border-radius:1px"></div>
+      font-weight:700;font-size:.85rem;letter-spacing:.04em;color:#C8FF00;opacity:1">
+      <div style="width:22px;height:2px;background:#C8FF00;border-radius:1px"></div>
       2025
     </button>
     <button id="btn2026" onclick="toggleAno('2026')" class="ano-btn active-2026" style="
@@ -907,7 +907,7 @@ const GA4_REFERRERS = [
 // STATE e CHARTS
 // ═══════════════════════════════════════════════
 let metricAtiva='receita', edicaoAtiva='total';
-let anoVisivel = { '2025': false, '2026': true };
+let anoVisivel = { '2025': true, '2026': true };
 let motosVis = { prop: true, tm: true };
 let autosVis = { prop: true, tm: true };
 let motosMetric = 'receita';
@@ -1148,19 +1148,28 @@ function buildComp() {
             label: ctx => {
               const idx = ctx.dataIndex;
               const is26 = ctx.dataset.label.includes('2026');
-              // D26 pode ter gaps por filtro: busca pela d=idx+1 (D+1 = index 0)
-              const row = is26 ? D26.find(r=>r.d===idx+1) : D25[idx];
+              // D26 pode ter gaps por filtro — busca pela d=idx+1
+              const row = is26 ? (D26.find(r=>r.d===idx+1) || D26[idx]) : D25[idx];
               if (!row) return null;
               const mq=row.mq||0, aq=row.aq||0, mv=row.mv||0, av=row.av||0;
               const ing = edicaoAtiva==='motos' ? mq : edicaoAtiva==='autos' ? aq : mq+aq;
               const rec = edicaoAtiva==='motos' ? mv : edicaoAtiva==='autos' ? av : mv+av;
               const year = is26 ? '2026' : '2025';
               const edLabel = edicaoAtiva==='motos' ? ' Motos' : edicaoAtiva==='autos' ? ' Autos' : ' Total';
-              return [
-                `${year}${edLabel}`,
-                `  Ingressos : ${fmtN(ing)}`,
-                `  Receita   : ${fmtR(rec)}`
-              ];
+              // Métrica ativa aparece primeiro — evita confusão visual
+              if (metricAtiva === 'ingressos') {
+                return [
+                  `${year}${edLabel}`,
+                  `  Ingressos : ${fmtN(ing)}`,
+                  `  Receita   : ${fmtR(rec)}`
+                ];
+              } else {
+                return [
+                  `${year}${edLabel}`,
+                  `  Receita   : ${fmtR(rec)}`,
+                  `  Ingressos : ${fmtN(ing)}`
+                ];
+              }
             },
             afterBody: items => {
               const idx = items[0].dataIndex;
