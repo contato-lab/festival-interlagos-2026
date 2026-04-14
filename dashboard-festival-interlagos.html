@@ -420,13 +420,13 @@ tr:hover td{background:rgba(255,255,255,.018)}
     <div class="kpi-label">🏍️ Receita Motos</div>
     <div class="kpi-value" id="kpiMotos">—</div>
     <div class="kpi-delta" id="kpiMotosDelta"></div>
-    <div class="kpi-sub">acumulado</div>
+    <div class="kpi-sub">TKT Médio: <strong id="kpiTktMotos">—</strong></div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">🚗 Receita Autos</div>
     <div class="kpi-value" id="kpiAutos">—</div>
     <div class="kpi-delta" id="kpiAutosDelta"></div>
-    <div class="kpi-sub">acumulado</div>
+    <div class="kpi-sub">TKT Médio: <strong id="kpiTktAutos">—</strong></div>
   </div>
 </div>
 
@@ -1014,6 +1014,11 @@ function calcKPIs() {
   setDelta('kpiMotosDelta',s26.mv,s25.mv);
   document.getElementById('kpiAutos').textContent=fmtK(s26.av);
   setDelta('kpiAutosDelta',s26.av,s25.av);
+  // TKT Médio por evento
+  const tktMotos = s26.mq ? s26.mv/s26.mq : 0;
+  const tktAutos = s26.aq ? s26.av/s26.aq : 0;
+  document.getElementById('kpiTktMotos').textContent = fmtR(tktMotos);
+  document.getElementById('kpiTktAutos').textContent = fmtR(tktAutos);
   document.getElementById('motosProprio').textContent=fmtK(s26.mp);
   document.getElementById('motosTM').textContent=fmtK(s26.mt);
   document.getElementById('autosProprio').textContent=fmtK(s26.ap);
