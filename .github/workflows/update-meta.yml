@@ -25,11 +25,17 @@ jobs:
           META_ACCT:  'act_2044706169171045'
         run: python update-meta-ads.py
 
-      - name: Commit meta-data.json
+      - name: Run Meta Creatives update script
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+          META_ACCT:  'act_2044706169171045'
+        run: python update-meta-creatives.py
+
+      - name: Commit meta data files
         run: |
           git config user.name  "GitHub Actions"
           git config user.email "actions@github.com"
-          git add meta-data.json
-          git diff --staged --quiet || git commit -m "chore: update meta-data.json [skip ci]"
+          git add meta-data.json meta-creatives-data.json
+          git diff --staged --quiet || git commit -m "chore: update meta-data.json + meta-creatives-data.json [skip ci]"
           git pull --rebase origin main || true
           git push

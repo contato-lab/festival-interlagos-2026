@@ -772,6 +772,75 @@ Google Ads
   </div>
 </div>
 
+<!-- ══ ANÁLISE DE CRIATIVOS — META ADS ══ -->
+<div class="chart-card" id="creativesCard">
+  <div class="section-header">
+    <div class="section-title">🎨 Análise de Criativos — Meta Ads</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="badge badge-ok" id="creativesStatus" style="font-size:.68rem">Conectando…</span>
+      <select id="creativesSortSel" onchange="renderCreatives()" style="
+        background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);
+        color:var(--text);font-family:'Barlow Condensed',sans-serif;font-weight:700;
+        font-size:.78rem;letter-spacing:.03em;padding:4px 10px;border-radius:6px;cursor:pointer">
+        <option value="spend">Ordenar: Maior Gasto</option>
+        <option value="purchases">Ordenar: Mais Vendas</option>
+        <option value="cpp">Ordenar: Menor Custo/Venda</option>
+        <option value="ctr">Ordenar: Maior CTR</option>
+        <option value="clicks">Ordenar: Mais Cliques</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- KPI strip criativos -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:18px">
+    <div style="padding:12px 14px;background:rgba(24,119,242,.06);border:1px solid rgba(24,119,242,.18);border-radius:8px">
+      <div style="font-family:'Inter',sans-serif;font-size:.58rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.1em">Criativos Ativos</div>
+      <div id="crvActive" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:#1877F2;margin-top:2px">—</div>
+    </div>
+    <div style="padding:12px 14px;background:rgba(200,255,0,.06);border:1px solid rgba(200,255,0,.18);border-radius:8px">
+      <div style="font-family:'Inter',sans-serif;font-size:.58rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.1em">CTR Médio</div>
+      <div id="crvCtr" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:var(--lime);margin-top:2px">—</div>
+    </div>
+    <div style="padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px">
+      <div style="font-family:'Inter',sans-serif;font-size:.58rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.1em">Cliques</div>
+      <div id="crvClicks" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:var(--text);margin-top:2px">—</div>
+    </div>
+    <div style="padding:12px 14px;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.18);border-radius:8px">
+      <div style="font-family:'Inter',sans-serif;font-size:.58rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.1em">Vendas</div>
+      <div id="crvPurch" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:#00FF88;margin-top:2px">—</div>
+    </div>
+    <div style="padding:12px 14px;background:rgba(255,184,0,.06);border:1px solid rgba(255,184,0,.18);border-radius:8px">
+      <div style="font-family:'Inter',sans-serif;font-size:.58rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.1em">Custo / Venda</div>
+      <div id="crvCpp" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:#FFB800;margin-top:2px">—</div>
+    </div>
+  </div>
+
+  <!-- Tabela de criativos -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="min-width:280px">Criativo</th>
+          <th>Impressões</th>
+          <th>Cliques</th>
+          <th>CTR</th>
+          <th>Gasto</th>
+          <th>Vendas</th>
+          <th>Custo / Venda</th>
+        </tr>
+      </thead>
+      <tbody id="creativesBody">
+        <tr><td colspan="7" style="text-align:center;color:#666;padding:30px">Carregando criativos…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note" style="margin-top:14px">
+    <strong style="color:var(--lime)">Fonte:</strong> Meta Ads API (nível <code>ad</code>) — atualizado a cada 5 min via GitHub Actions.
+    Top 20 criativos exibidos. <span id="creativesCount" style="color:#888"></span>
+  </div>
+</div>
+
 </div><!-- /main -->
 
 <footer class="footer">
@@ -2138,13 +2207,13 @@ function initDashboard(){
   buildSpk('spkGoogle',[180,420,680,390,510,720,480,560,420,640,740,530,460,680,790,560,440,820],'rgb(200,255,0)');
   
   _upd2026Lbl();
-  Promise.allSettled([fetchSheet(), fetchGA4Data(), fetchGAdsData(), fetchMetaData()])
+  Promise.allSettled([fetchSheet(), fetchGA4Data(), fetchGAdsData(), fetchMetaData(), fetchMetaCreatives()])
     .then(() => { fetchTicketmaster(); });
   setInterval(fetchTicketmaster, 60000);
-  
+
   // Auto-refresh a cada 30 segundos
   setInterval(() => {
-    fetchGAdsData(); fetchMetaData(); fetchGA4Data(); fetchTikTokData(); updateLastRefreshTime();
+    fetchGAdsData(); fetchMetaData(); fetchMetaCreatives(); fetchGA4Data(); fetchTikTokData(); updateLastRefreshTime();
   }, 30000);
 }
 
@@ -2152,6 +2221,106 @@ function initDashboard(){
 if(localStorage.getItem(_AUTH_KEY)==='1'){
   document.getElementById('loginOverlay').style.display='none';
   initDashboard();
+}
+
+/* ═══════════════════════════════════════════════
+   META CRIATIVOS — API (meta-creatives-data.json via GitHub Actions)
+═══════════════════════════════════════════════ */
+let META_CREATIVES_DATA = null;
+
+async function fetchMetaCreatives() {
+  try {
+    const res = await fetch('meta-creatives-data.json?t=' + Date.now(), {cache:'no-store'});
+    if (!res.ok) throw new Error('not found');
+    const data = await res.json();
+    if (!data.creatives?.length) throw new Error('empty');
+    META_CREATIVES_DATA = data;
+    const badge = document.getElementById('creativesStatus');
+    if (badge) { badge.textContent = '✓ API ativa'; }
+    renderCreatives();
+  } catch(e) {
+    const badge = document.getElementById('creativesStatus');
+    if (badge) { badge.textContent = 'Aguardando dados'; badge.style.background='rgba(255,184,0,.1)'; badge.style.borderColor='rgba(255,184,0,.3)'; badge.style.color='#FFB800'; }
+    const tbody = document.getElementById('creativesBody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#666;padding:30px">Aguardando primeira execução do workflow de criativos (até 5 min)…</td></tr>';
+  }
+}
+
+function renderCreatives() {
+  if (!META_CREATIVES_DATA) return;
+  const sortBy = document.getElementById('creativesSortSel')?.value || 'spend';
+  const creatives = [...META_CREATIVES_DATA.creatives]
+    .filter(c => c.spend > 0 || c.impressions > 0)
+    .sort((a,b) => {
+      if (sortBy === 'cpp') {
+        // Sem vendas vai pro fim
+        const av = a.cpp ?? 9e9, bv = b.cpp ?? 9e9;
+        return av - bv;
+      }
+      return (b[sortBy] || 0) - (a[sortBy] || 0);
+    })
+    .slice(0, 20);
+
+  const tot = META_CREATIVES_DATA.totals || {};
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  const fmtImp = v => v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1e3)+'K':String(v||0);
+
+  set('crvActive', tot.active_ads || creatives.length);
+  set('crvCtr',    (tot.ctr||0).toFixed(2) + '%');
+  set('crvClicks', (tot.clicks||0).toLocaleString('pt-BR'));
+  set('crvPurch',  (tot.purchases||0).toLocaleString('pt-BR'));
+  set('crvCpp',    tot.cpp ? 'R$ '+tot.cpp.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—');
+
+  const ctrMedio = tot.ctr || 0;
+  const cppMedio = tot.cpp || 0;
+
+  const tbody = document.getElementById('creativesBody');
+  if (!tbody) return;
+
+  if (creatives.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#666;padding:30px">Nenhum criativo com dados no período.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = creatives.map(c => {
+    const thumb = c.thumbnail_url
+      ? `<img src="${c.thumbnail_url}" alt="" style="width:42px;height:42px;object-fit:cover;border-radius:6px;border:1px solid rgba(255,255,255,.08)" onerror="this.style.display='none'">`
+      : `<div style="width:42px;height:42px;background:rgba(24,119,242,.12);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem">🎨</div>`;
+
+    const ctrColor  = c.ctr >= ctrMedio ? 'var(--lime)' : '#FFB800';
+    const cppColor  = c.cpp && cppMedio && c.cpp <= cppMedio ? 'var(--lime)' : (c.cpp ? '#FFB800' : '#666');
+    const purchColor = c.purchases > 0 ? '#00FF88' : '#666';
+
+    const adName = (c.ad_name || 'Sem nome').length > 55
+      ? (c.ad_name || 'Sem nome').slice(0,55) + '…'
+      : (c.ad_name || 'Sem nome');
+
+    return `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px">
+            ${thumb}
+            <div style="min-width:0;flex:1">
+              <div style="font-weight:700;font-size:.82rem;color:var(--text);line-height:1.2" title="${c.ad_name || ''}">${adName}</div>
+              <div style="font-size:.65rem;color:#888;margin-top:2px;font-family:'Inter',sans-serif">${c.campaign_name || ''}</div>
+            </div>
+          </div>
+        </td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-weight:700">${fmtImp(c.impressions)}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-weight:700">${(c.clicks||0).toLocaleString('pt-BR')}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-weight:800;color:${ctrColor}">${(c.ctr||0).toFixed(2)}%</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-weight:700">R$ ${(c.spend||0).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0})}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-weight:800;color:${purchColor}">${c.purchases||0}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-weight:800;color:${cppColor}">${c.cpp ? 'R$ '+c.cpp.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}</td>
+      </tr>
+    `;
+  }).join('');
+
+  const countEl = document.getElementById('creativesCount');
+  if (countEl) {
+    const total = META_CREATIVES_DATA.creatives.length;
+    countEl.textContent = `(${creatives.length} de ${total} criativos)`;
+  }
 }
 
 /* ═══════════════════════════════════════════════
