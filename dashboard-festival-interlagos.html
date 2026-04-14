@@ -560,6 +560,37 @@ tr:hover td{background:rgba(255,255,255,.018)}
       <span class="badge badge-ok">✓ Google Ads ao vivo</span>
     </div>
   </div>
+
+  <!-- CARD CAMPANHA — Investimento ADS acumulado -->
+  <div id="campInvestCard" style="
+    margin-bottom:18px;
+    padding:20px 28px;
+    background:linear-gradient(135deg,rgba(200,255,0,.06) 0%,rgba(200,255,0,.02) 100%);
+    border:1px solid rgba(200,255,0,.18);
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    gap:36px;
+    flex-wrap:wrap;
+  ">
+    <div style="flex:1;min-width:200px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:#888">CAMPANHA</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;color:var(--lime);margin-top:2px;letter-spacing:.04em">Investimento ADS acumulado</div>
+      <div id="campInvestVal" style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:2.2rem;color:var(--lime);line-height:1.1;margin-top:4px">—</div>
+      <div style="display:flex;gap:24px;margin-top:8px;flex-wrap:wrap">
+        <div>
+          <div style="font-family:'Inter',sans-serif;font-size:.58rem;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.1em">Média Diária</div>
+          <div id="campInvestMedia" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.05rem;color:var(--text)">—</div>
+        </div>
+        <div>
+          <div style="font-family:'Inter',sans-serif;font-size:.58rem;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.1em">Dias de Campanha</div>
+          <div id="campInvestDias" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.05rem;color:var(--text)">—</div>
+        </div>
+      </div>
+      <div id="campInvest25" style="font-family:'Inter',sans-serif;font-size:.72rem;color:#666;margin-top:8px">—</div>
+    </div>
+  </div>
+
   <div class="media-grid">
 
     <!-- META -->
@@ -1707,6 +1738,22 @@ function updateMetaCard(data, dateFrom, dateTo) {
   buildSpkTimeline('spkMeta', arr, 'rgb(200,255,0)');
 }
 
+// Investimento ADS 2025 por dia de campanha (semanal, do painel-executivo)
+const D25_INVEST = (() => {
+  const semanas = [
+    {from:1, to:3,  daily:2679.88},{from:4, to:10, daily:4350.08},
+    {from:11,to:17, daily:4903.26},{from:18,to:24, daily:3429.32},
+    {from:25,to:31, daily:2697.07},{from:32,to:38, daily:4996.89},
+    {from:39,to:45, daily:5801.66},{from:46,to:52, daily:6824.98},
+    {from:53,to:59, daily:6120.89},{from:60,to:66, daily:5165.62},
+    {from:67,to:73, daily:5804.51},{from:74,to:80, daily:6619.04},
+    {from:81,to:87, daily:3830.10},{from:88,to:94, daily:3142.76},
+  ];
+  const arr = [];
+  semanas.forEach(s => { for(let d=s.from;d<=s.to;d++) arr.push({d, v:s.daily}); });
+  return arr;
+})();
+
 function updateMediaTotals(dateFrom, dateTo) {
   let inv=0, imp=0, clk=0, comp=0;
   if (GADS_DATA) {
@@ -1731,6 +1778,21 @@ function updateMediaTotals(dateFrom, dateTo) {
   set('total-clicks', Math.round(clk).toLocaleString('pt-BR'));
   set('total-compras', Math.round(comp).toLocaleString('pt-BR'));
   set('total-cpp', comp > 0 ? 'R$ '+(inv/comp).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—');
+
+  // ── Card CAMPANHA — Investimento ADS acumulado ──
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const dias = Math.max(1, Math.round((hoje - DATA_INICIO) / 86400000) + 1);
+  const media = dias > 0 ? inv / dias : 0;
+  const invest25Same = D25_INVEST.filter(r => r.d <= dias).reduce((s,r) => s + r.v, 0);
+
+  const ciVal = document.getElementById('campInvestVal');
+  if (ciVal) ciVal.textContent = fmtR(inv);
+  const ciMedia = document.getElementById('campInvestMedia');
+  if (ciMedia) ciMedia.textContent = fmtR(media);
+  const ciDias = document.getElementById('campInvestDias');
+  if (ciDias) ciDias.textContent = dias + '\u00ba dia';
+  const ci25 = document.getElementById('campInvest25');
+  if (ci25) ci25.textContent = '2025 (mesmos ' + dias + ' dias): ' + fmtR(invest25Same);
 }
 
 async function fetchMetaData() {
