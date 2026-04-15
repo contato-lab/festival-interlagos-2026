@@ -902,6 +902,9 @@ const ACOES = [
 
   // ── INFLUENCIADORES ────────────────────────────
   { dia:1,  tipo:'influencer',titulo:'Influencers — Abertura', desc:'Influenciadores postaram na abertura (31/03)' },
+
+  // ── DIVULGAÇÕES / ANÚNCIOS DE LINE-UP ──────────
+  { dia:15, tipo:'divulgacao',titulo:'Divulgação Ja Rule + Line-up', desc:'Divulgação Ja Rule + Line-up (14/04)' },
 ];
 
 // Configuração visual por tipo
@@ -911,11 +914,13 @@ const ACAO_CONFIG = {
   prog:       { cor:'#00BFFF', icone:'🖥️',  label:'Mídia Programática',  dash:[4,4] },
   ooh:        { cor:'#FF6B35', icone:'🏙️',  label:'OOH / DOOH',          dash:[10,3] },
   influencer: { cor:'#7B2D8B', icone:'⭐', label:'Influenciadores',     dash:[5,5] },
+  divulgacao: { cor:'#FFD700', icone:'🎤', label:'Divulgação / Line-up', dash:[7,4] },
   email:      { cor:'#00FF88', icone:'📧', label:'E-mail MKT',          dash:[3,3] },
 };
 
 // Estado de visibilidade por tipo (toggle na legenda)
-const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv']));
+// Default: TV e divulgação visíveis (ações recentes/relevantes)
+const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv' || k === 'divulgacao']));
 // Ex: 'https://docs.google.com/spreadsheets/d/SEU_ID/export?format=csv&gid=0'
 
 // ═══════════════════════════════════════════════
