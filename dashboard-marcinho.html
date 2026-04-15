@@ -154,12 +154,26 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .leg-dot{width:10px;height:10px;border-radius:50%}
 .leg-line{width:20px;height:2px;border-radius:2px}
 
-/* ── TV GLOBO LEGEND ── */
+/* ── TV GLOBO LEGEND (legado — mantido p/ compatibilidade) ── */
 .tv-legend{
   display:flex;align-items:center;gap:6px;margin-top:8px;
   font-size:11px;color:var(--warn);
 }
 .tv-leg-line{width:2px;height:14px;background:rgba(255,184,0,0.7);border-radius:1px}
+
+/* ── LEGENDA DE AÇÕES (CLICÁVEL — toggle de cada tipo) ── */
+.acoes-legend{
+  display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;
+}
+.acao-leg-item{
+  display:flex;align-items:center;gap:6px;font-size:11px;color:#CCC;
+  cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid transparent;
+  transition:.2s;user-select:none;
+}
+.acao-leg-item:hover{background:rgba(255,255,255,.04)}
+.acao-leg-item.inactive{opacity:.35}
+.acao-leg-line{width:16px;height:2px;border-radius:1px;flex-shrink:0}
+.acao-leg-count{background:rgba(255,255,255,0.07);border-radius:10px;padding:1px 6px;font-size:10px;color:var(--text3)}
 
 /* ── CONVERSOES ── */
 .conv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -376,10 +390,8 @@ footer{
       <div class="legend">
         <div class="legend-item"><span class="leg-dot" style="background:#C8FF00"></span>2026</div>
         <div class="legend-item"><span class="leg-dot" style="background:#555"></span>2025</div>
-        <div class="legend-item" id="tvLegVendas" style="display:none">
-          <span class="tv-leg-line"></span><span style="color:var(--warn);font-size:11px">📺 TV Globo</span>
-        </div>
       </div>
+      <div class="acoes-legend" id="acoesLegendVendas"></div>
       <div class="chart-canvas-wrap"><canvas id="chartVendas"></canvas></div>
     </div>
 
@@ -398,10 +410,8 @@ footer{
       <div class="legend">
         <div class="legend-item"><span class="leg-dot" style="background:#C8FF00"></span>2026</div>
         <div class="legend-item"><span class="leg-dot" style="background:#555"></span>2025</div>
-        <div class="legend-item" id="tvLegInvest">
-          <span class="tv-leg-line"></span><span style="color:var(--warn);font-size:11px">📺 TV Globo</span>
-        </div>
       </div>
+      <div class="acoes-legend" id="acoesLegendInvest"></div>
       <div class="chart-canvas-wrap"><canvas id="chartInvest"></canvas></div>
     </div>
 
@@ -500,6 +510,53 @@ const TV_GLOBO = [
   {date:'2026-04-05', day26:6, programs:['Auto Esporte','Esporte Espetacular']},
   {date:'2026-04-06', day26:7, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
 ];
+
+/* ═══════════════════════════════════════════
+   AÇÕES DE MÍDIA — marcadores clicáveis no gráfico
+   (mesmo padrão do dashboard-festival-interlagos.html)
+
+   Campos:
+     dia    → dia relativo da campanha 2026 (D+1 = 31/03)
+     tipo   → 'tv' | 'radio' | 'prog' | 'ooh' | 'influencer' | 'divulgacao' | 'email'
+     titulo → nome curto (aparece no tooltip)
+     desc   → descrição completa
+
+   As ações do tipo 'tv' são geradas AUTOMATICAMENTE a partir de TV_GLOBO.
+   Para adicionar outra ação (divulgação, influenciador, etc) basta copiar
+   um bloco abaixo — a legenda clicável aparece sozinha.
+═══════════════════════════════════════════ */
+const ACOES_EXTRA = [
+  // ── DIVULGAÇÕES / ANÚNCIOS DE LINE-UP ──────────
+  { dia:15, tipo:'divulgacao', titulo:'Divulgação Ja Rule + Line-up', desc:'Divulgação Ja Rule + Line-up (14/04)' },
+];
+
+// Configuração visual por tipo
+const ACAO_CONFIG = {
+  tv:         { cor:'#FFB800', icone:'📺', label:'TV Globo',             dash:[4,3] },
+  radio:      { cor:'#FF9500', icone:'📻', label:'Rádio',                dash:[6,3] },
+  prog:       { cor:'#00BFFF', icone:'🖥️',  label:'Mídia Programática',   dash:[4,4] },
+  ooh:        { cor:'#FF6B35', icone:'🏙️',  label:'OOH / DOOH',           dash:[10,3] },
+  influencer: { cor:'#7B2D8B', icone:'⭐', label:'Influenciadores',      dash:[5,5] },
+  divulgacao: { cor:'#FFD700', icone:'🎤', label:'Divulgação / Line-up', dash:[7,4] },
+  email:      { cor:'#00FF88', icone:'📧', label:'E-mail MKT',           dash:[3,3] },
+};
+
+// ACOES = TV_GLOBO (auto) + ACOES_EXTRA (manual)
+const ACOES = [
+  ...TV_GLOBO.map(t => ({
+    dia: t.day26,
+    tipo: 'tv',
+    titulo: 'TV Globo',
+    desc: 'TV Globo (' + t.date + '): ' + t.programs.join(', ')
+  })),
+  ...ACOES_EXTRA,
+];
+
+// Estado de visibilidade por tipo (toggle na legenda)
+// Default: TV + divulgação ligadas (ações de maior impacto)
+const acoesVisiveis = Object.fromEntries(
+  Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv' || k === 'divulgacao'])
+);
 
 /* ═══════════════════════════════════════════
    DADOS 2025 — VENDAS DIÁRIAS
@@ -643,20 +700,27 @@ function tvProgramsForDay26(day26) {
   const tv = TV_GLOBO.find(t => t.day26 === day26);
   return tv ? tv.programs : null;
 }
-function getTvAnnotations(filteredDays26) {
-  // Retorna config de anotações Chart.js para dias com TV Globo
+function getAcoesAnnotations(filteredDays26) {
+  // Retorna config de anotações Chart.js para todas as ações visíveis
+  // (TV, divulgação, influenciador, rádio, OOH, etc)
   const annotations = {};
-  TV_GLOBO.forEach(tv => {
-    const idx = filteredDays26.indexOf(tv.day26);
+  ACOES.forEach((a, i) => {
+    if (!acoesVisiveis[a.tipo]) return;
+    const idx = filteredDays26.indexOf(a.dia);
     if (idx === -1) return;
-    annotations['tv_'+tv.day26] = {
+    const cfg = ACAO_CONFIG[a.tipo];
+    annotations['acao_'+i] = {
       type:'line', xMin:idx, xMax:idx,
-      borderColor:'rgba(255,184,0,0.7)',
-      borderWidth:2, borderDash:[4,3],
+      borderColor: cfg.cor,
+      borderWidth: 2,
+      borderDash: cfg.dash,
     };
   });
   return annotations;
 }
+
+// Alias para retrocompatibilidade (caso alguma função legada ainda chame)
+const getTvAnnotations = getAcoesAnnotations;
 
 /* ═══════════════════════════════════════════
    FETCH DOS DADOS
@@ -1037,7 +1101,7 @@ function buildVendasChart(days26) {
 
   const data26 = days26.map(d => get26(d));
   const data25 = days26.map(d => get25(d));
-  const annotations = getTvAnnotations(days26);
+  const annotations = getAcoesAnnotations(days26);
 
   if (chartVendas) chartVendas.destroy();
   const ctx = document.getElementById('chartVendas').getContext('2d');
@@ -1098,9 +1162,6 @@ function buildVendasChart(days26) {
     }
   });
 
-  // Show TV legend if any TV day in range
-  const hasTv = days26.some(d=>TV_GLOBO.some(t=>t.day26===d));
-  document.getElementById('tvLegVendas').style.display = hasTv ? 'flex' : 'none';
 }
 
 function buildInvestChart(days26) {
@@ -1126,7 +1187,7 @@ function buildInvestChart(days26) {
     data25 = days26.map(inv25);
   }
 
-  const annotations = getTvAnnotations(days26);
+  const annotations = getAcoesAnnotations(days26);
 
   if (chartInvest) chartInvest.destroy();
   const ctx = document.getElementById('chartInvest').getContext('2d');
@@ -1188,6 +1249,37 @@ function buildInvestChart(days26) {
 }
 
 /* ═══════════════════════════════════════════
+   LEGENDA DE AÇÕES (clicável — toggle de cada tipo)
+═══════════════════════════════════════════ */
+function buildAcoesLegend() {
+  ['acoesLegendVendas', 'acoesLegendInvest'].forEach(elId => {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.innerHTML = '';
+    Object.entries(ACAO_CONFIG).forEach(([tipo, cfg]) => {
+      const count = ACOES.filter(a => a.tipo === tipo).length;
+      if (!count) return; // só mostra tipos que têm pelo menos 1 ação
+      const div = document.createElement('div');
+      div.className = 'acao-leg-item' + (acoesVisiveis[tipo] ? '' : ' inactive');
+      div.innerHTML =
+        '<span style="font-size:.85rem">' + cfg.icone + '</span>' +
+        '<div class="acao-leg-line" style="background:' + cfg.cor + '"></div>' +
+        '<span>' + cfg.label + '</span>' +
+        '<span class="acao-leg-count">' + count + '</span>';
+      div.onclick = () => {
+        acoesVisiveis[tipo] = !acoesVisiveis[tipo];
+        // Re-renderiza AMBOS os gráficos + a legenda (mantém sincronia)
+        const days = getFilteredDays26();
+        buildVendasChart(days);
+        buildInvestChart(days);
+        buildAcoesLegend();
+      };
+      el.appendChild(div);
+    });
+  });
+}
+
+/* ═══════════════════════════════════════════
    PILLS INTERAÇÃO
 ═══════════════════════════════════════════ */
 function setVendasMetric(metric, btn) {
@@ -1215,6 +1307,7 @@ function renderAll() {
   renderHojeOntem();
   renderKPIs(days26);
   renderConversoes(days26);
+  buildAcoesLegend();     // legenda clicável (atualiza o estado visual dos toggles)
   buildVendasChart(days26);
   buildInvestChart(days26);
 }
