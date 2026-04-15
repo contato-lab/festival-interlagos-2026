@@ -56,6 +56,41 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .exec-meta-label{font-size:.62rem;color:#666;text-transform:uppercase;letter-spacing:.06em}
 .exec-meta-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;color:var(--text2)}
 .exec-tv-row{font-size:.7rem;color:var(--warn);margin-top:8px;display:flex;align-items:center;gap:5px}
+
+/* ═══ PROJEÇÃO DE RECEITA ATÉ 29/08 ═══ */
+.exec-fc-wrap{background:var(--card);border:1px solid rgba(200,255,0,.18);border-radius:var(--radius);padding:20px;margin-top:14px;position:relative;overflow:hidden}
+.exec-fc-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--lime) 0%,transparent 50%,var(--lime) 100%);opacity:.4}
+.exec-fc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.exec-fc-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.1rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text);display:flex;align-items:center;gap:8px}
+.exec-fc-title::before{content:'';width:3px;height:18px;background:var(--lime);border-radius:2px}
+.exec-fc-badge{background:var(--lime-dim);border:1px solid var(--lime-border);border-radius:20px;padding:4px 12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;color:var(--lime);letter-spacing:.04em}
+.exec-fc-inv-bar{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--rad-sm);padding:10px 12px}
+.exec-fc-inv-item{text-align:center;border-right:1px solid rgba(255,255,255,.05);padding:2px 4px}
+.exec-fc-inv-item:last-child{border-right:none;background:rgba(200,255,0,.05)}
+.exec-fc-inv-lbl{font-size:.56rem;color:#888;text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:3px}
+.exec-fc-inv-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.92rem;color:var(--text2)}
+.exec-fc-inv-val.lime{color:var(--lime)}
+.exec-fc-inputs{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.exec-fc-input{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:var(--rad-sm);padding:10px 12px}
+.exec-fc-input label{display:flex;justify-content:space-between;align-items:center;font-size:.63rem;color:#999;text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-bottom:6px}
+.exec-fc-input label .exec-fc-inp-val{color:var(--lime);font-family:'Barlow Condensed',sans-serif;font-size:.82rem}
+.exec-fc-input input[type="number"]{width:100%;background:transparent;border:none;outline:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text)}
+.exec-fc-input input[type="range"]{width:100%;accent-color:var(--lime);height:4px}
+.exec-fc-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.exec-fc-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);border-radius:var(--rad-sm);padding:14px}
+.exec-fc-card.accent{border-color:var(--lime-border);background:linear-gradient(135deg,rgba(200,255,0,.08) 0%,rgba(255,255,255,.02) 100%)}
+.exec-fc-card.alert{border-color:rgba(255,184,0,.25);background:rgba(255,184,0,.04)}
+.exec-fc-lbl{font-size:.62rem;color:#999;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:6px}
+.exec-fc-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.55rem;color:var(--text);line-height:1;margin-bottom:4px}
+.exec-fc-val.lime{color:var(--lime)}
+.exec-fc-val.warn{color:var(--warn)}
+.exec-fc-sub{font-size:.7rem;color:#999}
+.exec-fc-pct{font-size:.68rem;margin-top:4px;font-weight:700}
+.exec-fc-pct.up{color:var(--green)}.exec-fc-pct.down{color:var(--red)}
+.exec-fc-foot{font-size:.66rem;color:#666;margin-top:10px;line-height:1.5}
+@media(max-width:1024px){.exec-fc-inv-bar{grid-template-columns:repeat(3,1fr)}.exec-fc-inputs{grid-template-columns:repeat(2,1fr)}.exec-fc-cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.exec-fc-inv-bar{grid-template-columns:repeat(2,1fr)}.exec-fc-inputs{grid-template-columns:1fr}.exec-fc-cards{grid-template-columns:1fr 1fr}.exec-fc-val{font-size:1.3rem}}
+
 .exec-kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:6px}
 .exec-kpi{background:var(--card);border:1px solid var(--lime-border);border-radius:var(--radius);padding:16px 18px;box-shadow:0 0 0 1px rgba(200,255,0,0.08)}
 .exec-kpi-label{font-size:.66rem;color:#999;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:5px}
@@ -244,6 +279,98 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     <div class="exec-card" id="exec-card-campanha">
       <div class="exec-card-label">Campanha</div>
       <div class="exec-val-big">&mdash;</div>
+    </div>
+  </div>
+
+  <!-- ══ PROJEÇÃO DE RECEITA ATÉ 29/08 ══ -->
+  <div class="exec-fc-wrap">
+    <div class="exec-fc-head">
+      <div class="exec-fc-title">🔮 Projeção de Receita — Até 29/08/2026</div>
+      <span class="exec-fc-badge" id="execFcDiasBadge">—</span>
+    </div>
+
+    <!-- Mapa de Investimento Total -->
+    <div class="exec-fc-inv-bar">
+      <div class="exec-fc-inv-item">
+        <div class="exec-fc-inv-lbl">Meta+Google+TikTok</div>
+        <div class="exec-fc-inv-val">R$ 600k</div>
+      </div>
+      <div class="exec-fc-inv-item">
+        <div class="exec-fc-inv-lbl">UOL Ads</div>
+        <div class="exec-fc-inv-val">R$ 650k</div>
+      </div>
+      <div class="exec-fc-inv-item">
+        <div class="exec-fc-inv-lbl">ADSPLAY Prog.</div>
+        <div class="exec-fc-inv-val">R$ 600k</div>
+      </div>
+      <div class="exec-fc-inv-item">
+        <div class="exec-fc-inv-lbl">📺 TV Globo</div>
+        <div class="exec-fc-inv-val">R$ 273k</div>
+      </div>
+      <div class="exec-fc-inv-item">
+        <div class="exec-fc-inv-lbl">📻 Rádio BandNews</div>
+        <div class="exec-fc-inv-val">R$ 240k</div>
+      </div>
+      <div class="exec-fc-inv-item">
+        <div class="exec-fc-inv-lbl">INVEST. TOTAL</div>
+        <div class="exec-fc-inv-val lime">R$ 2,36M</div>
+      </div>
+    </div>
+
+    <div class="exec-fc-inputs">
+      <div class="exec-fc-input">
+        <label>🎯 Meta Total (R$)</label>
+        <input type="number" id="execFcMeta" value="11000000" step="500000" min="1000000" onchange="execBuildForecast()">
+      </div>
+      <div class="exec-fc-input">
+        <label>⚡ Pace Diário Alvo (R$)</label>
+        <input type="number" id="execFcPaceAlvo" value="50000" step="5000" min="1000" onchange="execBuildForecast()">
+      </div>
+      <div class="exec-fc-input">
+        <label>⚙️ Ajuste Pace <span class="exec-fc-inp-val" id="execFcPaceVal">100%</span></label>
+        <input type="range" id="execFcPace" min="50" max="200" value="100" oninput="document.getElementById('execFcPaceVal').textContent=this.value+'%';execBuildForecast()">
+      </div>
+      <div class="exec-fc-input">
+        <label>📺 Globo (últ. 10d) <span class="exec-fc-inp-val" id="execFcGloboVal">+150%</span></label>
+        <input type="range" id="execFcGlobo" min="0" max="500" value="150" step="10" oninput="document.getElementById('execFcGloboVal').textContent='+'+this.value+'%';execBuildForecast()">
+      </div>
+      <div class="exec-fc-input">
+        <label>📡 Programática Ago <span class="exec-fc-inp-val" id="execFcProgVal">+40%</span></label>
+        <input type="range" id="execFcProg" min="0" max="200" value="40" step="5" oninput="document.getElementById('execFcProgVal').textContent='+'+this.value+'%';execBuildForecast()">
+      </div>
+    </div>
+
+    <div class="exec-fc-cards">
+      <div class="exec-fc-card">
+        <div class="exec-fc-lbl">🟡 Conservador</div>
+        <div class="exec-fc-val" id="execFcConservador">—</div>
+        <div class="exec-fc-sub" id="execFcConservadorSub">—</div>
+        <div class="exec-fc-pct" id="execFcConservadorPct">—</div>
+      </div>
+      <div class="exec-fc-card accent">
+        <div class="exec-fc-lbl">🟢 Realista <span style="color:#666;font-size:.58rem">(+Globo)</span></div>
+        <div class="exec-fc-val lime" id="execFcRealista">—</div>
+        <div class="exec-fc-sub" id="execFcRealistaSub">—</div>
+        <div class="exec-fc-pct" id="execFcRealistaPct">—</div>
+      </div>
+      <div class="exec-fc-card">
+        <div class="exec-fc-lbl">🔥 Otimista <span style="color:#666;font-size:.58rem">(+Globo+Prog)</span></div>
+        <div class="exec-fc-val" id="execFcOtimista">—</div>
+        <div class="exec-fc-sub" id="execFcOtimistaSub">—</div>
+        <div class="exec-fc-pct" id="execFcOtimistaPct">—</div>
+      </div>
+      <div class="exec-fc-card alert">
+        <div class="exec-fc-lbl">📅 Pace p/ Bater Meta</div>
+        <div class="exec-fc-val warn" id="execFcGap">—</div>
+        <div class="exec-fc-sub" id="execFcGapSub">—</div>
+        <div class="exec-fc-pct" id="execFcGapPct">—</div>
+      </div>
+    </div>
+
+    <div style="height:280px;position:relative"><canvas id="execFcChart"></canvas></div>
+
+    <div class="exec-fc-foot">
+      💡 <strong>Sonho do Marcinho:</strong> manter R$ 50k/dia até a curva final (Globo ao vivo + pico ADSPLAY últimos 10 dias). Meta R$ 11M = ROI 4,7x sobre R$ 2,36M investido. Curva 2025 esticada para 151 dias, ajustada pelo pace real 2026, com uplifts configuráveis nos sliders.
     </div>
   </div>
 
@@ -1028,6 +1155,152 @@ function renderExecKPIs() {
 
 /* ═══ Grafico Vendas ═══ */
 
+// ═══════════════════════════════════════════════
+// PROJEÇÃO DE RECEITA ATÉ 29/08/2026
+// Metodologia: estica curva 2025 (94d) para 2026 (151d),
+// calibra pelo pace real, aplica uplifts Globo + ADSPLAY Agosto.
+// ═══════════════════════════════════════════════
+const EXEC_FC_DATA_EVENTO = new Date('2026-08-29T00:00:00');
+const EXEC_FC_DIAS_2026   = 151; // 31/03 → 29/08
+const EXEC_FC_GLOBO_DAYS  = 10;  // últimos N dias = Globo ao vivo
+const EXEC_FC_PROG_START  = 122; // ~01/08 = início pico ADSPLAY Agosto
+const EXEC_FC_PROG_END    = 151;
+let _execFcChart = null;
+
+function _execFcFmtR(n){
+  if(n >= 1e6) return 'R$ ' + (n/1e6).toFixed(2) + 'M';
+  if(n >= 1e3) return 'R$ ' + (n/1e3).toFixed(0) + 'k';
+  return 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+}
+function _execFcFmtFull(n){ return 'R$ ' + Math.round(n).toLocaleString('pt-BR'); }
+
+function execBuildForecast(){
+  if(!D25 || !D25.length) return;
+
+  const dias25 = D25.length;
+  const curve25Stretched = new Array(EXEC_FC_DIAS_2026).fill(0);
+  for(let i = 0; i < EXEC_FC_DIAS_2026; i++){
+    const idx = (i / (EXEC_FC_DIAS_2026 - 1)) * (dias25 - 1);
+    const lo = Math.floor(idx), hi = Math.min(dias25-1, lo+1);
+    const frac = idx - lo;
+    const recLo = (D25[lo]?.mv || 0) + (D25[lo]?.av || 0);
+    const recHi = (D25[hi]?.mv || 0) + (D25[hi]?.av || 0);
+    // Normaliza: estica mantendo o total aproximado
+    curve25Stretched[i] = (recLo + (recHi - recLo) * frac) * (dias25 / EXEC_FC_DIAS_2026);
+  }
+
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const diasDecorridos = Math.max(1, Math.floor((hoje - DATA_INICIO) / 86400000) + 1);
+  const diaAtual = Math.min(diasDecorridos, EXEC_FC_DIAS_2026);
+
+  const realizadoPorDia = new Array(EXEC_FC_DIAS_2026).fill(null);
+  let realizadoAcumulado = 0;
+  (D26_FULL || []).forEach(r => {
+    const idx = r.d - 1;
+    if(idx >= 0 && idx < EXEC_FC_DIAS_2026){
+      const rec = (r.mv || 0) + (r.av || 0);
+      realizadoPorDia[idx] = rec;
+      if(idx < diaAtual) realizadoAcumulado += rec;
+    }
+  });
+
+  let ref25Acum = 0;
+  for(let i = 0; i < diaAtual; i++) ref25Acum += curve25Stretched[i];
+  const fatorReal = ref25Acum > 0 ? realizadoAcumulado / ref25Acum : 1;
+
+  const meta     = parseFloat(document.getElementById('execFcMeta').value) || 11000000;
+  const paceAlvo = parseFloat(document.getElementById('execFcPaceAlvo').value) || 50000;
+  const paceAdj  = parseFloat(document.getElementById('execFcPace').value) / 100;
+  const upGlobo  = parseFloat(document.getElementById('execFcGlobo').value) / 100;
+  const upProg   = parseFloat(document.getElementById('execFcProg').value) / 100;
+
+  const fatorAjustado = fatorReal * paceAdj;
+
+  function projetar(upG, upP){
+    let total = realizadoAcumulado;
+    const serie = [...realizadoPorDia];
+    for(let i = diaAtual; i < EXEC_FC_DIAS_2026; i++){
+      let base = curve25Stretched[i] * fatorAjustado;
+      if(i >= EXEC_FC_DIAS_2026 - EXEC_FC_GLOBO_DAYS) base *= (1 + upG);
+      if(i >= EXEC_FC_PROG_START && i <= EXEC_FC_PROG_END) base *= (1 + upP);
+      serie[i] = base;
+      total += base;
+    }
+    return { total, serie };
+  }
+
+  const consv = projetar(0, 0);
+  const real  = projetar(upGlobo, 0);
+  const otim  = projetar(upGlobo, upProg);
+
+  const setCard = (totalId, subId, pctId, total) => {
+    const pct = meta > 0 ? (total/meta*100) : 0;
+    document.getElementById(totalId).textContent = _execFcFmtR(total);
+    document.getElementById(subId).textContent = pct.toFixed(1) + '% da meta (' + _execFcFmtR(meta) + ')';
+    const pctEl = document.getElementById(pctId);
+    const gap = total - meta;
+    pctEl.textContent = gap >= 0 ? '▲ +' + _execFcFmtR(gap) + ' acima' : '▼ ' + _execFcFmtR(-gap) + ' faltam';
+    pctEl.className = 'exec-fc-pct ' + (gap >= 0 ? 'up' : 'down');
+  };
+  setCard('execFcConservador', 'execFcConservadorSub', 'execFcConservadorPct', consv.total);
+  setCard('execFcRealista',    'execFcRealistaSub',    'execFcRealistaPct',    real.total);
+  setCard('execFcOtimista',    'execFcOtimistaSub',    'execFcOtimistaPct',    otim.total);
+
+  const diasFalt = EXEC_FC_DIAS_2026 - diaAtual;
+  const faltaPraMeta = Math.max(0, meta - realizadoAcumulado);
+  const porDiaPrecisa = diasFalt > 0 ? faltaPraMeta / diasFalt : 0;
+  document.getElementById('execFcGap').textContent = _execFcFmtR(porDiaPrecisa) + '/dia';
+  document.getElementById('execFcGapSub').textContent = diasFalt + ' dias restantes · falta ' + _execFcFmtR(faltaPraMeta);
+  const gapPctEl = document.getElementById('execFcGapPct');
+  const mediaAtual = diaAtual > 0 ? realizadoAcumulado / diaAtual : 0;
+  const deltaAlvo = paceAlvo > 0 ? ((mediaAtual - paceAlvo) / paceAlvo * 100) : 0;
+  gapPctEl.textContent = 'Pace atual: ' + _execFcFmtR(mediaAtual) + '/dia · alvo ' + _execFcFmtR(paceAlvo) + ' (' + (deltaAlvo >= 0 ? '▲+' : '▼') + deltaAlvo.toFixed(0) + '%)';
+  gapPctEl.className = 'exec-fc-pct ' + (deltaAlvo >= 0 ? 'up' : 'down');
+
+  document.getElementById('execFcDiasBadge').textContent = diaAtual + 'º dia · ' + diasFalt + ' restantes';
+
+  const labels = Array.from({length: EXEC_FC_DIAS_2026}, (_, i) => {
+    const d = new Date(DATA_INICIO); d.setDate(d.getDate() + i);
+    return d.getDate().toString().padStart(2,'0') + '/' + (d.getMonth()+1).toString().padStart(2,'0');
+  });
+
+  const acum = arr => { const r = []; let s = 0; for(const v of arr){ s += (v || 0); r.push(s); } return r; };
+  const realizadoAcumArr = acum(realizadoPorDia.map((v,i) => i < diaAtual ? (v || 0) : 0)).map((v,i) => i < diaAtual ? v : null);
+  const ref25AcumArr     = acum(curve25Stretched);
+  const consvAcum = acum(consv.serie.map(v=>v||0));
+  const realAcum  = acum(real.serie.map(v=>v||0));
+  const otimAcum  = acum(otim.serie.map(v=>v||0));
+
+  const ctx = document.getElementById('execFcChart');
+  if(!ctx) return;
+  if(_execFcChart) _execFcChart.destroy();
+  _execFcChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: '2025 (referência esticada)', data: ref25AcumArr, borderColor: 'rgba(123,45,139,0.55)', backgroundColor: 'rgba(123,45,139,0.05)', borderWidth: 1.5, borderDash: [4,4], pointRadius: 0, tension: .35, fill: false },
+        { label: '2026 realizado', data: realizadoAcumArr, borderColor: '#C8FF00', backgroundColor: 'rgba(200,255,0,0.08)', borderWidth: 2.5, pointRadius: 0, tension: .25, fill: true },
+        { label: 'Conservador', data: consvAcum, borderColor: 'rgba(255,184,0,0.8)', borderWidth: 1.5, borderDash: [6,3], pointRadius: 0, tension: .25, fill: false },
+        { label: 'Realista (+Globo)', data: realAcum, borderColor: '#00FF88', borderWidth: 2, pointRadius: 0, tension: .25, fill: false },
+        { label: 'Otimista (+Prog)', data: otimAcum, borderColor: 'rgba(255,68,68,0.8)', borderWidth: 1.5, borderDash: [2,3], pointRadius: 0, tension: .25, fill: false },
+        { label: 'META', data: labels.map(() => meta), borderColor: 'rgba(255,255,255,0.35)', borderDash: [8,5], borderWidth: 1, pointRadius: 0, fill: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, interaction: { mode:'index', intersect:false },
+      plugins: {
+        legend: { display: true, labels: { color: '#BBB', font: { size: 10, family: 'Inter' }, usePointStyle: true, pointStyle:'line', boxWidth: 28 } },
+        tooltip: { backgroundColor: '#0A0A0A', titleColor:'#EEE', bodyColor:'#CCC', borderColor:'rgba(200,255,0,.3)', borderWidth: 1, callbacks: { label: (c) => c.dataset.label + ': ' + _execFcFmtFull(c.parsed.y) } }
+      },
+      scales: {
+        x: { ticks: { color: '#666', font: { size: 9 }, maxTicksLimit: 12, callback: function(val, i) { return i % 15 === 0 ? this.getLabelForValue(val) : ''; } }, grid: { color: 'rgba(255,255,255,.03)' } },
+        y: { ticks: { color: '#666', font: { size: 10 }, callback: v => 'R$ ' + (v/1e6).toFixed(1) + 'M' }, grid: { color: 'rgba(255,255,255,.04)' } }
+      }
+    }
+  });
+}
+
 function buildExecVendasChart() {
   const invest = buildExecD26Invest(execFiltFrom, execFiltTo);
   const days = execGetAllDays(invest); if(!days.length) return;
@@ -1245,6 +1518,7 @@ function setExecPreset(id) {
 function renderPainelExecutivo() {
   renderExecHojeOntem();
   renderExecKPIs();
+  execBuildForecast();
   buildExecDplusBar();
   buildExecVendasChart();
   buildExecInvestChart();
