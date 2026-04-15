@@ -368,9 +368,43 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="exec-chart-wrap"><canvas id="exec-chartInvest"></canvas></div>
     </div>
 
-  
+
 </div><!-- /exec-charts-grid -->
 
+  <!-- ══ TIMELINE COMPLETA — 2025 vs 2026 ══ -->
+  <div class="exec-chart-card" style="margin-top:16px">
+    <div class="section-header" style="margin-bottom:10px">
+      <div>
+        <div class="section-title">📈 Linha do Tempo — 2025 vs 2026</div>
+        <div style="font-size:.7rem;color:#666;margin-top:3px">Comparativo dia a dia &middot; campanha completa</div>
+      </div>
+      <div class="pill-group" id="execTlPills">
+        <button class="exec-metric-pill active" onclick="execSetTlMetric('receita',this)">💰 Receita</button>
+        <button class="exec-metric-pill" onclick="execSetTlMetric('ingressos',this)">🎟️ Ingressos</button>
+      </div>
+    </div>
+    <div class="exec-leg">
+      <div class="exec-leg-item"><span style="display:inline-block;width:18px;height:2px;background:#C8FF00"></span>2025</div>
+      <div class="exec-leg-item"><span style="display:inline-block;width:18px;height:2px;background:#7B2D8B"></span>2026</div>
+      <div class="exec-leg-item clickable" id="exec-tvLegTl" style="display:none" onclick="execToggleAcaoTl('tv',this)">
+        <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,184,0,.8)"></span>
+        <span style="color:var(--warn)">TV Globo</span>
+      </div>
+      <div class="exec-leg-item clickable" id="exec-inflLegTl" style="display:none" onclick="execToggleAcaoTl('influencer',this)">
+        <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(123,45,139,.9)"></span>
+        <span style="color:#7B2D8B">Influenciadores</span>
+      </div>
+      <div class="exec-leg-item clickable" id="exec-divLegTl" style="display:none" onclick="execToggleAcaoTl('divulgacao',this)">
+        <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,215,0,.9)"></span>
+        <span style="color:#FFD700">🎤 Divulgação</span>
+      </div>
+      <div class="exec-leg-item clickable" id="exec-spotLegTl" style="display:none" onclick="execToggleAcaoTl('spotify',this)">
+        <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(29,185,84,.9)"></span>
+        <span style="color:#1DB954">🎵 Link Vendas Spotify</span>
+      </div>
+    </div>
+    <div style="position:relative;height:320px"><canvas id="exec-chartTimeline"></canvas></div>
+  </div>
 
   <!-- Conversoes -->
   <div class="exec-conv-grid">
@@ -1214,6 +1248,7 @@ function renderPainelExecutivo() {
   buildExecDplusBar();
   buildExecVendasChart();
   buildExecInvestChart();
+  buildExecTimelineChart();
   buildExecTMCharts();
   renderExecConversoes();
   const now = new Date();
@@ -1304,6 +1339,136 @@ if(localStorage.getItem(_AUTH_KEY)==='1'){
 // ═══════════════════════════════════════════════
 // EXEC — VENDAS MOTOS + AUTOS (Sistema Próprio vs TM)
 // ═══════════════════════════════════════════════
+// TIMELINE COMPLETA — 2025 vs 2026 com ações
+// ═══════════════════════════════════════════════
+let execTlMetric = 'receita'; // 'receita' | 'ingressos'
+let _execChartTl = null;
+
+function execSetTlMetric(metric, btn) {
+  execTlMetric = metric;
+  document.querySelectorAll('#execTlPills .exec-metric-pill').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  buildExecTimelineChart();
+}
+
+function execToggleAcaoTl(tipo, el) {
+  execAcoesVisiveis[tipo] = !execAcoesVisiveis[tipo];
+  el.classList.toggle('inactive', !execAcoesVisiveis[tipo]);
+  // Sincroniza com o outro chart
+  const outro = document.getElementById('exec-' + (tipo==='tv'?'tv':tipo==='influencer'?'infl':tipo==='divulgacao'?'div':'spot') + 'LegVendas');
+  if(outro) outro.classList.toggle('inactive', !execAcoesVisiveis[tipo]);
+  buildExecTimelineChart();
+  buildExecVendasChart();
+}
+
+function buildExecTimelineChart() {
+  const ctx = document.getElementById('exec-chartTimeline');
+  if(!ctx || !D25 || !D25.length) return;
+
+  const n = D25.length;
+  const days = Array.from({length:n},(_,i)=>i+1);
+  const labels = days.map(d => {
+    const dt = new Date(DATA_INICIO); dt.setDate(dt.getDate() + d - 1);
+    return dt.getDate().toString().padStart(2,'0') + '/' + dt.toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
+  });
+
+  const getVal = (r) => {
+    if(!r) return null;
+    const mv = r.mv||0, mq = r.mq||0, av = r.av||0, aq = r.aq||0;
+    return execTlMetric === 'receita' ? (mv + av) : (mq + aq);
+  };
+
+  const s25 = D25.map(getVal);
+  const s26 = Array(n).fill(null);
+  (D26_FULL || []).forEach(r => {
+    const i = r.d - 1;
+    if(i >= 0 && i < n) s26[i] = getVal(r);
+  });
+
+  // Anotações usando a mesma função já existente
+  const anns = execGetTvAnnotations(days);
+
+  if(_execChartTl) _execChartTl.destroy();
+  _execChartTl = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: '2025', data: s25,
+          borderColor: '#C8FF00', backgroundColor: 'rgba(200,255,0,0.05)',
+          borderWidth: 2, tension: .35, fill: true,
+          pointRadius: 2, pointHoverRadius: 6,
+          pointBackgroundColor: '#C8FF00'
+        },
+        {
+          label: '2026', data: s26,
+          borderColor: '#7B2D8B', backgroundColor: 'rgba(123,45,139,0.08)',
+          borderWidth: 2.5, tension: .35, fill: true,
+          pointRadius: 2.5, pointHoverRadius: 6,
+          pointBackgroundColor: '#7B2D8B'
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: { duration: 400 },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        annotation: { annotations: anns },
+        tooltip: {
+          backgroundColor: '#0A0A0A', titleColor: '#C8FF00', bodyColor: '#EEE',
+          borderColor: 'rgba(200,255,0,0.25)', borderWidth: 1, padding: 11,
+          callbacks: {
+            title: items => {
+              const dia = items[0].dataIndex + 1;
+              const dt = new Date(DATA_INICIO); dt.setDate(dt.getDate() + dia - 1);
+              return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) + ' · D+' + dia;
+            },
+            label: c => {
+              const v = c.parsed.y;
+              if(v == null) return '';
+              const fmt = execTlMetric === 'receita'
+                ? 'R$ ' + v.toLocaleString('pt-BR',{maximumFractionDigits:0})
+                : v.toLocaleString('pt-BR') + ' ing.';
+              return c.dataset.label + ': ' + fmt;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#666', font: { size: 9 },
+            maxTicksLimit: 14,
+            callback: function(val, i) { return i % 7 === 0 ? this.getLabelForValue(val) : ''; }
+          },
+          grid: { color: 'rgba(255,255,255,.03)' }
+        },
+        y: {
+          ticks: {
+            color: '#666', font: { size: 10 },
+            callback: v => execTlMetric === 'receita'
+              ? 'R$ ' + (v/1000).toFixed(0) + 'k'
+              : v.toLocaleString('pt-BR')
+          },
+          grid: { color: 'rgba(255,255,255,.04)' }
+        }
+      }
+    }
+  });
+
+  // Mostra legendas das ações que caem no range
+  const tvLegTl = document.getElementById('exec-tvLegTl');
+  if(tvLegTl) tvLegTl.style.display = EXEC_TV_GLOBO.some(t=>days.includes(t.day26))?'flex':'none';
+  const inflLegTl = document.getElementById('exec-inflLegTl');
+  if(inflLegTl) inflLegTl.style.display = EXEC_INFLUENCER_DIAS.some(t=>days.includes(t.day26))?'flex':'none';
+  const divLegTl = document.getElementById('exec-divLegTl');
+  if(divLegTl) divLegTl.style.display = EXEC_DIVULGACAO.some(t=>days.includes(t.day26))?'flex':'none';
+  const spotLegTl = document.getElementById('exec-spotLegTl');
+  if(spotLegTl) spotLegTl.style.display = EXEC_SPOTIFY.some(t=>days.includes(t.day26))?'flex':'none';
+}
+
 let execTMView = 'receita'; // 'receita' | 'ingressos'
 let _execChartMoto = null, _execChartAuto = null;
 
