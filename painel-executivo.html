@@ -289,57 +289,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <span class="exec-fc-badge" id="execFcDiasBadge">—</span>
     </div>
 
-    <!-- Mapa de Investimento Total -->
-    <div class="exec-fc-inv-bar">
-      <div class="exec-fc-inv-item">
-        <div class="exec-fc-inv-lbl">Meta+Google+TikTok</div>
-        <div class="exec-fc-inv-val">R$ 600k</div>
-      </div>
-      <div class="exec-fc-inv-item">
-        <div class="exec-fc-inv-lbl">UOL Ads</div>
-        <div class="exec-fc-inv-val">R$ 650k</div>
-      </div>
-      <div class="exec-fc-inv-item">
-        <div class="exec-fc-inv-lbl">ADSPLAY Prog.</div>
-        <div class="exec-fc-inv-val">R$ 600k</div>
-      </div>
-      <div class="exec-fc-inv-item">
-        <div class="exec-fc-inv-lbl">📺 TV Globo</div>
-        <div class="exec-fc-inv-val">R$ 273k</div>
-      </div>
-      <div class="exec-fc-inv-item">
-        <div class="exec-fc-inv-lbl">📻 Rádio BandNews</div>
-        <div class="exec-fc-inv-val">R$ 240k</div>
-      </div>
-      <div class="exec-fc-inv-item">
-        <div class="exec-fc-inv-lbl">INVEST. TOTAL</div>
-        <div class="exec-fc-inv-val lime">R$ 2,36M</div>
-      </div>
-    </div>
-
-    <div class="exec-fc-inputs">
-      <div class="exec-fc-input">
-        <label>🎯 Meta Total (R$)</label>
-        <input type="number" id="execFcMeta" value="11000000" step="500000" min="1000000" onchange="execBuildForecast()">
-      </div>
-      <div class="exec-fc-input">
-        <label>⚡ Pace Diário Alvo (R$)</label>
-        <input type="number" id="execFcPaceAlvo" value="50000" step="5000" min="1000" onchange="execBuildForecast()">
-      </div>
-      <div class="exec-fc-input">
-        <label>⚙️ Ajuste Pace <span class="exec-fc-inp-val" id="execFcPaceVal">100%</span></label>
-        <input type="range" id="execFcPace" min="50" max="200" value="100" oninput="document.getElementById('execFcPaceVal').textContent=this.value+'%';execBuildForecast()">
-      </div>
-      <div class="exec-fc-input">
-        <label>📺 Globo (últ. 10d) <span class="exec-fc-inp-val" id="execFcGloboVal">+150%</span></label>
-        <input type="range" id="execFcGlobo" min="0" max="500" value="150" step="10" oninput="document.getElementById('execFcGloboVal').textContent='+'+this.value+'%';execBuildForecast()">
-      </div>
-      <div class="exec-fc-input">
-        <label>📡 Programática Ago <span class="exec-fc-inp-val" id="execFcProgVal">+40%</span></label>
-        <input type="range" id="execFcProg" min="0" max="200" value="40" step="5" oninput="document.getElementById('execFcProgVal').textContent='+'+this.value+'%';execBuildForecast()">
-      </div>
-    </div>
-
     <div class="exec-fc-cards">
       <div class="exec-fc-card">
         <div class="exec-fc-lbl">🟡 Conservador</div>
@@ -1208,11 +1157,12 @@ function execBuildForecast(){
   for(let i = 0; i < diaAtual; i++) ref25Acum += curve25Stretched[i];
   const fatorReal = ref25Acum > 0 ? realizadoAcumulado / ref25Acum : 1;
 
-  const meta     = parseFloat(document.getElementById('execFcMeta').value) || 11000000;
-  const paceAlvo = parseFloat(document.getElementById('execFcPaceAlvo').value) || 50000;
-  const paceAdj  = parseFloat(document.getElementById('execFcPace').value) / 100;
-  const upGlobo  = parseFloat(document.getElementById('execFcGlobo').value) / 100;
-  const upProg   = parseFloat(document.getElementById('execFcProg').value) / 100;
+  // Valores fixos (inputs removidos da UI)
+  const meta     = 11000000;  // Meta total R$ 11M
+  const paceAlvo = 50000;     // Sonho Marcinho: R$ 50k/dia
+  const paceAdj  = 1.0;       // 100% — sem ajuste manual
+  const upGlobo  = 1.5;       // +150% últimos 10d (Globo ao vivo)
+  const upProg   = 0.4;       // +40% Agosto (pico ADSPLAY)
 
   const fatorAjustado = fatorReal * paceAdj;
 
