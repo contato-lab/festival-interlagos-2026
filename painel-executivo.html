@@ -341,6 +341,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
           <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,215,0,.9)"></span>
           <span style="color:#FFD700">🎤 Divulgação</span>
         </div>
+        <div class="exec-leg-item clickable" id="exec-spotLegVendas" style="display:none" onclick="execToggleAcao('spotify',this)">
+          <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(29,185,84,.9)"></span>
+          <span style="color:#1DB954">🎵 Link Vendas Spotify</span>
+        </div>
       </div>
       <div class="exec-chart-wrap"><canvas id="exec-chartVendas"></canvas></div>
     </div>
@@ -678,6 +682,10 @@ const EXEC_DIVULGACAO = [
   {date:'2026-04-14', day26:15, desc:'Divulgação Ja Rule + Line-up'},
 ];
 
+const EXEC_SPOTIFY = [
+  {date:'2026-04-20', day26:21, desc:'Link de Vendas Spotify'},
+];
+
 const EXEC_TV_GLOBO = [
   {date:'2026-04-01', day26:2, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
   {date:'2026-04-02', day26:3, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
@@ -758,7 +766,7 @@ function execGetAllDays(invest) {
 }
 
 /* Estado de visibilidade das ações (toggle na legenda) */
-const execAcoesVisiveis = { tv: true, influencer: true, divulgacao: true };
+const execAcoesVisiveis = { tv: true, influencer: true, divulgacao: true, spotify: true };
 
 function execToggleAcao(tipo, el) {
   execAcoesVisiveis[tipo] = !execAcoesVisiveis[tipo];
@@ -796,6 +804,16 @@ function execGetTvAnnotations(days) {
       anns['div_'+dv.day26] = {
         type:'line', xMin:idx, xMax:idx,
         borderColor:'rgba(255,215,0,0.9)', borderWidth:2, borderDash:[7,4]
+      };
+    });
+  }
+  if(execAcoesVisiveis.spotify) {
+    EXEC_SPOTIFY.forEach(sp => {
+      const idx = days.indexOf(sp.day26);
+      if(idx === -1) return;
+      anns['spot_'+sp.day26] = {
+        type:'line', xMin:idx, xMax:idx,
+        borderColor:'rgba(29,185,84,0.9)', borderWidth:2, borderDash:[5,3]
       };
     });
   }
@@ -1027,6 +1045,8 @@ function buildExecVendasChart() {
   if(inflLeg) inflLeg.style.display = days.some(d=>EXEC_INFLUENCER_DIAS.some(t=>t.day26===d))?'flex':'none';
   const divLeg = document.getElementById('exec-divLegVendas');
   if(divLeg) divLeg.style.display = days.some(d=>EXEC_DIVULGACAO.some(t=>t.day26===d))?'flex':'none';
+  const spotLeg = document.getElementById('exec-spotLegVendas');
+  if(spotLeg) spotLeg.style.display = days.some(d=>EXEC_SPOTIFY.some(t=>t.day26===d))?'flex':'none';
 }
 
 /* ═══ Grafico Investimento ═══ */
