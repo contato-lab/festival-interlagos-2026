@@ -411,7 +411,6 @@ footer{
         <div class="legend-item"><span class="leg-dot" style="background:#C8FF00"></span>2026</div>
         <div class="legend-item"><span class="leg-dot" style="background:#555"></span>2025</div>
       </div>
-      <div class="acoes-legend" id="acoesLegendInvest"></div>
       <div class="chart-canvas-wrap"><canvas id="chartInvest"></canvas></div>
     </div>
 
@@ -1187,7 +1186,9 @@ function buildInvestChart(days26) {
     data25 = days26.map(inv25);
   }
 
-  const annotations = getAcoesAnnotations(days26);
+  // Gráfico de investimento NÃO recebe anotações de ações (decisão visual:
+  // as marcações ficam só no gráfico de Vendas para nao poluir).
+  const annotations = {};
 
   if (chartInvest) chartInvest.destroy();
   const ctx = document.getElementById('chartInvest').getContext('2d');
@@ -1252,30 +1253,29 @@ function buildInvestChart(days26) {
    LEGENDA DE AÇÕES (clicável — toggle de cada tipo)
 ═══════════════════════════════════════════ */
 function buildAcoesLegend() {
-  ['acoesLegendVendas', 'acoesLegendInvest'].forEach(elId => {
-    const el = document.getElementById(elId);
-    if (!el) return;
-    el.innerHTML = '';
-    Object.entries(ACAO_CONFIG).forEach(([tipo, cfg]) => {
-      const count = ACOES.filter(a => a.tipo === tipo).length;
-      if (!count) return; // só mostra tipos que têm pelo menos 1 ação
-      const div = document.createElement('div');
-      div.className = 'acao-leg-item' + (acoesVisiveis[tipo] ? '' : ' inactive');
-      div.innerHTML =
-        '<span style="font-size:.85rem">' + cfg.icone + '</span>' +
-        '<div class="acao-leg-line" style="background:' + cfg.cor + '"></div>' +
-        '<span>' + cfg.label + '</span>' +
-        '<span class="acao-leg-count">' + count + '</span>';
-      div.onclick = () => {
-        acoesVisiveis[tipo] = !acoesVisiveis[tipo];
-        // Re-renderiza AMBOS os gráficos + a legenda (mantém sincronia)
-        const days = getFilteredDays26();
-        buildVendasChart(days);
-        buildInvestChart(days);
-        buildAcoesLegend();
-      };
-      el.appendChild(div);
-    });
+  // Legenda clicável aparece SOMENTE no gráfico de Vendas
+  // (o de Investimento nao mostra marcacoes para nao poluir o visual).
+  const el = document.getElementById('acoesLegendVendas');
+  if (!el) return;
+  el.innerHTML = '';
+  Object.entries(ACAO_CONFIG).forEach(([tipo, cfg]) => {
+    const count = ACOES.filter(a => a.tipo === tipo).length;
+    if (!count) return; // só mostra tipos que têm pelo menos 1 ação
+    const div = document.createElement('div');
+    div.className = 'acao-leg-item' + (acoesVisiveis[tipo] ? '' : ' inactive');
+    div.innerHTML =
+      '<span style="font-size:.85rem">' + cfg.icone + '</span>' +
+      '<div class="acao-leg-line" style="background:' + cfg.cor + '"></div>' +
+      '<span>' + cfg.label + '</span>' +
+      '<span class="acao-leg-count">' + count + '</span>';
+    div.onclick = () => {
+      acoesVisiveis[tipo] = !acoesVisiveis[tipo];
+      // Re-renderiza SÓ o gráfico de Vendas (invest nao tem marcacoes).
+      const days = getFilteredDays26();
+      buildVendasChart(days);
+      buildAcoesLegend();
+    };
+    el.appendChild(div);
   });
 }
 
