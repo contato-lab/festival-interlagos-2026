@@ -1,32 +1,21 @@
 {
-  "updated_at": "2026-04-14T23:31:58.150909+00:00",
+  "updated_at": "2026-04-15T00:09:17.409141+00:00",
   "property_id": "378336436",
   "period": {
-    "start": "2026-01-14",
-    "end": "2026-04-13"
+    "start": "2026-01-15",
+    "end": "2026-04-14"
   },
   "totals": {
-    "sessions": 192769,
-    "users": 165231,
-    "new_users": 135451,
-    "pageviews": 565720,
-    "events": 1322596,
-    "conversions": 1958.0,
-    "pages_per_session": 2.93,
-    "avg_bounce_rate": 55.21
+    "sessions": 196528,
+    "users": 168687,
+    "new_users": 138172,
+    "pageviews": 574423,
+    "events": 1343572,
+    "conversions": 1990.0,
+    "pages_per_session": 2.92,
+    "avg_bounce_rate": 55.23
   },
   "daily_series": [
-    {
-      "date": "2026-01-14",
-      "sessions": 130,
-      "users": 118,
-      "new_users": 92,
-      "pageviews": 135,
-      "events": 449,
-      "conversions": 0.0,
-      "bounce_rate": 49.23,
-      "avg_session_s": 62.0
-    },
     {
       "date": "2026-01-15",
       "sessions": 138,
@@ -1005,52 +994,63 @@
       "conversions": 53.0,
       "bounce_rate": 53.15,
       "avg_session_s": 127.8
+    },
+    {
+      "date": "2026-04-14",
+      "sessions": 3889,
+      "users": 3574,
+      "new_users": 2813,
+      "pageviews": 8838,
+      "events": 21425,
+      "conversions": 32.0,
+      "bounce_rate": 51.3,
+      "avg_session_s": 136.8
     }
   ],
   "traffic_sources": [
     {
       "channel": "Direct",
-      "sessions": 36334,
-      "conversions": 885.0
+      "sessions": 37010,
+      "conversions": 894.0
     },
     {
       "channel": "Paid Social",
-      "sessions": 32263,
-      "conversions": 1.0
+      "sessions": 33802,
+      "conversions": 2.0
     },
     {
       "channel": "Organic Search",
-      "sessions": 22613,
-      "conversions": 12.0
+      "sessions": 22644,
+      "conversions": 14.0
     },
     {
       "channel": "Organic Social",
-      "sessions": 22278,
+      "sessions": 22482,
       "conversions": 3.0
     },
     {
       "channel": "Unassigned",
-      "sessions": 18479,
-      "conversions": 7.0
+      "sessions": 19063,
+      "conversions": 8.0
     },
     {
       "channel": "Paid Search",
-      "sessions": 13264,
+      "sessions": 13873,
       "conversions": 5.0
     },
     {
       "channel": "Referral",
-      "sessions": 9263,
-      "conversions": 694.0
+      "sessions": 9592,
+      "conversions": 713.0
     },
     {
       "channel": "Paid Other",
-      "sessions": 326,
+      "sessions": 370,
       "conversions": 0.0
     },
     {
       "channel": "Cross-network",
-      "sessions": 120,
+      "sessions": 126,
       "conversions": 0.0
     },
     {
@@ -1060,68 +1060,63 @@
     },
     {
       "channel": "Email",
-      "sessions": 2,
+      "sessions": 1,
       "conversions": 0.0
     }
   ],
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 252400,
-      "sessions": 130492
+      "pageviews": 256469,
+      "sessions": 132201
     },
     {
       "page": "/ingressos/",
-      "pageviews": 56281,
-      "sessions": 33136
+      "pageviews": 57580,
+      "sessions": 34061
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-moto",
-      "pageviews": 32972,
-      "sessions": 21455
+      "pageviews": 33510,
+      "sessions": 21809
     },
     {
       "page": "/vendas/ingressos/ride-pass",
-      "pageviews": 32276,
-      "sessions": 10891
+      "pageviews": 32605,
+      "sessions": 11058
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026",
-      "pageviews": 26180,
-      "sessions": 24294
+      "pageviews": 26589,
+      "sessions": 24651
     },
     {
       "page": "/vendas/ingressos/sport-pass",
-      "pageviews": 15716,
-      "sessions": 7864
+      "pageviews": 15947,
+      "sessions": 8054
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-auto",
-      "pageviews": 15474,
-      "sessions": 10402
+      "pageviews": 15874,
+      "sessions": 10736
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 15323,
-      "sessions": 7167
+      "pageviews": 15523,
+      "sessions": 7286
     },
     {
       "page": "/conta/informacoes/",
-      "pageviews": 14563,
-      "sessions": 5902
+      "pageviews": 14714,
+      "sessions": 5963
     },
     {
       "page": "/carrinho/index",
-      "pageviews": 12784,
-      "sessions": 4045
+      "pageviews": 12848,
+      "sessions": 4092
     }
   ],
   "sessions_by_date": {
-    "2026-02-27": {
-      "Busca Orgânica": 76,
-      "Social Orgânico": 32,
-      "Direto pelo Link": 20
-    },
     "2026-02-28": {
       "Busca Orgânica": 54,
       "Social Orgânico": 22,
@@ -1331,17 +1326,22 @@
       "Direto pelo Link": 2646,
       "Social Orgânico": 479,
       "Busca Orgânica": 261
+    },
+    "2026-04-14": {
+      "Direto pelo Link": 1175,
+      "Social Orgânico": 202,
+      "Busca Orgânica": 97
     }
   },
   "influencer_breakdown": [
     {
       "source": "perfilfestival",
-      "sessions": 19849,
+      "sessions": 20388,
       "conversions": 0,
       "tickets": {
-        "Ride Pass": 1682,
-        "Sport Pass": 1922,
-        "Drive Pass": 1343
+        "Ride Pass": 1696,
+        "Sport Pass": 1937,
+        "Drive Pass": 1362
       },
       "daily": {
         "2026-03-31": 3805,
@@ -1357,16 +1357,17 @@
         "2026-04-13": 894,
         "2026-04-05": 880,
         "2026-04-08": 862,
-        "2026-04-09": 808
+        "2026-04-09": 808,
+        "2026-04-14": 355
       }
     },
     {
       "source": "dinamize",
-      "sessions": 463,
+      "sessions": 465,
       "conversions": 0,
       "tickets": {
         "Ride Pass": 77,
-        "Sport Pass": 59,
+        "Sport Pass": 61,
         "Drive Pass": 33
       },
       "daily": {
@@ -1383,6 +1384,7 @@
         "2026-04-08": 5,
         "2026-04-11": 5,
         "2026-04-13": 5,
+        "2026-04-14": 2,
         "2026-04-10": 1
       }
     },
@@ -1412,10 +1414,10 @@
     },
     {
       "source": "fullpower",
-      "sessions": 244,
+      "sessions": 248,
       "conversions": 0,
       "tickets": {
-        "Drive Pass": 16,
+        "Drive Pass": 17,
         "Sport Pass": 15,
         "Ride Pass": 1
       },
@@ -1431,6 +1433,7 @@
         "2026-04-12": 6,
         "2026-04-08": 4,
         "2026-04-11": 4,
+        "2026-04-14": 4,
         "2026-04-13": 3,
         "2026-04-06": 2
       }
@@ -1454,11 +1457,11 @@
     },
     {
       "source": "Vans",
-      "sessions": 194,
+      "sessions": 195,
       "conversions": 0,
       "tickets": {
-        "Ride Pass": 16,
-        "Sport Pass": 11
+        "Ride Pass": 17,
+        "Sport Pass": 12
       },
       "daily": {
         "2026-04-08": 85,
@@ -1467,7 +1470,8 @@
         "2026-03-31": 8,
         "2026-04-02": 5,
         "2026-04-09": 1,
-        "2026-04-10": 1
+        "2026-04-10": 1,
+        "2026-04-14": 1
       }
     },
     {
