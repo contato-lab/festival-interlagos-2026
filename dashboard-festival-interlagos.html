@@ -463,15 +463,15 @@ tr:hover td{background:rgba(255,255,255,.018)}
       <div class="proj-sub" id="projHojeIng">—</div>
     </div>
     <div class="proj-card">
-      <div class="proj-label">Ontem no mesmo horário <span style="color:var(--text3);font-size:.65rem">(est.)</span></div>
-      <div class="proj-val" id="projOntemMsmRec">—</div>
-      <div class="proj-sub" id="projOntemMsmIng">—</div>
-      <div class="proj-delta" id="projDeltaMsm">—</div>
-    </div>
-    <div class="proj-card">
       <div class="proj-label">Ontem fechado</div>
       <div class="proj-val" id="projOntemFullRec">—</div>
       <div class="proj-sub" id="projOntemFullIng">—</div>
+      <div class="proj-delta" id="projDeltaOntem">—</div>
+    </div>
+    <div class="proj-card">
+      <div class="proj-label">Média últimos 7 dias</div>
+      <div class="proj-val" id="projMediaRec">—</div>
+      <div class="proj-sub" id="projMediaIng">—</div>
     </div>
     <div class="proj-card accent">
       <div class="proj-label">Projeção hoje 23h59</div>
@@ -481,7 +481,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
     </div>
   </div>
   <div class="proj-footnote">
-    💡 Projeção calculada a partir de uma curva típica de vendas por hora. Pode variar conforme picos (ações, envios de mídia, etc).
+    💡 Projeção = acumulado de hoje ÷ fração do dia decorrido (projeção linear). Valores reais podem variar conforme picos de mídia ou ações pontuais.
   </div>
 </div>
 
@@ -1122,27 +1122,16 @@ function setFiltro(tipo,btn){
 }
 
 // ═══════════════════════════════════════════════
-// PROJEÇÃO DO DIA — curva típica de venda por hora
+// PROJEÇÃO DO DIA — baseada em dados reais
+// Projeção linear: acumulado_hoje / fração_do_dia_decorrido
 // ═══════════════════════════════════════════════
-const HOURLY_CURVE = [
-  0.005, 0.010, 0.015, 0.020, 0.025, 0.035, // 00-05
-  0.050, 0.075, 0.105, 0.145, 0.195, 0.250, // 06-11
-  0.310, 0.375, 0.445, 0.520, 0.600, 0.680, // 12-17
-  0.760, 0.835, 0.895, 0.945, 0.980, 1.000  // 18-23
-];
-function cumPctAt(h, m){
-  h = Math.min(23, Math.max(0, h));
-  const base = HOURLY_CURVE[h];
-  const next = HOURLY_CURVE[Math.min(23, h+1)] ?? 1;
-  return Math.min(1, base + (next - base) * (m/60));
-}
 function buildProjection(){
   if(!D26_FULL || !D26_FULL.length) return;
   const now = new Date();
   const hoje = new Date(now); hoje.setHours(0,0,0,0);
   const dHoje = Math.round((hoje - SEMANA_START) / 86400000);
 
-  // Acha hoje e ontem no D26_FULL; se hoje ainda não existe, usa o último disponível
+  // Acha hoje e ontem; se hoje não existe, usa último disponível
   let running = D26_FULL.find(r => r.d === dHoje);
   let yesterday = D26_FULL.find(r => r.d === dHoje - 1);
   let usingFallback = false;
@@ -1158,42 +1147,52 @@ function buildProjection(){
   const ont_rec  = yesterday ? ((yesterday.mv||0) + (yesterday.av||0)) : 0;
   const ont_ing  = yesterday ? ((yesterday.mq||0) + (yesterday.aq||0)) : 0;
 
-  const pct = usingFallback ? 1.0 : cumPctAt(now.getHours(), now.getMinutes());
-  const proj_rec = pct > 0.02 ? hoje_rec / pct : hoje_rec;
-  const proj_ing = pct > 0.02 ? hoje_ing / pct : hoje_ing;
-  const ont_msm_rec = ont_rec * pct;
-  const ont_msm_ing = ont_ing * pct;
+  // Fração linear do dia decorrida (baseado no relógio, não em curva inventada)
+  const frac = usingFallback ? 1.0 : Math.max(0.01, (now.getHours() + now.getMinutes()/60) / 24);
+  const proj_rec = frac > 0.02 ? hoje_rec / frac : hoje_rec;
+  const proj_ing = frac > 0.02 ? hoje_ing / frac : hoje_ing;
 
-  const dMsm = ont_msm_rec > 0 ? ((hoje_rec - ont_msm_rec) / ont_msm_rec * 100) : 0;
-  const dFim = ont_rec > 0 ? ((proj_rec - ont_rec) / ont_rec * 100) : 0;
+  // Média últimos 7 dias com dados (antes de hoje)
+  const dRef = running.d;
+  const ultimos7 = D26_FULL.filter(r => r.d < dRef).slice(-7);
+  const mediaRec = ultimos7.length ? ultimos7.reduce((a,r)=>a+(r.mv||0)+(r.av||0),0) / ultimos7.length : 0;
+  const mediaIng = ultimos7.length ? ultimos7.reduce((a,r)=>a+(r.mq||0)+(r.aq||0),0) / ultimos7.length : 0;
+
+  // Deltas da projeção
+  const dOntem = ont_rec > 0 ? ((proj_rec - ont_rec) / ont_rec * 100) : 0;
+  const dMedia = mediaRec > 0 ? ((proj_rec - mediaRec) / mediaRec * 100) : 0;
+  const dOntemAbs = hoje_rec - ont_rec;
+  const dOntemPct = ont_rec > 0 ? ((hoje_rec - ont_rec) / ont_rec * 100) : 0;
 
   const hh = String(now.getHours()).padStart(2,'0');
   const mm = String(now.getMinutes()).padStart(2,'0');
   const setTxt = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
 
   setTxt('projHora', hh + 'h' + mm);
-  setTxt('projPct', (pct*100).toFixed(0) + '%');
+  setTxt('projPct', (frac*100).toFixed(0) + '%');
   setTxt('projHojeRec', fmtK(hoje_rec));
   setTxt('projHojeIng', fmtN(hoje_ing) + ' ingressos');
-  setTxt('projOntemMsmRec', fmtK(ont_msm_rec));
-  setTxt('projOntemMsmIng', fmtN(Math.round(ont_msm_ing)) + ' ingressos');
   setTxt('projOntemFullRec', fmtK(ont_rec));
   setTxt('projOntemFullIng', fmtN(ont_ing) + ' ingressos');
+  setTxt('projMediaRec', fmtK(mediaRec));
+  setTxt('projMediaIng', fmtN(Math.round(mediaIng)) + ' ingressos/dia');
   setTxt('projFimRec', fmtK(proj_rec));
   setTxt('projFimIng', fmtN(Math.round(proj_ing)) + ' ingressos');
 
-  const delMsm = document.getElementById('projDeltaMsm');
-  if(delMsm){
-    delMsm.textContent = (dMsm >= 0 ? '▲ +' : '▼ ') + dMsm.toFixed(1) + '% vs ontem mesma hora';
-    delMsm.className = 'proj-delta ' + (dMsm >= 0 ? 'up' : 'down');
+  // Delta ontem vs hoje parcial (absoluto — honesto, sem extrapolação)
+  const delOntem = document.getElementById('projDeltaOntem');
+  if(delOntem && ont_rec > 0){
+    delOntem.textContent = 'Hoje parcial: ' + (dOntemPct >= 0 ? '▲ +' : '▼ ') + dOntemPct.toFixed(1) + '%';
+    delOntem.className = 'proj-delta ' + (dOntemPct >= 0 ? 'up' : 'down');
   }
+  // Delta projeção vs ontem fechado
   const delFim = document.getElementById('projDeltaFim');
   if(delFim){
-    delFim.textContent = (dFim >= 0 ? '▲ +' : '▼ ') + dFim.toFixed(1) + '% vs ontem fechado';
-    delFim.className = 'proj-delta ' + (dFim >= 0 ? 'up' : 'down');
+    delFim.textContent = (dOntem >= 0 ? '▲ +' : '▼ ') + dOntem.toFixed(1) + '% vs ontem fechado';
+    delFim.className = 'proj-delta ' + (dOntem >= 0 ? 'up' : 'down');
   }
   const bar = document.getElementById('projProgress');
-  if(bar) bar.style.width = (pct*100) + '%';
+  if(bar) bar.style.width = (frac*100) + '%';
 }
 
 function applyFiltro(){
