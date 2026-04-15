@@ -334,6 +334,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
           <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(123,45,139,.9)"></span>
           <span style="color:#7B2D8B">Influenciadores</span>
         </div>
+        <div class="exec-leg-item" id="exec-divLegVendas" style="display:none">
+          <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,215,0,.9)"></span>
+          <span style="color:#FFD700">🎤 Divulgação</span>
+        </div>
       </div>
       <div class="exec-chart-wrap"><canvas id="exec-chartVendas"></canvas></div>
     </div>
@@ -353,10 +357,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="exec-leg">
         <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>2026</div>
         <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#555"></span>2025 (est.)</div>
-        <div class="exec-leg-item" id="exec-tvLegInvest">
-          <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,184,0,.8)"></span>
-          <span style="color:var(--warn)">TV Globo</span>
-        </div>
       </div>
       <div class="exec-chart-wrap"><canvas id="exec-chartInvest"></canvas></div>
     </div>
@@ -671,6 +671,10 @@ const EXEC_INFLUENCER_DIAS = [
   {date:'2026-03-31', day26:1, desc:'Influenciadores — Abertura das vendas'},
 ];
 
+const EXEC_DIVULGACAO = [
+  {date:'2026-04-14', day26:15, desc:'Divulgação Ja Rule + Line-up'},
+];
+
 const EXEC_TV_GLOBO = [
   {date:'2026-04-01', day26:2, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
   {date:'2026-04-02', day26:3, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
@@ -767,6 +771,14 @@ function execGetTvAnnotations(days) {
     anns['infl_'+inf.day26] = {
       type:'line', xMin:idx, xMax:idx,
       borderColor:'rgba(123,45,139,0.8)', borderWidth:2, borderDash:[5,5]
+    };
+  });
+  EXEC_DIVULGACAO.forEach(dv => {
+    const idx = days.indexOf(dv.day26);
+    if(idx === -1) return;
+    anns['div_'+dv.day26] = {
+      type:'line', xMin:idx, xMax:idx,
+      borderColor:'rgba(255,215,0,0.9)', borderWidth:2, borderDash:[7,4]
     };
   });
   return anns;
@@ -994,6 +1006,8 @@ function buildExecVendasChart() {
   if(tvLeg) tvLeg.style.display = days.some(d=>EXEC_TV_GLOBO.some(t=>t.day26===d))?'flex':'none';
   const inflLeg = document.getElementById('exec-inflLegVendas');
   if(inflLeg) inflLeg.style.display = days.some(d=>EXEC_INFLUENCER_DIAS.some(t=>t.day26===d))?'flex':'none';
+  const divLeg = document.getElementById('exec-divLegVendas');
+  if(divLeg) divLeg.style.display = days.some(d=>EXEC_DIVULGACAO.some(t=>t.day26===d))?'flex':'none';
 }
 
 /* ═══ Grafico Investimento ═══ */
@@ -1023,8 +1037,9 @@ function buildExecInvestChart() {
       plugins:{
         legend:{display:false},
         tooltip:{backgroundColor:'#1C1C1C',borderColor:'rgba(200,255,0,.25)',borderWidth:1,padding:10,cornerRadius:8,titleColor:'#C8FF00',bodyColor:'#DDD',
-          callbacks:{label:i=>' '+i.dataset.label+': R$'+Math.round(i.raw||0).toLocaleString('pt-BR')}},
-        annotation:{annotations:execGetTvAnnotations(days)}
+          callbacks:{label:i=>' '+i.dataset.label+': R$'+Math.round(i.raw||0).toLocaleString('pt-BR')}}
+        // NOTA: removidas as anotacoes de acoes (TV/influencer/divulgacao).
+        // As marcacoes ficam so no grafico de Vendas para nao poluir o visual.
       },
       scales:{
         x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#555',maxTicksLimit:12,font:{size:10}}},
