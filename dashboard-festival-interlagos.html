@@ -1149,21 +1149,14 @@ function getAnnotations() {
     if (!acoesVisiveis[a.tipo]) return;
     const cfg = ACAO_CONFIG[a.tipo];
     const xIndex = a.dia - 1; // D+1 = index 0
+    // Linha vertical limpa (sem ícone no gráfico) — padrão dashboard Marcinho.
+    // O ícone/descrição da ação aparece na legenda e no tooltip ao passar o mouse.
     annotations[`acao_${i}`] = {
       type: 'line',
       xMin: xIndex, xMax: xIndex,
       borderColor: cfg.cor,
-      borderWidth: 1.5,
+      borderWidth: 2,
       borderDash: cfg.dash,
-      label: {
-        display: true,
-        content: cfg.icone,
-        position: 'start',
-        yAdjust: -4,
-        backgroundColor: 'transparent',
-        font: { size: 13 },
-        color: cfg.cor,
-      }
     };
   });
   return annotations;
