@@ -249,8 +249,7 @@ footer{
   <div class="header-title">Painel Executivo 2026</div>
   <div class="header-right">
     <span class="badge badge-live">Ao Vivo</span>
-    <span class="gen-date" id="genDateSheet">—</span>
-    <span class="gen-date" id="genDateTM" style="margin-left:10px">—</span>
+    <span class="gen-date" style="white-space:nowrap">Última atualização: <span id="genDateSheet">—</span> · <span id="genDateTM">—</span></span>
   </div>
 </header>
 
@@ -1322,16 +1321,16 @@ function renderAll() {
 /* ═══════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════ */
-function _fmtTs(iso) {
-  return new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+function _fmtHora(iso) {
+  return new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 }
 function updateSheetTs() {
   const el = document.getElementById('genDateSheet');
-  if (el) el.textContent = 'Sist. próprio: ' + _fmtTs(new Date().toISOString());
+  if (el) el.textContent = 'Próprio ' + _fmtHora(new Date().toISOString());
 }
 function updateTMTs(isoTimestamp) {
   const el = document.getElementById('genDateTM');
-  if (el) el.textContent = 'Ticket Master: ' + _fmtTs(isoTimestamp);
+  if (el) el.textContent = 'TM ' + _fmtHora(isoTimestamp);
 }
 
 async function init() {

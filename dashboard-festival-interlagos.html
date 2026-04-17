@@ -370,8 +370,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
     <span class="badge badge-ok" style="margin-right:4px">✓ Google Ads</span><span class="badge badge-ok" style="margin-right:4px">✓ Meta Ads</span><span class="badge badge-ok">✓ GA4</span>
     <span class="badge badge-pending" id="demoBadge" style="margin-left:4px">Vendas: aguardando</span>
     <span class="badge" id="periodoBadge">2026</span>
-    <span class="gen-date" id="genDateSheet" style="font-size:.72rem;color:#888"></span>
-    <span class="gen-date" id="genDateTM" style="font-size:.72rem;color:#888;margin-left:10px"></span>
+    <span class="gen-date" style="font-size:.72rem;color:#888;white-space:nowrap">Última atualização: <span id="genDateSheet">—</span> · <span id="genDateTM">—</span></span>
   </div>
 </header>
 
@@ -2189,16 +2188,17 @@ async function fetchSheet() {
 Chart.defaults.color='#555';
 Chart.defaults.font.family="'Inter',sans-serif";
 
-function _fmtTs(iso) {
-  return new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+function _fmtHora(iso) {
+  const d = new Date(iso);
+  return d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 }
 function updateSheetTs() {
   const el = document.getElementById('genDateSheet');
-  if (el) el.textContent = 'Sist. próprio: ' + _fmtTs(new Date().toISOString());
+  if (el) el.textContent = 'Próprio ' + _fmtHora(new Date().toISOString());
 }
 function updateTMTs(isoTimestamp) {
   const el = document.getElementById('genDateTM');
-  if (el) el.textContent = 'Ticket Master: ' + _fmtTs(isoTimestamp);
+  if (el) el.textContent = 'TM ' + _fmtHora(isoTimestamp);
 }
 function initDashboard(){
   fetchTikTokData();
