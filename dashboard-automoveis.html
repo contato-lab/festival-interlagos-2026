@@ -367,7 +367,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
     <span class="badge badge-ok">✓ Ao vivo</span>
     <span class="badge badge-pending" id="demoBadge" style="margin-left:4px">Vendas: aguardando</span>
     <span class="badge" id="periodoBadge">2026</span>
-    <span class="gen-date" style="font-size:.72rem;color:#888;white-space:nowrap">Última atualização: <span id="genDateSheet">—</span> · <span id="genDateTM">—</span></span>
+    <span class="gen-date" id="genDate" style="font-size:.72rem;color:#888"></span>
   </div>
 </header>
 
@@ -963,7 +963,7 @@ async function fetchTicketmaster() {
 
     D26_FULL.sort((a,b) => a.d - b.d);
     if (document.getElementById('demoBadge')) document.getElementById('demoBadge').style.display = 'none';
-    if (data.updated_at) updateTMTs(data.updated_at);
+    updateLastRefreshTime();
     applyFiltro();
     console.log('TM conectada:', data.daily.length, 'dias');
   } catch(e) { console.warn('fetchTicketmaster erro:', e.message); }
@@ -1053,7 +1053,7 @@ async function fetchSheet() {
     D26.length = 0; allDays.forEach(r => D26.push(r));
     D26_FULL = [...D26];
     document.getElementById('demoBadge').style.display = 'none';
-    updateSheetTs();
+    updateLastRefreshTime();
     applyFiltro();
     console.log('✅ Google Sheets conectado:', allDays.length, 'dias de ' + (currentWeek + 1) + ' semana(s)');
   }
@@ -1065,21 +1065,15 @@ async function fetchSheet() {
 Chart.defaults.color='#555';
 Chart.defaults.font.family="'Inter',sans-serif";
 
-function _fmtHora(iso) {
-  return new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-}
-function updateSheetTs() {
-  const el = document.getElementById('genDateSheet');
-  if (el) el.textContent = 'Próprio ' + _fmtHora(new Date().toISOString());
-}
-function updateTMTs(isoTimestamp) {
-  const el = document.getElementById('genDateTM');
-  if (el) el.textContent = 'TM ' + _fmtHora(isoTimestamp);
+function updateLastRefreshTime() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('genDate').textContent = 'Atualizado às ' + h + 'h' + m;
 }
 
 function initDashboard(){
-  const _s = document.getElementById('genDateSheet'); if(_s) _s.textContent = 'Sist. próprio: carregando...';
-  const _t = document.getElementById('genDateTM');    if(_t) _t.textContent = 'Ticket Master: carregando...';
+  updateLastRefreshTime();
   const ds=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
   document.getElementById('footerDate').textContent='Gerado em '+ds;
 
