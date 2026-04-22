@@ -34,13 +34,20 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .login-error{color:var(--red);font-size:.78rem;margin-top:12px;display:none}
 
 /* HEADER */
-.topbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px;padding:14px 20px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius)}
-.topbar-l{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.logo-tag{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1rem;color:var(--lime);letter-spacing:.06em}
-.topbar-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.9rem;color:var(--text2);letter-spacing:.04em;text-transform:uppercase}
-.topbar-update{font-size:.68rem;color:var(--text3)}
-.topbar-update .dot{display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;margin-right:6px;animation:pulse 2s infinite}
+.topbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:18px;padding:14px 22px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius)}
+.topbar-l{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo-lime{height:26px;width:auto;object-fit:contain;filter:drop-shadow(0 0 6px rgba(200,255,0,.25))}
+.logo-festival{height:40px;width:auto;object-fit:contain}
+.logo-sep{width:1px;height:28px;background:rgba(255,255,255,.12)}
+.topbar-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.88rem;color:var(--text2);letter-spacing:.04em;text-transform:uppercase}
+.topbar-update{font-size:.68rem;color:var(--text3);display:flex;align-items:center;gap:4px}
+.topbar-update .dot{display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;margin-right:4px;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Login logo */
+.login-logos{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px}
+.login-logos img{height:38px;width:auto;object-fit:contain}
+.login-logos .logo-festival-big{height:58px}
 
 .wrap{background:var(--card);border:1px solid rgba(200,255,0,.18);border-radius:var(--radius);padding:22px;position:relative;overflow:hidden}
 .wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--lime) 0%,transparent 50%,var(--lime) 100%);opacity:.4}
@@ -154,8 +161,13 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 /* MOBILE */
 @media(max-width:900px){
   body{padding:12px;font-size:13px}
-  .topbar{padding:10px 14px}
-  .topbar-title{font-size:.8rem}
+  .topbar{padding:10px 14px;gap:10px}
+  .topbar-title{font-size:.78rem}
+  .logo-lime{height:22px}
+  .logo-festival{height:32px}
+  .logo-sep{height:22px}
+  .login-logos img{height:32px}
+  .login-logos .logo-festival-big{height:46px}
   .wrap{padding:14px}
   .head{margin-bottom:14px}
   .title{font-size:1.05rem}
@@ -188,9 +200,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 @media(max-width:520px){
   body{padding:10px}
   .kpis{grid-template-columns:repeat(2,1fr)}
-  .topbar-l{gap:8px}
-  .logo-tag{font-size:.85rem}
+  .topbar-l{gap:10px}
   .topbar-title{display:none}
+  .logo-sep{display:none}
 }
 </style>
 </head>
@@ -199,9 +211,12 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 <!-- LOGIN OVERLAY -->
 <div id="loginOverlay" class="login-overlay">
   <div class="login-box">
-    <div class="login-logo">SUHAI FESTIVAL INTERLAGOS 2026</div>
+    <div class="login-logos">
+      <img src="logo-festival.png.png" alt="Suhai Festival Interlagos 2026" class="logo-festival-big" onerror="this.style.display='none'">
+      <img src="logo-lime.png.png" alt="Lime" onerror="this.style.display='none'">
+    </div>
     <div class="login-title">Projeção de Receita</div>
-    <div class="login-sub">Acesso restrito · Lime Agência</div>
+    <div class="login-sub">Acesso restrito</div>
     <input type="password" id="loginPwd" class="login-input" placeholder="Digite a senha" onkeydown="if(event.key==='Enter')checkLogin()" autocomplete="off">
     <button class="login-btn" onclick="checkLogin()">ENTRAR</button>
     <div class="login-error" id="loginError">Senha incorreta</div>
@@ -212,8 +227,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-l">
-      <div class="logo-tag">⚡ LIME</div>
-      <div class="topbar-title">Suhai Festival Interlagos 2026 · Projeção</div>
+      <img src="logo-festival.png.png" alt="Suhai Festival Interlagos 2026" class="logo-festival" onerror="this.style.display='none'">
+      <div class="logo-sep"></div>
+      <img src="logo-lime.png.png" alt="Lime" class="logo-lime" onerror="this.style.display='none'">
+      <div class="topbar-title">Projeção de Receita</div>
     </div>
     <div class="topbar-update"><span class="dot"></span><span id="updateTime">carregando...</span></div>
   </div>
