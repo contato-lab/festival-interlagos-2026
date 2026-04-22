@@ -81,9 +81,56 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .scn-btn.active .scn-check{background:currentColor;border-color:currentColor}
 
 /* Detail */
-.detail{display:grid;grid-template-columns:1fr 1.2fr;gap:14px;margin-bottom:18px}
+.detail{display:grid;grid-template-columns:1fr 1.2fr;gap:14px;margin-bottom:14px}
 .detail-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);border-radius:var(--rad-sm);padding:18px}
 .detail-card.accent{border-color:var(--lime-border);background:linear-gradient(135deg,rgba(200,255,0,.06) 0%,rgba(255,255,255,.02) 100%)}
+
+/* Progresso + Gap */
+.progress-block{margin-bottom:16px;padding-bottom:14px;border-bottom:1px dashed rgba(255,255,255,.08)}
+.progress-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;flex-wrap:wrap;gap:6px}
+.progress-lbl{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.progress-pct{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.2rem;color:var(--lime)}
+.progress-bar{width:100%;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;position:relative}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--lime) 0%,#80FF88 100%);border-radius:4px;transition:width .6s ease}
+.progress-gap{display:flex;justify-content:space-between;margin-top:10px;font-size:.75rem;flex-wrap:wrap;gap:8px}
+.progress-gap .pg-i{color:var(--text3)}
+.progress-gap .pg-i b{color:var(--text);font-family:'Barlow Condensed',sans-serif;font-weight:800;margin-left:4px}
+
+/* Pace + Insight */
+.pace-insight{display:grid;grid-template-columns:1.1fr 1.4fr;gap:14px;margin-bottom:18px}
+.pace-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);border-radius:var(--rad-sm);padding:16px 18px}
+.pace-head{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pace-rows{display:flex;flex-direction:column;gap:10px}
+.pace-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:6px}
+.pace-row.hi{border-color:var(--lime-border);background:rgba(200,255,0,.05)}
+.pace-row-l{display:flex;flex-direction:column;gap:2px}
+.pace-row-lbl{font-size:.66rem;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.pace-row-sub{font-size:.68rem;color:var(--text3)}
+.pace-row-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.15rem;color:var(--text)}
+.pace-row-val.lime{color:var(--lime)}
+.pace-row-val.warn{color:var(--warn)}
+.pace-row-val.alert{color:var(--red)}
+.pace-row-val.good{color:var(--green)}
+
+.insight-card{background:linear-gradient(135deg,rgba(200,255,0,.08) 0%,rgba(123,45,139,0.08) 100%);border:1px solid var(--lime-border);border-radius:var(--rad-sm);padding:16px 18px;position:relative;overflow:hidden}
+.insight-card.warn{background:linear-gradient(135deg,rgba(255,184,0,.12) 0%,rgba(255,68,68,.05) 100%);border-color:rgba(255,184,0,.35)}
+.insight-card.alert{background:linear-gradient(135deg,rgba(255,68,68,.12) 0%,rgba(0,0,0,.2) 100%);border-color:rgba(255,68,68,.4)}
+.insight-card.good{background:linear-gradient(135deg,rgba(0,255,136,.1) 0%,rgba(200,255,0,.05) 100%);border-color:rgba(0,255,136,.35)}
+.insight-head{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:8px;color:var(--lime)}
+.insight-card.warn .insight-head{color:var(--warn)}
+.insight-card.alert .insight-head{color:var(--red)}
+.insight-card.good .insight-head{color:var(--green)}
+.insight-status{font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,.08);margin-left:auto}
+.insight-txt{font-size:.88rem;line-height:1.55;color:var(--text);font-weight:500}
+.insight-txt strong{color:var(--lime);font-family:'Barlow Condensed',sans-serif;font-weight:800}
+.insight-card.warn .insight-txt strong{color:var(--warn)}
+.insight-card.alert .insight-txt strong{color:var(--red)}
+.insight-card.good .insight-txt strong{color:var(--green)}
+.insight-action{margin-top:10px;padding:9px 12px;background:rgba(0,0,0,.3);border-left:2px solid var(--lime);border-radius:4px;font-size:.74rem;color:var(--text2);line-height:1.5}
+.insight-card.warn .insight-action{border-left-color:var(--warn)}
+.insight-card.alert .insight-action{border-left-color:var(--red)}
+.insight-card.good .insight-action{border-left-color:var(--green)}
+.insight-action b{color:var(--text);font-family:'Barlow Condensed',sans-serif}
 .dt-head{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.8rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .dt-head::before{content:'';width:3px;height:12px;background:var(--lime);border-radius:2px}
 .detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
@@ -127,6 +174,12 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   .detail-card{padding:14px}
   .detail-grid{gap:10px}
   .detail-item .di-val{font-size:1.3rem}
+  .pace-insight{grid-template-columns:1fr;gap:10px}
+  .pace-card{padding:14px}
+  .insight-card{padding:14px}
+  .insight-txt{font-size:.82rem}
+  .progress-pct{font-size:1.05rem}
+  .progress-gap{font-size:.7rem}
   .lever{padding:10px}
   .lever-val{font-size:.85rem;padding:3px 8px}
   .chart-wrap{height:300px;padding:10px}
@@ -210,6 +263,18 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     <div class="detail">
       <div class="detail-card accent">
         <div class="dt-head">📊 <span id="dtHeadL">Cenário Realista</span></div>
+        <div class="progress-block">
+          <div class="progress-head">
+            <span class="progress-lbl">Progresso da meta</span>
+            <span class="progress-pct" id="dtProgressPct">—</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="dtProgressFill" style="width:0%"></div></div>
+          <div class="progress-gap">
+            <span class="pg-i">💰 Faltam <b id="dtGapRec">—</b></span>
+            <span class="pg-i">🎫 Faltam <b id="dtGapIng">—</b></span>
+            <span class="pg-i">📅 <b id="dtGapDias">—</b> dias restantes</span>
+          </div>
+        </div>
         <div class="detail-grid">
           <div class="detail-item">
             <div class="di-lbl">Receita projetada</div>
@@ -237,6 +302,42 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="detail-card">
         <div class="dt-head">🎯 O que precisa acontecer</div>
         <div class="levers" id="dtLevers"></div>
+      </div>
+    </div>
+
+    <!-- Pace + Insight -->
+    <div class="pace-insight">
+      <div class="pace-card">
+        <div class="pace-head">⚡ Pace · atual vs necessário</div>
+        <div class="pace-rows">
+          <div class="pace-row">
+            <div class="pace-row-l">
+              <div class="pace-row-lbl">Pace atual</div>
+              <div class="pace-row-sub" id="paceAtualSub">últimos 7 dias</div>
+            </div>
+            <div class="pace-row-val" id="paceAtual">—</div>
+          </div>
+          <div class="pace-row hi">
+            <div class="pace-row-l">
+              <div class="pace-row-lbl">Pace necessário (próx. 7d)</div>
+              <div class="pace-row-sub" id="paceNecSub">conforme curva 2025 + cenário</div>
+            </div>
+            <div class="pace-row-val lime" id="paceNec">—</div>
+          </div>
+          <div class="pace-row">
+            <div class="pace-row-l">
+              <div class="pace-row-lbl">Essa semana precisa</div>
+              <div class="pace-row-sub" id="paceSemanaSub">pra seguir no ritmo</div>
+            </div>
+            <div class="pace-row-val" id="paceSemana">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-card" id="insightCard">
+        <div class="insight-head">💡 <span id="insightTitle">Insight</span><span class="insight-status" id="insightStatus">—</span></div>
+        <div class="insight-txt" id="insightTxt">Analisando o ritmo...</div>
+        <div class="insight-action" id="insightAction">—</div>
       </div>
     </div>
 
@@ -609,10 +710,81 @@ function renderCenarioButtons(){
   }
 }
 
+function calcularGapEPace(c){
+  const res = calcularCenario(c);
+  const serie = projetarSerie(c);
+  const metaRec = res.rec;
+  const metaIng = res.ing_total;
+
+  const gapRec = Math.max(0, metaRec - STATE.d26_rec);
+  const gapIng = Math.max(0, metaIng - STATE.d26_ing);
+  const pctAtingido = (STATE.d26_rec / metaRec) * 100;
+  const diasRest = DIAS_TOTAL - STATE.d26_dias;
+
+  // Onde deveria estar hoje pela curva do cenário?
+  const esperadoHoje = STATE.d26_dias > 0 ? serie[STATE.d26_dias - 1] : 0;
+
+  // Pace últimos 7 dias realizados (real)
+  const byDay = {};
+  (STATE.dados26||[]).forEach(r => byDay[r.d] = r);
+  let ult7Rec = 0, cntUlt7 = 0;
+  for(let i = Math.max(1, STATE.d26_dias - 6); i <= STATE.d26_dias; i++){
+    const r = byDay[i];
+    if(r){ ult7Rec += (r.mv||0) + (r.av||0); cntUlt7++; }
+  }
+  const paceAtual = cntUlt7 > 0 ? ult7Rec / cntUlt7 : 0;
+
+  // Pace necessário próximos 7 dias (pela curva do cenário)
+  const prox7End = Math.min(STATE.d26_dias + 7, DIAS_TOTAL);
+  const prox7Start = STATE.d26_dias;
+  const prox7Rec = prox7End > prox7Start ? serie[prox7End-1] - serie[Math.max(0, prox7Start-1)] : 0;
+  const paceNec = prox7End > prox7Start ? prox7Rec / (prox7End - prox7Start) : 0;
+
+  // Essa semana (próx 7 dias totais)
+  const semanaPrecisa = prox7Rec;
+
+  // Status
+  const ratio = paceNec > 0 ? paceAtual / paceNec : 1;
+  let status, statusLbl, className;
+  if(ratio >= 1.05){ status='good'; statusLbl='✓ ACIMA DO RITMO'; className='good'; }
+  else if(ratio >= 0.90){ status='ok'; statusLbl='✓ NO RITMO'; className=''; }
+  else if(ratio >= 0.70){ status='warn'; statusLbl='⚠ ABAIXO'; className='warn'; }
+  else { status='alert'; statusLbl='⚠ MUITO ABAIXO'; className='alert'; }
+
+  // Mensagem do insight
+  let insightTxt = '', insightAction = '';
+  const diffPace = paceAtual - paceNec;
+  const diffPct = Math.abs((ratio - 1) * 100);
+
+  if(status === 'good'){
+    insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>${diffPct.toFixed(0)}% acima</strong> do necessário pra bater o cenário ${c.nome.toLowerCase()}. Nesse ritmo, chegamos a superar a meta.`;
+    insightAction = `<b>Ação:</b> manter a operação como está. Monitorar o ADSPLAY quando começar (d62 em diante) pra garantir o uplift projetado.`;
+  } else if(status === 'ok'){
+    insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está dentro do esperado pra bater o cenário ${c.nome.toLowerCase()}. Faltam <strong>${fmtM(gapRec)}</strong> e <strong>${fmtInt(gapIng)} ingressos</strong> em ${diasRest} dias.`;
+    insightAction = `<b>Ação:</b> manter ritmo atual. Essa semana precisa fechar <b>${fmtM(semanaPrecisa)}</b> (${fmtM(paceNec)}/dia).`;
+  } else if(status === 'warn'){
+    const deficit = (paceNec - paceAtual) * diasRest;
+    insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>${diffPct.toFixed(0)}% abaixo</strong> do necessário. Se continuar assim, a projeção fecha <strong>${fmtM(deficit)} abaixo</strong> do cenário ${c.nome.toLowerCase()}.`;
+    insightAction = `<b>Ação:</b> acelerar em <b>${fmtM(paceNec - paceAtual)}/dia</b> ou antecipar a ativação do ADSPLAY. Essa semana: precisa <b>${fmtM(semanaPrecisa)}</b> (${fmtM(paceNec)}/dia).`;
+  } else {
+    const deficit = (paceNec - paceAtual) * diasRest;
+    insightTxt = `🚨 Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>${diffPct.toFixed(0)}% abaixo</strong> do mínimo. Fechamento projetado: <strong>${fmtM(STATE.d26_rec + paceAtual * diasRest)}</strong> (distância crítica da meta).`;
+    insightAction = `<b>Ação urgente:</b> revisar estratégia de mídia. Precisa dobrar o pace ou injetar novo orçamento. Essa semana: <b>${fmtM(semanaPrecisa)}</b> necessários.`;
+  }
+
+  return {
+    metaRec, metaIng, gapRec, gapIng, pctAtingido, diasRest,
+    paceAtual, paceNec, semanaPrecisa,
+    status, statusLbl, className, insightTxt, insightAction,
+    esperadoHoje
+  };
+}
+
 function renderDetalhe(key){
   STATE.cenarioAtivo = key;
   const c = CENARIOS[key];
   const res = calcularCenario(c);
+  const gp = calcularGapEPace(c);
   document.getElementById('dtHeadL').textContent = 'Cenário ' + c.nome;
   document.getElementById('dtRec').textContent = fmtM(res.rec);
   document.getElementById('dtRecSub').textContent = '+' + (res.vs_2025*100).toFixed(0) + '% vs 2025';
@@ -621,6 +793,28 @@ function renderDetalhe(key){
   document.getElementById('dtTkt').textContent = 'R$ ' + Math.round(res.tkt);
   document.getElementById('dtTktSub').textContent = 'vs R$ ' + Math.round(d25_tkt_tot) + ' em 2025';
   document.getElementById('dtRoi').textContent = res.roi.toFixed(1) + 'x';
+
+  // Progresso
+  document.getElementById('dtProgressPct').textContent = gp.pctAtingido.toFixed(1) + '%';
+  document.getElementById('dtProgressFill').style.width = Math.min(100, gp.pctAtingido) + '%';
+  document.getElementById('dtGapRec').textContent = fmtM(gp.gapRec);
+  document.getElementById('dtGapIng').textContent = fmtInt(gp.gapIng);
+  document.getElementById('dtGapDias').textContent = gp.diasRest;
+
+  // Pace
+  document.getElementById('paceAtual').textContent = fmtM(gp.paceAtual) + '/dia';
+  document.getElementById('paceAtual').className = 'pace-row-val ' + (gp.className || '');
+  document.getElementById('paceNec').textContent = fmtM(gp.paceNec) + '/dia';
+  document.getElementById('paceSemana').textContent = fmtM(gp.semanaPrecisa);
+  document.getElementById('paceSemanaSub').textContent = 'pra seguir no ritmo do cenário ' + c.nome.toLowerCase();
+
+  // Insight
+  const insightCard = document.getElementById('insightCard');
+  insightCard.className = 'insight-card ' + gp.className;
+  document.getElementById('insightTitle').textContent = 'Diagnóstico — Cenário ' + c.nome;
+  document.getElementById('insightStatus').textContent = gp.statusLbl;
+  document.getElementById('insightTxt').innerHTML = gp.insightTxt;
+  document.getElementById('insightAction').innerHTML = gp.insightAction;
 
   const ritmoVal = '+' + ((STATE.fator_ing-1)*100).toFixed(1) + '%';
   const leversHtml = `
