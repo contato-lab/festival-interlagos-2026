@@ -699,24 +699,40 @@ document.getElementById('scnSel').addEventListener('click', e => {
 });
 
 // ════════════════════════════════════════════════════
-// BOOT
+// BOOT + AUTO-REFRESH
 // ════════════════════════════════════════════════════
-async function boot(){
-  document.getElementById('updateTime').textContent = 'carregando dados...';
-  try {
-    const dados26 = await carregarDados26();
-    computarEstado26(dados26);
-  } catch(e) {
-    console.error('boot erro:', e);
-    computarEstado26([]);
-  }
-  renderKPIs();
-  renderCenarioButtons();
-  renderDetalhe('real');
+function updateLastRefreshTime(){
   const now = new Date();
   const h = String(now.getHours()).padStart(2,'0');
   const m = String(now.getMinutes()).padStart(2,'0');
   document.getElementById('updateTime').textContent = 'atualizado ' + h + ':' + m;
+}
+
+async function atualizarDados(){
+  try {
+    const dados26 = await carregarDados26();
+    computarEstado26(dados26);
+    renderKPIs();
+    renderCenarioButtons();
+    renderDetalhe(STATE.cenarioAtivo);
+    updateLastRefreshTime();
+    console.log('[projecao] dados atualizados:', STATE.d26_dias, 'dias,', fmtM(STATE.d26_rec));
+  } catch(e) {
+    console.error('[projecao] erro ao atualizar:', e);
+  }
+}
+
+async function boot(){
+  document.getElementById('updateTime').textContent = 'carregando dados...';
+  await atualizarDados();
+  // Auto-refresh (mesmo mecanismo do painel executivo)
+  // Ticketmaster atualiza a cada 60s (via GitHub Actions a cada 5min)
+  setInterval(atualizarDados, 60000);
+  // Re-render a cada 30s pro pace/horário ficarem atualizados mesmo sem fetch novo
+  setInterval(() => {
+    renderKPIs();
+    updateLastRefreshTime();
+  }, 30000);
 }
 
 if(document.getElementById('mainContent').style.display !== 'none') boot();
