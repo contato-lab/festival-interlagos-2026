@@ -86,6 +86,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .scn-btn.otim.active .scn-val,.scn-btn.otim.active .scn-name{color:var(--otim)}
 .scn-btn .scn-check{position:absolute;top:12px;right:12px;width:16px;height:16px;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);transition:all .2s}
 .scn-btn.active .scn-check{background:currentColor;border-color:currentColor}
+.scn-viab{position:absolute;top:10px;right:36px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:3px 9px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.7rem;color:var(--text2);letter-spacing:.04em}
+.scn-viab.good{background:rgba(0,255,136,.12);border-color:rgba(0,255,136,.4);color:var(--green)}
+.scn-viab.warn{background:rgba(255,184,0,.12);border-color:rgba(255,184,0,.4);color:var(--warn)}
+.scn-viab.alert{background:rgba(255,68,68,.12);border-color:rgba(255,68,68,.4);color:var(--red)}
 
 /* Detail */
 .detail{display:grid;grid-template-columns:1fr 1.2fr;gap:14px;margin-bottom:14px}
@@ -255,6 +259,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     <div class="scenarios" id="scnSel">
       <button class="scn-btn cons" data-scn="cons">
         <span class="scn-check"></span>
+        <span class="scn-viab" id="scnViabCons">—</span>
         <span class="scn-ico">🟡</span>
         <div class="scn-name">Conservador</div>
         <div class="scn-val" id="scnValCons">—</div>
@@ -262,6 +267,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       </button>
       <button class="scn-btn real active" data-scn="real">
         <span class="scn-check"></span>
+        <span class="scn-viab" id="scnViabReal">—</span>
         <span class="scn-ico">🟢</span>
         <div class="scn-name">Realista</div>
         <div class="scn-val" id="scnValReal">—</div>
@@ -269,6 +275,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       </button>
       <button class="scn-btn otim" data-scn="otim">
         <span class="scn-check"></span>
+        <span class="scn-viab" id="scnViabOtim">—</span>
         <span class="scn-ico">🔥</span>
         <div class="scn-name">Otimista</div>
         <div class="scn-val" id="scnValOtim">—</div>
@@ -348,6 +355,13 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
             </div>
             <div class="pace-row-val" id="paceSemana">—</div>
           </div>
+          <div class="pace-row">
+            <div class="pace-row-l">
+              <div class="pace-row-lbl">Se mantiver pace atual</div>
+              <div class="pace-row-sub" id="paceProjLinearSub">projeção linear sem rampa</div>
+            </div>
+            <div class="pace-row-val" id="paceProjLinear">—</div>
+          </div>
         </div>
       </div>
 
@@ -361,9 +375,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     <div class="chart-wrap"><canvas id="fcChart"></canvas></div>
 
     <div class="foot">
-      💡 <strong>Metodologia:</strong> curva 2025 real (94 dias, R$ 7,19M, 43.923 ingressos) esticada para os 151 dias de 2026, calibrada pelo ritmo real já realizado em ingressos, com uplifts das ações genuinamente novas em 2026.
-      <br><strong>Novo em 2026:</strong> Programática ADSPLAY (R$ 600k rodando nos últimos 3 meses + festival) · +57 dias de campanha (151 vs 94).
+      💡 <strong>Metodologia:</strong> curva 2025 real (94 dias, R$ 7,19M, 43.923 ingressos) esticada para os 151 dias de 2026, calibrada pelo ritmo real em ingressos, com uplifts das ações genuinamente novas em 2026.
+      <br><strong>Novo em 2026:</strong> Programática ADSPLAY (R$ 600k rodando últimos 3 meses + festival) · +57 dias de campanha (151 vs 94).
       <br><strong>Já existia em 2025:</strong> Meta/Google/TikTok, TV Globo, Rádio BandNews, Influenciadores — embutidos na curva base, sem uplift duplicado.
+      <br><br><strong>Índice de viabilidade:</strong> calculado com base em 4 fatores — base do cenário (conservador 70% · realista 50% · otimista 25%), pace da janela curta, projeção linear do pace atual vs meta, e % do período decorrido. Não é probabilidade estatística, é um sinalizador de dificuldade que se atualiza a cada 60s com os dados novos.
     </div>
   </div>
 </div>
@@ -721,13 +736,19 @@ function renderKPIs(){
 function renderCenarioButtons(){
   for(const key of ['cons','real','otim']){
     const res = calcularCenario(CENARIOS[key]);
-    document.getElementById('scnVal'+key.charAt(0).toUpperCase()+key.slice(1)).textContent = fmtM(res.rec);
-    document.getElementById('scnDelta'+key.charAt(0).toUpperCase()+key.slice(1)).textContent =
+    const gp = calcularGapEPace(CENARIOS[key], key);
+    const cap = key.charAt(0).toUpperCase()+key.slice(1);
+    document.getElementById('scnVal'+cap).textContent = fmtM(res.rec);
+    document.getElementById('scnDelta'+cap).textContent =
       '+' + (res.vs_2025*100).toFixed(0) + '% vs 2025 · ROI ' + res.roi.toFixed(1) + 'x';
+    const vEl = document.getElementById('scnViab'+cap);
+    vEl.textContent = gp.viabPct + '%';
+    vEl.className = 'scn-viab ' + gp.viabClass;
+    vEl.title = 'Índice de viabilidade: ' + gp.viabLbl;
   }
 }
 
-function calcularGapEPace(c){
+function calcularGapEPace(c, cenarioKey){
   const res = calcularCenario(c);
   const serie = projetarSerie(c);
   const metaRec = res.rec;
@@ -737,9 +758,6 @@ function calcularGapEPace(c){
   const gapIng = Math.max(0, metaIng - STATE.d26_ing);
   const pctAtingido = (STATE.d26_rec / metaRec) * 100;
   const diasRest = DIAS_TOTAL - STATE.d26_dias;
-
-  // Onde deveria estar hoje pela curva do cenário?
-  const esperadoHoje = STATE.d26_dias > 0 ? serie[STATE.d26_dias - 1] : 0;
 
   // Pace últimos 7 dias realizados (real)
   const byDay = {};
@@ -756,44 +774,95 @@ function calcularGapEPace(c){
   const prox7Start = STATE.d26_dias;
   const prox7Rec = prox7End > prox7Start ? serie[prox7End-1] - serie[Math.max(0, prox7Start-1)] : 0;
   const paceNec = prox7End > prox7Start ? prox7Rec / (prox7End - prox7Start) : 0;
-
-  // Essa semana (próx 7 dias totais)
   const semanaPrecisa = prox7Rec;
 
-  // Status
-  const ratio = paceNec > 0 ? paceAtual / paceNec : 1;
-  let status, statusLbl, className;
-  if(ratio >= 1.05){ status='good'; statusLbl='✓ ACIMA DO RITMO'; className='good'; }
-  else if(ratio >= 0.90){ status='ok'; statusLbl='✓ NO RITMO'; className=''; }
-  else if(ratio >= 0.70){ status='warn'; statusLbl='⚠ ABAIXO'; className='warn'; }
-  else { status='alert'; statusLbl='⚠ MUITO ABAIXO'; className='alert'; }
+  // Ratio pace janela curta
+  const ratioJanela = paceNec > 0 ? paceAtual / paceNec : 1;
 
-  // Mensagem do insight
+  // PROJECAO LINEAR (se pace atual mantiver sem rampa)
+  const projLinear = STATE.d26_rec + paceAtual * diasRest;
+  const ratioLinear = projLinear / metaRec;
+
+  // PROJECAO COM CURVA (o que a metodologia do cenario projeta)
+  const projCurva = metaRec;
+
+  // === INDICE DE VIABILIDADE ===
+  // Base por cenario: quao provavel historicamente
+  const baseViab = {cons: 0.70, real: 0.50, otim: 0.25}[cenarioKey] || 0.50;
+  // Ajuste pelo pace janela curta (se pace >= 1.1x necessario, bom sinal)
+  const adjJanela = Math.max(-0.15, Math.min(0.15, (ratioJanela - 1) * 0.4));
+  // Ajuste pela projecao linear vs meta (muito peso)
+  //   - ratioLinear >= 0.9: pace por si so ja quase bate -> facil
+  //   - ratioLinear entre 0.5 e 0.9: precisa da rampa entregar (normal)
+  //   - ratioLinear < 0.5: muito longe, rampa dificil salva
+  let adjLinear;
+  if(ratioLinear >= 0.9) adjLinear = 0.20;
+  else if(ratioLinear >= 0.7) adjLinear = 0.10;
+  else if(ratioLinear >= 0.5) adjLinear = 0;
+  else if(ratioLinear >= 0.35) adjLinear = -0.15;
+  else adjLinear = -0.30;
+  // Ajuste pelo tempo decorrido (mais tempo = menos incerteza)
+  const pctDecorrido = STATE.d26_dias / DIAS_TOTAL;
+  const adjTempo = pctDecorrido * 0.08;
+  // Final
+  let viab = baseViab + adjJanela + adjLinear + adjTempo;
+  viab = Math.max(0.05, Math.min(0.95, viab));
+  const viabPct = Math.round(viab * 100);
+
+  // Classificacao do indice
+  let viabLbl, viabClass;
+  if(viabPct >= 70){viabLbl='ALTA VIABILIDADE'; viabClass='good';}
+  else if(viabPct >= 50){viabLbl='VIÁVEL'; viabClass='';}
+  else if(viabPct >= 30){viabLbl='DESAFIADOR'; viabClass='warn';}
+  else {viabLbl='IMPROVÁVEL'; viabClass='alert';}
+
+  // Status da janela curta (pace atual vs proximos 7 dias)
+  let jStatus, jLbl, jClass;
+  if(ratioJanela >= 1.05){jStatus='good'; jLbl='✓ ACIMA DO ESPERADO'; jClass='good';}
+  else if(ratioJanela >= 0.90){jStatus='ok'; jLbl='✓ NO RITMO'; jClass='';}
+  else if(ratioJanela >= 0.70){jStatus='warn'; jLbl='⚠ ABAIXO'; jClass='warn';}
+  else {jStatus='alert'; jLbl='⚠ MUITO ABAIXO'; jClass='alert';}
+
+  // === INSIGHT HONESTO ===
+  // Usa a projecao linear pra dizer a verdade sobre o pace atual
+  const diffLinear = projLinear - metaRec;
+  const gapLinear = metaRec - projLinear;
+
   let insightTxt = '', insightAction = '';
-  const diffPace = paceAtual - paceNec;
-  const diffPct = Math.abs((ratio - 1) * 100);
 
-  if(status === 'good'){
-    insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>${diffPct.toFixed(0)}% acima</strong> do necessário pra bater o cenário ${c.nome.toLowerCase()}. Nesse ritmo, chegamos a superar a meta.`;
-    insightAction = `<b>Ação:</b> manter a operação como está. Monitorar o ADSPLAY quando começar (d62 em diante) pra garantir o uplift projetado.`;
-  } else if(status === 'ok'){
-    insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está dentro do esperado pra bater o cenário ${c.nome.toLowerCase()}. Faltam <strong>${fmtM(gapRec)}</strong> e <strong>${fmtInt(gapIng)} ingressos</strong> em ${diasRest} dias.`;
-    insightAction = `<b>Ação:</b> manter ritmo atual. Essa semana precisa fechar <b>${fmtM(semanaPrecisa)}</b> (${fmtM(paceNec)}/dia).`;
-  } else if(status === 'warn'){
-    const deficit = (paceNec - paceAtual) * diasRest;
-    insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>${diffPct.toFixed(0)}% abaixo</strong> do necessário. Se continuar assim, a projeção fecha <strong>${fmtM(deficit)} abaixo</strong> do cenário ${c.nome.toLowerCase()}.`;
-    insightAction = `<b>Ação:</b> acelerar em <b>${fmtM(paceNec - paceAtual)}/dia</b> ou antecipar a ativação do ADSPLAY. Essa semana: precisa <b>${fmtM(semanaPrecisa)}</b> (${fmtM(paceNec)}/dia).`;
+  // 3 situacoes:
+  // A) Pace atual ja sustentaria a meta (projLinear >= meta): super tranquilo
+  // B) Pace atual + rampa historica da: precisa a rampa acontecer (caso normal)
+  // C) Pace atual nao chega nem com rampa: risco real
+
+  if(ratioLinear >= 1){
+    // A — Pace atual sozinho ja fecharia o cenario
+    insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> por si só já projeta fechamento em <strong>${fmtM(projLinear)}</strong>, <strong>${fmtM(diffLinear)} acima</strong> do cenário ${c.nome.toLowerCase()}. Quando a rampa natural e o ADSPLAY entrarem (a partir do d62), tende a superar ainda mais.`;
+    insightAction = `<b>Ação:</b> manter operação atual. Garantir que o ADSPLAY ative no d62 pra travar o upside. Revisar criativos a cada 3 semanas pra evitar fadiga.`;
+  } else if(ratioLinear >= 0.5){
+    // B — Pace atual + rampa historica
+    const rampaNec = gapLinear;
+    const rampaPct = ((metaRec/projLinear - 1) * 100).toFixed(0);
+    if(jStatus === 'good' || jStatus === 'ok'){
+      insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>${jLbl.toLowerCase().replace('✓ ','')}</strong> na janela curta. Porém, se esse ritmo se mantiver linear até o fim, fecha em <strong>${fmtM(projLinear)}</strong> (${(ratioLinear*100).toFixed(0)}% da meta). Pra bater ${c.nome.toLowerCase()}, a rampa final precisa entregar <strong>${fmtM(rampaNec)}</strong> (~${rampaPct}% acima do linear).`;
+      insightAction = `<b>Ação:</b> a rampa depende do ADSPLAY (d62+) e do lineup estar 100% divulgado. Garantir essas duas frentes pra destravar o restante.`;
+    } else {
+      insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>${((1-ratioJanela)*100).toFixed(0)}% abaixo</strong> do esperado na janela curta. Mantendo esse ritmo, fecha em <strong>${fmtM(projLinear)}</strong> (${(ratioLinear*100).toFixed(0)}% da meta ${c.nome.toLowerCase()}).`;
+      insightAction = `<b>Ação:</b> recuperar pace dos próximos 7 dias (precisa <b>${fmtM(paceNec)}/dia</b>) E garantir execução impecável do ADSPLAY na janela final. Sem os dois, cenário não bate.`;
+    }
   } else {
-    const deficit = (paceNec - paceAtual) * diasRest;
-    insightTxt = `🚨 Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>${diffPct.toFixed(0)}% abaixo</strong> do mínimo. Fechamento projetado: <strong>${fmtM(STATE.d26_rec + paceAtual * diasRest)}</strong> (distância crítica da meta).`;
-    insightAction = `<b>Ação urgente:</b> revisar estratégia de mídia. Precisa dobrar o pace ou injetar novo orçamento. Essa semana: <b>${fmtM(semanaPrecisa)}</b> necessários.`;
+    // C — Pace atual muito longe
+    insightTxt = `🚨 Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> extrapolado linear fecha em <strong>${fmtM(projLinear)}</strong> — apenas <strong>${(ratioLinear*100).toFixed(0)}%</strong> do cenário ${c.nome.toLowerCase()}. Mesmo com a rampa histórica, distância crítica da meta.`;
+    insightAction = `<b>Ação urgente:</b> revisão de estratégia. Cenário ${c.nome.toLowerCase()} exige pace médio de <b>${fmtM(paceNec)}/dia</b> na janela atual. Considerar reforço de mídia ou migrar foco pro cenário conservador.`;
   }
 
   return {
     metaRec, metaIng, gapRec, gapIng, pctAtingido, diasRest,
-    paceAtual, paceNec, semanaPrecisa,
-    status, statusLbl, className, insightTxt, insightAction,
-    esperadoHoje
+    paceAtual, paceNec, semanaPrecisa, projLinear, ratioLinear,
+    jStatus, jLbl, jClass,
+    viabPct, viabLbl, viabClass,
+    insightTxt, insightAction,
+    status: jStatus, statusLbl: jLbl, className: jClass // compat
   };
 }
 
@@ -801,7 +870,7 @@ function renderDetalhe(key){
   STATE.cenarioAtivo = key;
   const c = CENARIOS[key];
   const res = calcularCenario(c);
-  const gp = calcularGapEPace(c);
+  const gp = calcularGapEPace(c, key);
   document.getElementById('dtHeadL').textContent = 'Cenário ' + c.nome;
   document.getElementById('dtRec').textContent = fmtM(res.rec);
   document.getElementById('dtRecSub').textContent = '+' + (res.vs_2025*100).toFixed(0) + '% vs 2025';
@@ -820,16 +889,25 @@ function renderDetalhe(key){
 
   // Pace
   document.getElementById('paceAtual').textContent = fmtM(gp.paceAtual) + '/dia';
-  document.getElementById('paceAtual').className = 'pace-row-val ' + (gp.className || '');
+  document.getElementById('paceAtual').className = 'pace-row-val ' + (gp.jClass || '');
   document.getElementById('paceNec').textContent = fmtM(gp.paceNec) + '/dia';
   document.getElementById('paceSemana').textContent = fmtM(gp.semanaPrecisa);
   document.getElementById('paceSemanaSub').textContent = 'pra seguir no ritmo do cenário ' + c.nome.toLowerCase();
 
+  // Projeção linear (novo)
+  const pl = document.getElementById('paceProjLinear');
+  if(pl){
+    pl.textContent = fmtM(gp.projLinear);
+    const ratioStr = (gp.ratioLinear*100).toFixed(0) + '% da meta';
+    document.getElementById('paceProjLinearSub').textContent = ratioStr + ' · se mantiver pace atual';
+    pl.className = 'pace-row-val ' + (gp.ratioLinear >= 1 ? 'good' : gp.ratioLinear >= 0.7 ? '' : gp.ratioLinear >= 0.5 ? 'warn' : 'alert');
+  }
+
   // Insight
   const insightCard = document.getElementById('insightCard');
-  insightCard.className = 'insight-card ' + gp.className;
+  insightCard.className = 'insight-card ' + gp.viabClass;
   document.getElementById('insightTitle').textContent = 'Diagnóstico — Cenário ' + c.nome;
-  document.getElementById('insightStatus').textContent = gp.statusLbl;
+  document.getElementById('insightStatus').textContent = gp.viabPct + '% ' + gp.viabLbl;
   document.getElementById('insightTxt').innerHTML = gp.insightTxt;
   document.getElementById('insightAction').innerHTML = gp.insightAction;
 
