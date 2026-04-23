@@ -2,7 +2,8 @@ name: Update Google Ads Data
 
 on:
   schedule:
-    - cron: '*/5 * * * *'   # a cada 5 minutos
+    # Offset +3 pra evitar colisao (:03, :08, :13...)
+    - cron: '3-59/5 * * * *'
   workflow_dispatch:          # permite rodar manualmente
 
 jobs:
@@ -31,11 +32,28 @@ jobs:
           GOOGLE_ADS_LOGIN_CUSTOMER_ID: ${{ secrets.GOOGLE_ADS_LOGIN_CUSTOMER_ID }}
         run: python update-google-ads.py
 
-      - name: Commit and push data
+      - name: Commit and push data (com retry loop)
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add google-ads-data.json
-          git diff --staged --quiet || git commit -m "chore: update google-ads-data.json [skip ci]"
-          git pull --rebase origin main || true
-          git push
+          if git diff --staged --quiet; then
+            echo "Sem mudancas em google-ads-data.json"
+            exit 0
+          fi
+          git commit -m "chore: update google-ads-data.json [skip ci]"
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            git pull --rebase origin main 2>&1 || {
+              git rebase --abort 2>/dev/null || true
+              git add google-ads-data.json
+              git diff --staged --quiet || git commit -m "chore: update google-ads-data.json [skip ci]" --allow-empty
+            }
+            if git push 2>&1; then
+              echo "Push OK na tentativa $attempt"
+              exit 0
+            fi
+            echo "Push falhou na tentativa $attempt, aguardando..."
+            sleep $((RANDOM % 15 + 5))
+          done
+          echo "ERRO: push falhou apos 10 tentativas"
+          exit 1

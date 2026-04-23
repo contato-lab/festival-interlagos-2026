@@ -33,11 +33,28 @@ jobs:
           TM_API_KEY: ${{ secrets.TM_API_KEY }}
         run: python update-ticketmaster.py
 
-      - name: Commit ticketmaster-data.json
+      - name: Commit ticketmaster-data.json (com retry loop)
         run: |
           git config user.name  "GitHub Actions"
           git config user.email "actions@github.com"
           git add ticketmaster-data.json
-          git diff --staged --quiet || git commit -m "chore: update ticketmaster-data.json [skip ci]"
-          git pull --rebase origin main || true
-          git push
+          if git diff --staged --quiet; then
+            echo "Sem mudancas em ticketmaster-data.json"
+            exit 0
+          fi
+          git commit -m "chore: update ticketmaster-data.json [skip ci]"
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            git pull --rebase origin main 2>&1 || {
+              git rebase --abort 2>/dev/null || true
+              git add ticketmaster-data.json
+              git diff --staged --quiet || git commit -m "chore: update ticketmaster-data.json [skip ci]" --allow-empty
+            }
+            if git push 2>&1; then
+              echo "Push OK na tentativa $attempt"
+              exit 0
+            fi
+            echo "Push falhou na tentativa $attempt, aguardando..."
+            sleep $((RANDOM % 15 + 5))
+          done
+          echo "ERRO: push falhou apos 10 tentativas"
+          exit 1
