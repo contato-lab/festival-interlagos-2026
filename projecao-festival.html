@@ -845,7 +845,7 @@ function calcularGapEPace(c, cenarioKey){
     const rampaPct = ((metaRec/projLinear - 1) * 100).toFixed(0);
     if(jStatus === 'good' || jStatus === 'ok'){
       insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>${jLbl.toLowerCase().replace('✓ ','')}</strong> na janela curta. Porém, se esse ritmo se mantiver linear até o fim, fecha em <strong>${fmtM(projLinear)}</strong> (${(ratioLinear*100).toFixed(0)}% da meta). Pra bater ${c.nome.toLowerCase()}, a rampa final precisa entregar <strong>${fmtM(rampaNec)}</strong> (~${rampaPct}% acima do linear).`;
-      insightAction = `<b>Ação:</b> a rampa depende do ADSPLAY (d62+) e do lineup estar 100% divulgado. Garantir essas duas frentes pra destravar o restante.`;
+      insightAction = `<b>Ação:</b> lineup no ar — ativar retargeting agressivo com os artistas confirmados como gancho nas próximas 2 semanas. Garantir ADSPLAY em plena operação (d62+) pra travar a rampa.`;
     } else {
       insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>${((1-ratioJanela)*100).toFixed(0)}% abaixo</strong> do esperado na janela curta. Mantendo esse ritmo, fecha em <strong>${fmtM(projLinear)}</strong> (${(ratioLinear*100).toFixed(0)}% da meta ${c.nome.toLowerCase()}).`;
       insightAction = `<b>Ação:</b> recuperar pace dos próximos 7 dias (precisa <b>${fmtM(paceNec)}/dia</b>) E garantir execução impecável do ADSPLAY na janela final. Sem os dois, cenário não bate.`;
