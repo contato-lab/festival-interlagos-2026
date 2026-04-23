@@ -721,7 +721,7 @@ function renderKPIs(){
   const deltaRec = d25_rec_periodo>0 ? (STATE.d26_rec/d25_rec_periodo-1)*100 : 0;
   const deltaIng = d25_ing_periodo>0 ? (STATE.d26_ing/d25_ing_periodo-1)*100 : 0;
 
-  document.getElementById('kpiVendido').textContent = fmtM(STATE.d26_rec);
+  document.getElementById('kpiVendido').textContent = 'R$ ' + Math.round(STATE.d26_rec).toLocaleString('pt-BR');
   document.getElementById('kpiVendidoSub').textContent = STATE.d26_dias + ' dias · ' + (deltaRec>=0?'+':'') + deltaRec.toFixed(1) + '% vs 2025';
   document.getElementById('kpiIng').textContent = fmtInt(STATE.d26_ing);
   document.getElementById('kpiIngSub').textContent = (deltaIng>=0?'+':'') + deltaIng.toFixed(1) + '% vs 2025';
