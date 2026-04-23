@@ -463,14 +463,12 @@ const D25 = [
 // ════════════════════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════════════════════
-const SHEET_ID = '1jk7jjYB6n-IjkdmBUv54QEerujL_iAAP';
-const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=';
+// Google Sheets removido — dados de vendas vêm exclusivamente da API da plataforma própria
 const SEMANA_START = new Date('2026-03-30T00:00:00');
 const DATA_INICIO = new Date('2026-03-31T00:00:00');
 const DATA_EVENTO = new Date('2026-08-29T00:00:00');
 const DIAS_TOTAL = 151;
 const INVEST_CAIXA = 1_860_000;
-function getCurrentWeek(){const n=new Date();n.setHours(0,0,0,0);return Math.max(0,Math.floor((n-SEMANA_START)/604800000));}
 
 let D26_FULL = [];
 
@@ -565,72 +563,14 @@ async function fetchTicketmaster(){
 }
 
 // ════════════════════════════════════════════════════
-// FETCH GOOGLE SHEETS
-// ════════════════════════════════════════════════════
-async function fetchSheet(){
-  const currentWeek = getCurrentWeek();
-  const allDays = [];
-  function parseCSV(raw){
-    return raw.split('\n').map(line => {
-      const cells = []; let inQ = false, cell = '';
-      for(const ch of line){
-        if(ch === '"'){inQ = !inQ; continue;}
-        if(ch === ',' && !inQ){cells.push(cell.trim()); cell=''; continue;}
-        cell += ch;
-      }
-      cells.push(cell.trim());
-      return cells;
-    });
-  }
-  const parseMoeda = v => parseFloat((v||'').replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.').trim()) || 0;
-  const parseQtd = v => parseInt((v||'').replace(/[^\d]/g,'')) || 0;
-  const findRow = (rows, afterIdx, match) => {
-    for(let i = afterIdx; i < rows.length; i++){
-      if(match((rows[i][0]||'').trim())) return i;
-    }
-    return -1;
-  };
-  const isVV = l => l === 'VENDAS VALOR:';
-  const isQTD = l => l.startsWith('QTD');
-  for(let w = 0; w <= currentWeek; w++){
-    try {
-      const url = SHEET_BASE + encodeURIComponent('SEMANA ' + w) + '&t=' + Date.now();
-      const res = await fetch(url);
-      if(!res.ok) continue;
-      const text = await res.text();
-      const rows = parseCSV(text);
-      const iMpV = findRow(rows, 1, isVV);
-      const iMpQ = iMpV >= 0 ? findRow(rows, iMpV+1, isQTD) : -1;
-      const iMtV = iMpQ >= 0 ? findRow(rows, iMpQ+1, isVV)  : -1;
-      const iMtQ = iMtV >= 0 ? findRow(rows, iMtV+1, isQTD) : -1;
-      const iApV = iMtQ >= 0 ? findRow(rows, iMtQ+1, isVV)  : -1;
-      const iApQ = iApV >= 0 ? findRow(rows, iApV+1, isQTD) : -1;
-      if(iMpV < 0 || iApV < 0) continue;
-      const get = ri => (ri >= 0 ? rows[ri] : []) || [];
-      for(let c = 1; c <= 7; c++){
-        const mp = parseMoeda(get(iMpV)[c]);
-        const mqP = parseQtd(get(iMpQ)[c]);
-        const ap = parseMoeda(get(iApV)[c]);
-        const aqP = parseQtd(get(iApQ)[c]);
-        if(mp || mqP || ap || aqP){
-          allDays.push({
-            d: w*7 + (c-1),
-            mp, ap, mpQ: mqP, apQ: aqP
-          });
-        }
-      }
-    } catch(e) { console.warn('fetchSheet w='+w, e.message); }
-  }
-  return allDays;
-}
+// Google Sheets removido — fonte única: API da plataforma própria (fetchVendasProprio)
 
 // ════════════════════════════════════════════════════
 // MERGE DADOS
 // ════════════════════════════════════════════════════
 async function carregarDados26(){
-  // Tenta API própria; fallback para Google Sheets se falhar
+  // API da plataforma própria — fonte única de dados de vendas
   let sheetData = await fetchVendasProprio();
-  if (!sheetData || !sheetData.length) sheetData = await fetchSheet();
   const tmByDay = await fetchTicketmaster();
   const sheet = sheetData;
   const byDay = {};

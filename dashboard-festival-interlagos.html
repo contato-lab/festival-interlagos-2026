@@ -871,13 +871,7 @@ function checkLogin(){
   }
 }
 
-// ═══════════════════════════════════════════════
-// CONFIG — Google Sheets (gviz CSV — leitura pública)
-// ═══════════════════════════════════════════════
-const SHEET_ID = '1jk7jjYB6n-IjkdmBUv54QEerujL_iAAP';
-const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=';
-const SEMANA_START = new Date('2026-03-30T00:00:00'); // Segunda-feira da SEMANA 0
-function getCurrentWeek(){const n=new Date();n.setHours(0,0,0,0);return Math.max(0,Math.floor((n-SEMANA_START)/604800000));}
+// Google Sheets removido — dados de vendas vêm exclusivamente da API da plataforma própria
 
 // Data de início das vendas (D+1). Ajuste para a data real quando disponível.
 const DATA_INICIO = new Date('2026-03-31T00:00:00'); // D+1 = abertura das vendas
@@ -2173,95 +2167,7 @@ async function fetchVendasProprio() {
   } catch(e) { console.warn('[API Própria] erro:', e.message); }
 }
 
-// GOOGLE SHEETS — fetch automático
-// ═══════════════════════════════════════════════
-async function fetchSheet() {
-  if(!SHEET_ID) return;
-  const currentWeek = getCurrentWeek();
-  const allDays = [];
-
-  // Parse CSV com suporte a campos entre aspas
-  function parseCSV(raw) {
-    return raw.split('\n').map(line => {
-      const cells = []; let inQ = false, cell = '';
-      for (const ch of line) {
-        if (ch === '"') { inQ = !inQ; continue; }
-        if (ch === ',' && !inQ) { cells.push(cell.trim()); cell = ''; continue; }
-        cell += ch;
-      }
-      cells.push(cell.trim());
-      return cells;
-    });
-  }
-
-  const parseMoeda = v => parseFloat((v||'').replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.').trim()) || 0;
-  const parseQtd   = v => parseInt((v||'').replace(/[^\d]/g,'')) || 0;
-  const findRow = (rows, afterIdx, match) => {
-    for (let i = afterIdx; i < rows.length; i++) {
-      if (match((rows[i][0]||'').trim())) return i;
-    }
-    return -1;
-  };
-  const isVV  = l => l === 'VENDAS VALOR:';
-  const isQTD = l => l.startsWith('QTD');
-
-  // Busca todas as semanas (SEMANA 0 até semana atual)
-  for (let w = 0; w <= currentWeek; w++) {
-    try {
-      const url = SHEET_BASE + encodeURIComponent('SEMANA ' + w) + '&t=' + Date.now();
-      const res = await fetch(url);
-      if (!res.ok) { console.warn('fetchSheet: SEMANA ' + w + ' não encontrada'); continue; }
-      const text = await res.text();
-      const rows = parseCSV(text);
-
-      const iMpV = findRow(rows, 1, isVV);
-      const iMpQ = iMpV >= 0 ? findRow(rows, iMpV + 1, isQTD) : -1;
-      const iMtV = iMpQ >= 0 ? findRow(rows, iMpQ + 1, isVV)  : -1;
-      const iMtQ = iMtV >= 0 ? findRow(rows, iMtV + 1, isQTD) : -1;
-      const iApV = iMtQ >= 0 ? findRow(rows, iMtQ + 1, isVV)  : -1;
-      const iApQ = iApV >= 0 ? findRow(rows, iApV + 1, isQTD) : -1;
-      const iAtV = iApQ >= 0 ? findRow(rows, iApQ + 1, isVV)  : -1;
-      const iAtQ = iAtV >= 0 ? findRow(rows, iAtV + 1, isQTD) : -1;
-
-      if (iMpV < 0 || iApV < 0) {
-        console.warn('fetchSheet: SEMANA ' + w + ' estrutura não reconhecida');
-        continue;
-      }
-
-      const get = ri => (ri >= 0 ? rows[ri] : []) || [];
-      for (let c = 1; c <= 7; c++) {
-        const mp  = parseMoeda(get(iMpV)[c]);
-        const mqP = parseQtd  (get(iMpQ)[c]);
-        const mt  = 0; // TM: agora via API Ticketmaster
-        const mqT = 0; // TM: agora via API Ticketmaster
-        const ap  = parseMoeda(get(iApV)[c]);
-        const aqP = parseQtd  (get(iApQ)[c]);
-        const at  = 0; // TM: agora via API Ticketmaster
-        const aqT = 0; // TM: agora via API Ticketmaster
-        if (mp || mqP || mt || mqT || ap || aqP || at || aqT) {
-          allDays.push({
-            d: w * 7 + (c - 1),  // SEMANA 0 col1=d0, col2=d1(DATA_INICIO)… SEMANA 1 col1=d7…
-            mp, mt, ap, at,
-            mv: mp + mt, mq: mqP + mqT,
-            av: ap + at, aq: aqP + aqT,
-            mpQ: mqP, mtQ: mqT, apQ: aqP, atQ: aqT
-          });
-        }
-      }
-      console.log('✅ SEMANA ' + w + ' carregada');
-    } catch(e) { console.warn('fetchSheet SEMANA ' + w + ' erro:', e.message); }
-  }
-
-  if (allDays.length) {
-    allDays.sort((a, b) => a.d - b.d);
-    D26.length = 0; allDays.forEach(r => D26.push(r));
-    D26_FULL = [...D26];
-    document.getElementById('demoBadge').style.display = 'none';
-    updateLastRefreshTime();
-    applyFiltro();
-    console.log('✅ Google Sheets conectado:', allDays.length, 'dias de ' + (currentWeek + 1) + ' semana(s)');
-  }
-}
+// Google Sheets removido — fonte única: API da plataforma própria (fetchVendasProprio)
 
 // ═══════════════════════════════════════════════
 // INIT
@@ -2292,7 +2198,7 @@ function initDashboard(){
   buildSpk('spkGoogle',[180,420,680,390,510,720,480,560,420,640,740,530,460,680,790,560,440,820],'rgb(200,255,0)');
   
   _upd2026Lbl();
-  Promise.allSettled([fetchSheet(), fetchVendasProprio(), fetchGA4Data(), fetchGAdsData(), fetchMetaData(), fetchMetaCreatives()])
+  Promise.allSettled([fetchVendasProprio(), fetchGA4Data(), fetchGAdsData(), fetchMetaData(), fetchMetaCreatives()])
     .then(() => { fetchTicketmaster(); });
 
   // Vendas própria + TM: refresh a cada 5 minutos
