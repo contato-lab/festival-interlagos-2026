@@ -928,7 +928,7 @@ async function fetchTicketmaster() {
 
     const tmByDay = {};
     data.daily.forEach(row => {
-      const d = Math.round((new Date(row.date + 'T00:00:00') - SEMANA_START) / 86400000);
+      const d = Math.floor((new Date(row.date + 'T00:00:00') - DATA_INICIO) / 86400000) + 1;
       tmByDay[d] = {
         mt: row.moto_receita    || 0,
         at: row.auto_receita    || 0,
@@ -965,76 +965,31 @@ async function fetchTicketmaster() {
 }
 
 // ═══════════════════════════════════════════════
-// API PLATAFORMA PRÓPRIA — Vendas Moto + Auto
-// Refresh: a cada 5 minutos
+// VENDAS PRÓPRIAS — lê vendas-data.json (gerado pelo GitHub Actions a cada 5 min)
+// Endpoint direto removido — CORS/403 resolvido via workflow server-side
 // ═══════════════════════════════════════════════
-const API_MOTO_BASE = 'https://ingressosmoto.festivalinterlagos.com.br';
-const API_AUTO_BASE = 'https://ingressosauto.festivalinterlagos.com.br';
-
-async function _apiToken(base) {
-  const r = await fetch(base + '/apis/token', {cache:'no-store'});
-  if (!r.ok) throw new Error('Token HTTP ' + r.status);
-  const d = await r.json();
-  if (d.status !== 'success') throw new Error('Token status: ' + d.status);
-  return d.token;
-}
-
-async function _apiVendasAll(base, token) {
-  const sales = []; let page = 1;
-  const fim = new Date().toISOString().split('T')[0];
-  while (true) {
-    const url = `${base}/apis/vendas?data_inicio=2026-01-01&data_fim=${fim}&page_size=100&page=${page}`;
-    const r = await fetch(url, {headers:{'Authorization':'Bearer '+token}, cache:'no-store'});
-    if (!r.ok) throw new Error('Vendas HTTP ' + r.status);
-    const d = await r.json();
-    if (d.status !== 'success' || !d.data?.length) break;
-    sales.push(...d.data);
-    if (d.pagination?.isNextPage !== 'Y') break;
-    page++;
-  }
-  return sales;
-}
-
-function _vendasPorDia(sales) {
-  const byDay = {};
-  sales.forEach(v => {
-    if (String(v.venda_status) !== '3') return;
-    const ds = (v.created_at || '').split(' ')[0];
-    if (!ds) return;
-    const dt = new Date(ds + 'T00:00:00');
-    const d = Math.floor((dt - DATA_INICIO) / 86400000) + 1;
-    if (d < 1) return;
-    if (!byDay[d]) byDay[d] = {receita: 0, qtd: 0};
-    byDay[d].receita += parseFloat(v.venda_valor) || 0;
-    byDay[d].qtd += (v.qrcodes || []).length;
-  });
-  return byDay;
-}
-
 async function fetchVendasProprio() {
   try {
-    const [motoTk, autoTk] = await Promise.all([_apiToken(API_MOTO_BASE), _apiToken(API_AUTO_BASE)]);
-    const [motoSales, autoSales] = await Promise.all([
-      _apiVendasAll(API_MOTO_BASE, motoTk),
-      _apiVendasAll(API_AUTO_BASE, autoTk)
-    ]);
-    const moto = _vendasPorDia(motoSales);
-    const auto = _vendasPorDia(autoSales);
-    const dias = new Set([...Object.keys(moto), ...Object.keys(auto)].map(Number));
-    dias.forEach(d => {
-      const m = moto[d] || {receita: 0, qtd: 0};
-      const a = auto[d] || {receita: 0, qtd: 0};
-      let row = D26_FULL.find(r => r.d === d);
-      if (!row) {
-        row = {d, mp:0, mt:0, ap:0, at:0, mv:0, mq:0, av:0, aq:0, mpQ:0, mtQ:0, apQ:0, atQ:0};
-        D26_FULL.push(row);
+    const res = await fetch('vendas-data.json?t=' + Date.now(), {cache:'no-store'});
+    if (!res.ok) throw new Error('vendas-data.json HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.daily || !data.daily.length) return;
+
+    data.daily.forEach(row => {
+      const d = row.d;
+      let r = D26_FULL.find(x => x.d === d);
+      if (!r) {
+        r = {d, mp:0, mt:0, ap:0, at:0, mv:0, mq:0, av:0, aq:0, mpQ:0, mtQ:0, apQ:0, atQ:0};
+        D26_FULL.push(r);
       }
-      row.mp = m.receita; row.mpQ = m.qtd;
-      row.ap = a.receita; row.apQ = a.qtd;
-      row.mv = row.mp + (row.mt || 0);
-      row.mq = row.mpQ + (row.mtQ || 0);
-      row.av = row.ap + (row.at || 0);
-      row.aq = row.apQ + (row.atQ || 0);
+      r.mp  = row.moto_receita   || 0;
+      r.mpQ = row.moto_ingressos || 0;
+      r.ap  = row.auto_receita   || 0;
+      r.apQ = row.auto_ingressos || 0;
+      r.mv  = r.mp  + (r.mt  || 0);
+      r.mq  = r.mpQ + (r.mtQ || 0);
+      r.av  = r.ap  + (r.at  || 0);
+      r.aq  = r.apQ + (r.atQ || 0);
     });
     D26_FULL.sort((a, b) => a.d - b.d);
     if (document.getElementById('demoBadge')) document.getElementById('demoBadge').style.display = 'none';
@@ -1046,11 +1001,9 @@ async function fetchVendasProprio() {
       document.getElementById('filtroATE').value = dateToIso(ultimo);
     }
     applyFiltro();
-    console.log('[API Própria] Moto:', motoSales.length, '| Auto:', autoSales.length, 'vendas carregadas');
-  } catch(e) { console.warn('[API Própria] erro:', e.message); }
+    console.log('[vendas-data.json] Moto:', data.totals.moto_ingressos, '| Auto:', data.totals.auto_ingressos, 'ingressos | atualizado:', data.updated_at);
+  } catch(e) { console.warn('[Vendas Próprias] erro:', e.message); }
 }
-
-// Google Sheets removido — fonte única: API da plataforma própria (fetchVendasProprio)
 
 // ═══════════════════════════════════════════════
 // INIT
