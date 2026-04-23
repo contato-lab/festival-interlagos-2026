@@ -491,67 +491,30 @@ document.getElementById('scnSel').addEventListener('click', e => {
 });
 
 // ═══════════════════════════════════════════════
-// API PLATAFORMA PRÓPRIA — atualiza 2026 real
+// VENDAS PRÓPRIAS — lê vendas-data.json (gerado pelo GitHub Actions a cada 5 min)
+// Endpoint direto removido — CORS/403 resolvido via workflow server-side
 // ═══════════════════════════════════════════════
-const _PREV_MOTO_BASE = 'https://ingressosmoto.festivalinterlagos.com.br';
-const _PREV_AUTO_BASE = 'https://ingressosauto.festivalinterlagos.com.br';
-const _PREV_DATA_INICIO = new Date('2026-03-31T00:00:00');
-
-async function _prevToken(base) {
-  const r = await fetch(base + '/apis/token', {cache:'no-store'});
-  if (!r.ok) throw new Error('Token HTTP ' + r.status);
-  const d = await r.json();
-  if (d.status !== 'success') throw new Error('Token: ' + d.status);
-  return d.token;
-}
-
-async function _prevVendasAll(base, token) {
-  const sales = []; let page = 1;
-  const fim = new Date().toISOString().split('T')[0];
-  while (true) {
-    const url = `${base}/apis/vendas?data_inicio=2026-01-01&data_fim=${fim}&page_size=100&page=${page}`;
-    const r = await fetch(url, {headers:{'Authorization':'Bearer '+token}, cache:'no-store'});
-    if (!r.ok) throw new Error('Vendas HTTP ' + r.status);
-    const d = await r.json();
-    if (d.status !== 'success' || !d.data?.length) break;
-    sales.push(...d.data);
-    if (d.pagination?.isNextPage !== 'Y') break;
-    page++;
-  }
-  return sales;
-}
-
 async function fetchVendasProprioPreview() {
   try {
-    const [motoTk, autoTk] = await Promise.all([_prevToken(_PREV_MOTO_BASE), _prevToken(_PREV_AUTO_BASE)]);
-    const [motoSales, autoSales] = await Promise.all([
-      _prevVendasAll(_PREV_MOTO_BASE, motoTk),
-      _prevVendasAll(_PREV_AUTO_BASE, autoTk)
-    ]);
-    const allSales = [...motoSales, ...autoSales];
-    let totalReceita = 0, totalIngressos = 0;
-    const diasComVendas = new Set();
-    allSales.forEach(v => {
-      if (String(v.venda_status) !== '3') return;
-      const ds = (v.created_at || '').split(' ')[0];
-      if (!ds) return;
-      const dt = new Date(ds + 'T00:00:00');
-      const d = Math.floor((dt - _PREV_DATA_INICIO) / 86400000) + 1;
-      if (d < 1) return;
-      totalReceita   += parseFloat(v.venda_valor) || 0;
-      totalIngressos += (v.qrcodes || []).length;
-      diasComVendas.add(d);
-    });
+    const res = await fetch('vendas-data.json?t=' + Date.now(), {cache:'no-store'});
+    if (!res.ok) throw new Error('vendas-data.json HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.totals || !data.daily || !data.daily.length) return;
+
+    const totalReceita   = (data.totals.moto_receita   || 0) + (data.totals.auto_receita   || 0);
+    const totalIngressos = (data.totals.moto_ingressos || 0) + (data.totals.auto_ingressos || 0);
+    const diasComVendas  = data.daily.filter(r => (r.moto_ingressos + r.auto_ingressos) > 0).length;
+
     if (totalIngressos > 0) {
       D26_REAL_TOTAL = totalReceita;
       D26_REAL_ING   = totalIngressos;
-      D26_DIAS       = diasComVendas.size;
+      D26_DIAS       = diasComVendas;
       fator_ing      = D26_REAL_ING / d25_ing_23;
       realizado      = simDiasReais();
       preencherCenario(cenarioAtivo);
-      console.log('[API Própria Preview] Rec:', Math.round(D26_REAL_TOTAL), '| Ing:', D26_REAL_ING, '| Dias:', D26_DIAS);
+      console.log('[vendas-data.json Preview] Rec:', Math.round(D26_REAL_TOTAL), '| Ing:', D26_REAL_ING, '| Dias:', D26_DIAS, '| atualizado:', data.updated_at);
     }
-  } catch(e) { console.warn('[API Própria Preview] erro:', e.message); }
+  } catch(e) { console.warn('[Vendas Próprias Preview] erro:', e.message); }
 }
 
 // Init

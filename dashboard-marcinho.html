@@ -761,72 +761,43 @@ async function fetchGAds() {
   } catch(e) { console.warn('GAds fetch failed:', e.message); }
 }
 
-async function fetchSheets() {
-  const currentWeek = getCurrentWeekM();
-  const allDays = [];
+// ═══════════════════════════════════════════════
+// VENDAS PRÓPRIAS — lê vendas-data.json (gerado pelo GitHub Actions a cada 5 min)
+// Substitui o fetch do Google Sheets (que foi descontinuado como fonte de dados)
+// ═══════════════════════════════════════════════
+async function fetchVendasProprio() {
+  try {
+    const res = await fetch('vendas-data.json?t=' + Date.now(), {cache:'no-store'});
+    if (!res.ok) throw new Error('vendas-data.json HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.daily || !data.daily.length) return;
 
-  function parseCSV(raw) {
-    return raw.split('\n').map(line => {
-      const cells = []; let inQ = false, cell = '';
-      for (const ch of line) {
-        if (ch === '"') { inQ = !inQ; continue; }
-        if (ch === ',' && !inQ) { cells.push(cell.trim()); cell = ''; continue; }
-        cell += ch;
-      }
-      cells.push(cell.trim());
-      return cells;
-    });
-  }
+    const allDays = data.daily.map(row => ({
+      d:   row.d,
+      mp:  row.moto_receita   || 0,
+      mt:  0, // Ticketmaster preenchido por fetchTicketmaster
+      ap:  row.auto_receita   || 0,
+      at:  0,
+      mv:  row.moto_receita   || 0,
+      mq:  row.moto_ingressos || 0,
+      av:  row.auto_receita   || 0,
+      aq:  row.auto_ingressos || 0,
+      mpQ: row.moto_ingressos || 0,
+      mtQ: 0,
+      apQ: row.auto_ingressos || 0,
+      atQ: 0
+    }));
 
-  const parseMoeda = v => parseFloat((v||'').replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.').trim()) || 0;
-  const parseQtd   = v => parseInt((v||'').replace(/[^\d]/g,'')) || 0;
-  const findRow = (rows, afterIdx, match) => {
-    for (let i = afterIdx; i < rows.length; i++) {
-      if (match((rows[i][0]||'').trim())) return i;
-    }
-    return -1;
-  };
-  const isVV  = l => l === 'VENDAS VALOR:';
-  const isQTD = l => l.startsWith('QTD');
-
-  for (let w = 0; w <= currentWeek; w++) {
-    try {
-      const url = SHEET_BASE + encodeURIComponent('SEMANA ' + w) + '&t=' + Date.now();
-      const res = await fetch(url);
-      if (!res.ok) continue;
-      const rows = parseCSV(await res.text());
-
-      const iMpV = findRow(rows, 1, isVV);
-      const iMpQ = iMpV >= 0 ? findRow(rows, iMpV+1, isQTD) : -1;
-      const iMtV = iMpQ >= 0 ? findRow(rows, iMpQ+1, isVV)  : -1;
-      const iMtQ = iMtV >= 0 ? findRow(rows, iMtV+1, isQTD) : -1;
-      const iApV = iMtQ >= 0 ? findRow(rows, iMtQ+1, isVV)  : -1;
-      const iApQ = iApV >= 0 ? findRow(rows, iApV+1, isQTD) : -1;
-      const iAtV = iApQ >= 0 ? findRow(rows, iApQ+1, isVV)  : -1;
-      const iAtQ = iAtV >= 0 ? findRow(rows, iAtV+1, isQTD) : -1;
-      if (iMpV < 0 || iApV < 0) continue;
-
-      const get = ri => (ri >= 0 ? rows[ri] : []) || [];
-      for (let c = 1; c <= 7; c++) {
-        const mp=parseMoeda(get(iMpV)[c]), mqP=parseQtd(get(iMpQ)[c]);
-        const mt=0, mqT=0; // TM: agora via API Ticketmaster (fetchTicketmaster)
-        const ap=parseMoeda(get(iApV)[c]), aqP=parseQtd(get(iApQ)[c]);
-        const at=0, aqT=0; // TM: agora via API Ticketmaster (fetchTicketmaster)
-        if (mp||mqP||ap||aqP) {
-          allDays.push({ d: w*7+(c-1), mp, mt, ap, at, mv:mp+mt, mq:mqP+mqT, av:ap+at, aq:aqP+aqT, mpQ:mqP, mtQ:mqT, apQ:aqP, atQ:aqT });
-        }
-      }
-    } catch(e) { console.warn('fetchSheets SEMANA '+w+' erro:', e.message); }
-  }
-
-  if (allDays.length) {
     allDays.sort((a,b)=>a.d-b.d);
     D26_SALES.length = 0;
     allDays.forEach(r => D26_SALES.push(r));
     updateLastRefreshTime();
-    console.log('✅ Google Sheets conectado:', allDays.length, 'dias');
-  }
+    console.log('[vendas-data.json] Moto:', data.totals.moto_ingressos, '| Auto:', data.totals.auto_ingressos, 'ingressos | atualizado:', data.updated_at);
+  } catch(e) { console.warn('[Vendas Próprias] erro:', e.message); }
 }
+
+// Alias para compat com o fluxo antigo (init chamava fetchSheets)
+const fetchSheets = fetchVendasProprio;
 
 async function fetchTicketmaster() {
   try {
@@ -837,6 +808,7 @@ async function fetchTicketmaster() {
 
     const tmByDay = {};
     data.daily.forEach(row => {
+      // d=1 corresponde a 2026-03-31 (consistente com vendas-data.json)
       const d = Math.round((new Date(row.date + 'T00:00:00') - SEMANA_START_M) / 86400000);
       tmByDay[d] = {
         mt: row.moto_receita    || 0,
