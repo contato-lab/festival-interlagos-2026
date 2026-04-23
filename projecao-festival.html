@@ -475,6 +475,75 @@ function getCurrentWeek(){const n=new Date();n.setHours(0,0,0,0);return Math.max
 let D26_FULL = [];
 
 // ════════════════════════════════════════════════════
+// API PLATAFORMA PRÓPRIA — Vendas Moto + Auto
+// Refresh: a cada 5 minutos (via atualizarDados)
+// ════════════════════════════════════════════════════
+const API_MOTO_BASE = 'https://ingressosmoto.festivalinterlagos.com.br';
+const API_AUTO_BASE = 'https://ingressosauto.festivalinterlagos.com.br';
+
+async function _apiToken(base) {
+  const r = await fetch(base + '/apis/token', {cache:'no-store'});
+  if (!r.ok) throw new Error('Token HTTP ' + r.status);
+  const d = await r.json();
+  if (d.status !== 'success') throw new Error('Token status: ' + d.status);
+  return d.token;
+}
+
+async function _apiVendasAll(base, token) {
+  const sales = []; let page = 1;
+  const fim = new Date().toISOString().split('T')[0];
+  while (true) {
+    const url = `${base}/apis/vendas?data_inicio=2026-01-01&data_fim=${fim}&page_size=100&page=${page}`;
+    const r = await fetch(url, {headers:{'Authorization':'Bearer '+token}, cache:'no-store'});
+    if (!r.ok) throw new Error('Vendas HTTP ' + r.status);
+    const d = await r.json();
+    if (d.status !== 'success' || !d.data?.length) break;
+    sales.push(...d.data);
+    if (d.pagination?.isNextPage !== 'Y') break;
+    page++;
+  }
+  return sales;
+}
+
+async function fetchVendasProprio() {
+  // Retorna array [{d, mp, ap, mpQ, apQ}] — mesmo formato que fetchSheet()
+  try {
+    const [motoTk, autoTk] = await Promise.all([_apiToken(API_MOTO_BASE), _apiToken(API_AUTO_BASE)]);
+    const [motoSales, autoSales] = await Promise.all([
+      _apiVendasAll(API_MOTO_BASE, motoTk),
+      _apiVendasAll(API_AUTO_BASE, autoTk)
+    ]);
+    const byDay = {};
+    const addSales = (sales, tipo) => {
+      sales.forEach(v => {
+        if (String(v.venda_status) !== '3') return;
+        const ds = (v.created_at || '').split(' ')[0];
+        if (!ds) return;
+        const dt = new Date(ds + 'T00:00:00');
+        const d = Math.floor((dt - DATA_INICIO) / 86400000) + 1;
+        if (d < 1) return;
+        if (!byDay[d]) byDay[d] = {d, mp:0, ap:0, mpQ:0, apQ:0};
+        if (tipo === 'moto') {
+          byDay[d].mp  += parseFloat(v.venda_valor) || 0;
+          byDay[d].mpQ += (v.qrcodes || []).length;
+        } else {
+          byDay[d].ap  += parseFloat(v.venda_valor) || 0;
+          byDay[d].apQ += (v.qrcodes || []).length;
+        }
+      });
+    };
+    addSales(motoSales, 'moto');
+    addSales(autoSales, 'auto');
+    const arr = Object.values(byDay).sort((a,b) => a.d - b.d);
+    console.log('[API Própria] Moto:', motoSales.length, '| Auto:', autoSales.length, 'vendas carregadas');
+    return arr;
+  } catch(e) {
+    console.warn('[API Própria] erro:', e.message);
+    return null;
+  }
+}
+
+// ════════════════════════════════════════════════════
 // FETCH TICKETMASTER
 // ════════════════════════════════════════════════════
 async function fetchTicketmaster(){
@@ -559,7 +628,11 @@ async function fetchSheet(){
 // MERGE DADOS
 // ════════════════════════════════════════════════════
 async function carregarDados26(){
-  const [sheet, tmByDay] = await Promise.all([fetchSheet(), fetchTicketmaster()]);
+  // Tenta API própria; fallback para Google Sheets se falhar
+  let sheetData = await fetchVendasProprio();
+  if (!sheetData || !sheetData.length) sheetData = await fetchSheet();
+  const tmByDay = await fetchTicketmaster();
+  const sheet = sheetData;
   const byDay = {};
   (sheet||[]).forEach(r => {
     byDay[r.d] = {
@@ -1014,10 +1087,9 @@ async function atualizarDados(){
 async function boot(){
   document.getElementById('updateTime').textContent = 'carregando dados...';
   await atualizarDados();
-  // Auto-refresh (mesmo mecanismo do painel executivo)
-  // Ticketmaster atualiza a cada 60s (via GitHub Actions a cada 5min)
-  setInterval(atualizarDados, 60000);
-  // Re-render a cada 30s pro pace/horário ficarem atualizados mesmo sem fetch novo
+  // Auto-refresh completo (API própria + TM) a cada 5 minutos
+  setInterval(atualizarDados, 300000);
+  // Re-render a cada 30s pro pace/horário ficarem atualizados sem fetch novo
   setInterval(() => {
     renderKPIs();
     updateLastRefreshTime();
