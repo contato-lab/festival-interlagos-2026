@@ -346,6 +346,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
           <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(29,185,84,.9)"></span>
           <span style="color:#1DB954">🎵 Link Vendas Spotify</span>
         </div>
+        <div class="exec-leg-item clickable" id="exec-waLegVendas" style="display:none" onclick="execToggleAcao('whatsapp',this)">
+          <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(37,211,102,.9)"></span>
+          <span style="color:#25D366">💬 Disparos WhatsApp</span>
+        </div>
       </div>
       <div class="exec-chart-wrap"><canvas id="exec-chartVendas"></canvas></div>
     </div>
@@ -402,6 +406,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="exec-leg-item clickable" id="exec-spotLegTl" style="display:none" onclick="execToggleAcaoTl('spotify',this)">
         <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(29,185,84,.9)"></span>
         <span style="color:#1DB954">🎵 Link Vendas Spotify</span>
+      </div>
+      <div class="exec-leg-item clickable" id="exec-waLegTl" style="display:none" onclick="execToggleAcaoTl('whatsapp',this)">
+        <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(37,211,102,.9)"></span>
+        <span style="color:#25D366">💬 Disparos WhatsApp</span>
       </div>
     </div>
     <div style="position:relative;height:320px"><canvas id="exec-chartTimeline"></canvas></div>
@@ -675,6 +683,10 @@ const EXEC_SPOTIFY = [
   {date:'2026-04-20', day26:21, desc:'Link de Vendas Spotify'},
 ];
 
+const EXEC_WHATSAPP = [
+  {date:'2026-04-23', day26:24, desc:'Disparos WhatsApp — início'},
+];
+
 const EXEC_TV_GLOBO = [
   {date:'2026-04-01', day26:2, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
   {date:'2026-04-02', day26:3, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
@@ -755,7 +767,7 @@ function execGetAllDays(invest) {
 }
 
 /* Estado de visibilidade das ações (toggle na legenda) */
-const execAcoesVisiveis = { tv: true, influencer: true, divulgacao: true, spotify: true };
+const execAcoesVisiveis = { tv: true, influencer: true, divulgacao: true, spotify: true, whatsapp: true };
 
 function execToggleAcao(tipo, el) {
   execAcoesVisiveis[tipo] = !execAcoesVisiveis[tipo];
@@ -803,6 +815,16 @@ function execGetTvAnnotations(days) {
       anns['spot_'+sp.day26] = {
         type:'line', xMin:idx, xMax:idx,
         borderColor:'rgba(29,185,84,0.9)', borderWidth:2, borderDash:[5,3]
+      };
+    });
+  }
+  if(execAcoesVisiveis.whatsapp) {
+    EXEC_WHATSAPP.forEach(wa => {
+      const idx = days.indexOf(wa.day26);
+      if(idx === -1) return;
+      anns['wa_'+wa.day26] = {
+        type:'line', xMin:idx, xMax:idx,
+        borderColor:'rgba(37,211,102,0.9)', borderWidth:2, borderDash:[4,3]
       };
     });
   }
@@ -1047,6 +1069,8 @@ function buildExecVendasChart() {
   if(divLeg) divLeg.style.display = days.some(d=>EXEC_DIVULGACAO.some(t=>t.day26===d))?'flex':'none';
   const spotLeg = document.getElementById('exec-spotLegVendas');
   if(spotLeg) spotLeg.style.display = days.some(d=>EXEC_SPOTIFY.some(t=>t.day26===d))?'flex':'none';
+  const waLeg = document.getElementById('exec-waLegVendas');
+  if(waLeg) waLeg.style.display = days.some(d=>EXEC_WHATSAPP.some(t=>t.day26===d))?'flex':'none';
 }
 
 /* ═══ Grafico Investimento ═══ */
@@ -1321,7 +1345,8 @@ function execToggleAcaoTl(tipo, el) {
   execAcoesVisiveis[tipo] = !execAcoesVisiveis[tipo];
   el.classList.toggle('inactive', !execAcoesVisiveis[tipo]);
   // Sincroniza com o outro chart
-  const outro = document.getElementById('exec-' + (tipo==='tv'?'tv':tipo==='influencer'?'infl':tipo==='divulgacao'?'div':'spot') + 'LegVendas');
+  const key = tipo==='tv'?'tv':tipo==='influencer'?'infl':tipo==='divulgacao'?'div':tipo==='spotify'?'spot':'wa';
+  const outro = document.getElementById('exec-' + key + 'LegVendas');
   if(outro) outro.classList.toggle('inactive', !execAcoesVisiveis[tipo]);
   buildExecTimelineChart();
   buildExecVendasChart();
@@ -1433,6 +1458,8 @@ function buildExecTimelineChart() {
   if(divLegTl) divLegTl.style.display = EXEC_DIVULGACAO.some(t=>days.includes(t.day26))?'flex':'none';
   const spotLegTl = document.getElementById('exec-spotLegTl');
   if(spotLegTl) spotLegTl.style.display = EXEC_SPOTIFY.some(t=>days.includes(t.day26))?'flex':'none';
+  const waLegTl = document.getElementById('exec-waLegTl');
+  if(waLegTl) waLegTl.style.display = EXEC_WHATSAPP.some(t=>days.includes(t.day26))?'flex':'none';
 }
 
 let execTMView = 'receita'; // 'receita' | 'ingressos'
