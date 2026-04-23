@@ -917,8 +917,19 @@ function renderExecHojeOntem() {
 function renderExecKPIs() {
   const invest = buildExecD26Invest(execFiltFrom, execFiltTo);
   const days = execGetAllDays(invest);
-  const minDay = days.length ? days[0] : 1;
-  const maxDay = days.length ? days[days.length-1] : 1;
+  // Usa dias das vendas reais (D26_FULL) quando não há filtro ativo ou range de investimento vazio
+  let minDay, maxDay;
+  if (execFiltFrom && execFiltTo) {
+    const dFrom = Math.floor((new Date(execFiltFrom+'T00:00:00') - DATA_INICIO) / 86400000) + 1;
+    const dTo   = Math.floor((new Date(execFiltTo  +'T00:00:00') - DATA_INICIO) / 86400000) + 1;
+    minDay = dFrom; maxDay = dTo;
+  } else if (D26_FULL.length > 0) {
+    minDay = D26_FULL[0].d;
+    maxDay = D26_FULL[D26_FULL.length - 1].d;
+  } else {
+    minDay = days.length ? days[0] : 1;
+    maxDay = days.length ? days[days.length-1] : 1;
+  }
   const dias = invest.length || 1;
   const s26 = D26_FULL.filter(r=>r.d>=minDay&&r.d<=maxDay).reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
   const s25 = D25.filter(r=>r.d>=minDay&&r.d<=maxDay).reduce((a,r)=>({mv:a.mv+r.mv,mq:a.mq+r.mq,av:a.av+r.av,aq:a.aq+r.aq}),{mv:0,mq:0,av:0,aq:0});
