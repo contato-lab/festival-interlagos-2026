@@ -940,7 +940,7 @@ function renderExecKPIs() {
     const abaixo = ratio < 1;
     ctxEl.innerHTML = `<span>\ud83d\udca1</span><span>O ritmo de investimento em ADS est\u00e1 <strong style="color:${abaixo?'var(--lime)':'var(--warn)'}">${abaixo?'abaixo':'acima'} do mesmo per\u00edodo de 2025</strong> (${(ratio*100).toFixed(0)}% do ritmo 2025). ${abaixo?'Isso \u00e9 <strong>intencional</strong>: a campanha de 2026 tem mais dias de dura\u00e7\u00e3o, distribuindo o budget de forma mais gradual.':'O investimento est\u00e1 acelerado em rela\u00e7\u00e3o a 2025.'}</span>`;
   }
-  const receitaTotalCamp = D26.reduce((s,r)=>s+(r.mv||0)+(r.av||0),0);
+  const receitaTotalCamp = D26_FULL.reduce((s,r)=>s+(r.mv||0)+(r.av||0),0);
   document.getElementById('exec-kpi-receita-total').textContent = receitaTotalCamp>0 ? 'R$ '+receitaTotalCamp.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) : '—';
   // Total 2025 — numeros REAIS da planilha CORRIGIDA (soma SEMANA 0-13):
   // Moto: R$ 4.413.344,66 | 28.045 ingressos
@@ -962,8 +962,8 @@ function renderExecKPIs() {
     // Delta vs MESMO PERIODO de 2025 (compara o acumulado total da campanha 2026
     // com os mesmos D-days correspondentes em 2025)
     const pctEl = document.getElementById('exec-kpi-receita-total-pct');
-    if (pctEl && receitaTotalCamp>0 && D26.length>0) {
-      const dMin = D26[0].d, dMax = D26[D26.length-1].d;
+    if (pctEl && receitaTotalCamp>0 && D26_FULL.length>0) {
+      const dMin = D26_FULL[0].d, dMax = D26_FULL[D26_FULL.length-1].d;
       const rec25Periodo = D25.filter(r=>r.d>=dMin&&r.d<=dMax)
         .reduce((s,r)=>s+(r.mv||0)+(r.av||0),0);
       if (rec25Periodo>0) {
