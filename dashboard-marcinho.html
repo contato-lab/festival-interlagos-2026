@@ -1320,7 +1320,10 @@ function updateLastRefreshTime() { __lastRefreshAt = new Date(); renderLastRefre
 function renderLastRefreshLabel() {
   const el = document.getElementById('genDate');
   if (!el) return;
-  if (!__lastRefreshAt) { el.textContent = 'Carregando...'; return; }
+  if (!__lastRefreshAt) {
+    el.innerHTML = '<span style="color:#C8FF00;animation:pulse 1.2s ease-in-out infinite">⚡ Sincronizando dados em tempo real...</span>';
+    return;
+  }
   const diffSec = Math.floor((Date.now() - __lastRefreshAt.getTime()) / 1000);
   const h = String(__lastRefreshAt.getHours()).padStart(2,'0');
   const m = String(__lastRefreshAt.getMinutes()).padStart(2,'0');

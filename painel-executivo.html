@@ -18,6 +18,7 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;min-height:100vh}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.55} }
 
 /* HEADER */
 .header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);background:#0D0D0D;position:sticky;top:0;z-index:100}
@@ -546,7 +547,10 @@ function updateLastRefreshTime() {
 function renderLastRefreshLabel() {
   const el = document.getElementById('genDate');
   if (!el) return;
-  if (!__lastRefreshAt) { el.textContent = 'Carregando...'; return; }
+  if (!__lastRefreshAt) {
+    el.innerHTML = '<span style="color:var(--lime);animation:pulse 1.2s ease-in-out infinite">⚡ Sincronizando dados em tempo real...</span>';
+    return;
+  }
   const diffSec = Math.floor((Date.now() - __lastRefreshAt.getTime()) / 1000);
   const h = String(__lastRefreshAt.getHours()).padStart(2,'0');
   const m = String(__lastRefreshAt.getMinutes()).padStart(2,'0');
