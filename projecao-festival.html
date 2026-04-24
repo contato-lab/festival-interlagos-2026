@@ -514,10 +514,19 @@ async function fetchVendasProprio() {
 // ════════════════════════════════════════════════════
 // FETCH TICKETMASTER
 // ════════════════════════════════════════════════════
+const TM_WORKER_URL = 'https://ticketmaster-festival-interlagos.performance-ef2.workers.dev/';
+
 async function fetchTicketmaster(){
   try {
-    const res = await fetch('ticketmaster-data.json?t=' + Date.now(), {cache:'no-store'});
-    if(!res.ok) throw new Error('nao encontrado');
+    let res;
+    try {
+      res = await fetch(TM_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
+      if (!res.ok) throw new Error('TM Worker HTTP ' + res.status);
+    } catch(err) {
+      console.warn('[TM Worker] falhou, usando fallback ticketmaster-data.json:', err.message);
+      res = await fetch('ticketmaster-data.json?t=' + Date.now(), {cache:'no-store'});
+      if(!res.ok) throw new Error('nao encontrado');
+    }
     const data = await res.json();
     if(!data.daily || !data.daily.length) return null;
     const tmByDay = {};
