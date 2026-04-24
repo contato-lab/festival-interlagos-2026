@@ -1315,13 +1315,23 @@ function renderAll() {
 /* ═══════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════ */
-function updateLastRefreshTime() {
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2,'0');
-  const m = String(now.getMinutes()).padStart(2,'0');
+let __lastRefreshAt = null;
+function updateLastRefreshTime() { __lastRefreshAt = new Date(); renderLastRefreshLabel(); }
+function renderLastRefreshLabel() {
   const el = document.getElementById('genDate');
-  if (el) el.textContent = 'Atualizado às ' + h + 'h' + m;
+  if (!el) return;
+  if (!__lastRefreshAt) { el.textContent = 'Carregando...'; return; }
+  const diffSec = Math.floor((Date.now() - __lastRefreshAt.getTime()) / 1000);
+  const h = String(__lastRefreshAt.getHours()).padStart(2,'0');
+  const m = String(__lastRefreshAt.getMinutes()).padStart(2,'0');
+  let rel;
+  if (diffSec < 5) rel = 'agora mesmo';
+  else if (diffSec < 60) rel = 'ha ' + diffSec + 's';
+  else if (diffSec < 3600) { const mm = Math.floor(diffSec/60), ss = diffSec%60; rel = 'ha ' + mm + 'min' + (ss?' '+ss+'s':''); }
+  else { const hh = Math.floor(diffSec/3600), mm = Math.floor((diffSec%3600)/60); rel = 'ha ' + hh + 'h' + (mm?' '+mm+'min':''); }
+  el.textContent = 'Atualizado ' + rel + ' (' + h + 'h' + m + ')';
 }
+setInterval(renderLastRefreshLabel, 1000);
 
 async function init() {
   updateLastRefreshTime();

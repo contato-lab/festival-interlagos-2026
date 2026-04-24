@@ -535,13 +535,45 @@ const fmtR = v => 'R$ '+v.toLocaleString('pt-BR',{maximumFractionDigits:0});
 const fmtK = v => fmtR(v);
 const fmtN = v => v.toLocaleString('pt-BR');
 
+// Timestamp da ultima atualizacao (sobre qualquer fetch de dados vendas/TM)
+let __lastRefreshAt = null;
+
 function updateLastRefreshTime() {
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2,'0');
-  const m = String(now.getMinutes()).padStart(2,'0');
-  const el = document.getElementById('genDate');
-  if (el) el.textContent = 'Atualizado às ' + h + 'h' + m;
+  __lastRefreshAt = new Date();
+  renderLastRefreshLabel();
 }
+
+function renderLastRefreshLabel() {
+  const el = document.getElementById('genDate');
+  if (!el) return;
+  if (!__lastRefreshAt) { el.textContent = 'Carregando...'; return; }
+  const diffSec = Math.floor((Date.now() - __lastRefreshAt.getTime()) / 1000);
+  const h = String(__lastRefreshAt.getHours()).padStart(2,'0');
+  const m = String(__lastRefreshAt.getMinutes()).padStart(2,'0');
+  let rel;
+  if (diffSec < 5)       rel = 'agora mesmo';
+  else if (diffSec < 60) rel = 'ha ' + diffSec + 's';
+  else if (diffSec < 3600) {
+    const mm = Math.floor(diffSec / 60);
+    const ss = diffSec % 60;
+    rel = 'ha ' + mm + 'min' + (ss ? ' ' + ss + 's' : '');
+  } else {
+    const hh = Math.floor(diffSec / 3600);
+    const mm = Math.floor((diffSec % 3600) / 60);
+    rel = 'ha ' + hh + 'h' + (mm ? ' ' + mm + 'min' : '');
+  }
+  // Cor conforme frescor
+  let color;
+  if (diffSec < 60)       color = 'var(--lime)';         // verde
+  else if (diffSec < 180) color = 'var(--text2)';         // neutro
+  else if (diffSec < 600) color = 'var(--warn)';          // amarelo
+  else                    color = 'var(--red)';           // vermelho
+  el.innerHTML = '<span style="color:' + color + '">&#9679;</span> Atualizado ' + rel +
+                 ' <span style="color:var(--text3);font-size:.92em">&middot; ' + h + 'h' + m + '</span>';
+}
+
+// Tick a cada 1s para atualizar o "ha Xs"
+setInterval(renderLastRefreshLabel, 1000);
 
 // ═══════════════════════════════════════════════
 // TICKETMASTER API — dados de vendas automatico
