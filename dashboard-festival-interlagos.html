@@ -2091,13 +2091,22 @@ async function fetchTicketmaster() {
 }
 
 // ═══════════════════════════════════════════════
-// VENDAS PRÓPRIAS — lê vendas-data.json (gerado pelo GitHub Actions a cada 5 min)
-// Endpoint direto removido — CORS/403 resolvido via workflow server-side
+// VENDAS PRÓPRIAS — Cloudflare Worker (real-time, cache 30s)
+// Fallback: vendas-data.json (GitHub Actions a cada 5 min)
 // ═══════════════════════════════════════════════
+const VENDAS_WORKER_URL = 'https://vendas-festival-interlagos.performance-ef2.workers.dev/';
+
 async function fetchVendasProprio() {
   try {
-    const res = await fetch('vendas-data.json?t=' + Date.now(), {cache:'no-store'});
-    if (!res.ok) throw new Error('vendas-data.json HTTP ' + res.status);
+    let res;
+    try {
+      res = await fetch(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
+      if (!res.ok) throw new Error('Worker HTTP ' + res.status);
+    } catch(err) {
+      console.warn('[Worker] falhou, usando fallback vendas-data.json:', err.message);
+      res = await fetch('vendas-data.json?t=' + Date.now(), {cache:'no-store'});
+      if (!res.ok) throw new Error('vendas-data.json HTTP ' + res.status);
+    }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
 
