@@ -577,7 +577,6 @@ async function fetchTicketmaster() {
         D26_FULL.push({d,mp:0,mt:tm.mt,ap:0,at:tm.at,mv:tm.mt,av:tm.at,mq:tm.mtQ,aq:tm.atQ,mpQ:0,mtQ:tm.mtQ,apQ:0,atQ:tm.atQ});
     });
     D26_FULL.sort((a,b)=>a.d-b.d);
-    renderPainelExecutivo();
     updateLastRefreshTime();
     console.log('TM conectada:', data.daily.length, 'dias');
   } catch(e) { console.warn('fetchTicketmaster erro:', e.message); }
@@ -624,7 +623,6 @@ async function fetchVendasProprio() {
       r.aq  = r.apQ + (r.atQ || 0);
     });
     D26_FULL.sort((a, b) => a.d - b.d);
-    renderPainelExecutivo();
     updateLastRefreshTime();
     console.log('[vendas-data.json] Moto:', data.totals.moto_ingressos, '| Auto:', data.totals.auto_ingressos, 'ingressos | atualizado:', data.updated_at);
   } catch(e) { console.warn('[Vendas Próprias] erro:', e.message); }
@@ -1325,11 +1323,21 @@ Chart.defaults.font.family="'Inter',sans-serif";
 
 function initDashboard(){
   updateLastRefreshTime();
-  Promise.allSettled([fetchVendasProprio(), fetchGAdsData(), fetchMetaData(), tiktokLoad()])
-    .then(() => { fetchTicketmaster(); renderPainelExecutivo(); });
+  // Carrega TUDO em paralelo e so renderiza quando ambos (vendas + TM) chegam
+  // -> evita flicker na abertura (showing only sistema proprio sem TM)
+  Promise.allSettled([
+    fetchVendasProprio(),
+    fetchTicketmaster(),
+    fetchGAdsData(),
+    fetchMetaData(),
+    tiktokLoad()
+  ]).then(() => renderPainelExecutivo());
 
-  // Vendas própria + TM: refresh a cada 5 minutos
-  setInterval(() => { fetchVendasProprio(); fetchTicketmaster(); }, 300000);
+  // Vendas própria + TM: refresh a cada 30 segundos (Workers em real-time)
+  setInterval(() => {
+    Promise.allSettled([fetchVendasProprio(), fetchTicketmaster()])
+      .then(() => renderPainelExecutivo());
+  }, 30000);
 
   // Mídia (Google Ads, Meta, TikTok): refresh a cada 30 segundos
   setInterval(() => {

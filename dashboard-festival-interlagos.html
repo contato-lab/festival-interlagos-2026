@@ -2095,7 +2095,6 @@ async function fetchTicketmaster() {
     D26_FULL.sort((a,b) => a.d - b.d);
     if (document.getElementById('demoBadge')) document.getElementById('demoBadge').style.display = 'none';
     updateLastRefreshTime();
-    applyFiltro();
     console.log('TM conectada:', data.daily.length, 'dias');
   } catch(e) { console.warn('fetchTicketmaster erro:', e.message); }
 }
@@ -2146,7 +2145,6 @@ async function fetchVendasProprio() {
       document.getElementById('filtroDE').value  = dateToIso(primeiro);
       document.getElementById('filtroATE').value = dateToIso(ultimo);
     }
-    applyFiltro();
     console.log('[vendas-data.json] Moto:', data.totals.moto_ingressos, '| Auto:', data.totals.auto_ingressos, 'ingressos | atualizado:', data.updated_at);
   } catch(e) { console.warn('[Vendas Próprias] erro:', e.message); }
 }
@@ -2180,11 +2178,22 @@ function initDashboard(){
   buildSpk('spkGoogle',[180,420,680,390,510,720,480,560,420,640,740,530,460,680,790,560,440,820],'rgb(200,255,0)');
   
   _upd2026Lbl();
-  Promise.allSettled([fetchVendasProprio(), fetchGA4Data(), fetchGAdsData(), fetchMetaData(), fetchMetaCreatives()])
-    .then(() => { fetchTicketmaster(); });
+  // Carrega TUDO em paralelo e so renderiza quando vendas + TM chegam
+  // -> evita flicker na abertura (showing only sistema proprio sem TM)
+  Promise.allSettled([
+    fetchVendasProprio(),
+    fetchTicketmaster(),
+    fetchGA4Data(),
+    fetchGAdsData(),
+    fetchMetaData(),
+    fetchMetaCreatives()
+  ]).then(() => applyFiltro());
 
-  // Vendas própria + TM: refresh a cada 5 minutos
-  setInterval(() => { fetchVendasProprio(); fetchTicketmaster(); }, 300000);
+  // Vendas própria + TM: refresh a cada 30 segundos (Workers em real-time)
+  setInterval(() => {
+    Promise.allSettled([fetchVendasProprio(), fetchTicketmaster()])
+      .then(() => applyFiltro());
+  }, 30000);
 
   // Mídia (Google Ads, Meta, GA4, TikTok): refresh a cada 30 segundos
   setInterval(() => {
