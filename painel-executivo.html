@@ -377,6 +377,41 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 
 </div><!-- /exec-charts-grid -->
 
+<!-- ══ TICKET MEDIO — 2025 vs 2026 ══ -->
+<div class="exec-chart-card" style="margin-top:16px">
+  <div class="section-header" style="margin-bottom:10px">
+    <div>
+      <div class="section-title">🎟️ Ticket Médio — 2025 vs 2026</div>
+      <div style="font-size:.7rem;color:#666;margin-top:3px">Receita / Ingressos por dia de campanha</div>
+    </div>
+    <div class="pill-group" id="execTktPills">
+      <button class="exec-metric-pill active" onclick="execSetTktMetric('total',this)">Total</button>
+      <button class="exec-metric-pill moto" onclick="execSetTktMetric('motos',this)">&#127949;&#65039; Motos</button>
+      <button class="exec-metric-pill auto" onclick="execSetTktMetric('autos',this)">&#128663; Autos</button>
+    </div>
+  </div>
+  <div class="exec-leg">
+    <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>2026</div>
+    <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#888"></span>2025</div>
+  </div>
+  <!-- KPIs ticket medio -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 14px">
+    <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px">
+      <div style="font-size:.6rem;letter-spacing:.08em;color:#888;text-transform:uppercase">TKT médio 2026 (acum.)</div>
+      <div id="exec-tkt-26" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:#C8FF00">—</div>
+    </div>
+    <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px">
+      <div style="font-size:.6rem;letter-spacing:.08em;color:#888;text-transform:uppercase">TKT médio 2025 (acum.)</div>
+      <div id="exec-tkt-25" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:#888">—</div>
+    </div>
+    <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px">
+      <div style="font-size:.6rem;letter-spacing:.08em;color:#888;text-transform:uppercase">Δ vs 2025</div>
+      <div id="exec-tkt-delta" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem">—</div>
+    </div>
+  </div>
+  <div class="exec-chart-wrap"><canvas id="exec-chartTkt"></canvas></div>
+</div>
+
   <!-- ══ TIMELINE COMPLETA — 2025 vs 2026 ══ -->
   <div class="exec-chart-card" style="margin-top:16px">
     <div class="section-header" style="margin-bottom:10px">
@@ -1178,6 +1213,101 @@ function buildExecInvestChart() {
   });
 }
 
+/* ═══ Grafico Ticket Medio ═══ */
+let execTktMetric = 'total'; // 'total' | 'motos' | 'autos'
+let _execChartTkt = null;
+function execSetTktMetric(m, btn) {
+  execTktMetric = m;
+  document.querySelectorAll('#execTktPills .exec-metric-pill').forEach(b=>b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  buildExecTktChart();
+}
+function buildExecTktChart() {
+  const ctx = document.getElementById('exec-chartTkt')?.getContext('2d');
+  if(!ctx) return;
+  // Eixo unificado D+1..D+94 (D+1 = 14/03/2025 = 31/03/2026)
+  const n = D25_CAMPAIGN.length;
+  const labels = Array.from({length:n}, (_,i) => 'D+'+(i+1));
+  const m = execTktMetric;
+  const tktOf = r => {
+    if(!r) return null;
+    const v = m==='motos' ? (r.mv||0) : m==='autos' ? (r.av||0) : ((r.mv||0)+(r.av||0));
+    const q = m==='motos' ? (r.mq||0) : m==='autos' ? (r.aq||0) : ((r.mq||0)+(r.aq||0));
+    return q>0 ? v/q : null;
+  };
+  const tkt25 = D25_CAMPAIGN.map(tktOf);
+  const tkt26 = Array(n).fill(null);
+  (D26_FULL || []).forEach(r => {
+    const i = r.d - 1;
+    if(i>=0 && i<n) tkt26[i] = tktOf(r);
+  });
+
+  // KPIs (acumulado)
+  const acumOf = (arr) => {
+    let v=0, q=0;
+    arr.forEach(r => {
+      if(!r) return;
+      v += m==='motos' ? (r.mv||0) : m==='autos' ? (r.av||0) : ((r.mv||0)+(r.av||0));
+      q += m==='motos' ? (r.mq||0) : m==='autos' ? (r.aq||0) : ((r.mq||0)+(r.aq||0));
+    });
+    return q>0 ? v/q : null;
+  };
+  // 2025 acumulado: limita aos mesmos D+ que 2026 ja tem dado
+  const maxD26 = (D26_FULL||[]).reduce((m,r)=>Math.max(m,r.d),0);
+  const t25 = acumOf(D25_CAMPAIGN.filter(r=>r.d<=maxD26));
+  const t26 = acumOf(D26_FULL || []);
+  const fmt = v => v==null ? '—' : 'R$ ' + v.toLocaleString('pt-BR',{maximumFractionDigits:0});
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('exec-tkt-26', fmt(t26));
+  set('exec-tkt-25', fmt(t25));
+  const dEl = document.getElementById('exec-tkt-delta');
+  if(dEl){
+    if(t25 && t26){
+      const pct = (t26/t25-1)*100;
+      dEl.textContent = (pct>=0?'▲ +':'▼ ')+Math.abs(pct).toFixed(1)+'%';
+      dEl.style.color = pct>=0 ? 'var(--green,#00FF88)' : 'var(--red,#FF4444)';
+    } else { dEl.textContent='—'; dEl.style.color='#888'; }
+  }
+
+  if(_execChartTkt) _execChartTkt.destroy();
+  _execChartTkt = new Chart(ctx, {
+    type:'line',
+    data:{labels, datasets:[
+      {label:'2025', data:tkt25, borderColor:'#888', backgroundColor:'rgba(136,136,136,0.05)', borderWidth:1.8, borderDash:[5,3], pointRadius:1.5, tension:.3, fill:false},
+      {label:'2026', data:tkt26, borderColor:'#C8FF00', backgroundColor:'rgba(200,255,0,0.08)', borderWidth:2.5, pointRadius:3, tension:.3, fill:true, spanGaps:false}
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false, animation:{duration:400},
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'#0A0A0A', titleColor:'#C8FF00', bodyColor:'#EEE',
+          borderColor:'rgba(200,255,0,0.25)', borderWidth:1, padding:11,
+          callbacks:{
+            title: items => {
+              const idx = items[0].dataIndex;
+              const dt25 = new Date('2025-03-14T00:00:00'); dt25.setDate(dt25.getDate()+idx);
+              const dt26 = new Date(DATA_INICIO);            dt26.setDate(dt26.getDate()+idx);
+              const f = d => d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+              return 'D+'+(idx+1)+'  ·  2025: '+f(dt25)+'  ·  2026: '+f(dt26);
+            },
+            label: c => {
+              const v = c.parsed.y;
+              if(v==null) return '';
+              return c.dataset.label+': R$ '+v.toLocaleString('pt-BR',{maximumFractionDigits:0});
+            }
+          }
+        }
+      },
+      scales:{
+        x:{ ticks:{ color:'#666', font:{size:9}, maxTicksLimit:14, callback:function(val,i){return i%7===0?this.getLabelForValue(val):''} }, grid:{ color:'rgba(255,255,255,.03)' } },
+        y:{ ticks:{ color:'#666', font:{size:10}, callback:v=>'R$ '+v.toLocaleString('pt-BR',{maximumFractionDigits:0}) }, grid:{ color:'rgba(255,255,255,.04)' } }
+      }
+    }
+  });
+}
+
 /* ═══ Conversoes ═══ */
 function renderExecConversoes() {
   const invest    = buildExecD26Invest(execFiltFrom, execFiltTo);
@@ -1304,6 +1434,7 @@ function renderPainelExecutivo() {
   buildExecDplusBar();
   buildExecVendasChart();
   buildExecInvestChart();
+  buildExecTktChart();
   buildExecTimelineChart();
   buildExecTMCharts();
   renderExecConversoes();
