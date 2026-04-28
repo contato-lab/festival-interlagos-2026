@@ -21,7 +21,9 @@ const API_AUTO        = 'https://ingressosauto.festivalinterlagos.com.br';
 const DATA_INICIO_STR = '2026-01-01';              // busca tudo desde jan/26
 const DATA_INICIO     = new Date('2026-03-31T00:00:00Z'); // D+1
 const PAGE_SIZE       = 100;
-const CACHE_TTL       = 30; // segundos
+const CACHE_TTL       = 30;        // segundos - cache normal
+const STALE_TTL       = 600;       // 10min - cache 'velho aceitavel' quando API falha
+const MAX_RETRIES     = 3;         // retry para chamadas individuais a API
 
 // ─── HEADERS para escapar do 403 ─────────────────────────
 function buildHeaders(base, token) {
@@ -38,10 +40,27 @@ function buildHeaders(base, token) {
   return h;
 }
 
-// ─── CHAMADAS API ────────────────────────────────────────
+// ─── CHAMADAS API com retry + backoff ────────────────────
+async function fetchWithRetry(url, opts, label) {
+  let lastErr;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const r = await fetch(url, opts);
+      if (!r.ok) throw new Error(`${label} HTTP ${r.status}`);
+      return r;
+    } catch (err) {
+      lastErr = err;
+      if (attempt < MAX_RETRIES) {
+        // Backoff exponencial: 200ms, 600ms, 1800ms
+        await new Promise(res => setTimeout(res, 200 * Math.pow(3, attempt - 1)));
+      }
+    }
+  }
+  throw new Error(`${label} falhou apos ${MAX_RETRIES} tentativas: ${lastErr.message}`);
+}
+
 async function getToken(base) {
-  const r = await fetch(base + '/apis/token', { headers: buildHeaders(base) });
-  if (!r.ok) throw new Error(`Token ${base} HTTP ${r.status}`);
+  const r = await fetchWithRetry(base + '/apis/token', { headers: buildHeaders(base) }, `Token ${base}`);
   const d = await r.json();
   if (d.status !== 'success') throw new Error('Token status: ' + d.status);
   return d.token;
@@ -53,8 +72,7 @@ async function getAllVendas(base, token) {
   let page    = 1;
   while (true) {
     const url = `${base}/apis/vendas?data_inicio=${DATA_INICIO_STR}&data_fim=${fim}&page_size=${PAGE_SIZE}&page=${page}`;
-    const r   = await fetch(url, { headers: buildHeaders(base, token) });
-    if (!r.ok) throw new Error(`Vendas ${base} HTTP ${r.status}`);
+    const r   = await fetchWithRetry(url, { headers: buildHeaders(base, token) }, `Vendas ${base} pag.${page}`);
     const d = await r.json();
     if (d.status !== 'success' || !d.data || !d.data.length) break;
     sales.push(...d.data);
@@ -137,6 +155,16 @@ async function buildVendasData() {
 }
 
 // ─── WORKER HANDLER ──────────────────────────────────────
+//
+// Estrategia 'stale-while-error':
+//   - Cache fresco (< CACHE_TTL): retorna direto (X-Cache: HIT)
+//   - Cache velho (CACHE_TTL a STALE_TTL): tenta atualizar; se API falha, retorna o velho (X-Cache: STALE)
+//   - Sem cache OU cache muito velho (> STALE_TTL): tenta API; se falha, retorna 503
+//
+// Usa 2 chaves de cache:
+//   - cacheKey         : versao curta (CACHE_TTL = 30s) - serve respostas frescas
+//   - staleCacheKey    : versao longa (STALE_TTL = 10min) - guarda ultimo dado bom pra fallback
+//
 export default {
   async fetch(request, env, ctx) {
     // CORS preflight
@@ -150,20 +178,26 @@ export default {
       });
     }
 
-    // Tenta pegar do cache (30s TTL)
-    const cache    = caches.default;
-    const cacheKey = new Request(new URL(request.url).toString(), request);
-    let response   = await cache.match(cacheKey);
-    if (response) {
-      const r2 = new Response(response.body, response);
+    const cache         = caches.default;
+    const baseUrl       = new URL(request.url).toString().split('?')[0];
+    const cacheKey      = new Request(baseUrl + '?v=fresh', request);
+    const staleCacheKey = new Request(baseUrl + '?v=stale', request);
+
+    // 1) Cache fresco?
+    let cached = await cache.match(cacheKey);
+    if (cached) {
+      const r2 = new Response(cached.body, cached);
       r2.headers.set('X-Cache', 'HIT');
       return r2;
     }
 
-    // Sem cache: busca na API
+    // 2) Tenta API
     try {
       const data = await buildVendasData();
-      response = new Response(JSON.stringify(data), {
+      const body = JSON.stringify(data);
+
+      // Cache fresco (30s)
+      const freshResp = new Response(body, {
         headers: {
           'Content-Type':                 'application/json; charset=utf-8',
           'Cache-Control':                `public, max-age=${CACHE_TTL}`,
@@ -171,14 +205,41 @@ export default {
           'X-Cache':                      'MISS',
         },
       });
-      ctx.waitUntil(cache.put(cacheKey, response.clone()));
-      return response;
+      ctx.waitUntil(cache.put(cacheKey, freshResp.clone()));
+
+      // Cache stale (10min) - usado como fallback se API cair
+      const staleResp = new Response(body, {
+        headers: {
+          'Content-Type':                 'application/json; charset=utf-8',
+          'Cache-Control':                `public, max-age=${STALE_TTL}`,
+          'Access-Control-Allow-Origin':  '*',
+        },
+      });
+      ctx.waitUntil(cache.put(staleCacheKey, staleResp));
+
+      return freshResp;
     } catch (err) {
+      // 3) API falhou: tenta servir cache stale (ate 10min de idade)
+      const stale = await cache.match(staleCacheKey);
+      if (stale) {
+        const body = await stale.text();
+        return new Response(body, {
+          headers: {
+            'Content-Type':                'application/json; charset=utf-8',
+            'Access-Control-Allow-Origin': '*',
+            'X-Cache':                     'STALE',
+            'X-Error':                     err.message,
+          },
+        });
+      }
+
+      // 4) Sem nenhum cache disponivel: 503 com info
       return new Response(JSON.stringify({
         error:      err.message,
         updated_at: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+        hint:       'API origem indisponivel e sem cache stale. Tentar fallback estatico.',
       }), {
-        status:  500,
+        status:  503,
         headers: {
           'Content-Type':                'application/json',
           'Access-Control-Allow-Origin': '*',

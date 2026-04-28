@@ -21,7 +21,27 @@ const CAMPAIGN_START_MS = 1774396800000; // 2026-03-25 00:00:00 UTC
 const MOTO_SHOW_IDS = new Set([195330, 195736, 195737, 195738]);
 const AUTO_SHOW_IDS = new Set([195331, 195739, 195740, 195741]);
 
-const CACHE_TTL = 30; // segundos
+const CACHE_TTL  = 30;        // segundos - cache normal
+const STALE_TTL  = 600;       // 10min - fallback cache quando API falha
+const MAX_RETRIES = 3;
+
+// ─── FETCH com retry + backoff ───────────────────────────
+async function fetchWithRetry(url, opts, label) {
+  let lastErr;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const r = await fetch(url, opts);
+      if (!r.ok) throw new Error(`${label} HTTP ${r.status}`);
+      return r;
+    } catch (err) {
+      lastErr = err;
+      if (attempt < MAX_RETRIES) {
+        await new Promise(res => setTimeout(res, 200 * Math.pow(3, attempt - 1)));
+      }
+    }
+  }
+  throw new Error(`${label} falhou apos ${MAX_RETRIES} tentativas: ${lastErr.message}`);
+}
 
 // ─── FETCH COM PAGINACAO ─────────────────────────────────
 async function fetchAllMovements() {
@@ -33,13 +53,12 @@ async function fetchAllMovements() {
   while (true) {
     page++;
     const url = `${API_BASE}${API_ENDPOINT}?lastUpdate=${lastUpdate}&lastMovementId=${lastMovementId}`;
-    const r = await fetch(url, {
+    const r = await fetchWithRetry(url, {
       headers: {
         'apiKey':       API_KEY,
         'Content-Type': 'application/json',
       },
-    });
-    if (!r.ok) throw new Error(`TM HTTP ${r.status} na pagina ${page}`);
+    }, `TM pag.${page}`);
     const d = await r.json();
     const movements = d.movements || [];
     const hasMore   = d.hasMore || false;
@@ -151,6 +170,12 @@ async function buildTmData() {
 }
 
 // ─── HANDLER ─────────────────────────────────────────────
+//
+// Estrategia 'stale-while-error':
+//   - Cache fresco (< CACHE_TTL): retorna direto
+//   - Sem cache fresco: tenta API; se sucesso, atualiza cache fresco E stale
+//   - API falha: tenta servir cache stale (ate 10min); se nada disponivel, 503
+//
 export default {
   async fetch(request, env, ctx) {
     if (request.method === 'OPTIONS') {
@@ -163,18 +188,25 @@ export default {
       });
     }
 
-    const cache    = caches.default;
-    const cacheKey = new Request(new URL(request.url).toString(), request);
-    let response   = await cache.match(cacheKey);
-    if (response) {
-      const r2 = new Response(response.body, response);
+    const cache         = caches.default;
+    const baseUrl       = new URL(request.url).toString().split('?')[0];
+    const cacheKey      = new Request(baseUrl + '?v=fresh', request);
+    const staleCacheKey = new Request(baseUrl + '?v=stale', request);
+
+    // 1) Cache fresco?
+    let cached = await cache.match(cacheKey);
+    if (cached) {
+      const r2 = new Response(cached.body, cached);
       r2.headers.set('X-Cache', 'HIT');
       return r2;
     }
 
+    // 2) Tenta API
     try {
       const data = await buildTmData();
-      response = new Response(JSON.stringify(data), {
+      const body = JSON.stringify(data);
+
+      const freshResp = new Response(body, {
         headers: {
           'Content-Type':                 'application/json; charset=utf-8',
           'Cache-Control':                `public, max-age=${CACHE_TTL}`,
@@ -182,14 +214,40 @@ export default {
           'X-Cache':                      'MISS',
         },
       });
-      ctx.waitUntil(cache.put(cacheKey, response.clone()));
-      return response;
+      ctx.waitUntil(cache.put(cacheKey, freshResp.clone()));
+
+      const staleResp = new Response(body, {
+        headers: {
+          'Content-Type':                 'application/json; charset=utf-8',
+          'Cache-Control':                `public, max-age=${STALE_TTL}`,
+          'Access-Control-Allow-Origin':  '*',
+        },
+      });
+      ctx.waitUntil(cache.put(staleCacheKey, staleResp));
+
+      return freshResp;
     } catch (err) {
+      // 3) API falhou: tenta servir cache stale
+      const stale = await cache.match(staleCacheKey);
+      if (stale) {
+        const body = await stale.text();
+        return new Response(body, {
+          headers: {
+            'Content-Type':                'application/json; charset=utf-8',
+            'Access-Control-Allow-Origin': '*',
+            'X-Cache':                     'STALE',
+            'X-Error':                     err.message,
+          },
+        });
+      }
+
+      // 4) Sem nenhum cache: 503
       return new Response(JSON.stringify({
         error:      err.message,
         updated_at: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+        hint:       'API origem indisponivel e sem cache stale.',
       }), {
-        status:  500,
+        status:  503,
         headers: {
           'Content-Type':                'application/json',
           'Access-Control-Allow-Origin': '*',

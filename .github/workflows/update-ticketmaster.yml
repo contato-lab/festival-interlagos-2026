@@ -2,7 +2,7 @@ name: Update Ticketmaster Data
 
 on:
   schedule:
-    - cron: '*/5 * * * *'   # a cada 5 minutos
+    - cron: '1-59/2 * * * *'   # a cada 2 minutos, offset impar (01,03,05...) pra nao colidir com vendas
   workflow_dispatch:
   workflow_run:
     workflows:

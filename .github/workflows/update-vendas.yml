@@ -2,8 +2,8 @@ name: Update Vendas Proprias
 
 on:
   schedule:
-    # A cada 5 min, offset +2 (roda em :02, :07, :12...) pra evitar colisao com Ticketmaster
-    - cron: '2-59/5 * * * *'
+    # A cada 2 min, offset par (00,02,04...) - fallback fresco quando Worker falha
+    - cron: '*/2 * * * *'
   workflow_dispatch:
 
 jobs:
