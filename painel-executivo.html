@@ -1456,7 +1456,9 @@ function buildExecTimelineChart() {
     if(i >= 0 && i < n) s26[i] = getVal(r);
   });
 
-  // Anotacoes: passa array de days com offset (pre-launch como negativos para nao bater com action.day26)
+  // Days = D+ da campanha 2026 que aparecem no eixo (1..77)
+  const days = Array.from({length: D25.length}, (_,i) => i+1);
+  // Anotacoes: passa array com offset (pre-launch como dummies negativos para nao bater com action.day26)
   const daysForAnn = [];
   for (let i=0; i<PRE_DAYS; i++) daysForAnn.push(-1000-i); // dummies para nao colidir
   for (let i=1; i<=D25.length; i++) daysForAnn.push(i);
