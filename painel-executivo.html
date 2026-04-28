@@ -412,53 +412,85 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   <div class="exec-chart-wrap"><canvas id="exec-chartTkt"></canvas></div>
 </div>
 
-<!-- ══ ANALISE DETALHADA TICKET MEDIO — para entender a queda ══ -->
+<!-- ══ ANALISE DETALHADA TICKET MEDIO — entender a queda real ══ -->
 <div class="exec-chart-card" style="margin-top:16px;border:1px solid rgba(255,184,0,0.25);background:linear-gradient(135deg, rgba(255,184,0,0.03), rgba(20,20,20,0.5))">
   <div class="section-header" style="margin-bottom:14px">
     <div>
-      <div class="section-title">⚠️ Por que o Ticket Médio caiu? — Composição da venda 2025 vs 2026</div>
-      <div style="font-size:.72rem;color:#888;margin-top:4px">Análise da plataforma Ticketmaster · % meia, inteira, cortesia por ano</div>
+      <div class="section-title">⚠️ Ticket Médio — comparação contextualizada 2025 vs 2026</div>
+      <div style="font-size:.72rem;color:#888;margin-top:4px">Estrutura de venda mudou: em 2025, Sistema Próprio era exclusivo de 14/03 a 09/05 (sem meia). Em 2026, Ticketmaster + meia disponíveis desde D+1.</div>
     </div>
   </div>
 
-  <!-- KPIs comparativos: TKT pagantes (sem cortesia) -->
-  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:18px">
-    <!-- Motos -->
-    <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px">
-      <div style="font-size:.72rem;letter-spacing:.06em;color:#888;text-transform:uppercase;margin-bottom:8px">🏍️ TKT MÉDIO PAGANTES — MOTOS</div>
-      <div style="display:flex;gap:18px;align-items:baseline">
-        <div>
-          <div style="font-size:.65rem;color:#888">2025</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#aaa">R$ 99,42</div>
+  <!-- Linha do tempo das fases -->
+  <div style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 16px;margin-bottom:18px">
+    <div style="font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:10px">📅 As 3 fases distintas</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <div style="background:rgba(200,255,0,0.04);border-left:3px solid #C8FF00;padding:10px 12px;border-radius:6px">
+        <div style="font-size:.62rem;color:#C8FF00;font-weight:700;letter-spacing:.05em">FASE 1 · 2025 SP exclusivo</div>
+        <div style="font-size:.78rem;color:#ddd;margin:3px 0">14/03 → 09/05 (57 dias)</div>
+        <div style="font-size:.7rem;color:#888">Sistema Próprio · <strong style="color:#C8FF00">SEM meia</strong> · só inteira</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#fff;margin-top:6px">TKT R$ 245</div>
+        <div style="font-size:.65rem;color:#888">14.701 ing · R$ 3,60M</div>
+      </div>
+      <div style="background:rgba(155,90,180,0.04);border-left:3px solid #9B3DAB;padding:10px 12px;border-radius:6px">
+        <div style="font-size:.62rem;color:#9B3DAB;font-weight:700;letter-spacing:.05em">FASE 2 · 2025 TM ativo</div>
+        <div style="font-size:.78rem;color:#ddd;margin:3px 0">10/05 → 15/06 (37 dias)</div>
+        <div style="font-size:.7rem;color:#888">SP + TM · <strong style="color:#FFB800">COM meia + cortesia</strong></div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#fff;margin-top:6px">TKT R$ 123</div>
+        <div style="font-size:.65rem;color:#888">29.222 ing · R$ 3,59M</div>
+      </div>
+      <div style="background:rgba(255,184,0,0.04);border-left:3px solid #FFB800;padding:10px 12px;border-radius:6px">
+        <div style="font-size:.62rem;color:#FFB800;font-weight:700;letter-spacing:.05em">FASE 3 · 2026 atual (D+1-29)</div>
+        <div style="font-size:.78rem;color:#ddd;margin:3px 0">31/03 → 28/04 (29 dias)</div>
+        <div style="font-size:.7rem;color:#888">SP + TM <strong style="color:#FFB800">desde dia 1</strong> · meia disponível</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#fff;margin-top:6px">TKT R$ 295</div>
+        <div style="font-size:.65rem;color:#888">8.151 ing · R$ 2,41M</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparacao "apples-to-apples": TM only vs TM only -->
+  <div style="background:rgba(20,20,20,.5);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px 16px;margin-bottom:18px">
+    <div style="font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:10px">🎯 Comparação justa: Ticketmaster only — pagantes (sem cortesia)</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">
+      <!-- Motos -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 14px">
+        <div style="font-size:.7rem;letter-spacing:.05em;color:#888;text-transform:uppercase;margin-bottom:6px">🏍️ TM PAGANTES — MOTOS</div>
+        <div style="display:flex;gap:14px;align-items:baseline">
+          <div>
+            <div style="font-size:.6rem;color:#888">2025 TM</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.35rem;color:#aaa">R$ 99,42</div>
+          </div>
+          <div style="font-size:.9rem;color:#666">→</div>
+          <div>
+            <div style="font-size:.6rem;color:#888">2026 TM</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.35rem;color:#C8FF00">R$ 89,61</div>
+          </div>
+          <div style="margin-left:auto;background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.4);padding:4px 10px;border-radius:6px">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.1rem;color:#FF4444">▼ -9,9%</div>
+          </div>
         </div>
-        <div style="font-size:1rem;color:#666">→</div>
-        <div>
-          <div style="font-size:.65rem;color:#888">2026</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#C8FF00">R$ 89,61</div>
-        </div>
-        <div style="margin-left:auto;background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.4);padding:6px 12px;border-radius:8px">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.3rem;color:#FF4444">▼ -9,9%</div>
+      </div>
+      <!-- Autos -->
+      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:12px 14px">
+        <div style="font-size:.7rem;letter-spacing:.05em;color:#888;text-transform:uppercase;margin-bottom:6px">🚗 TM PAGANTES — AUTOS</div>
+        <div style="display:flex;gap:14px;align-items:baseline">
+          <div>
+            <div style="font-size:.6rem;color:#888">2025 TM</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.35rem;color:#aaa">R$ 102,40</div>
+          </div>
+          <div style="font-size:.9rem;color:#666">→</div>
+          <div>
+            <div style="font-size:.6rem;color:#888">2026 TM</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.35rem;color:#C8FF00">R$ 92,70</div>
+          </div>
+          <div style="margin-left:auto;background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.4);padding:4px 10px;border-radius:6px">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.1rem;color:#FF4444">▼ -9,5%</div>
+          </div>
         </div>
       </div>
     </div>
-    <!-- Autos -->
-    <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px">
-      <div style="font-size:.72rem;letter-spacing:.06em;color:#888;text-transform:uppercase;margin-bottom:8px">🚗 TKT MÉDIO PAGANTES — AUTOS</div>
-      <div style="display:flex;gap:18px;align-items:baseline">
-        <div>
-          <div style="font-size:.65rem;color:#888">2025</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#aaa">R$ 102,40</div>
-        </div>
-        <div style="font-size:1rem;color:#666">→</div>
-        <div>
-          <div style="font-size:.65rem;color:#888">2026</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#C8FF00">R$ 92,70</div>
-        </div>
-        <div style="margin-left:auto;background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.4);padding:6px 12px;border-radius:8px">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.3rem;color:#FF4444">▼ -9,5%</div>
-        </div>
-      </div>
-    </div>
+    <div style="font-size:.68rem;color:#777;margin-top:10px;font-style:italic">⚠️ Atenção: em 2025, esses dados de TM são de <strong>maio-junho</strong> (final de campanha). Em 2026, são de <strong>março-abril</strong> (início). Mesmo assim 2026 TM tem TKT menor.</div>
   </div>
 
   <!-- Mix de venda: 2025 vs 2026 -->
@@ -475,16 +507,17 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 
   <!-- Insight para o chefe -->
   <div style="background:rgba(255,184,0,0.06);border-left:3px solid #FFB800;border-radius:6px;padding:14px 16px;margin-top:6px">
-    <div style="font-size:.78rem;color:#FFB800;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px">📌 Conclusão para a diretoria</div>
+    <div style="font-size:.78rem;color:#FFB800;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px">📌 Leitura para a diretoria</div>
     <div style="font-size:.86rem;color:#ddd;line-height:1.55">
-      <strong style="color:#fff">Ticket médio dos pagantes caiu ~10% em 2026 vs 2025</strong>, em ambas edições. Comparando a composição da venda <strong>entre os pagantes</strong> (excluindo cortesias dos dois anos):
+      <strong style="color:#fff">A queda do TKT médio em 2026 é parcialmente estrutural, não apenas comportamental.</strong> O setup de venda mudou:
       <ul style="margin:8px 0 8px 22px;padding:0">
-        <li><strong>Motos:</strong> meia foi <strong>32,7%</strong> em 2025 → <strong>35,5%</strong> em 2026 (+2,8 p.p. — leve aumento)</li>
-        <li><strong>Autos:</strong> meia foi <strong>38,2%</strong> em 2025 → <strong>43,3%</strong> em 2026 (+5,1 p.p.)</li>
-        <li>2026 está vendendo mais <strong>Street Pass R$ 98</strong> (inteira primeiro lote) e R$ 49 (meia) — mix que rebaixa o TKT vs 2025 que vendeu mais inteira a R$ 123-130 médios.</li>
-        <li>2026 ainda <strong style="color:#FFB800">não entrou na fase de cortesias</strong> (em 2025 foram 21-33% das vendas TM, distribuídas perto do evento) — quando isso ocorrer, o TKT total (com cortesia) cai ainda mais.</li>
+        <li><strong style="color:#C8FF00">Em 2025:</strong> os primeiros 57 dias (14/03 a 09/05) só tinham Sistema Próprio rodando — <strong>sem opção de meia-entrada</strong>. Isso forçou TKT alto de <strong>R$ 245</strong> nessa fase. A TM só entrou em 10/05 (D+58), trazendo meia + cortesia, o que derrubou o TKT da fase 2 para <strong>R$ 123</strong>.</li>
+        <li><strong style="color:#FFB800">Em 2026:</strong> SP + TM rodando desde D+1 (31/03). Ou seja, <strong>meia-entrada disponível desde o primeiro dia</strong>. Naturalmente puxa o TKT pra baixo na fase inicial. TKT atual: <strong>R$ 295</strong> (ainda alto pq SP segura R$ 600+).</li>
+        <li><strong>Comparação justa (TM vs TM, só pagantes):</strong> Motos 99,42 → 89,61 (-10%) · Autos 102,40 → 92,70 (-9,5%). A queda real existe, mas é menor do que parece olhando o mix completo.</li>
+        <li>% meia nos pagantes TM: Motos +2,8 p.p. · Autos +5,1 p.p. — aumento moderado.</li>
+        <li>2026 ainda <strong style="color:#FFB800">não entrou na fase de cortesias</strong> (21-33% das vendas TM em 2025). Quando entrar perto do evento, o TKT total cairá mais.</li>
       </ul>
-      <span style="color:#aaa">⚠️ Mitigação: a campanha 2026 tem <strong style="color:#C8FF00">+57 dias</strong> que 2025. Volume maior + previsão de fases de preço crescentes (segundo lote, terceiro lote) podem recuperar o TKT na rampa final.</span>
+      <span style="color:#aaa">✅ <strong style="color:#C8FF00">Mitigação:</strong> 2026 tem <strong>+57 dias de campanha</strong> e a estratégia de lotes crescentes (1º lote R$ 98 → próximos lotes R$ 148+) deve recuperar o TKT na rampa final. A análise final só deve ser feita comparando TKT do período inteiro 2025 (R$ 163) vs TKT 2026 ao final da campanha.</span>
     </div>
   </div>
 </div>
