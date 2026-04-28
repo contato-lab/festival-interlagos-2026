@@ -1092,10 +1092,16 @@ const gridLine = { color:'rgba(255,255,255,0.05)', drawBorder:false };
 
 function buildVendasChart(days26) {
   const metric = currentVendasMetric;
-  const labels = days26.map(d => {
-    const dt = dateOf26Day(d);
+  // Mostra os 17 dias de pre-lancamento 2025 (14/03 a 30/03) ANTES do D+1 de 2026.
+  // Apenas a linha de 2025 aparece nesse trecho; 2026 fica null (campanha so comeca em 31/03).
+  // So inclui pre-lancamento se o filtro ja mostra D+1 (caso contrario nao faz sentido).
+  const showPre = days26[0] === 1;
+  const preLabels = showPre ? D25_PRE.map((_,i) => {
+    const dt = new Date(CAMP_START_2026);
+    dt.setDate(dt.getDate() - PRE_DAYS + i);
     return fmtDate(dt);
-  });
+  }) : [];
+  const labels = [...preLabels, ...days26.map(d => fmtDate(dateOf26Day(d)))];
 
   function get26(d) {
     const r = D26_SALES.find(x=>x.d===d);
@@ -1111,10 +1117,38 @@ function buildVendasChart(days26) {
     if (metric==='autos') return r.av;
     return r.mv + r.av;
   }
+  function get25Pre(idx) {
+    const r = D25_PRE[idx];
+    if (!r) return null;
+    if (metric==='motos') return r.mv;
+    if (metric==='autos') return r.av;
+    return r.mv + r.av;
+  }
 
-  const data26 = days26.map(d => get26(d));
-  const data25 = days26.map(d => get25(d));
-  const annotations = getAcoesAnnotations(days26);
+  const data26 = [
+    ...preLabels.map(()=>null),
+    ...days26.map(d => get26(d))
+  ];
+  const data25 = [
+    ...(showPre ? D25_PRE.map((_,i)=>get25Pre(i)) : []),
+    ...days26.map(d => get25(d))
+  ];
+  // Annotations: dia de acao (D+N de 2026) -> indice no eixo = preLabels.length + (D+N - days26[0])
+  const PRE_OFFSET = preLabels.length;
+  const annotations = (function(){
+    const ann = {};
+    ACOES.forEach((a, i) => {
+      if (!acoesVisiveis[a.tipo]) return;
+      const idx = days26.indexOf(a.dia);
+      if (idx === -1) return;
+      const cfg = ACAO_CONFIG[a.tipo];
+      ann['acao_'+i] = {
+        type:'line', xMin: idx + PRE_OFFSET, xMax: idx + PRE_OFFSET,
+        borderColor: cfg.cor, borderWidth: 2, borderDash: cfg.dash,
+      };
+    });
+    return ann;
+  })();
 
   if (chartVendas) chartVendas.destroy();
   const ctx = document.getElementById('chartVendas').getContext('2d');
