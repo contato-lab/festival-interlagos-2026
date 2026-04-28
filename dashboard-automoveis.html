@@ -735,14 +735,10 @@ function getSeries(data, met) {
 
 // ─── Gera as anotações de linha vertical para o Chart.js ───────────────────
 function buildComp() {
-  const n=D25.length;
-  const labels=Array.from({length:n},(_,i)=>{
-    const dt=dToDate(i+1);
-    const d=dt.getDate().toString().padStart(2,'0');
-    const m=dt.toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
-    return`${d}/${m}`;
-  });
-  const s25=getSeries(D25,metricAtiva);
+  // Eixo unificado D+1..D+94 usando D25_CAMPAIGN (D+1 = 14/03/2025 = 31/03/2026)
+  const n=D25_CAMPAIGN.length;
+  const labels=Array.from({length:n},(_,i)=>'D+'+(i+1));
+  const s25=getSeries(D25_CAMPAIGN,metricAtiva);
   // Posiciona cada ponto de D26 no indice correto do grafico (d-1),
   // respeitando filtro (dias nao contidos ficam null)
   const s26=Array(n).fill(null);
@@ -799,15 +795,16 @@ function buildComp() {
           callbacks:{
             title: items => {
               const dia = items[0].dataIndex + 1;
-              const dt = dToDate(dia);
-              const dateStr = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-              return `${dateStr} · D+${dia}`;
+              const dt25=new Date('2025-03-14T00:00:00'); dt25.setDate(dt25.getDate()+dia-1);
+              const dt26=new Date(DATA_INICIO);            dt26.setDate(dt26.getDate()+dia-1);
+              const f=d=>d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+              return `D+${dia}  ·  2025: ${f(dt25)}  ·  2026: ${f(dt26)}`;
             },
             label: ctx => {
               const idx = ctx.dataIndex;
               const is26 = ctx.dataset.label.includes('2026');
               // D26 pode ter gaps por filtro: busca pela d=idx+1 (D+1 = index 0)
-              const row = is26 ? D26.find(r=>r.d===idx+1) : D25[idx];
+              const row = is26 ? D26.find(r=>r.d===idx+1) : D25_CAMPAIGN[idx];
               if (!row) return null;
               const mq=row.mq||0, aq=row.aq||0, mv=row.mv||0, av=row.av||0;
               const ing = aq;
