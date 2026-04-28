@@ -968,7 +968,7 @@ function renderChart(key){
   const curve25AcumReal    = curve2025RealAcum();
   const labels = Array.from({length:DIAS_TOTAL}, (_,i)=>{
     const d = new Date(DATA_INICIO); d.setDate(d.getDate()+i);
-    return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+    return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getFullYear()).slice(-2);
   });
 
   // Marcos chave (1-indexado: D+N => index N-1)
@@ -1006,25 +1006,25 @@ function renderChart(key){
               borderColor:'rgba(200,255,0,0.18)',
               borderWidth:1,
               borderDash:[4,4],
-              label:{display:true, content:'Rampa final (-30 dias)', position:'start', color:'#C8FF00', font:{size:10, weight:600}, backgroundColor:'rgba(0,0,0,.7)', padding:4, yAdjust:-6}
+              label:{display:true, content:'Rampa final', position:{x:'center', y:'end'}, color:'#C8FF00', font:{size:10, weight:600}, backgroundColor:'rgba(0,0,0,.75)', padding:4, yAdjust:8}
             },
-            // Linha vertical: fim do 2025 (D+94)
+            // Linha vertical: fim do 2025 (D+94, 02/07/2026) — equivalente em 2026 a quando 2025 acabou
             fim2025:{
               type:'line', xMin: D_FIM_2025-1, xMax: D_FIM_2025-1,
               borderColor:'rgba(255,107,53,0.5)', borderWidth:1.5, borderDash:[3,3],
-              label:{display:true, content:'2025 acabou aqui', position:'start', color:'#FF6B35', font:{size:9, weight:600}, backgroundColor:'rgba(0,0,0,.7)', padding:3, yAdjust:6}
+              label:{display:true, content:'02/07: 2025 ja teria acabado', position:'start', color:'#FF6B35', font:{size:9, weight:600}, backgroundColor:'rgba(0,0,0,.75)', padding:3, xAdjust:0, yAdjust:18}
             },
-            // Linha vertical: evento 2026
+            // Linha vertical: evento 2026 (28/08/2026)
             evento:{
               type:'line', xMin: D_EVENTO-1, xMax: D_EVENTO-1,
-              borderColor:'rgba(200,255,0,0.7)', borderWidth:2,
-              label:{display:true, content:'Festival 2026', position:'end', color:'#C8FF00', font:{size:10, weight:700}, backgroundColor:'rgba(0,0,0,.85)', padding:4, yAdjust:-4}
+              borderColor:'rgba(200,255,0,0.85)', borderWidth:2,
+              label:{display:true, content:'Festival 2026 (28/08)', position:'start', color:'#0A0A0A', font:{size:10, weight:700}, backgroundColor:'#C8FF00', padding:4, yAdjust:-2, xAdjust:-2}
             }
           }
         }
       },
       scales:{
-        x:{ticks:{color:'#666', font:{size:9}, maxTicksLimit:10, callback:function(v,i){return i%20===0?this.getLabelForValue(v):'';}}, grid:{color:'rgba(255,255,255,.03)'}},
+        x:{ticks:{color:'#888', font:{size:9}, maxTicksLimit:11, autoSkip:false, callback:function(v,i){return i%15===0?this.getLabelForValue(v):'';}}, grid:{color:'rgba(255,255,255,.03)'}},
         y:{ticks:{color:'#666', font:{size:10}, callback: v => 'R$ ' + (v/1e6).toFixed(1) + 'M'}, grid:{color:'rgba(255,255,255,.04)'}}
       }
     }
