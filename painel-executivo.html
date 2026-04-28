@@ -1431,10 +1431,13 @@ function buildExecTimelineChart() {
   const ctx = document.getElementById('exec-chartTimeline');
   if(!ctx || !D25 || !D25.length) return;
 
-  const n = D25.length;
-  const days = Array.from({length:n},(_,i)=>i+1);
-  const labels = days.map(d => {
-    const dt = new Date(DATA_INICIO); dt.setDate(dt.getDate() + d - 1);
+  // Eixo extendido: 17 dias pre-lancamento 2025 (14/03 a 30/03) + 77 dias alinhados (31/03 a 15/06)
+  // Linha 2025 mostrada em todo o eixo. Linha 2026 so a partir do indice PRE_DAYS (31/03).
+  const n = PRE_DAYS + D25.length; // 94
+  const labels = Array.from({length:n}, (_,i) => {
+    // i=0 -> 14/03; i=PRE_DAYS -> 31/03 (= DATA_INICIO)
+    const dt = new Date(DATA_INICIO);
+    dt.setDate(dt.getDate() + (i - PRE_DAYS));
     return dt.getDate().toString().padStart(2,'0') + '/' + dt.toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
   });
 
@@ -1444,15 +1447,20 @@ function buildExecTimelineChart() {
     return execTlMetric === 'receita' ? (mv + av) : (mq + aq);
   };
 
-  const s25 = D25.map(getVal);
+  // 2025: pre-lancamento + alinhado (94 valores total)
+  const s25 = [...D25_PRE.map(getVal), ...D25.map(getVal)];
+  // 2026: nulls nos primeiros PRE_DAYS dias
   const s26 = Array(n).fill(null);
   (D26_FULL || []).forEach(r => {
-    const i = r.d - 1;
+    const i = r.d - 1 + PRE_DAYS;
     if(i >= 0 && i < n) s26[i] = getVal(r);
   });
 
-  // Anotações usando a mesma função já existente
-  const anns = execGetTvAnnotations(days);
+  // Anotacoes: passa array de days com offset (pre-launch como negativos para nao bater com action.day26)
+  const daysForAnn = [];
+  for (let i=0; i<PRE_DAYS; i++) daysForAnn.push(-1000-i); // dummies para nao colidir
+  for (let i=1; i<=D25.length; i++) daysForAnn.push(i);
+  const anns = execGetTvAnnotations(daysForAnn);
 
   if(_execChartTl) _execChartTl.destroy();
   _execChartTl = new Chart(ctx, {
@@ -1487,9 +1495,13 @@ function buildExecTimelineChart() {
           borderColor: 'rgba(200,255,0,0.25)', borderWidth: 1, padding: 11,
           callbacks: {
             title: items => {
-              const dia = items[0].dataIndex + 1;
-              const dt = new Date(DATA_INICIO); dt.setDate(dt.getDate() + dia - 1);
-              return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) + ' · D+' + dia;
+              const idx = items[0].dataIndex;
+              const d26 = idx - PRE_DAYS + 1;
+              const dt = new Date(DATA_INICIO);
+              dt.setDate(dt.getDate() + (idx - PRE_DAYS));
+              const dateStr = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+              if (d26 < 1) return dateStr + ' · pré-lançamento 2025';
+              return dateStr + ' · D+' + d26;
             },
             label: c => {
               const v = c.parsed.y;
