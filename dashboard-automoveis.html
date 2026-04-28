@@ -569,6 +569,27 @@ const D25 = [
   {d:75,mv:0,mq:0,av:174146.4,aq:1567},{d:76,mv:0,mq:0,av:226793.6,aq:2025},
   {d:77,mv:0,mq:0,av:128185.4,aq:1222}
 ];
+// PRE-LANCAMENTO 2025: 14/03 a 30/03 (17 dias antes do D+1 de 2026)
+// R$ 1.889.501,37 / 5.534 ingressos. Usado para comparativo "mesmo dia de campanha".
+const D25_PRE = [
+  {d:1,mv:520012.46,mq:1236,av:179545.3,aq:380},{d:2,mv:171212.18,mq:430,av:82677.58,aq:153},
+  {d:3,mv:92003.74,mq:279,av:27577,aq:71},{d:4,mv:81187.39,mq:239,av:32146.64,aq:69},
+  {d:5,mv:70160.79,mq:222,av:23344.97,aq:49},{d:6,mv:51338.15,mq:163,av:26621.16,aq:84},
+  {d:7,mv:44664.51,mq:166,av:25742.43,aq:53},{d:8,mv:36375.53,mq:127,av:26335.36,aq:71},
+  {d:9,mv:20913.37,mq:69,av:13460.25,aq:63},{d:10,mv:36451.06,mq:156,av:16062.21,aq:62},
+  {d:11,mv:45186.53,mq:181,av:17321.96,aq:57},{d:12,mv:38180,mq:211,av:18691.29,aq:63},
+  {d:13,mv:24978.98,mq:120,av:17391.05,aq:40},{d:14,mv:32801.07,mq:160,av:6164.02,aq:45},
+  {d:15,mv:18000.61,mq:97,av:11404.48,aq:50},{d:16,mv:27130.12,mq:116,av:9036.71,aq:40},
+  {d:17,mv:33397.96,mq:174,av:11984.51,aq:38}
+];
+const PRE_DAYS = D25_PRE.length;
+// D25_CAMPAIGN: 94 dias re-indexados como D+1..D+94 da CAMPANHA 2025 (14/03 a 15/06)
+// Usado para comparar 2026 D+N vs 2025 D+N (mesmo numero de dias de campanha)
+const D25_CAMPAIGN = [
+  ...D25_PRE.map(r => ({...r})),
+  ...D25.map(r => ({...r, d: r.d + 17}))
+];
+
 
 // ═══════════════════════════════════════════════
 // DADOS 2026 — preenchidos via Google Sheets (todas as SEMANA 0, 1, 2…)
@@ -676,7 +697,7 @@ function calcKPIs() {
   const s26 = D26.reduce((a,r)=>({av:a.av+r.av,aq:a.aq+r.aq,ap:a.ap+r.ap,at:a.at+r.at,apQ:a.apQ+(r.apQ||0),atQ:a.atQ+(r.atQ||0)}),{av:0,aq:0,ap:0,at:0,apQ:0,atQ:0});
   const d26Min = D26.length ? D26[0].d : 1;
   const d26Max = D26.length ? D26[D26.length-1].d : n;
-  const s25 = D25.filter(r=>r.d>=d26Min&&r.d<=d26Max).reduce((a,r)=>({av:a.av+r.av,aq:a.aq+r.aq}),{av:0,aq:0});
+  const s25 = D25_CAMPAIGN.filter(r=>r.d>=d26Min&&r.d<=d26Max).reduce((a,r)=>({av:a.av+r.av,aq:a.aq+r.aq}),{av:0,aq:0});
   const rec26=s26.av, rec25=s25.av;
   const ing26=s26.aq, ing25=s25.aq;
   const tkt26=ing26?rec26/ing26:0, tkt25=s25.aq?rec25/s25.aq:0;
