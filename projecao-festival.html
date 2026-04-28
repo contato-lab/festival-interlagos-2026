@@ -251,7 +251,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="kpi"><div class="kpi-lbl">Vendido 2026</div><div class="kpi-val lime" id="kpiVendido">—</div><div class="kpi-sub" id="kpiVendidoSub">—</div></div>
       <div class="kpi"><div class="kpi-lbl">Ingressos</div><div class="kpi-val" id="kpiIng">—</div><div class="kpi-sub" id="kpiIngSub">—</div></div>
       <div class="kpi"><div class="kpi-lbl">Ticket médio</div><div class="kpi-val" id="kpiTkt">—</div><div class="kpi-sub" id="kpiTktSub">—</div></div>
-      <div class="kpi"><div class="kpi-lbl">2025 total ref.</div><div class="kpi-val">R$ 7,19M</div><div class="kpi-sub">43.923 ing · 94 dias</div></div>
+      <div class="kpi"><div class="kpi-lbl">2025 total ref.</div><div class="kpi-val">R$ 7,19M</div><div class="kpi-sub">43.923 ing · 94 dias (14/03–15/06)</div></div>
       <div class="kpi"><div class="kpi-lbl">Invest. caixa</div><div class="kpi-val">R$ 1,86M</div><div class="kpi-sub">sem permutas</div></div>
       <div class="kpi hi"><div class="kpi-lbl">Pace atual</div><div class="kpi-val lime" id="kpiPace">—</div><div class="kpi-sub" id="kpiPaceSub">—</div></div>
     </div>
@@ -376,8 +376,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     <div class="chart-wrap"><canvas id="fcChart"></canvas></div>
 
     <div class="foot">
-      💡 <strong>Metodologia:</strong> curva 2025 real (94 dias, R$ 7,19M, 43.923 ingressos) esticada para os 151 dias de 2026, calibrada pelo ritmo real em ingressos, com uplifts das ações genuinamente novas em 2026.
-      <br><strong>Novo em 2026:</strong> Programática ADSPLAY (R$ 600k rodando últimos 3 meses + festival) · +57 dias de campanha (151 vs 94).
+      💡 <strong>Metodologia:</strong> 2025 vendeu R$ 7,19M / 43.923 ing em 94 dias (14/03 a 15/06). Como 2026 começou em 31/03, o gráfico compara apenas o trecho equivalente: <strong>31/03 a 15/06/2025 = 77 dias, R$ 5,30M, 38.389 ing</strong>. Os 17 dias de pré-lançamento de 2025 (14–30/03, R$ 1,89M / 5.534 ing) ficam fora da comparação por não terem equivalente em 2026. Curva esticada para os 151 dias de 2026, calibrada pelo ritmo real em ingressos, com uplifts das ações novas em 2026.
+      <br><strong>Novo em 2026:</strong> Programática ADSPLAY (R$ 600k rodando últimos 3 meses + festival) · +74 dias de campanha (151 vs 77 do trecho comparável).
       <br><strong>Já existia em 2025:</strong> Meta/Google/TikTok, TV Globo, Rádio BandNews, Influenciadores — embutidos na curva base, sem uplift duplicado.
       <br><br><strong>📊 Como ler o gráfico (regra geral: VERDE = 2026 · ROXO = 2025):</strong>
       <br>• <span style="color:#C8FF00;font-weight:700">2026 REALIZADO (verde sólido com preenchimento)</span> = vendas reais de 2026 até hoje, em tempo real.
@@ -414,56 +414,48 @@ if(localStorage.getItem(_AUTH_KEY)==='1'){
 }
 
 // ════════════════════════════════════════════════════
-// DADOS 2025 — 94 dias reais
+// DADOS 2025 — 77 dias reais (31/03 a 15/06/2025), alinhados com início campanha 2026
 // ════════════════════════════════════════════════════
 const D25 = [
-  {d:1,mv:520012,mq:1236,av:179545,aq:380},{d:2,mv:171212,mq:430,av:82678,aq:153},
-  {d:3,mv:92004,mq:279,av:27577,aq:71},{d:4,mv:81187,mq:239,av:32147,aq:69},
-  {d:5,mv:70161,mq:222,av:23345,aq:49},{d:6,mv:51338,mq:163,av:26621,aq:84},
-  {d:7,mv:44665,mq:166,av:25742,aq:53},{d:8,mv:36376,mq:127,av:26335,aq:71},
-  {d:9,mv:20913,mq:69,av:13460,aq:63},{d:10,mv:36451,mq:156,av:16062,aq:62},
-  {d:11,mv:45187,mq:181,av:17322,aq:57},{d:12,mv:38180,mq:211,av:18691,aq:63},
-  {d:13,mv:24979,mq:120,av:17391,aq:40},{d:14,mv:32801,mq:160,av:6164,aq:45},
-  {d:15,mv:18001,mq:97,av:11404,aq:50},{d:16,mv:27130,mq:116,av:9037,aq:40},
-  {d:17,mv:33398,mq:174,av:11985,aq:38},{d:18,mv:35606,mq:179,av:18897,aq:53},
-  {d:19,mv:32944,mq:150,av:14963,aq:54},{d:20,mv:24839,mq:138,av:12298,aq:44},
-  {d:21,mv:29073,mq:115,av:19265,aq:42},{d:22,mv:23632,mq:127,av:5071,aq:35},
-  {d:23,mv:21128,mq:103,av:15668,aq:43},{d:24,mv:18959,mq:113,av:5477,aq:43},
-  {d:25,mv:33191,mq:172,av:8454,aq:51},{d:26,mv:24193,mq:107,av:9700,aq:38},
-  {d:27,mv:38651,mq:220,av:7158,aq:42},{d:28,mv:24192,mq:117,av:5253,aq:30},
-  {d:29,mv:19580,mq:103,av:17131,aq:41},{d:30,mv:21006,mq:99,av:19666,aq:44},
-  {d:31,mv:25098,mq:120,av:5695,aq:38},{d:32,mv:23522,mq:111,av:17489,aq:52},
-  {d:33,mv:27382,mq:153,av:11660,aq:57},{d:34,mv:27995,mq:133,av:15251,aq:38},
-  {d:35,mv:17338,mq:99,av:15664,aq:30},{d:36,mv:26321,mq:129,av:9720,aq:46},
-  {d:37,mv:16619,mq:86,av:10735,aq:44},{d:38,mv:22681,mq:121,av:5402,aq:32},
-  {d:39,mv:19399,mq:116,av:12974,aq:70},{d:40,mv:29687,mq:149,av:7023,aq:36},
-  {d:41,mv:25948,mq:126,av:5707,aq:26},{d:42,mv:21952,mq:167,av:6027,aq:38},
-  {d:43,mv:30784,mq:131,av:16497,aq:64},{d:44,mv:22632,mq:131,av:10992,aq:54},
-  {d:45,mv:16327,mq:103,av:16641,aq:62},{d:46,mv:32110,mq:188,av:7205,aq:59},
-  {d:47,mv:29093,mq:189,av:16967,aq:65},{d:48,mv:33232,mq:220,av:11716,aq:72},
-  {d:49,mv:31999,mq:182,av:10994,aq:79},{d:50,mv:35743,mq:215,av:13928,aq:79},
-  {d:51,mv:24710,mq:196,av:20011,aq:106},{d:52,mv:26214,mq:187,av:10477,aq:62},
-  {d:53,mv:86756,mq:621,av:28567,aq:204},{d:54,mv:56729,mq:340,av:24156,aq:89},
-  {d:55,mv:49066,mq:307,av:30696,aq:121},{d:56,mv:41054,mq:256,av:15035,aq:128},
-  {d:57,mv:32472,mq:237,av:17933,aq:100},{d:58,mv:27052,mq:171,av:16161,aq:68},
-  {d:59,mv:31811,mq:216,av:14580,aq:61},{d:60,mv:26393,mq:170,av:9970,aq:57},
-  {d:61,mv:36206,mq:239,av:11450,aq:67},{d:62,mv:46798,mq:366,av:12979,aq:95},
-  {d:63,mv:47072,mq:304,av:13666,aq:67},{d:64,mv:35656,mq:266,av:21909,aq:90},
-  {d:65,mv:32313,mq:216,av:22049,aq:104},{d:66,mv:33546,mq:253,av:12510,aq:108},
-  {d:67,mv:42095,mq:368,av:14742,aq:119},{d:68,mv:59688,mq:423,av:14815,aq:99},
-  {d:69,mv:53212,mq:421,av:24304,aq:97},{d:70,mv:53259,mq:407,av:35519,aq:98},
-  {d:71,mv:49437,mq:390,av:9954,aq:70},{d:72,mv:48459,mq:399,av:16912,aq:83},
-  {d:73,mv:59365,mq:606,av:17319,aq:105},{d:74,mv:104032,mq:1049,av:29984,aq:114},
-  {d:75,mv:123208,mq:1204,av:23899,aq:165},{d:76,mv:148895,mq:1482,av:35402,aq:158},
-  {d:77,mv:184942,mq:1855,av:20197,aq:122},{d:78,mv:283178,mq:2651,av:15480,aq:114},
-  {d:79,mv:271433,mq:2643,av:20182,aq:125},{d:80,mv:91444,mq:1044,av:37424,aq:231},
-  {d:81,mv:0,mq:0,av:54914,aq:223},{d:82,mv:0,mq:0,av:35590,aq:213},
-  {d:83,mv:0,mq:0,av:52148,aq:242},{d:84,mv:0,mq:0,av:41807,aq:244},
-  {d:85,mv:0,mq:0,av:36704,aq:313},{d:86,mv:0,mq:0,av:32066,aq:257},
-  {d:87,mv:0,mq:0,av:65284,aq:306},{d:88,mv:0,mq:0,av:93664,aq:572},
-  {d:89,mv:0,mq:0,av:81620,aq:574},{d:90,mv:0,mq:0,av:107572,aq:876},
-  {d:91,mv:0,mq:0,av:116842,aq:1028},{d:92,mv:0,mq:0,av:174146,aq:1567},
-  {d:93,mv:0,mq:0,av:226794,aq:2025},{d:94,mv:0,mq:0,av:128185,aq:1222}
+  {d:1,mv:35606.33,mq:179,av:18897.17,aq:53},{d:2,mv:32943.57,mq:150,av:14962.55,aq:54},
+  {d:3,mv:24839.35,mq:138,av:12297.55,aq:44},{d:4,mv:29072.92,mq:115,av:19265.22,aq:42},
+  {d:5,mv:23632,mq:127,av:5070.76,aq:35},{d:6,mv:21127.99,mq:103,av:15667.93,aq:43},
+  {d:7,mv:18958.85,mq:113,av:5476.58,aq:43},{d:8,mv:33191,mq:172,av:8454,aq:51},
+  {d:9,mv:24193,mq:107,av:9700,aq:38},{d:10,mv:38651,mq:220,av:7158,aq:42},
+  {d:11,mv:24192,mq:117,av:5253,aq:30},{d:12,mv:19580,mq:103,av:17131,aq:41},
+  {d:13,mv:21006,mq:99,av:19666,aq:44},{d:14,mv:25098,mq:120,av:5695,aq:38},
+  {d:15,mv:23522.47,mq:111,av:17488.57,aq:52},{d:16,mv:27382.35,mq:153,av:11660.41,aq:57},
+  {d:17,mv:27994.74,mq:133,av:15250.65,aq:38},{d:18,mv:17338.03,mq:99,av:15664.48,aq:30},
+  {d:19,mv:26320.53,mq:129,av:9719.71,aq:46},{d:20,mv:16619.17,mq:86,av:10735.37,aq:44},
+  {d:21,mv:22681.45,mq:121,av:5401.6,aq:32},{d:22,mv:19398.85,mq:116,av:12974.38,aq:70},
+  {d:23,mv:29687.02,mq:149,av:7022.87,aq:36},{d:24,mv:25948.46,mq:126,av:5707,aq:26},
+  {d:25,mv:21952.35,mq:167,av:6027.2,aq:38},{d:26,mv:30784.32,mq:131,av:16496.58,aq:64},
+  {d:27,mv:22631.61,mq:131,av:10992.31,aq:54},{d:28,mv:16326.62,mq:103,av:16640.61,aq:62},
+  {d:29,mv:32110.11,mq:188,av:7204.84,aq:59},{d:30,mv:29092.85,mq:189,av:16967.43,aq:65},
+  {d:31,mv:33231.54,mq:220,av:11716.04,aq:72},{d:32,mv:31998.71,mq:182,av:10994.36,aq:79},
+  {d:33,mv:35742.72,mq:215,av:13928.27,aq:79},{d:34,mv:24710.35,mq:196,av:20011.06,aq:106},
+  {d:35,mv:26214.11,mq:187,av:10476.73,aq:62},{d:36,mv:86755.55,mq:621,av:28566.63,aq:204},
+  {d:37,mv:56728.86,mq:340,av:24156.28,aq:89},{d:38,mv:49066.42,mq:307,av:30696.21,aq:121},
+  {d:39,mv:41054.12,mq:256,av:15034.98,aq:128},{d:40,mv:32471.53,mq:237,av:17932.51,aq:100},
+  {d:41,mv:27052.16,mq:171,av:16160.95,aq:68},{d:42,mv:31811.19,mq:216,av:14580.05,aq:61},
+  {d:43,mv:26393.24,mq:170,av:9970.02,aq:57},{d:44,mv:36205.57,mq:239,av:11449.75,aq:67},
+  {d:45,mv:46797.76,mq:366,av:12979.01,aq:95},{d:46,mv:47071.99,mq:304,av:13666,aq:67},
+  {d:47,mv:35655.54,mq:266,av:21909.39,aq:90},{d:48,mv:32312.88,mq:216,av:22048.7,aq:104},
+  {d:49,mv:33546.11,mq:253,av:12509.51,aq:108},{d:50,mv:42095.33,mq:368,av:14742,aq:119},
+  {d:51,mv:59687.67,mq:423,av:14814.52,aq:99},{d:52,mv:53211.76,mq:421,av:24303.5,aq:97},
+  {d:53,mv:53258.82,mq:407,av:35519.37,aq:98},{d:54,mv:49437.24,mq:390,av:9953.5,aq:70},
+  {d:55,mv:48458.93,mq:399,av:16912,aq:83},{d:56,mv:59365.43,mq:606,av:17318.77,aq:105},
+  {d:57,mv:104031.74,mq:1049,av:29983.78,aq:114},{d:58,mv:123207.92,mq:1204,av:23898.91,aq:165},
+  {d:59,mv:148895.32,mq:1482,av:35402.5,aq:158},{d:60,mv:184942.06,mq:1855,av:20197,aq:122},
+  {d:61,mv:283177.7,mq:2651,av:15480,aq:114},{d:62,mv:271433.2,mq:2643,av:20182,aq:125},
+  {d:63,mv:91443.8,mq:1044,av:37423.54,aq:231},{d:64,mv:0,mq:0,av:54913.72,aq:223},
+  {d:65,mv:0,mq:0,av:35590.01,aq:213},{d:66,mv:0,mq:0,av:52147.67,aq:242},
+  {d:67,mv:0,mq:0,av:41806.89,aq:244},{d:68,mv:0,mq:0,av:36704.01,aq:313},
+  {d:69,mv:0,mq:0,av:32066.15,aq:257},{d:70,mv:0,mq:0,av:65284.31,aq:306},
+  {d:71,mv:0,mq:0,av:93663.74,aq:572},{d:72,mv:0,mq:0,av:81619.72,aq:574},
+  {d:73,mv:0,mq:0,av:107572.41,aq:876},{d:74,mv:0,mq:0,av:116841.7,aq:1028},
+  {d:75,mv:0,mq:0,av:174146.4,aq:1567},{d:76,mv:0,mq:0,av:226793.6,aq:2025},
+  {d:77,mv:0,mq:0,av:128185.4,aq:1222}
 ];
 
 // ════════════════════════════════════════════════════
@@ -629,10 +621,16 @@ const fmtInt = n => Math.round(n).toLocaleString('pt-BR');
 // ════════════════════════════════════════════════════
 // CALCULOS
 // ════════════════════════════════════════════════════
-const d25_rec_tot = D25.reduce((s,r)=>s+r.mv+r.av,0);
-const d25_ing_tot = D25.reduce((s,r)=>s+r.mq+r.aq,0);
+// ─── Totais REAIS 2025 (94 dias completos: 14/03 a 15/06/2025) ───
+// Usado para projecoes (e o que 2026 precisa bater de fato)
+// O array D25 acima sao 77 dias (31/03 a 15/06) so para alinhamento de datas no grafico.
+// Os 17 dias de pre-lancamento (14-30/03) somam R$ 1.889.501 / 5.534 ing.
+const D25_FULL_REC = 7191753.92;  // R$ 7,19M total 2025 (94 dias)
+const D25_FULL_ING = 43923;       // ingressos total 2025
+const d25_rec_tot = D25_FULL_REC;
+const d25_ing_tot = D25_FULL_ING;
 const d25_tkt_tot = d25_rec_tot/d25_ing_tot;
-const d25_ing_ads = D25.filter(r=>r.d>=40).reduce((s,r)=>s+r.mq+r.aq,0);
+const d25_ing_ads = D25.filter(r=>r.d>=40-17).reduce((s,r)=>s+r.mq+r.aq,0); // ajuste -17 (D40 antigo = D23 novo)
 
 let STATE = {
   d26_rec: 0, d26_ing: 0, d26_dias: 0, fator_ing: 1,
@@ -663,14 +661,15 @@ function calcularCenario(c){
 }
 
 function curveStretched(){
+  const N25 = D25.length; // 77 dias reais (31/03 a 15/06/2025)
   const out = [];
   for(let i=0;i<DIAS_TOTAL;i++){
-    const idx = (i/(DIAS_TOTAL-1))*(94-1);
-    const lo = Math.floor(idx), hi = Math.min(93, lo+1);
+    const idx = (i/(DIAS_TOTAL-1))*(N25-1);
+    const lo = Math.floor(idx), hi = Math.min(N25-1, lo+1);
     const frac = idx-lo;
     const rec = (D25[lo].mv+D25[lo].av) + ((D25[hi].mv+D25[hi].av)-(D25[lo].mv+D25[lo].av))*frac;
     const ing = (D25[lo].mq+D25[lo].aq) + ((D25[hi].mq+D25[hi].aq)-(D25[lo].mq+D25[lo].aq))*frac;
-    out.push({rec: rec*(94/DIAS_TOTAL), ing: ing*(94/DIAS_TOTAL)});
+    out.push({rec: rec*(N25/DIAS_TOTAL), ing: ing*(N25/DIAS_TOTAL)});
   }
   return out;
 }
@@ -706,14 +705,14 @@ function curve2025AcumStretched(){
   return out;
 }
 
-// 2025 ritmo REAL (sem stretch): 94 dias com a curva real, depois plateau no total.
-// Mostra que 2025 ja tinha acabado em D+94 (julho), enquanto 2026 vai ate D+151 (agosto).
+// 2025 ritmo REAL (sem stretch): 77 dias com a curva real (31/03 a 15/06/2025), depois plateau no total.
+// Mostra que 2025 ja tinha acabado em D+77 (15/06), enquanto 2026 vai ate D+151 (28/08).
 // Onde 2026 fica abaixo dessa curva = vendas mais lentas que 2025 no mesmo dia de campanha.
 function curve2025RealAcum(){
   const out = [];
   let acum = 0;
   for(let i=0;i<DIAS_TOTAL;i++){
-    if(i < 94){
+    if(i < D25.length){
       acum += (D25[i].mv + D25[i].av);
     }
     out.push(acum);
@@ -972,7 +971,7 @@ function renderChart(key){
   });
 
   // Marcos chave (1-indexado: D+N => index N-1)
-  const D_FIM_2025  = 94;   // 02/07/2026 — onde 2025 chegou ao total final
+  const D_FIM_2025  = 77;   // 15/06/2026 — onde 2025 chegou ao total final (Festival 2025 foi 14-15/06)
   const D_RAMPA     = 121;  // 29/07/2026 — inicio dos ultimos 30 dias (rampa de explosao)
   const D_EVENTO    = 151;  // 28/08/2026 — Festival 2026
 
@@ -984,8 +983,8 @@ function renderChart(key){
       labels,
       datasets:[
         // ── 2025 (ROXO) — apenas o ritmo REAL ─────────────────────
-        // Plateau apos D+94 (02/07). Mostra que 2025 ja tinha acabado em julho.
-        {label:'2025 (ritmo real, 94 dias)', data:curve25AcumReal, borderColor:'rgba(155,90,180,0.85)', backgroundColor:'transparent', borderWidth:2, borderDash:[2,3], pointRadius:0, tension:.15, fill:false},
+        // Plateau apos D+77 (15/06). Mostra que 2025 ja tinha acabado em meados de junho.
+        {label:'2025 (ritmo real, 77 dias)', data:curve25AcumReal, borderColor:'rgba(155,90,180,0.85)', backgroundColor:'transparent', borderWidth:2, borderDash:[2,3], pointRadius:0, tension:.15, fill:false},
 
         // ── 2026 (VERDE LIME — sempre) ────────────────────────────
         // 2026 realizado (atual ate hoje)
@@ -1011,11 +1010,11 @@ function renderChart(key){
               borderDash:[4,4],
               label:{display:true, content:'Rampa final (-30 dias)', position:{x:'center', y:'start'}, color:'#C8FF00', font:{size:10, weight:700}, backgroundColor:'rgba(0,0,0,.85)', padding:5, yAdjust:14}
             },
-            // Linha vertical: fim do 2025 (D+94, 02/07/2026) — equivalente em 2026 a quando 2025 acabou
+            // Linha vertical: fim do 2025 (D+77, 15/06/2026) — equivalente em 2026 a quando 2025 acabou
             fim2025:{
               type:'line', xMin: D_FIM_2025-1, xMax: D_FIM_2025-1,
               borderColor:'rgba(155,90,180,0.55)', borderWidth:1.5, borderDash:[3,3],
-              label:{display:true, content:'02/07 — 2025 ja teria acabado', position:'start', color:'#fff', font:{size:9, weight:600}, backgroundColor:'rgba(123,45,139,0.85)', padding:4, yAdjust:32}
+              label:{display:true, content:'15/06 — 2025 ja teria acabado', position:'start', color:'#fff', font:{size:9, weight:600}, backgroundColor:'rgba(123,45,139,0.85)', padding:4, yAdjust:32}
             },
             // Linha vertical: evento 2026 (28/08/2026)
             evento:{
