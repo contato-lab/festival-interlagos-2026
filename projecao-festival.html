@@ -379,10 +379,11 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       💡 <strong>Metodologia:</strong> curva 2025 real (94 dias, R$ 7,19M, 43.923 ingressos) esticada para os 151 dias de 2026, calibrada pelo ritmo real em ingressos, com uplifts das ações genuinamente novas em 2026.
       <br><strong>Novo em 2026:</strong> Programática ADSPLAY (R$ 600k rodando últimos 3 meses + festival) · +57 dias de campanha (151 vs 94).
       <br><strong>Já existia em 2025:</strong> Meta/Google/TikTok, TV Globo, Rádio BandNews, Influenciadores — embutidos na curva base, sem uplift duplicado.
-      <br><br><strong>📊 Como ler o gráfico:</strong>
-      <br>• <span style="color:#FF6B35">Linha laranja pontilhada</span> = 2025 no <strong>ritmo real</strong> (94 dias). Ela achata em 02/07 porque o festival 2025 já tinha rolado em junho. Onde 2026 fica abaixo dela = vendas mais lentas que 2025 no mesmo dia de campanha — <strong>natural</strong>, porque 2026 tem 57 dias a mais e o público distribui a compra.
-      <br>• <span style="color:#7B2D8B">Linha roxa tracejada</span> = 2025 <strong>esticada</strong> para 151 dias (comparação por % de progresso da campanha).
-      <br>• <span style="color:#C8FF00">Área verde</span> = vendas 2026 já realizadas em tempo real.
+      <br><br><strong>📊 Como ler o gráfico (regra geral: VERDE = 2026 · ROXO = 2025):</strong>
+      <br>• <span style="color:#C8FF00;font-weight:700">2026 REALIZADO (verde sólido com preenchimento)</span> = vendas reais de 2026 até hoje, em tempo real.
+      <br>• <span style="color:#C8FF00;font-weight:700">2026 PROJETADO (verde tracejado)</span> = continuação da curva — projeção de onde vai chegar até o festival (28/08).
+      <br>• <span style="color:#9B5AB4;font-weight:600">2025 ritmo real (roxo pontilhado escuro)</span> = como 2025 vendeu dia-a-dia. Achata em 02/07 porque o festival 2025 rolou em junho. <strong>Onde 2026 fica abaixo dela = vendas mais lentas que 2025 no mesmo dia</strong> — natural, porque 2026 tem 57 dias a mais e o público distribui a compra.
+      <br>• <span style="color:#7B2D8B;font-weight:600">2025 esticado (roxo tracejado claro)</span> = 2025 esticado para 151 dias (comparação por % de progresso da campanha).
       <br>• <span style="color:#C8FF00">Faixa "Rampa final"</span> = últimos 30 dias (29/07 → 28/08). É <strong>aqui que a explosão acontece</strong>: em 2025, ~60% dos ingressos foram vendidos nas últimas 4 semanas. A projeção 2026 já modela esse comportamento.
       <br><br><strong>Índice de viabilidade:</strong> calculado com base em 4 fatores — base do cenário (conservador 70% · realista 50% · otimista 25%), pace da janela curta, projeção linear do pace atual vs meta, e % do período decorrido. Não é probabilidade estatística, é um sinalizador de dificuldade que se atualiza a cada 60s com os dados novos.
     </div>
@@ -983,12 +984,17 @@ function renderChart(key){
     data:{
       labels,
       datasets:[
-        // 2025 RITMO REAL (sem stretch): plateau no total apos D+94. Mostra que 2025 ja tinha acabado em julho.
-        {label:'2025 (ritmo real, 94 dias)', data:curve25AcumReal, borderColor:'rgba(255,107,53,0.55)', backgroundColor:'rgba(255,107,53,0.04)', borderWidth:1.5, borderDash:[2,3], pointRadius:0, tension:.15, fill:false},
+        // ── 2025 (ROXO/LILAS) ────────────────────────────────────
+        // 2025 RITMO REAL (sem stretch): plateau apos D+94. Mostra que 2025 ja tinha acabado em julho.
+        {label:'2025 (ritmo real, 94 dias)', data:curve25AcumReal, borderColor:'rgba(155,90,180,0.85)', backgroundColor:'transparent', borderWidth:2, borderDash:[2,3], pointRadius:0, tension:.15, fill:false},
         // 2025 esticado para 151 dias — comparacao "% de progresso da campanha"
-        {label:'2025 (esticado p/ 151 dias)', data:curve25AcumStretch, borderColor:'rgba(123,45,139,0.6)', backgroundColor:'rgba(123,45,139,0.04)', borderWidth:1.5, borderDash:[5,5], pointRadius:0, tension:.35, fill:false},
-        {label:'2026 realizado', data:serieReal, borderColor:'#C8FF00', backgroundColor:'rgba(200,255,0,0.12)', borderWidth:3, pointRadius:0, tension:.25, fill:true},
-        {label:'Projeção '+c.nome, data:serieFuturo, borderColor:c.color, backgroundColor:c.color+'15', borderWidth:2.5, borderDash:[2,3], pointRadius:0, tension:.25, fill:false}
+        {label:'2025 (esticado p/ 151 dias)', data:curve25AcumStretch, borderColor:'rgba(123,45,139,0.55)', backgroundColor:'transparent', borderWidth:1.5, borderDash:[5,5], pointRadius:0, tension:.35, fill:false},
+
+        // ── 2026 (VERDE LIME — sempre) ────────────────────────────
+        // 2026 realizado (atual ate hoje)
+        {label:'2026 REALIZADO (ate hoje)', data:serieReal, borderColor:'#C8FF00', backgroundColor:'rgba(200,255,0,0.18)', borderWidth:4, pointRadius:0, tension:.25, fill:true},
+        // 2026 projetado (futuro) — MESMA cor lime, so dashed pra distinguir
+        {label:'2026 PROJETADO ('+c.nome+')', data:serieFuturo, borderColor:'#C8FF00', backgroundColor:'rgba(200,255,0,0.06)', borderWidth:3, borderDash:[6,4], pointRadius:0, tension:.25, fill:true}
       ]
     },
     options:{
@@ -1002,23 +1008,23 @@ function renderChart(key){
             rampaArea:{
               type:'box',
               xMin: D_RAMPA-1, xMax: D_EVENTO-1,
-              backgroundColor:'rgba(200,255,0,0.05)',
-              borderColor:'rgba(200,255,0,0.18)',
+              backgroundColor:'rgba(200,255,0,0.06)',
+              borderColor:'rgba(200,255,0,0.25)',
               borderWidth:1,
               borderDash:[4,4],
-              label:{display:true, content:'Rampa final', position:{x:'center', y:'end'}, color:'#C8FF00', font:{size:10, weight:600}, backgroundColor:'rgba(0,0,0,.75)', padding:4, yAdjust:8}
+              label:{display:true, content:'Rampa final (-30 dias)', position:{x:'center', y:'start'}, color:'#C8FF00', font:{size:10, weight:700}, backgroundColor:'rgba(0,0,0,.85)', padding:5, yAdjust:14}
             },
             // Linha vertical: fim do 2025 (D+94, 02/07/2026) — equivalente em 2026 a quando 2025 acabou
             fim2025:{
               type:'line', xMin: D_FIM_2025-1, xMax: D_FIM_2025-1,
-              borderColor:'rgba(255,107,53,0.5)', borderWidth:1.5, borderDash:[3,3],
-              label:{display:true, content:'02/07: 2025 ja teria acabado', position:'start', color:'#FF6B35', font:{size:9, weight:600}, backgroundColor:'rgba(0,0,0,.75)', padding:3, xAdjust:0, yAdjust:18}
+              borderColor:'rgba(155,90,180,0.55)', borderWidth:1.5, borderDash:[3,3],
+              label:{display:true, content:'02/07 — 2025 ja teria acabado', position:'start', color:'#fff', font:{size:9, weight:600}, backgroundColor:'rgba(123,45,139,0.85)', padding:4, yAdjust:32}
             },
             // Linha vertical: evento 2026 (28/08/2026)
             evento:{
               type:'line', xMin: D_EVENTO-1, xMax: D_EVENTO-1,
-              borderColor:'rgba(200,255,0,0.85)', borderWidth:2,
-              label:{display:true, content:'Festival 2026 (28/08)', position:'start', color:'#0A0A0A', font:{size:10, weight:700}, backgroundColor:'#C8FF00', padding:4, yAdjust:-2, xAdjust:-2}
+              borderColor:'rgba(200,255,0,0.9)', borderWidth:2.5,
+              label:{display:true, content:'Festival 2026 (28/08)', position:'end', color:'#0A0A0A', font:{size:11, weight:800}, backgroundColor:'#C8FF00', padding:5, yAdjust:0, xAdjust:-4}
             }
           }
         }
