@@ -1504,12 +1504,22 @@ function buildExecTimelineChart() {
               return dateStr + ' · D+' + d26;
             },
             label: c => {
-              const v = c.parsed.y;
-              if(v == null) return '';
-              const fmt = execTlMetric === 'receita'
-                ? 'R$ ' + v.toLocaleString('pt-BR',{maximumFractionDigits:0})
-                : v.toLocaleString('pt-BR') + ' ing.';
-              return c.dataset.label + ': ' + fmt;
+              const idx = c.dataIndex;
+              const is26 = c.dataset.label === '2026';
+              let row;
+              if (is26) {
+                const d26 = idx - PRE_DAYS + 1;
+                if (d26 < 1) return '';
+                row = (D26_FULL || []).find(r => r.d === d26);
+              } else {
+                row = idx < PRE_DAYS ? D25_PRE[idx] : D25[idx - PRE_DAYS];
+              }
+              if (!row) return '';
+              const rec = (row.mv||0) + (row.av||0);
+              const ing = (row.mq||0) + (row.aq||0);
+              const recFmt = 'R$ ' + rec.toLocaleString('pt-BR',{maximumFractionDigits:0});
+              const ingFmt = ing.toLocaleString('pt-BR') + ' ing.';
+              return c.dataset.label + ': ' + recFmt + ' · ' + ingFmt;
             }
           }
         }
