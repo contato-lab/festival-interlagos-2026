@@ -382,8 +382,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <br><br><strong>📊 Como ler o gráfico (regra geral: VERDE = 2026 · ROXO = 2025):</strong>
       <br>• <span style="color:#C8FF00;font-weight:700">2026 REALIZADO (verde sólido com preenchimento)</span> = vendas reais de 2026 até hoje, em tempo real.
       <br>• <span style="color:#C8FF00;font-weight:700">2026 PROJETADO (verde tracejado)</span> = continuação da curva — projeção de onde vai chegar até o festival (28/08).
-      <br>• <span style="color:#9B5AB4;font-weight:600">2025 ritmo real (roxo pontilhado escuro)</span> = como 2025 vendeu dia-a-dia. Achata em 02/07 porque o festival 2025 rolou em junho. <strong>Onde 2026 fica abaixo dela = vendas mais lentas que 2025 no mesmo dia</strong> — natural, porque 2026 tem 57 dias a mais e o público distribui a compra.
-      <br>• <span style="color:#7B2D8B;font-weight:600">2025 esticado (roxo tracejado claro)</span> = 2025 esticado para 151 dias (comparação por % de progresso da campanha).
+      <br>• <span style="color:#9B5AB4;font-weight:600">2025 ritmo real (roxo pontilhado)</span> = como 2025 vendeu dia-a-dia. Achata em 02/07 porque o festival 2025 rolou em junho. <strong>Onde 2026 fica abaixo dela = vendas mais lentas que 2025 no mesmo dia</strong> — natural, porque 2026 tem 57 dias a mais e o público distribui a compra.
       <br>• <span style="color:#C8FF00">Faixa "Rampa final"</span> = últimos 30 dias (29/07 → 28/08). É <strong>aqui que a explosão acontece</strong>: em 2025, ~60% dos ingressos foram vendidos nas últimas 4 semanas. A projeção 2026 já modela esse comportamento.
       <br><br><strong>Índice de viabilidade:</strong> calculado com base em 4 fatores — base do cenário (conservador 70% · realista 50% · otimista 25%), pace da janela curta, projeção linear do pace atual vs meta, e % do período decorrido. Não é probabilidade estatística, é um sinalizador de dificuldade que se atualiza a cada 60s com os dados novos.
     </div>
@@ -984,11 +983,9 @@ function renderChart(key){
     data:{
       labels,
       datasets:[
-        // ── 2025 (ROXO/LILAS) ────────────────────────────────────
-        // 2025 RITMO REAL (sem stretch): plateau apos D+94. Mostra que 2025 ja tinha acabado em julho.
+        // ── 2025 (ROXO) — apenas o ritmo REAL ─────────────────────
+        // Plateau apos D+94 (02/07). Mostra que 2025 ja tinha acabado em julho.
         {label:'2025 (ritmo real, 94 dias)', data:curve25AcumReal, borderColor:'rgba(155,90,180,0.85)', backgroundColor:'transparent', borderWidth:2, borderDash:[2,3], pointRadius:0, tension:.15, fill:false},
-        // 2025 esticado para 151 dias — comparacao "% de progresso da campanha"
-        {label:'2025 (esticado p/ 151 dias)', data:curve25AcumStretch, borderColor:'rgba(123,45,139,0.55)', backgroundColor:'transparent', borderWidth:1.5, borderDash:[5,5], pointRadius:0, tension:.35, fill:false},
 
         // ── 2026 (VERDE LIME — sempre) ────────────────────────────
         // 2026 realizado (atual ate hoje)
