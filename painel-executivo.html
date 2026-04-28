@@ -128,6 +128,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   .exec-conv-grid{grid-template-columns:1fr}
   .header{padding:14px 18px}
   .footer{padding:14px 18px}
+  /* Secao TKT em tablet: hero e mix charts empilham */
+  #tkt-hero-grid{grid-template-columns:1fr !important}
+  #tkt-mix-grid{grid-template-columns:1fr !important}
 }
 /* RESPONSIVE — MOBILE */
 @media(max-width:768px){
@@ -149,6 +152,23 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   .section-header{flex-direction:column;gap:8px;align-items:flex-start}
   .section-title{font-size:1rem}
   .pill-group{width:100%;justify-content:flex-start}
+  /* Secao TKT no mobile: ajustes de tamanho */
+  #tkt-hero-grid > div{padding:12px !important;gap:10px !important}
+  #tkt-hero-grid > div > div:first-child{font-size:1.4rem !important}
+  #tkt-hero-grid > div > div:nth-child(2) > div:last-child{font-size:1.2rem !important;letter-spacing:-.02em}
+  #tkt-hero-grid > div > div:last-child{font-size:.95rem !important;padding:5px 9px !important}
+  /* Tabela das fases vira cards verticais no mobile */
+  #tkt-fases-wrap{padding:6px !important}
+  #tkt-fases-table thead{display:none}
+  #tkt-fases-table tr{display:block;background:rgba(255,255,255,.02);border-radius:8px;margin-bottom:8px;padding:10px 12px;border:1px solid rgba(255,255,255,.06)}
+  #tkt-fases-table tr:last-child{margin-bottom:0}
+  #tkt-fases-table td{display:block;padding:0 !important;border:none !important}
+  #tkt-fases-table td:nth-child(1){font-size:.78rem;margin-bottom:3px}
+  #tkt-fases-table td:nth-child(2){font-size:.7rem;color:#999 !important;margin-bottom:6px}
+  #tkt-fases-table td:nth-child(3){text-align:left !important;font-size:1.4rem !important}
+  /* Mix charts mais altos no mobile */
+  #tkt-mix-grid{gap:14px !important}
+  #tkt-mix-grid > div > div:last-child{height:180px !important}
 }
 </style>
 </head>
@@ -422,7 +442,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   </div>
 
   <!-- HERO: a queda em 2 numeros gigantes -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
+  <div id="tkt-hero-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
     <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:16px 18px;display:flex;align-items:center;gap:14px">
       <div style="font-size:1.8rem">🏍️</div>
       <div style="flex:1">
@@ -442,8 +462,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   </div>
 
   <!-- TABELA SIMPLES: as 3 fases -->
-  <div style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px 16px;margin-bottom:14px">
-    <table style="width:100%;border-collapse:collapse;font-size:.85rem">
+  <div id="tkt-fases-wrap" style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px 16px;margin-bottom:14px;overflow-x:auto">
+    <table id="tkt-fases-table" style="width:100%;border-collapse:collapse;font-size:.85rem">
       <thead>
         <tr style="color:#888;text-transform:uppercase;font-size:.65rem;letter-spacing:.06em">
           <th style="text-align:left;padding:8px 6px;border-bottom:1px solid #333">Fase</th>
@@ -472,7 +492,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   </div>
 
   <!-- Mix charts -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:14px">
+  <div id="tkt-mix-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:14px">
     <div>
       <div style="font-size:.78rem;color:#ccc;font-weight:700;margin-bottom:10px">🏍️ Composição da venda — Motos</div>
       <div style="position:relative;height:200px"><canvas id="exec-chartMixMotos"></canvas></div>
