@@ -1092,16 +1092,9 @@ const gridLine = { color:'rgba(255,255,255,0.05)', drawBorder:false };
 
 function buildVendasChart(days26) {
   const metric = currentVendasMetric;
-  // Mostra os 17 dias de pre-lancamento 2025 (14/03 a 30/03) ANTES do D+1 de 2026.
-  // Apenas a linha de 2025 aparece nesse trecho; 2026 fica null (campanha so comeca em 31/03).
-  // So inclui pre-lancamento se o filtro ja mostra D+1 (caso contrario nao faz sentido).
-  const showPre = days26[0] === 1;
-  const preLabels = showPre ? D25_PRE.map((_,i) => {
-    const dt = new Date(CAMP_START_2026);
-    dt.setDate(dt.getDate() - PRE_DAYS + i);
-    return fmtDate(dt);
-  }) : [];
-  const labels = [...preLabels, ...days26.map(d => fmtDate(dateOf26Day(d)))];
+  // Eixo unificado: cada D+N do filtro mostra 2025 D+N e 2026 D+N na mesma posicao
+  // 2025 D+1 = 14/03/2025; 2026 D+1 = 31/03/2026
+  const labels = days26.map(d => 'D+'+d);
 
   function get26(d) {
     const r = D26_SALES.find(x=>x.d===d);
@@ -1111,44 +1104,17 @@ function buildVendasChart(days26) {
     return r.mv + r.av;
   }
   function get25(d) {
-    const r = D25.find(x=>x.d===d);
-    if (!r) return null;
-    if (metric==='motos') return r.mv;
-    if (metric==='autos') return r.av;
-    return r.mv + r.av;
-  }
-  function get25Pre(idx) {
-    const r = D25_PRE[idx];
+    // Usa D25_CAMPAIGN (94 dias da campanha 2025, 14/03 a 15/06)
+    const r = D25_CAMPAIGN.find(x=>x.d===d);
     if (!r) return null;
     if (metric==='motos') return r.mv;
     if (metric==='autos') return r.av;
     return r.mv + r.av;
   }
 
-  const data26 = [
-    ...preLabels.map(()=>null),
-    ...days26.map(d => get26(d))
-  ];
-  const data25 = [
-    ...(showPre ? D25_PRE.map((_,i)=>get25Pre(i)) : []),
-    ...days26.map(d => get25(d))
-  ];
-  // Annotations: dia de acao (D+N de 2026) -> indice no eixo = preLabels.length + (D+N - days26[0])
-  const PRE_OFFSET = preLabels.length;
-  const annotations = (function(){
-    const ann = {};
-    ACOES.forEach((a, i) => {
-      if (!acoesVisiveis[a.tipo]) return;
-      const idx = days26.indexOf(a.dia);
-      if (idx === -1) return;
-      const cfg = ACAO_CONFIG[a.tipo];
-      ann['acao_'+i] = {
-        type:'line', xMin: idx + PRE_OFFSET, xMax: idx + PRE_OFFSET,
-        borderColor: cfg.cor, borderWidth: 2, borderDash: cfg.dash,
-      };
-    });
-    return ann;
-  })();
+  const data26 = days26.map(d => get26(d));
+  const data25 = days26.map(d => get25(d));
+  const annotations = getAcoesAnnotations(days26);
 
   if (chartVendas) chartVendas.destroy();
   const ctx = document.getElementById('chartVendas').getContext('2d');
@@ -1191,27 +1157,13 @@ function buildVendasChart(days26) {
         tooltip:{...tooltipBase,
           callbacks:{
             title: items => {
-              const idx = items[0].dataIndex;
-              const dateLabel = items[0].label;
-              const d25 = (showPre ? idx + 1 : idx + days26[0] + PRE_DAYS);
-              // showPre=true: idx 0..16 = 2025 D+1..17 (so 2025); idx 17+ = 2025 D+18+ E 2026 D+1+
-              // showPre=false: idx 0+ = 2025 D+(days26[0]+PRE_DAYS) E 2026 D+days26[0]
-              const inPre = showPre && idx < PRE_DAYS;
-              if (inPre) return dateLabel + ' · 2025 D+' + (idx + 1);
-              const d26 = showPre ? days26[idx - PRE_DAYS] : days26[idx];
-              const d25Real = d26 + PRE_DAYS;
-              return dateLabel + ' · 2025 D+' + d25Real + ' · 2026 D+' + d26;
+              const dPlus = days26[items[0].dataIndex];
+              const dt25 = new Date('2025-03-14T00:00:00'); dt25.setDate(dt25.getDate() + dPlus - 1);
+              const dt26 = new Date(CAMP_START_2026);       dt26.setDate(dt26.getDate() + dPlus - 1);
+              const f = d => d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+              return 'D+' + dPlus + '  ·  2025: ' + f(dt25) + '  ·  2026: ' + f(dt26);
             },
-            label: item => {
-              const idx = item.dataIndex;
-              const is26 = item.dataset.label === '2026';
-              const inPre = showPre && idx < PRE_DAYS;
-              if (is26 && inPre) return '';
-              const dPlus = is26
-                ? (showPre ? days26[idx - PRE_DAYS] : days26[idx])
-                : (inPre ? idx + 1 : (showPre ? days26[idx - PRE_DAYS] + PRE_DAYS : days26[idx] + PRE_DAYS));
-              return ' ' + item.dataset.label + ' D+' + dPlus + ': R$ ' + Math.round(item.raw||0).toLocaleString('pt-BR');
-            },
+            label: item => ' ' + item.dataset.label + ': R$ ' + Math.round(item.raw||0).toLocaleString('pt-BR'),
           }
         },
         annotation:{annotations}

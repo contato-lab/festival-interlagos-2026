@@ -1170,8 +1170,8 @@ function getAnnotations() {
   ACOES.forEach((a, i) => {
     if (!acoesVisiveis[a.tipo]) return;
     const cfg = ACAO_CONFIG[a.tipo];
-    // D+1 (campanha 2026, 31/03) = index PRE_DAYS no grafico estendido
-    const xIndex = a.dia - 1 + PRE_DAYS;
+    // a.dia = D+ da campanha 2026; eixo unificado: D+1 = index 0
+    const xIndex = a.dia - 1;
     annotations[`acao_${i}`] = {
       type: 'line',
       xMin: xIndex, xMax: xIndex,
@@ -1184,23 +1184,15 @@ function getAnnotations() {
 }
 
 function buildComp() {
-  // Eixo extendido: 17 dias pre-lancamento 2025 (14/03 a 30/03) + 77 dias alinhados (31/03 a 15/06)
-  // 2025 tem dado em todo o eixo; 2026 so a partir do index PRE_DAYS (31/03)
-  const n = PRE_DAYS + D25.length; // 94
-  const labels=Array.from({length:n},(_,i)=>{
-    // i=0 -> 14/03/2025; i=PRE_DAYS -> 31/03/2026 (= DATA_INICIO)
-    const dt=new Date(DATA_INICIO);
-    dt.setDate(dt.getDate() + (i - PRE_DAYS));
-    const d=dt.getDate().toString().padStart(2,'0');
-    const m=dt.toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
-    return`${d}/${m}`;
-  });
-  // 2025: pre-lancamento + alinhado = 94 valores
-  const s25 = [...getSeries(D25_PRE,metricAtiva,edicaoAtiva), ...getSeries(D25,metricAtiva,edicaoAtiva)];
-  // 2026: nulls nos primeiros PRE_DAYS dias (sem dado), depois posicionado em d-1+PRE_DAYS
+  // Eixo unificado por DIA DE CAMPANHA: D+1..D+94 (94 dias)
+  // D+1 de 2025 = 14/03/2025 = D+1 de 2026 = 31/03/2026 (mesma posicao no eixo)
+  const n = D25_CAMPAIGN.length; // 94
+  const labels = Array.from({length:n}, (_,i) => 'D+'+(i+1));
+  const s25 = getSeries(D25_CAMPAIGN, metricAtiva, edicaoAtiva);
+  // 2026: alinhado por D+ de campanha (D+1 vai pro indice 0)
   const s26=Array(n).fill(null);
   D26.forEach(r=>{
-    const i=r.d-1+PRE_DAYS;
+    const i=r.d-1;
     if(i<0||i>=n)return;
     const mv=r.mv||0,mq=r.mq||0,av=r.av||0,aq=r.aq||0;
     const tv=mv+av,tq=mq+aq;
@@ -1239,20 +1231,15 @@ function buildComp() {
       afterDraw(chart){
         const ctx=chart.ctx, xS=chart.scales.x, n=chart.data.labels.length;
         ctx.save();
-        ctx.font="9px 'Barlow Condensed',sans-serif";
+        ctx.font="8px 'Barlow Condensed',sans-serif";
         ctx.textAlign='center';
         for(let i=0;i<n;i++){
-          const d26 = i - PRE_DAYS + 1; // D+ da campanha 2026
-          const d25 = i + 1;             // D+ da campanha 2025
-          if (d26 >= 1 && (d26-1)%7===0) {
-            // tem ambos: mostra 2026 D+ (principal) e 2025 D+ menor abaixo
-            ctx.fillStyle='#999';
-            ctx.fillText('26·D+'+d26, xS.getPixelForValue(i), xS.bottom+13);
-          } else if (d26 < 1 && (i)%7===0) {
-            // so 2025: mostra 2025 D+
-            ctx.fillStyle='#666';
-            ctx.fillText('25·D+'+d25, xS.getPixelForValue(i), xS.bottom+13);
-          }
+          if (i%7!==0) continue;
+          const dt25=new Date('2025-03-14T00:00:00'); dt25.setDate(dt25.getDate()+i);
+          const dt26=new Date(DATA_INICIO);            dt26.setDate(dt26.getDate()+i);
+          const f=d=>d.getDate()+'/'+(d.getMonth()+1);
+          ctx.fillStyle='#666';
+          ctx.fillText(f(dt25)+'→'+f(dt26), xS.getPixelForValue(i), xS.bottom+13);
         }
         ctx.restore();
       }
@@ -1270,60 +1257,43 @@ function buildComp() {
           callbacks:{
             title: items => {
               const idx = items[0].dataIndex;
-              const d25 = idx + 1;                   // D+ da campanha 2025 (D+1 = 14/03)
-              const d26 = idx - PRE_DAYS + 1;        // D+ da campanha 2026 (D+1 = 31/03)
-              const dt = new Date(DATA_INICIO);
-              dt.setDate(dt.getDate() + (idx - PRE_DAYS));
-              const dateStr = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-              const dStr = d26 < 1 ? `2025 D+${d25}` : `2025 D+${d25} · 2026 D+${d26}`;
-              if (d26 < 1) return `${dateStr} · ${dStr}`;
-              const acoesNoDia = ACOES.filter(a => a.dia === d26 && acoesVisiveis[a.tipo]);
+              const dPlus = idx + 1;
+              const dt25 = new Date('2025-03-14T00:00:00'); dt25.setDate(dt25.getDate() + idx);
+              const dt26 = new Date(DATA_INICIO);           dt26.setDate(dt26.getDate() + idx);
+              const f = d => d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+              const head = `D+${dPlus}  ·  2025: ${f(dt25)}  ·  2026: ${f(dt26)}`;
+              const acoesNoDia = ACOES.filter(a => a.dia === dPlus && acoesVisiveis[a.tipo]);
               if (acoesNoDia.length) {
                 const label = acoesNoDia.map(a=>`${ACAO_CONFIG[a.tipo].icone} ${a.titulo}`).join(' · ');
-                return `${dateStr} · ${dStr} · ${label}`;
+                return `${head}  ·  ${label}`;
               }
-              return `${dateStr} · ${dStr}`;
+              return head;
             },
             label: ctx => {
               const idx = ctx.dataIndex;
               const is26 = ctx.dataset.label.includes('2026');
-              // 2025 D+ = idx+1; 2026 D+ = idx-PRE_DAYS+1
-              let row, dPlus;
-              if (is26) {
-                dPlus = idx - PRE_DAYS + 1;
-                if (dPlus < 1) return null;
-                row = D26.find(r=>r.d===dPlus) || D26[dPlus-1];
-              } else {
-                dPlus = idx + 1;
-                row = idx < PRE_DAYS ? D25_PRE[idx] : D25[idx - PRE_DAYS];
-              }
+              const dPlus = idx + 1;
+              const row = is26
+                ? (D26.find(r=>r.d===dPlus) || D26[dPlus-1])
+                : D25_CAMPAIGN[idx];
               if (!row) return null;
               const mq=row.mq||0, aq=row.aq||0, mv=row.mv||0, av=row.av||0;
               const ing = edicaoAtiva==='motos' ? mq : edicaoAtiva==='autos' ? aq : mq+aq;
               const rec = edicaoAtiva==='motos' ? mv : edicaoAtiva==='autos' ? av : mv+av;
               const year = is26 ? '2026' : '2025';
               const edLabel = edicaoAtiva==='motos' ? ' Motos' : edicaoAtiva==='autos' ? ' Autos' : ' Total';
-              const yearD = `${year} D+${dPlus}${edLabel}`;
+              const yearD = `${year}${edLabel}`;
               if (metricAtiva === 'ingressos') {
-                return [
-                  yearD,
-                  `  Ingressos : ${fmtN(ing)}`,
-                  `  Receita   : ${fmtR(rec)}`
-                ];
+                return [yearD, `  Ingressos : ${fmtN(ing)}`, `  Receita   : ${fmtR(rec)}`];
               } else {
-                return [
-                  yearD,
-                  `  Receita   : ${fmtR(rec)}`,
-                  `  Ingressos : ${fmtN(ing)}`
-                ];
+                return [yearD, `  Receita   : ${fmtR(rec)}`, `  Ingressos : ${fmtN(ing)}`];
               }
             },
             afterBody: items => {
               const idx = items[0].dataIndex;
-              const d26 = idx - PRE_DAYS + 1;
-              if (d26 < 1) return []; // pre-lancamento: nao tem gasto Meta/Google de 2026
+              const dPlus = idx + 1;
               const dt = new Date(DATA_INICIO);
-              dt.setDate(dt.getDate() + (idx - PRE_DAYS));
+              dt.setDate(dt.getDate() + (dPlus - 1));
               const dateStr = dt.toISOString().split('T')[0];
               const gastoG = getGadsSpend(dateStr);
               const gastoM = getMetaSpend(dateStr);
@@ -1339,7 +1309,7 @@ function buildComp() {
         }
       },
       scales:{
-        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:window.innerWidth<=768?6:7},autoSkip:window.innerWidth<=768,maxTicksLimit:window.innerWidth<=768?15:undefined,maxRotation:0,callback:(v,i)=>{const dt=new Date(DATA_INICIO);dt.setDate(dt.getDate()+(i-PRE_DAYS));const d=dt.getDate();return(i===0||d===1)?d+'/'+(dt.getMonth()+1):''+d;}}},
+        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:window.innerWidth<=768?6:7},autoSkip:false,maxTicksLimit:window.innerWidth<=768?15:undefined,maxRotation:0,callback:(v,i)=>i%7===0?'D+'+(i+1):''}},
         y:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:10},callback:v=>metricAtiva==='ingressos'?fmtN(v):fmtK(v)}}
       }
     }

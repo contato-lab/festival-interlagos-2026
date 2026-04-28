@@ -1429,17 +1429,13 @@ function execToggleAcaoTl(tipo, el) {
 
 function buildExecTimelineChart() {
   const ctx = document.getElementById('exec-chartTimeline');
-  if(!ctx || !D25 || !D25.length) return;
+  if(!ctx || !D25_CAMPAIGN || !D25_CAMPAIGN.length) return;
 
-  // Eixo extendido: 17 dias pre-lancamento 2025 (14/03 a 30/03) + 77 dias alinhados (31/03 a 15/06)
-  // Linha 2025 mostrada em todo o eixo. Linha 2026 so a partir do indice PRE_DAYS (31/03).
-  const n = PRE_DAYS + D25.length; // 94
-  const labels = Array.from({length:n}, (_,i) => {
-    // i=0 -> 14/03; i=PRE_DAYS -> 31/03 (= DATA_INICIO)
-    const dt = new Date(DATA_INICIO);
-    dt.setDate(dt.getDate() + (i - PRE_DAYS));
-    return dt.getDate().toString().padStart(2,'0') + '/' + dt.toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
-  });
+  // Eixo unificado por DIA DE CAMPANHA: D+1..D+94 (94 dias)
+  // D+1 de 2025 = 14/03/2025 = D+1 de 2026 = 31/03/2026 (mesmo ponto no eixo)
+  // Tooltip mostra ambas datas reais. Labels mostram "D+N" + datas embaixo.
+  const n = D25_CAMPAIGN.length; // 94
+  const labels = Array.from({length:n}, (_,i) => 'D+'+(i+1));
 
   const getVal = (r) => {
     if(!r) return null;
@@ -1447,22 +1443,17 @@ function buildExecTimelineChart() {
     return execTlMetric === 'receita' ? (mv + av) : (mq + aq);
   };
 
-  // 2025: pre-lancamento + alinhado (94 valores total)
-  const s25 = [...D25_PRE.map(getVal), ...D25.map(getVal)];
-  // 2026: nulls nos primeiros PRE_DAYS dias
+  // 2025: D+1..D+94 da campanha 2025 (14/03 a 15/06/2025)
+  const s25 = D25_CAMPAIGN.map(getVal);
+  // 2026: D+1..D+N da campanha 2026 (31/03/2026 em diante), alinhado por dia de campanha
   const s26 = Array(n).fill(null);
   (D26_FULL || []).forEach(r => {
-    const i = r.d - 1 + PRE_DAYS;
+    const i = r.d - 1; // D+1 vai pro indice 0 do eixo
     if(i >= 0 && i < n) s26[i] = getVal(r);
   });
 
-  // Days = D+ da campanha 2026 que aparecem no eixo (1..77)
-  const days = Array.from({length: D25.length}, (_,i) => i+1);
-  // Anotacoes: passa array com offset (pre-launch como dummies negativos para nao bater com action.day26)
-  const daysForAnn = [];
-  for (let i=0; i<PRE_DAYS; i++) daysForAnn.push(-1000-i); // dummies para nao colidir
-  for (let i=1; i<=D25.length; i++) daysForAnn.push(i);
-  const anns = execGetTvAnnotations(daysForAnn);
+  const days = Array.from({length: n}, (_,i) => i+1);
+  const anns = execGetTvAnnotations(days);
 
   if(_execChartTl) _execChartTl.destroy();
   _execChartTl = new Chart(ctx, {
@@ -1498,32 +1489,29 @@ function buildExecTimelineChart() {
           callbacks: {
             title: items => {
               const idx = items[0].dataIndex;
-              const d25 = idx + 1;                   // D+ da campanha 2025 (D+1 = 14/03)
-              const d26 = idx - PRE_DAYS + 1;        // D+ da campanha 2026 (D+1 = 31/03)
-              const dt = new Date(DATA_INICIO);
-              dt.setDate(dt.getDate() + (idx - PRE_DAYS));
-              const dateStr = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-              if (d26 < 1) return dateStr + ' · 2025 D+' + d25;
-              return dateStr + ' · 2025 D+' + d25 + ' · 2026 D+' + d26;
+              const dPlus = idx + 1;
+              // Datas calendario: 2025 D+N = 14/03/2025 + (N-1); 2026 D+N = 31/03/2026 + (N-1)
+              const dt25 = new Date('2025-03-14T00:00:00'); dt25.setDate(dt25.getDate() + idx);
+              const dt26 = new Date(DATA_INICIO);           dt26.setDate(dt26.getDate() + idx);
+              const f = d => d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+              return 'D+' + dPlus + '  ·  2025: ' + f(dt25) + '  ·  2026: ' + f(dt26);
             },
             label: c => {
               const idx = c.dataIndex;
               const is26 = c.dataset.label === '2026';
-              let row, dPlus;
+              const dPlus = idx + 1;
+              let row;
               if (is26) {
-                dPlus = idx - PRE_DAYS + 1;
-                if (dPlus < 1) return '';
                 row = (D26_FULL || []).find(r => r.d === dPlus);
               } else {
-                dPlus = idx + 1;
-                row = idx < PRE_DAYS ? D25_PRE[idx] : D25[idx - PRE_DAYS];
+                row = D25_CAMPAIGN[idx];
               }
               if (!row) return '';
               const rec = (row.mv||0) + (row.av||0);
               const ing = (row.mq||0) + (row.aq||0);
               const recFmt = 'R$ ' + rec.toLocaleString('pt-BR',{maximumFractionDigits:0});
               const ingFmt = ing.toLocaleString('pt-BR') + ' ing.';
-              return c.dataset.label + ' D+' + dPlus + ': ' + recFmt + ' · ' + ingFmt;
+              return c.dataset.label + ': ' + recFmt + ' · ' + ingFmt;
             }
           }
         }
@@ -1533,7 +1521,14 @@ function buildExecTimelineChart() {
           ticks: {
             color: '#666', font: { size: 9 },
             maxTicksLimit: 14,
-            callback: function(val, i) { return i % 7 === 0 ? this.getLabelForValue(val) : ''; }
+            callback: function(val, i) {
+              if (i % 7 !== 0) return '';
+              // Mostra "D+N" + datas resumidas: "14/3→31/3"
+              const dt25 = new Date('2025-03-14T00:00:00'); dt25.setDate(dt25.getDate() + i);
+              const dt26 = new Date(DATA_INICIO); dt26.setDate(dt26.getDate() + i);
+              const f = d => d.getDate() + '/' + (d.getMonth()+1);
+              return ['D+'+(i+1), f(dt25)+'→'+f(dt26)];
+            }
           },
           grid: { color: 'rgba(255,255,255,.03)' }
         },
