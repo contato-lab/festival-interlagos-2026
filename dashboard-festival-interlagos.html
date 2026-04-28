@@ -1243,13 +1243,15 @@ function buildComp() {
         ctx.textAlign='center';
         for(let i=0;i<n;i++){
           const d26 = i - PRE_DAYS + 1; // D+ da campanha 2026
+          const d25 = i + 1;             // D+ da campanha 2025
           if (d26 >= 1 && (d26-1)%7===0) {
-            ctx.fillStyle='#777';
-            ctx.fillText('D+'+d26, xS.getPixelForValue(i), xS.bottom+13);
+            // tem ambos: mostra 2026 D+ (principal) e 2025 D+ menor abaixo
+            ctx.fillStyle='#999';
+            ctx.fillText('26·D+'+d26, xS.getPixelForValue(i), xS.bottom+13);
           } else if (d26 < 1 && (i)%7===0) {
-            // pre-lancamento 2025: marcar como "pre" em roxo claro
+            // so 2025: mostra 2025 D+
             ctx.fillStyle='#666';
-            ctx.fillText('pré', xS.getPixelForValue(i), xS.bottom+13);
+            ctx.fillText('25·D+'+d25, xS.getPixelForValue(i), xS.bottom+13);
           }
         }
         ctx.restore();
@@ -1268,32 +1270,31 @@ function buildComp() {
           callbacks:{
             title: items => {
               const idx = items[0].dataIndex;
-              const d26 = idx - PRE_DAYS + 1; // D+ da campanha 2026 (pode ser <=0 no pre-lancamento)
+              const d25 = idx + 1;                   // D+ da campanha 2025 (D+1 = 14/03)
+              const d26 = idx - PRE_DAYS + 1;        // D+ da campanha 2026 (D+1 = 31/03)
               const dt = new Date(DATA_INICIO);
               dt.setDate(dt.getDate() + (idx - PRE_DAYS));
               const dateStr = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-              if (d26 < 1) {
-                // pre-lancamento 2025: mostra so a data + label
-                return `${dateStr} · pré-lançamento 2025`;
-              }
+              const dStr = d26 < 1 ? `2025 D+${d25}` : `2025 D+${d25} · 2026 D+${d26}`;
+              if (d26 < 1) return `${dateStr} · ${dStr}`;
               const acoesNoDia = ACOES.filter(a => a.dia === d26 && acoesVisiveis[a.tipo]);
               if (acoesNoDia.length) {
                 const label = acoesNoDia.map(a=>`${ACAO_CONFIG[a.tipo].icone} ${a.titulo}`).join(' · ');
-                return `${dateStr} · ${label}`;
+                return `${dateStr} · ${dStr} · ${label}`;
               }
-              return `${dateStr} · D+${d26}`;
+              return `${dateStr} · ${dStr}`;
             },
             label: ctx => {
               const idx = ctx.dataIndex;
               const is26 = ctx.dataset.label.includes('2026');
-              // 2025: pre-lancamento (idx<PRE_DAYS) usa D25_PRE; alinhado usa D25[idx-PRE_DAYS]
-              // 2026: indice no D26 = idx - PRE_DAYS + 1
-              let row;
+              // 2025 D+ = idx+1; 2026 D+ = idx-PRE_DAYS+1
+              let row, dPlus;
               if (is26) {
-                const d26 = idx - PRE_DAYS + 1;
-                if (d26 < 1) return null;
-                row = D26.find(r=>r.d===d26) || D26[d26-1];
+                dPlus = idx - PRE_DAYS + 1;
+                if (dPlus < 1) return null;
+                row = D26.find(r=>r.d===dPlus) || D26[dPlus-1];
               } else {
+                dPlus = idx + 1;
                 row = idx < PRE_DAYS ? D25_PRE[idx] : D25[idx - PRE_DAYS];
               }
               if (!row) return null;
@@ -1302,16 +1303,16 @@ function buildComp() {
               const rec = edicaoAtiva==='motos' ? mv : edicaoAtiva==='autos' ? av : mv+av;
               const year = is26 ? '2026' : '2025';
               const edLabel = edicaoAtiva==='motos' ? ' Motos' : edicaoAtiva==='autos' ? ' Autos' : ' Total';
-              // Métrica ativa aparece primeiro — evita confusão visual
+              const yearD = `${year} D+${dPlus}${edLabel}`;
               if (metricAtiva === 'ingressos') {
                 return [
-                  `${year}${edLabel}`,
+                  yearD,
                   `  Ingressos : ${fmtN(ing)}`,
                   `  Receita   : ${fmtR(rec)}`
                 ];
               } else {
                 return [
-                  `${year}${edLabel}`,
+                  yearD,
                   `  Receita   : ${fmtR(rec)}`,
                   `  Ingressos : ${fmtN(ing)}`
                 ];

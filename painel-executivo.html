@@ -1498,22 +1498,24 @@ function buildExecTimelineChart() {
           callbacks: {
             title: items => {
               const idx = items[0].dataIndex;
-              const d26 = idx - PRE_DAYS + 1;
+              const d25 = idx + 1;                   // D+ da campanha 2025 (D+1 = 14/03)
+              const d26 = idx - PRE_DAYS + 1;        // D+ da campanha 2026 (D+1 = 31/03)
               const dt = new Date(DATA_INICIO);
               dt.setDate(dt.getDate() + (idx - PRE_DAYS));
               const dateStr = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-              if (d26 < 1) return dateStr + ' · pré-lançamento 2025';
-              return dateStr + ' · D+' + d26;
+              if (d26 < 1) return dateStr + ' · 2025 D+' + d25;
+              return dateStr + ' · 2025 D+' + d25 + ' · 2026 D+' + d26;
             },
             label: c => {
               const idx = c.dataIndex;
               const is26 = c.dataset.label === '2026';
-              let row;
+              let row, dPlus;
               if (is26) {
-                const d26 = idx - PRE_DAYS + 1;
-                if (d26 < 1) return '';
-                row = (D26_FULL || []).find(r => r.d === d26);
+                dPlus = idx - PRE_DAYS + 1;
+                if (dPlus < 1) return '';
+                row = (D26_FULL || []).find(r => r.d === dPlus);
               } else {
+                dPlus = idx + 1;
                 row = idx < PRE_DAYS ? D25_PRE[idx] : D25[idx - PRE_DAYS];
               }
               if (!row) return '';
@@ -1521,7 +1523,7 @@ function buildExecTimelineChart() {
               const ing = (row.mq||0) + (row.aq||0);
               const recFmt = 'R$ ' + rec.toLocaleString('pt-BR',{maximumFractionDigits:0});
               const ingFmt = ing.toLocaleString('pt-BR') + ' ing.';
-              return c.dataset.label + ': ' + recFmt + ' · ' + ingFmt;
+              return c.dataset.label + ' D+' + dPlus + ': ' + recFmt + ' · ' + ingFmt;
             }
           }
         }

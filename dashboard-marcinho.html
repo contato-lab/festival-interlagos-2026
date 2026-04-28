@@ -1190,8 +1190,28 @@ function buildVendasChart(days26) {
         legend:{display:false},
         tooltip:{...tooltipBase,
           callbacks:{
-            title: items => items[0].label,
-            label: item => ' '+item.dataset.label+': R$ '+Math.round(item.raw||0).toLocaleString('pt-BR'),
+            title: items => {
+              const idx = items[0].dataIndex;
+              const dateLabel = items[0].label;
+              const d25 = (showPre ? idx + 1 : idx + days26[0] + PRE_DAYS);
+              // showPre=true: idx 0..16 = 2025 D+1..17 (so 2025); idx 17+ = 2025 D+18+ E 2026 D+1+
+              // showPre=false: idx 0+ = 2025 D+(days26[0]+PRE_DAYS) E 2026 D+days26[0]
+              const inPre = showPre && idx < PRE_DAYS;
+              if (inPre) return dateLabel + ' · 2025 D+' + (idx + 1);
+              const d26 = showPre ? days26[idx - PRE_DAYS] : days26[idx];
+              const d25Real = d26 + PRE_DAYS;
+              return dateLabel + ' · 2025 D+' + d25Real + ' · 2026 D+' + d26;
+            },
+            label: item => {
+              const idx = item.dataIndex;
+              const is26 = item.dataset.label === '2026';
+              const inPre = showPre && idx < PRE_DAYS;
+              if (is26 && inPre) return '';
+              const dPlus = is26
+                ? (showPre ? days26[idx - PRE_DAYS] : days26[idx])
+                : (inPre ? idx + 1 : (showPre ? days26[idx - PRE_DAYS] + PRE_DAYS : days26[idx] + PRE_DAYS));
+              return ' ' + item.dataset.label + ' D+' + dPlus + ': R$ ' + Math.round(item.raw||0).toLocaleString('pt-BR');
+            },
           }
         },
         annotation:{annotations}
