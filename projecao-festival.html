@@ -7,6 +7,7 @@
 <title>Projeção de Receita — Suhai Festival Interlagos 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <style>
 :root {
   --lime:#C8FF00; --lime-dim:rgba(200,255,0,0.12); --lime-border:rgba(200,255,0,0.3);
@@ -378,6 +379,11 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       💡 <strong>Metodologia:</strong> curva 2025 real (94 dias, R$ 7,19M, 43.923 ingressos) esticada para os 151 dias de 2026, calibrada pelo ritmo real em ingressos, com uplifts das ações genuinamente novas em 2026.
       <br><strong>Novo em 2026:</strong> Programática ADSPLAY (R$ 600k rodando últimos 3 meses + festival) · +57 dias de campanha (151 vs 94).
       <br><strong>Já existia em 2025:</strong> Meta/Google/TikTok, TV Globo, Rádio BandNews, Influenciadores — embutidos na curva base, sem uplift duplicado.
+      <br><br><strong>📊 Como ler o gráfico:</strong>
+      <br>• <span style="color:#FF6B35">Linha laranja pontilhada</span> = 2025 no <strong>ritmo real</strong> (94 dias). Ela achata em 02/07 porque o festival 2025 já tinha rolado em junho. Onde 2026 fica abaixo dela = vendas mais lentas que 2025 no mesmo dia de campanha — <strong>natural</strong>, porque 2026 tem 57 dias a mais e o público distribui a compra.
+      <br>• <span style="color:#7B2D8B">Linha roxa tracejada</span> = 2025 <strong>esticada</strong> para 151 dias (comparação por % de progresso da campanha).
+      <br>• <span style="color:#C8FF00">Área verde</span> = vendas 2026 já realizadas em tempo real.
+      <br>• <span style="color:#C8FF00">Faixa "Rampa final"</span> = últimos 30 dias (29/07 → 28/08). É <strong>aqui que a explosão acontece</strong>: em 2025, ~60% dos ingressos foram vendidos nas últimas 4 semanas. A projeção 2026 já modela esse comportamento.
       <br><br><strong>Índice de viabilidade:</strong> calculado com base em 4 fatores — base do cenário (conservador 70% · realista 50% · otimista 25%), pace da janela curta, projeção linear do pace atual vs meta, e % do período decorrido. Não é probabilidade estatística, é um sinalizador de dificuldade que se atualiza a cada 60s com os dados novos.
     </div>
   </div>
@@ -700,6 +706,21 @@ function curve2025AcumStretched(){
   return out;
 }
 
+// 2025 ritmo REAL (sem stretch): 94 dias com a curva real, depois plateau no total.
+// Mostra que 2025 ja tinha acabado em D+94 (julho), enquanto 2026 vai ate D+151 (agosto).
+// Onde 2026 fica abaixo dessa curva = vendas mais lentas que 2025 no mesmo dia de campanha.
+function curve2025RealAcum(){
+  const out = [];
+  let acum = 0;
+  for(let i=0;i<DIAS_TOTAL;i++){
+    if(i < 94){
+      acum += (D25[i].mv + D25[i].av);
+    }
+    out.push(acum);
+  }
+  return out;
+}
+
 // ════════════════════════════════════════════════════
 // UI
 // ════════════════════════════════════════════════════
@@ -943,11 +964,18 @@ function renderChart(key){
   const serieProj = projetarSerie(c);
   const serieReal = serieProj.map((v,i) => i<STATE.d26_dias ? v : null);
   const serieFuturo = serieProj.map((v,i) => i>=STATE.d26_dias-1 ? v : null);
-  const curve25Acum = curve2025AcumStretched();
+  const curve25AcumStretch = curve2025AcumStretched();
+  const curve25AcumReal    = curve2025RealAcum();
   const labels = Array.from({length:DIAS_TOTAL}, (_,i)=>{
     const d = new Date(DATA_INICIO); d.setDate(d.getDate()+i);
     return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
   });
+
+  // Marcos chave (1-indexado: D+N => index N-1)
+  const D_FIM_2025  = 94;   // 02/07/2026 — onde 2025 chegou ao total final
+  const D_RAMPA     = 121;  // 29/07/2026 — inicio dos ultimos 30 dias (rampa de explosao)
+  const D_EVENTO    = 151;  // 28/08/2026 — Festival 2026
+
   const ctx = document.getElementById('fcChart');
   if(chart) chart.destroy();
   chart = new Chart(ctx, {
@@ -955,7 +983,10 @@ function renderChart(key){
     data:{
       labels,
       datasets:[
-        {label:'2025 (referência esticada)', data:curve25Acum, borderColor:'rgba(123,45,139,0.6)', backgroundColor:'rgba(123,45,139,0.04)', borderWidth:1.5, borderDash:[5,5], pointRadius:0, tension:.35, fill:false},
+        // 2025 RITMO REAL (sem stretch): plateau no total apos D+94. Mostra que 2025 ja tinha acabado em julho.
+        {label:'2025 (ritmo real, 94 dias)', data:curve25AcumReal, borderColor:'rgba(255,107,53,0.55)', backgroundColor:'rgba(255,107,53,0.04)', borderWidth:1.5, borderDash:[2,3], pointRadius:0, tension:.15, fill:false},
+        // 2025 esticado para 151 dias — comparacao "% de progresso da campanha"
+        {label:'2025 (esticado p/ 151 dias)', data:curve25AcumStretch, borderColor:'rgba(123,45,139,0.6)', backgroundColor:'rgba(123,45,139,0.04)', borderWidth:1.5, borderDash:[5,5], pointRadius:0, tension:.35, fill:false},
         {label:'2026 realizado', data:serieReal, borderColor:'#C8FF00', backgroundColor:'rgba(200,255,0,0.12)', borderWidth:3, pointRadius:0, tension:.25, fill:true},
         {label:'Projeção '+c.nome, data:serieFuturo, borderColor:c.color, backgroundColor:c.color+'15', borderWidth:2.5, borderDash:[2,3], pointRadius:0, tension:.25, fill:false}
       ]
@@ -964,7 +995,33 @@ function renderChart(key){
       responsive:true, maintainAspectRatio:false, interaction:{mode:'index', intersect:false},
       plugins:{
         legend:{display:true, labels:{color:'#BBB', font:{size:10, family:'Inter'}, usePointStyle:true, pointStyle:'line', boxWidth:24}},
-        tooltip:{backgroundColor:'#0A0A0A', titleColor:'#EEE', bodyColor:'#CCC', borderColor:'rgba(200,255,0,.3)', borderWidth:1, callbacks:{label: ci => ci.dataset.label + ': ' + (ci.parsed.y==null?'—':fmtFull(ci.parsed.y))}}
+        tooltip:{backgroundColor:'#0A0A0A', titleColor:'#EEE', bodyColor:'#CCC', borderColor:'rgba(200,255,0,.3)', borderWidth:1, callbacks:{label: ci => ci.dataset.label + ': ' + (ci.parsed.y==null?'—':fmtFull(ci.parsed.y))}},
+        annotation:{
+          annotations:{
+            // Area da rampa final (D+121 ate D+151) — onde se espera explosao de vendas
+            rampaArea:{
+              type:'box',
+              xMin: D_RAMPA-1, xMax: D_EVENTO-1,
+              backgroundColor:'rgba(200,255,0,0.05)',
+              borderColor:'rgba(200,255,0,0.18)',
+              borderWidth:1,
+              borderDash:[4,4],
+              label:{display:true, content:'Rampa final (-30 dias)', position:'start', color:'#C8FF00', font:{size:10, weight:600}, backgroundColor:'rgba(0,0,0,.7)', padding:4, yAdjust:-6}
+            },
+            // Linha vertical: fim do 2025 (D+94)
+            fim2025:{
+              type:'line', xMin: D_FIM_2025-1, xMax: D_FIM_2025-1,
+              borderColor:'rgba(255,107,53,0.5)', borderWidth:1.5, borderDash:[3,3],
+              label:{display:true, content:'2025 acabou aqui', position:'start', color:'#FF6B35', font:{size:9, weight:600}, backgroundColor:'rgba(0,0,0,.7)', padding:3, yAdjust:6}
+            },
+            // Linha vertical: evento 2026
+            evento:{
+              type:'line', xMin: D_EVENTO-1, xMax: D_EVENTO-1,
+              borderColor:'rgba(200,255,0,0.7)', borderWidth:2,
+              label:{display:true, content:'Festival 2026', position:'end', color:'#C8FF00', font:{size:10, weight:700}, backgroundColor:'rgba(0,0,0,.85)', padding:4, yAdjust:-4}
+            }
+          }
+        }
       },
       scales:{
         x:{ticks:{color:'#666', font:{size:9}, maxTicksLimit:10, callback:function(v,i){return i%20===0?this.getLabelForValue(v):'';}}, grid:{color:'rgba(255,255,255,.03)'}},
