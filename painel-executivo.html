@@ -412,6 +412,82 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   <div class="exec-chart-wrap"><canvas id="exec-chartTkt"></canvas></div>
 </div>
 
+<!-- ══ ANALISE DETALHADA TICKET MEDIO — para entender a queda ══ -->
+<div class="exec-chart-card" style="margin-top:16px;border:1px solid rgba(255,184,0,0.25);background:linear-gradient(135deg, rgba(255,184,0,0.03), rgba(20,20,20,0.5))">
+  <div class="section-header" style="margin-bottom:14px">
+    <div>
+      <div class="section-title">⚠️ Por que o Ticket Médio caiu? — Composição da venda 2025 vs 2026</div>
+      <div style="font-size:.72rem;color:#888;margin-top:4px">Análise da plataforma Ticketmaster · % meia, inteira, cortesia por ano</div>
+    </div>
+  </div>
+
+  <!-- KPIs comparativos: TKT pagantes (sem cortesia) -->
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:18px">
+    <!-- Motos -->
+    <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px">
+      <div style="font-size:.72rem;letter-spacing:.06em;color:#888;text-transform:uppercase;margin-bottom:8px">🏍️ TKT MÉDIO PAGANTES — MOTOS</div>
+      <div style="display:flex;gap:18px;align-items:baseline">
+        <div>
+          <div style="font-size:.65rem;color:#888">2025</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#aaa">R$ 99,42</div>
+        </div>
+        <div style="font-size:1rem;color:#666">→</div>
+        <div>
+          <div style="font-size:.65rem;color:#888">2026</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#C8FF00">R$ 89,61</div>
+        </div>
+        <div style="margin-left:auto;background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.4);padding:6px 12px;border-radius:8px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.3rem;color:#FF4444">▼ -9,9%</div>
+        </div>
+      </div>
+    </div>
+    <!-- Autos -->
+    <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px">
+      <div style="font-size:.72rem;letter-spacing:.06em;color:#888;text-transform:uppercase;margin-bottom:8px">🚗 TKT MÉDIO PAGANTES — AUTOS</div>
+      <div style="display:flex;gap:18px;align-items:baseline">
+        <div>
+          <div style="font-size:.65rem;color:#888">2025</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#aaa">R$ 102,40</div>
+        </div>
+        <div style="font-size:1rem;color:#666">→</div>
+        <div>
+          <div style="font-size:.65rem;color:#888">2026</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#C8FF00">R$ 92,70</div>
+        </div>
+        <div style="margin-left:auto;background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.4);padding:6px 12px;border-radius:8px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.3rem;color:#FF4444">▼ -9,5%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mix de venda: 2025 vs 2026 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:14px">
+    <div>
+      <div style="font-size:.78rem;color:#ccc;font-weight:700;margin-bottom:10px">🏍️ Composição da venda — Motos</div>
+      <div style="position:relative;height:200px"><canvas id="exec-chartMixMotos"></canvas></div>
+    </div>
+    <div>
+      <div style="font-size:.78rem;color:#ccc;font-weight:700;margin-bottom:10px">🚗 Composição da venda — Autos</div>
+      <div style="position:relative;height:200px"><canvas id="exec-chartMixAutos"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Insight para o chefe -->
+  <div style="background:rgba(255,184,0,0.06);border-left:3px solid #FFB800;border-radius:6px;padding:14px 16px;margin-top:6px">
+    <div style="font-size:.78rem;color:#FFB800;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px">📌 Conclusão para a diretoria</div>
+    <div style="font-size:.86rem;color:#ddd;line-height:1.55">
+      <strong style="color:#fff">Ticket médio dos pagantes caiu ~10% em 2026 vs 2025</strong>, em ambas edições. A causa é o <strong style="color:#C8FF00">aumento da venda de meia-entrada</strong>:
+      <ul style="margin:8px 0 8px 22px;padding:0">
+        <li><strong>Motos:</strong> meia subiu de <strong>25,7%</strong> em 2025 → <strong>35,5%</strong> em 2026 (+9,8 p.p.)</li>
+        <li><strong>Autos:</strong> meia subiu de <strong>25,7%</strong> em 2025 → <strong>43,3%</strong> em 2026 (+17,6 p.p.)</li>
+        <li>2026 ainda <strong style="color:#FFB800">não entrou na fase de cortesias</strong> (em 2025 foram 21-33% das vendas TM, distribuídas perto do evento) — quando isso ocorrer, o TKT total cai mais.</li>
+      </ul>
+      <span style="color:#aaa">⚠️ Mitigação: a campanha 2026 tem <strong style="color:#C8FF00">+57 dias</strong> que 2025. Volume maior pode compensar a queda de TKT, mas exige acompanhamento da rampa final (D+122 a D+151).</span>
+    </div>
+  </div>
+</div>
+
   <!-- ══ TIMELINE COMPLETA — 2025 vs 2026 ══ -->
   <div class="exec-chart-card" style="margin-top:16px">
     <div class="section-header" style="margin-bottom:10px">
@@ -1308,6 +1384,82 @@ function buildExecTktChart() {
   });
 }
 
+/* ═══ Mix de venda 2025 vs 2026 (TM only) — analise de queda do TKT ═══ */
+let _execChartMixM = null, _execChartMixA = null;
+function buildExecMixCharts(){
+  // Dados consolidados da analise da planilha activity (29/04 a 15/06/2025) e API TM 2026.
+  // 2026: como API nao retorna rate_name, agrupado por faixa de preco.
+  const data = {
+    motos: {
+      labels: ['Inteira (cheia)', 'Meia/Promo', 'Cortesia', 'Outros'],
+      _2025: { qtds:[12543, 6805, 5682, 1482], cor:['#888','#bbb','#666','#999'] }, // Meia+Idoso=6805
+      _2026: { qtds:[106, 3072, 0, 62], cor:['#C8FF00','rgba(200,255,0,.55)','#444','rgba(200,255,0,.85)'] } // 1151 baixo + 1921 medio = 3072
+    },
+    autos: {
+      labels: ['Inteira (cheia)', 'Meia/Promo', 'Cortesia', 'Outros'],
+      _2025: { qtds:[7038, 4473, 5704, 199], cor:['#888','#bbb','#666','#999'] }, // Meia+Idoso=4473
+      _2026: { qtds:[163, 1968, 0, 76], cor:['#C8FF00','rgba(200,255,0,.55)','#444','rgba(200,255,0,.85)'] } // 956+1012=1968
+    }
+  };
+  function pct(qtds){ const t=qtds.reduce((a,b)=>a+b,0); return qtds.map(q=>t?q/t*100:0); }
+  function build(canvasId, ed){
+    const ctx = document.getElementById(canvasId)?.getContext('2d');
+    if(!ctx) return null;
+    const d = data[ed];
+    const p25 = pct(d._2025.qtds), p26 = pct(d._2026.qtds);
+    const datasets = d.labels.map((lbl,i) => ({
+      label: lbl,
+      data: [p25[i], p26[i]],
+      backgroundColor: i===0 ? ['#666','#C8FF00'][0] :
+                       i===1 ? ['rgba(255,184,0,.65)','rgba(255,184,0,.65)'][0] :
+                       i===2 ? ['rgba(255,68,68,.4)','#333'][0] :
+                       ['#999','rgba(200,255,0,.85)'][0],
+      stack: 'mix',
+      barThickness: 38,
+      borderColor: '#0A0A0A',
+      borderWidth: 1
+    }));
+    // Custom colors per (label, year) - simpler approach:
+    const cols = {
+      'Inteira (cheia)':['#bbb','#C8FF00'],
+      'Meia/Promo':     ['rgba(255,184,0,.65)','rgba(255,184,0,.85)'],
+      'Cortesia':       ['rgba(255,68,68,.45)','rgba(255,68,68,.20)'],
+      'Outros':         ['#666','#999']
+    };
+    datasets.forEach((ds,idx)=>{
+      const c = cols[d.labels[idx]] || ['#888','#bbb'];
+      ds.backgroundColor = c;
+    });
+    return new Chart(ctx, {
+      type:'bar',
+      data:{ labels:['2025','2026'], datasets },
+      options:{
+        responsive:true, maintainAspectRatio:false, indexAxis:'y',
+        plugins:{
+          legend:{display:true, position:'bottom', labels:{color:'#aaa',font:{size:10},boxWidth:12,padding:8}},
+          tooltip:{
+            callbacks:{
+              label: ctx => {
+                const yr = ctx.dataIndex===0 ? '_2025' : '_2026';
+                const qty = data[ed][yr].qtds[datasets.indexOf(ctx.dataset)];
+                return ctx.dataset.label + ': ' + ctx.parsed.x.toFixed(1) + '% (' + qty.toLocaleString('pt-BR') + ' ing)';
+              }
+            }
+          }
+        },
+        scales:{
+          x:{ stacked:true, max:100, ticks:{color:'#888',font:{size:10},callback:v=>v+'%'}, grid:{color:'rgba(255,255,255,.04)'} },
+          y:{ stacked:true, ticks:{color:'#ddd',font:{size:11,weight:700}}, grid:{display:false} }
+        }
+      }
+    });
+  }
+  if(_execChartMixM) _execChartMixM.destroy();
+  if(_execChartMixA) _execChartMixA.destroy();
+  _execChartMixM = build('exec-chartMixMotos', 'motos');
+  _execChartMixA = build('exec-chartMixAutos', 'autos');
+}
+
 /* ═══ Conversoes ═══ */
 function renderExecConversoes() {
   const invest    = buildExecD26Invest(execFiltFrom, execFiltTo);
@@ -1435,6 +1587,7 @@ function renderPainelExecutivo() {
   buildExecVendasChart();
   buildExecInvestChart();
   buildExecTktChart();
+  buildExecMixCharts();
   buildExecTimelineChart();
   buildExecTMCharts();
   renderExecConversoes();
