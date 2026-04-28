@@ -1087,9 +1087,10 @@ function buildExecVendasChart() {
   const metric = execCurrentVendasMetric;
   const labels = days.map(d => 'D+'+d);
   const getRec26 = d => { const r=D26_FULL.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
-  const getRec25 = d => { const r=D25.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
+  // 2025 usa D25_CAMPAIGN (94 dias, D+1 = 14/03/2025) - mesmo dia de campanha vs 2026
+  const getRec25 = d => { const r=D25_CAMPAIGN.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
   const getQtd26 = d => { const r=D26_FULL.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mq:metric==='autos'?r.aq:r.mq+r.aq; };
-  const getQtd25 = d => { const r=D25.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mq:metric==='autos'?r.aq:r.mq+r.aq; };
+  const getQtd25 = d => { const r=D25_CAMPAIGN.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mq:metric==='autos'?r.aq:r.mq+r.aq; };
 
   if(execChartVendas) execChartVendas.destroy();
   const ctx = document.getElementById('exec-chartVendas')?.getContext('2d');
