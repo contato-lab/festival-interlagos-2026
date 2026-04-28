@@ -477,13 +477,14 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   <div style="background:rgba(255,184,0,0.06);border-left:3px solid #FFB800;border-radius:6px;padding:14px 16px;margin-top:6px">
     <div style="font-size:.78rem;color:#FFB800;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px">📌 Conclusão para a diretoria</div>
     <div style="font-size:.86rem;color:#ddd;line-height:1.55">
-      <strong style="color:#fff">Ticket médio dos pagantes caiu ~10% em 2026 vs 2025</strong>, em ambas edições. A causa é o <strong style="color:#C8FF00">aumento da venda de meia-entrada</strong>:
+      <strong style="color:#fff">Ticket médio dos pagantes caiu ~10% em 2026 vs 2025</strong>, em ambas edições. Comparando a composição da venda <strong>entre os pagantes</strong> (excluindo cortesias dos dois anos):
       <ul style="margin:8px 0 8px 22px;padding:0">
-        <li><strong>Motos:</strong> meia subiu de <strong>25,7%</strong> em 2025 → <strong>35,5%</strong> em 2026 (+9,8 p.p.)</li>
-        <li><strong>Autos:</strong> meia subiu de <strong>25,7%</strong> em 2025 → <strong>43,3%</strong> em 2026 (+17,6 p.p.)</li>
-        <li>2026 ainda <strong style="color:#FFB800">não entrou na fase de cortesias</strong> (em 2025 foram 21-33% das vendas TM, distribuídas perto do evento) — quando isso ocorrer, o TKT total cai mais.</li>
+        <li><strong>Motos:</strong> meia foi <strong>32,7%</strong> em 2025 → <strong>35,5%</strong> em 2026 (+2,8 p.p. — leve aumento)</li>
+        <li><strong>Autos:</strong> meia foi <strong>38,2%</strong> em 2025 → <strong>43,3%</strong> em 2026 (+5,1 p.p.)</li>
+        <li>2026 está vendendo mais <strong>Street Pass R$ 98</strong> (inteira primeiro lote) e R$ 49 (meia) — mix que rebaixa o TKT vs 2025 que vendeu mais inteira a R$ 123-130 médios.</li>
+        <li>2026 ainda <strong style="color:#FFB800">não entrou na fase de cortesias</strong> (em 2025 foram 21-33% das vendas TM, distribuídas perto do evento) — quando isso ocorrer, o TKT total (com cortesia) cai ainda mais.</li>
       </ul>
-      <span style="color:#aaa">⚠️ Mitigação: a campanha 2026 tem <strong style="color:#C8FF00">+57 dias</strong> que 2025. Volume maior pode compensar a queda de TKT, mas exige acompanhamento da rampa final (D+122 a D+151).</span>
+      <span style="color:#aaa">⚠️ Mitigação: a campanha 2026 tem <strong style="color:#C8FF00">+57 dias</strong> que 2025. Volume maior + previsão de fases de preço crescentes (segundo lote, terceiro lote) podem recuperar o TKT na rampa final.</span>
     </div>
   </div>
 </div>
@@ -1387,18 +1388,27 @@ function buildExecTktChart() {
 /* ═══ Mix de venda 2025 vs 2026 (TM only) — analise de queda do TKT ═══ */
 let _execChartMixM = null, _execChartMixA = null;
 function buildExecMixCharts(){
-  // Dados consolidados da analise da planilha activity (29/04 a 15/06/2025) e API TM 2026.
-  // 2026: como API nao retorna rate_name, agrupado por faixa de preco.
+  // Dados consolidados — categorizacao corrigida pelos PRECOS reais 2026:
+  //   R$98 Street Pass = INTEIRA primeiro lote
+  //   R$49 Street Pass = MEIA primeiro lote
+  //   R$148 Pista Premium = INTEIRA Pista Premium
+  //   R$83.30, R$88.20 = descontos promocionais sobre inteira
+  //   R$980 = VIP Lounge (categoria propria)
+  // 2025: planilha activity Ticketmaster (29/04 a 15/06/2025)
   const data = {
     motos: {
-      labels: ['Inteira (cheia)', 'Meia/Promo', 'Cortesia', 'Outros'],
-      _2025: { qtds:[12543, 6805, 5682, 1482], cor:['#888','#bbb','#666','#999'] }, // Meia+Idoso=6805
-      _2026: { qtds:[106, 3072, 0, 62], cor:['#C8FF00','rgba(200,255,0,.55)','#444','rgba(200,255,0,.85)'] } // 1151 baixo + 1921 medio = 3072
+      labels: ['Inteira', 'Meia', 'Promo/Desconto', 'Cortesia', 'VIP'],
+      // 2025: Inteira=12543, Meia(+idoso)=6805, Desc.Patroc=1482, Cortesia=5682, VIP=0 (incluido em produtos)
+      _2025: { qtds:[12543, 6805, 1482, 5682, 0] },
+      // 2026: Inteira=1816 (R$98+R$148+R$296), Meia=1151 (R$49), Promo=252 (R$83-88,R$266,R$833), Cortesia=0, VIP=21 (R$980)
+      _2026: { qtds:[1816, 1151, 252, 0, 21] }
     },
     autos: {
-      labels: ['Inteira (cheia)', 'Meia/Promo', 'Cortesia', 'Outros'],
-      _2025: { qtds:[7038, 4473, 5704, 199], cor:['#888','#bbb','#666','#999'] }, // Meia+Idoso=4473
-      _2026: { qtds:[163, 1968, 0, 76], cor:['#C8FF00','rgba(200,255,0,.55)','#444','rgba(200,255,0,.85)'] } // 956+1012=1968
+      labels: ['Inteira', 'Meia', 'Promo/Desconto', 'Cortesia', 'VIP'],
+      // 2025: Inteira=7038, Meia(+idoso)=4473, Promo=199, Cortesia=5704, VIP=0
+      _2025: { qtds:[7038, 4473, 199, 5704, 0] },
+      // 2026: Inteira=1173 (R$98+R$148+R$296), Meia=956 (R$49), Promo=61, Cortesia=0, VIP=17 (R$980)
+      _2026: { qtds:[1173, 956, 61, 0, 17] }
     }
   };
   function pct(qtds){ const t=qtds.reduce((a,b)=>a+b,0); return qtds.map(q=>t?q/t*100:0); }
@@ -1419,12 +1429,13 @@ function buildExecMixCharts(){
       borderColor: '#0A0A0A',
       borderWidth: 1
     }));
-    // Custom colors per (label, year) - simpler approach:
+    // Cores por categoria (mesma para 2025 e 2026 — comparacao visual direta)
     const cols = {
-      'Inteira (cheia)':['#bbb','#C8FF00'],
-      'Meia/Promo':     ['rgba(255,184,0,.65)','rgba(255,184,0,.85)'],
-      'Cortesia':       ['rgba(255,68,68,.45)','rgba(255,68,68,.20)'],
-      'Outros':         ['#666','#999']
+      'Inteira':        ['#7FB800','#C8FF00'],          // verde/lime = inteira (preco cheio)
+      'Meia':           ['#FFB800','#FFB800'],          // amarelo = meia
+      'Promo/Desconto': ['rgba(255,140,0,.65)','rgba(255,140,0,.65)'], // laranja
+      'Cortesia':       ['rgba(255,68,68,.55)','rgba(255,68,68,.55)'], // vermelho
+      'VIP':            ['#9B3DAB','#9B3DAB']           // roxo
     };
     datasets.forEach((ds,idx)=>{
       const c = cols[d.labels[idx]] || ['#888','#bbb'];
