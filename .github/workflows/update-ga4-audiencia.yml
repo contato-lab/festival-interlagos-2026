@@ -1,9 +1,13 @@
-name: Update GA4 Audiencia Motos
+name: GA4 Audiencia Motos 2025 (relatorio one-shot)
 
+# Roda APENAS quando o arquivo do script muda (push) ou disparo manual.
+# Nao tem cron - este eh um job de relatorio historico (campanha 2025), nao recorrente.
 on:
-  workflow_dispatch:          # roda manualmente sob demanda
-  schedule:
-    - cron: '37 */6 * * *'    # a cada 6h, offset minuto 37 pra evitar colisao
+  push:
+    paths:
+      - 'update-ga4-audiencia-motos.py'
+      - '.github/workflows/update-ga4-audiencia.yml'
+  workflow_dispatch:
 
 jobs:
   update:
@@ -38,11 +42,11 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add ga4-audiencia-motos.json
+          git add ga4-audiencia-motos-2025.json
           if git diff --staged --quiet; then echo "sem mudancas"; exit 0; fi
-          git commit -m "chore: update ga4-audiencia-motos.json [skip ci]"
+          git commit -m "chore: update ga4-audiencia-motos-2025.json [skip ci]"
           for i in 1 2 3 4 5 6 7 8 9 10; do
-            git pull --rebase origin main 2>&1 || { git rebase --abort 2>/dev/null || true; git add ga4-audiencia-motos.json; git diff --staged --quiet || git commit -m "chore: update [skip ci]" --allow-empty; }
+            git pull --rebase origin main 2>&1 || { git rebase --abort 2>/dev/null || true; git add ga4-audiencia-motos-2025.json; git diff --staged --quiet || git commit -m "chore: update [skip ci]" --allow-empty; }
             if git push 2>&1; then echo "Push OK $i"; exit 0; fi
             sleep $((RANDOM % 15 + 5))
           done

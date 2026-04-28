@@ -18,9 +18,11 @@ from google.analytics.data_v1beta.types import (
 )
 
 PROPERTY_ID  = os.environ.get("GA4_PROPERTY_ID", "378336436")
-OUTPUT_FILE  = "ga4-audiencia-motos.json"
+OUTPUT_FILE  = "ga4-audiencia-motos-2025.json"
 SCOPES       = ["https://www.googleapis.com/auth/analytics.readonly"]
-LOOKBACK     = 60  # dias
+# Periodo da campanha 2025: 14/03/2025 a 15/06/2025 (94 dias)
+PERIODO_INICIO = "2025-03-14"
+PERIODO_FIM    = "2025-06-15"
 
 # Filtro: paginas relacionadas a Edicao Motos
 MOTOS_HOST_FILTER = FilterExpression(or_group=FilterExpressionList(expressions=[
@@ -89,10 +91,8 @@ def query(client, dim, start, end, limit=50, order_by_metric=True, extra_filter=
 
 
 def main():
-    end = datetime.now(timezone.utc) - timedelta(days=1)
-    start = end - timedelta(days=LOOKBACK)
-    s, e = start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d")
-    print(f"Periodo: {s} -> {e}")
+    s, e = PERIODO_INICIO, PERIODO_FIM
+    print(f"Periodo CAMPANHA 2025: {s} -> {e}")
 
     client = get_client()
     print("Cliente GA4 OK. Property:", PROPERTY_ID)
@@ -101,7 +101,8 @@ def main():
         "updated_at":  datetime.now(timezone.utc).isoformat(),
         "property_id": PROPERTY_ID,
         "edition":     "Motos",
-        "period":      {"start": s, "end": e, "days": LOOKBACK},
+        "year":        2025,
+        "period":      {"start": s, "end": e},
     }
 
     print("\n--- Idade ---")
