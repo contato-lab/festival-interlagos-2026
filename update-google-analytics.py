@@ -22,6 +22,7 @@ from google.analytics.data_v1beta.types import (
     Dimension,
     Filter,
     FilterExpression,
+    FilterExpressionList,
     Metric,
     OrderBy,
     RunReportRequest,
@@ -359,6 +360,70 @@ def compute_totals(series):
     return t
 
 
+def fetch_audiencia_motos(client, start_date, end_date):
+    """
+    Perfil demografico do publico Edicao MOTOS.
+    Filtra por hostName ingressosmoto OU pagePath com ride/sport/pit-pass ou motos.
+    """
+    motos_filter = FilterExpression(or_group=FilterExpressionList(expressions=[
+        FilterExpression(filter=Filter(field_name="hostName",
+            string_filter=Filter.StringFilter(value="ingressosmoto",
+                match_type=Filter.StringFilter.MatchType.CONTAINS))),
+        FilterExpression(filter=Filter(field_name="pagePath",
+            string_filter=Filter.StringFilter(value="ride-pass",
+                match_type=Filter.StringFilter.MatchType.CONTAINS))),
+        FilterExpression(filter=Filter(field_name="pagePath",
+            string_filter=Filter.StringFilter(value="sport-pass",
+                match_type=Filter.StringFilter.MatchType.CONTAINS))),
+        FilterExpression(filter=Filter(field_name="pagePath",
+            string_filter=Filter.StringFilter(value="pit-pass",
+                match_type=Filter.StringFilter.MatchType.CONTAINS))),
+        FilterExpression(filter=Filter(field_name="pagePath",
+            string_filter=Filter.StringFilter(value="moto",
+                match_type=Filter.StringFilter.MatchType.CONTAINS))),
+    ]))
+
+    def q(dim, limit=20):
+        dims = [Dimension(name=d) for d in (dim if isinstance(dim, list) else [dim])]
+        req = RunReportRequest(
+            property=f"properties/{PROPERTY_ID}",
+            date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
+            dimensions=dims,
+            metrics=[Metric(name="sessions"), Metric(name="totalUsers"),
+                     Metric(name="averageSessionDuration"), Metric(name="bounceRate")],
+            dimension_filter=motos_filter,
+            order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name="sessions"), desc=True)],
+            limit=limit,
+        )
+        r = client.run_report(req)
+        out = []
+        for row in r.rows:
+            d_vals = [v.value for v in row.dimension_values]
+            m_vals = [v.value for v in row.metric_values]
+            out.append({
+                "dim": d_vals[0] if len(d_vals)==1 else d_vals,
+                "sessions":   int(m_vals[0]),
+                "users":      int(m_vals[1]),
+                "avg_sess_s": round(float(m_vals[2]), 1),
+                "bounce":     round(float(m_vals[3])*100, 2),
+            })
+        return out
+
+    return {
+        "age":        q("userAgeBracket", 20),
+        "gender":     q("userGender", 10),
+        "cities":     q("city", 30),
+        "regions":    q("region", 30),
+        "countries":  q("country", 10),
+        "devices":    q("deviceCategory", 10),
+        "os":         q("operatingSystem", 10),
+        "browsers":   q("browser", 10),
+        "channels":   q("sessionDefaultChannelGrouping", 15),
+        "languages":  q("language", 10),
+        "age_gender": q(["userAgeBracket","userGender"], 50),
+    }
+
+
 def main():
     print(f"=== GA4 Update — property {PROPERTY_ID} ===")
     client = get_client()
@@ -385,6 +450,10 @@ def main():
             sessions_by_channel[date].get("Influenciadores", 0) + count
         )
 
+    print(f"Buscando perfil de audiencia Edicao MOTOS (60 dias)…")
+    audiencia_start = (today - timedelta(days=60)).strftime("%Y-%m-%d")
+    audiencia_motos = fetch_audiencia_motos(client, audiencia_start, end_date)
+
     data = {
         "updated_at":      datetime.now(timezone.utc).isoformat(),
         "property_id":     PROPERTY_ID,
@@ -397,6 +466,8 @@ def main():
         "sessions_by_date":    sessions_by_channel,
         # ↓ Top influenciadores com breakdown moto/auto
         "influencer_breakdown": influencer_breakdown,
+        # ↓ Perfil de publico Edicao Motos (60 dias)
+        "audiencia_motos":      audiencia_motos,
     }
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
