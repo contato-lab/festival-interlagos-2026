@@ -251,7 +251,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="kpi"><div class="kpi-lbl">Vendido 2026</div><div class="kpi-val lime" id="kpiVendido">—</div><div class="kpi-sub" id="kpiVendidoSub">—</div></div>
       <div class="kpi"><div class="kpi-lbl">Ingressos</div><div class="kpi-val" id="kpiIng">—</div><div class="kpi-sub" id="kpiIngSub">—</div></div>
       <div class="kpi"><div class="kpi-lbl">Ticket médio</div><div class="kpi-val" id="kpiTkt">—</div><div class="kpi-sub" id="kpiTktSub">—</div></div>
-      <div class="kpi"><div class="kpi-lbl">2025 total ref.</div><div class="kpi-val">R$ 7,19M</div><div class="kpi-sub">43.923 ing · 94 dias (14/03–15/06)</div></div>
+      <div class="kpi"><div class="kpi-lbl">2025 total ref.</div><div class="kpi-val">R$ 7,19M</div><div class="kpi-sub">43.923 ing · 94 dias · TKT R$ 164</div></div>
       <div class="kpi"><div class="kpi-lbl">Invest. caixa</div><div class="kpi-val">R$ 1,86M</div><div class="kpi-sub">sem permutas</div></div>
       <div class="kpi hi"><div class="kpi-lbl">Pace atual</div><div class="kpi-val lime" id="kpiPace">—</div><div class="kpi-sub" id="kpiPaceSub">—</div></div>
     </div>
@@ -376,8 +376,11 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     <div class="chart-wrap"><canvas id="fcChart"></canvas></div>
 
     <div class="foot">
-      💡 <strong>Metodologia:</strong> 2025 vendeu R$ 7,19M / 43.923 ing em 94 dias (14/03 a 15/06). Como 2026 começou em 31/03, o gráfico compara apenas o trecho equivalente: <strong>31/03 a 15/06/2025 = 77 dias, R$ 5,30M, 38.389 ing</strong>. Os 17 dias de pré-lançamento de 2025 (14–30/03, R$ 1,89M / 5.534 ing) ficam fora da comparação por não terem equivalente em 2026. Curva esticada para os 151 dias de 2026, calibrada pelo ritmo real em ingressos, com uplifts das ações novas em 2026.
-      <br><strong>Novo em 2026:</strong> Programática ADSPLAY (R$ 600k rodando últimos 3 meses + festival) · +74 dias de campanha (151 vs 77 do trecho comparável).
+      💡 <strong>Metodologia:</strong> 2025 vendeu R$ 7,19M / 43.923 ing em <strong>94 dias de campanha</strong> (14/03 a 15/06/25). Comparação por <strong>dia de campanha</strong>: D+1 de 2025 (14/03) = D+1 de 2026 (31/03). A projeção 2026 (151 dias) preserva a curva real de 2025 em duas fases:<br>
+      <strong>Fase normal (D+1 a D+121, 121 dias):</strong> estica os 64 primeiros dias de 2025 para ocupar o período inicial de 2026 (mais tempo de aquecimento).<br>
+      <strong>Rampa final (D+122 a D+151, últimos 30 dias):</strong> mantém 1:1 a curva explosiva de 2025 (D+65 a D+94 = 16/05 a 15/06/25), onde houve a maior aceleração de vendas. Isso espelha o pico que 2026 deve viver entre 29/07 e 28/08.<br>
+      <strong>Calibração:</strong> ajustada pelo ritmo real de ingressos vendidos em 2026 vs mesmos dias de campanha em 2025 (fator multiplicativo aplicado em todos os dias futuros).<br>
+      <strong>Novo em 2026:</strong> Programática ADSPLAY (R$ 600k últimos 3 meses + festival) · +57 dias de campanha (151 vs 94).
       <br><strong>Já existia em 2025:</strong> Meta/Google/TikTok, TV Globo, Rádio BandNews, Influenciadores — embutidos na curva base, sem uplift duplicado.
       <br><br><strong>📊 Como ler o gráfico (regra geral: VERDE = 2026 · ROXO = 2025):</strong>
       <br>• <span style="color:#C8FF00;font-weight:700">2026 REALIZADO (verde sólido com preenchimento)</span> = vendas reais de 2026 até hoje, em tempo real.
@@ -456,6 +459,24 @@ const D25 = [
   {d:73,mv:0,mq:0,av:107572.41,aq:876},{d:74,mv:0,mq:0,av:116841.7,aq:1028},
   {d:75,mv:0,mq:0,av:174146.4,aq:1567},{d:76,mv:0,mq:0,av:226793.6,aq:2025},
   {d:77,mv:0,mq:0,av:128185.4,aq:1222}
+];
+// PRE-LANCAMENTO 2025: 14/03 a 30/03 (17 dias antes do D+1 de 2026)
+// R$ 1.889.501,37 / 5.534 ingressos
+const D25_PRE = [
+  {d:1,mv:520012.46,mq:1236,av:179545.3,aq:380},{d:2,mv:171212.18,mq:430,av:82677.58,aq:153},
+  {d:3,mv:92003.74,mq:279,av:27577,aq:71},{d:4,mv:81187.39,mq:239,av:32146.64,aq:69},
+  {d:5,mv:70160.79,mq:222,av:23344.97,aq:49},{d:6,mv:51338.15,mq:163,av:26621.16,aq:84},
+  {d:7,mv:44664.51,mq:166,av:25742.43,aq:53},{d:8,mv:36375.53,mq:127,av:26335.36,aq:71},
+  {d:9,mv:20913.37,mq:69,av:13460.25,aq:63},{d:10,mv:36451.06,mq:156,av:16062.21,aq:62},
+  {d:11,mv:45186.53,mq:181,av:17321.96,aq:57},{d:12,mv:38180,mq:211,av:18691.29,aq:63},
+  {d:13,mv:24978.98,mq:120,av:17391.05,aq:40},{d:14,mv:32801.07,mq:160,av:6164.02,aq:45},
+  {d:15,mv:18000.61,mq:97,av:11404.48,aq:50},{d:16,mv:27130.12,mq:116,av:9036.71,aq:40},
+  {d:17,mv:33397.96,mq:174,av:11984.51,aq:38}
+];
+// D25_CAMPAIGN: 94 dias re-indexados como D+1..D+94 da CAMPANHA 2025 (14/03 a 15/06)
+const D25_CAMPAIGN = [
+  ...D25_PRE.map(r => ({...r})),
+  ...D25.map(r => ({...r, d: r.d + 17}))
 ];
 
 // ════════════════════════════════════════════════════
@@ -622,15 +643,14 @@ const fmtInt = n => Math.round(n).toLocaleString('pt-BR');
 // CALCULOS
 // ════════════════════════════════════════════════════
 // ─── Totais REAIS 2025 (94 dias completos: 14/03 a 15/06/2025) ───
-// Usado para projecoes (e o que 2026 precisa bater de fato)
-// O array D25 acima sao 77 dias (31/03 a 15/06) so para alinhamento de datas no grafico.
-// Os 17 dias de pre-lancamento (14-30/03) somam R$ 1.889.501 / 5.534 ing.
-const D25_FULL_REC = 7191753.92;  // R$ 7,19M total 2025 (94 dias)
+// D25_CAMPAIGN tem os 94 dias da CAMPANHA 2025 (D+1 = 14/03/2025)
+// Usado em comparacao 2026 D+N vs 2025 D+N (mesmo dia de campanha)
+const D25_FULL_REC = 7191753.92;  // R$ 7,19M total 2025
 const D25_FULL_ING = 43923;       // ingressos total 2025
 const d25_rec_tot = D25_FULL_REC;
 const d25_ing_tot = D25_FULL_ING;
 const d25_tkt_tot = d25_rec_tot/d25_ing_tot;
-const d25_ing_ads = D25.filter(r=>r.d>=40-17).reduce((s,r)=>s+r.mq+r.aq,0); // ajuste -17 (D40 antigo = D23 novo)
+const d25_ing_ads = D25_CAMPAIGN.filter(r=>r.d>=40).reduce((s,r)=>s+r.mq+r.aq,0); // ADS era: D+40 de 2025 (22/04) em diante
 
 let STATE = {
   d26_rec: 0, d26_ing: 0, d26_dias: 0, fator_ing: 1,
@@ -641,7 +661,7 @@ function computarEstado26(dados26){
   STATE.d26_rec = dados26.reduce((s,r)=>s+r.mv+r.av,0);
   STATE.d26_ing = dados26.reduce((s,r)=>s+r.mq+r.aq,0);
   STATE.d26_dias = dados26.length > 0 ? Math.max(...dados26.map(r=>r.d)) : 0;
-  const d25_ing_periodo = D25.filter(r => r.d <= STATE.d26_dias).reduce((s,r)=>s+r.mq+r.aq,0);
+  const d25_ing_periodo = D25_CAMPAIGN.filter(r => r.d <= STATE.d26_dias).reduce((s,r)=>s+r.mq+r.aq,0);
   STATE.fator_ing = d25_ing_periodo > 0 ? STATE.d26_ing/d25_ing_periodo : 1;
   STATE.dados26 = dados26;
 }
@@ -660,16 +680,36 @@ function calcularCenario(c){
   };
 }
 
+// Estrategia de projecao 2026 baseada em 2025:
+// - 2025: 94 dias (14/03 a 15/06/2025), evento em 15/06
+// - 2026: 151 dias (31/03 a 28/08/2026), evento em 28/08
+// - Os ULTIMOS 30 DIAS antes do evento sao a "rampa final" (explosao de vendas)
+// - Preserva a rampa final 1:1 (D-30 ate evento de 2025 = D-30 ate evento de 2026)
+// - Estica os 64 dias iniciais de 2025 para ocupar os 121 dias iniciais de 2026
 function curveStretched(){
-  const N25 = D25.length; // 77 dias reais (31/03 a 15/06/2025)
+  const N25 = D25_CAMPAIGN.length;          // 94
+  const RAMP_DAYS = 30;
+  const N25_NORMAL = N25 - RAMP_DAYS;       // 64 (D+1..D+64 de 2025 = fase normal)
+  const N26_NORMAL = DIAS_TOTAL - RAMP_DAYS; // 121 (D+1..D+121 de 2026 = fase normal)
   const out = [];
   for(let i=0;i<DIAS_TOTAL;i++){
-    const idx = (i/(DIAS_TOTAL-1))*(N25-1);
-    const lo = Math.floor(idx), hi = Math.min(N25-1, lo+1);
-    const frac = idx-lo;
-    const rec = (D25[lo].mv+D25[lo].av) + ((D25[hi].mv+D25[hi].av)-(D25[lo].mv+D25[lo].av))*frac;
-    const ing = (D25[lo].mq+D25[lo].aq) + ((D25[hi].mq+D25[hi].aq)-(D25[lo].mq+D25[lo].aq))*frac;
-    out.push({rec: rec*(N25/DIAS_TOTAL), ing: ing*(N25/DIAS_TOTAL)});
+    if(i < N26_NORMAL){
+      // FASE NORMAL: stretch linear de 64 dias 2025 para 121 dias 2026
+      const idx = (i/(N26_NORMAL-1))*(N25_NORMAL-1);
+      const lo = Math.floor(idx), hi = Math.min(N25_NORMAL-1, lo+1);
+      const frac = idx-lo;
+      const rec = (D25_CAMPAIGN[lo].mv+D25_CAMPAIGN[lo].av) + ((D25_CAMPAIGN[hi].mv+D25_CAMPAIGN[hi].av)-(D25_CAMPAIGN[lo].mv+D25_CAMPAIGN[lo].av))*frac;
+      const ing = (D25_CAMPAIGN[lo].mq+D25_CAMPAIGN[lo].aq) + ((D25_CAMPAIGN[hi].mq+D25_CAMPAIGN[hi].aq)-(D25_CAMPAIGN[lo].mq+D25_CAMPAIGN[lo].aq))*frac;
+      // Multiplica por (N25_NORMAL/N26_NORMAL) para preservar o total da fase normal de 2025
+      out.push({rec: rec*(N25_NORMAL/N26_NORMAL), ing: ing*(N25_NORMAL/N26_NORMAL)});
+    } else {
+      // RAMPA FINAL (ultimos 30 dias antes do evento): preserva 1:1 a curva real de 2025
+      // i = N26_NORMAL..DIAS_TOTAL-1 -> j = N25_NORMAL..N25-1 (D+65..D+94 de 2025)
+      const j = i - N26_NORMAL + N25_NORMAL;
+      const rec = D25_CAMPAIGN[j].mv + D25_CAMPAIGN[j].av;
+      const ing = D25_CAMPAIGN[j].mq + D25_CAMPAIGN[j].aq;
+      out.push({rec, ing});
+    }
   }
   return out;
 }
@@ -705,15 +745,15 @@ function curve2025AcumStretched(){
   return out;
 }
 
-// 2025 ritmo REAL (sem stretch): 77 dias com a curva real (31/03 a 15/06/2025), depois plateau no total.
-// Mostra que 2025 ja tinha acabado em D+77 (15/06), enquanto 2026 vai ate D+151 (28/08).
-// Onde 2026 fica abaixo dessa curva = vendas mais lentas que 2025 no mesmo dia de campanha.
+// 2025 ritmo REAL (sem stretch): 94 dias com a curva real (D+1..D+94 da campanha 2025),
+// depois plateau no total (R$ 7,19M). Eixo X = D+ unificado: D+1 = 14/03/25 = 31/03/26.
+// 2025 acabou em D+94 (15/06/25); 2026 segue ate D+151 (28/08/26).
 function curve2025RealAcum(){
   const out = [];
   let acum = 0;
   for(let i=0;i<DIAS_TOTAL;i++){
-    if(i < D25.length){
-      acum += (D25[i].mv + D25[i].av);
+    if(i < D25_CAMPAIGN.length){
+      acum += (D25_CAMPAIGN[i].mv + D25_CAMPAIGN[i].av);
     }
     out.push(acum);
   }
@@ -728,8 +768,8 @@ let chart = null;
 function renderKPIs(){
   const tkt = STATE.d26_ing > 0 ? STATE.d26_rec/STATE.d26_ing : 0;
   const pace = STATE.d26_dias > 0 ? STATE.d26_rec/STATE.d26_dias : 0;
-  const d25_rec_periodo = D25.filter(r=>r.d<=STATE.d26_dias).reduce((s,r)=>s+r.mv+r.av,0);
-  const d25_ing_periodo = D25.filter(r=>r.d<=STATE.d26_dias).reduce((s,r)=>s+r.mq+r.aq,0);
+  const d25_rec_periodo = D25_CAMPAIGN.filter(r=>r.d<=STATE.d26_dias).reduce((s,r)=>s+r.mv+r.av,0);
+  const d25_ing_periodo = D25_CAMPAIGN.filter(r=>r.d<=STATE.d26_dias).reduce((s,r)=>s+r.mq+r.aq,0);
   const deltaRec = d25_rec_periodo>0 ? (STATE.d26_rec/d25_rec_periodo-1)*100 : 0;
   const deltaIng = d25_ing_periodo>0 ? (STATE.d26_ing/d25_ing_periodo-1)*100 : 0;
 
@@ -971,8 +1011,8 @@ function renderChart(key){
   });
 
   // Marcos chave (1-indexado: D+N => index N-1)
-  const D_FIM_2025  = 77;   // 15/06/2026 — onde 2025 chegou ao total final (Festival 2025 foi 14-15/06)
-  const D_RAMPA     = 121;  // 29/07/2026 — inicio dos ultimos 30 dias (rampa de explosao)
+  const D_FIM_2025  = 94;   // D+94 da campanha (= 02/07/2026 calendario) — onde 2025 chegou no total final
+  const D_RAMPA     = DIAS_TOTAL - 30 + 1;  // D+122 — inicio dos ultimos 30 dias (rampa final)
   const D_EVENTO    = 151;  // 28/08/2026 — Festival 2026
 
   const ctx = document.getElementById('fcChart');
@@ -983,8 +1023,8 @@ function renderChart(key){
       labels,
       datasets:[
         // ── 2025 (ROXO) — apenas o ritmo REAL ─────────────────────
-        // Plateau apos D+77 (15/06). Mostra que 2025 ja tinha acabado em meados de junho.
-        {label:'2025 (ritmo real, 77 dias)', data:curve25AcumReal, borderColor:'rgba(155,90,180,0.85)', backgroundColor:'transparent', borderWidth:2, borderDash:[2,3], pointRadius:0, tension:.15, fill:false},
+        // Plateau apos D+94 da campanha 2025. Mostra que 2025 ja tinha acabado quando ainda faltam 57 dias para o evento de 2026.
+        {label:'2025 (ritmo real, 94 dias)', data:curve25AcumReal, borderColor:'rgba(155,90,180,0.85)', backgroundColor:'transparent', borderWidth:2, borderDash:[2,3], pointRadius:0, tension:.15, fill:false},
 
         // ── 2026 (VERDE LIME — sempre) ────────────────────────────
         // 2026 realizado (atual ate hoje)
@@ -1014,7 +1054,7 @@ function renderChart(key){
             fim2025:{
               type:'line', xMin: D_FIM_2025-1, xMax: D_FIM_2025-1,
               borderColor:'rgba(155,90,180,0.55)', borderWidth:1.5, borderDash:[3,3],
-              label:{display:true, content:'15/06 — 2025 ja teria acabado', position:'start', color:'#fff', font:{size:9, weight:600}, backgroundColor:'rgba(123,45,139,0.85)', padding:4, yAdjust:32}
+              label:{display:true, content:'D+94 — 2025 ja teria acabado', position:'start', color:'#fff', font:{size:9, weight:600}, backgroundColor:'rgba(123,45,139,0.85)', padding:4, yAdjust:32}
             },
             // Linha vertical: evento 2026 (28/08/2026)
             evento:{
