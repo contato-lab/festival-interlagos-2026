@@ -971,6 +971,21 @@ const D25 = [
   {d:77,mv:0,mq:0,av:128185.4,aq:1222}
 ];
 
+// PRE-LANCAMENTO 2025: 14/03 a 30/03 (17 dias antes do D+1 de 2026)
+// R$ 1.889.501,37 / 5.534 ingressos. Mostrado no grafico apenas como linha 2025; 2026 nao tem equivalente.
+const D25_PRE = [
+  {d:1,mv:520012.46,mq:1236,av:179545.3,aq:380},{d:2,mv:171212.18,mq:430,av:82677.58,aq:153},
+  {d:3,mv:92003.74,mq:279,av:27577,aq:71},{d:4,mv:81187.39,mq:239,av:32146.64,aq:69},
+  {d:5,mv:70160.79,mq:222,av:23344.97,aq:49},{d:6,mv:51338.15,mq:163,av:26621.16,aq:84},
+  {d:7,mv:44664.51,mq:166,av:25742.43,aq:53},{d:8,mv:36375.53,mq:127,av:26335.36,aq:71},
+  {d:9,mv:20913.37,mq:69,av:13460.25,aq:63},{d:10,mv:36451.06,mq:156,av:16062.21,aq:62},
+  {d:11,mv:45186.53,mq:181,av:17321.96,aq:57},{d:12,mv:38180,mq:211,av:18691.29,aq:63},
+  {d:13,mv:24978.98,mq:120,av:17391.05,aq:40},{d:14,mv:32801.07,mq:160,av:6164.02,aq:45},
+  {d:15,mv:18000.61,mq:97,av:11404.48,aq:50},{d:16,mv:27130.12,mq:116,av:9036.71,aq:40},
+  {d:17,mv:33397.96,mq:174,av:11984.51,aq:38}
+];
+const PRE_DAYS = D25_PRE.length; // 17 dias de pre-lancamento 2025
+
 // ═══════════════════════════════════════════════
 // DADOS 2026 — preenchidos via Google Sheets (todas as SEMANA 0, 1, 2…)
 // Formato esperado no Sheets: D | Dia | Fase | MotosP_R | MotosP_Q | MotosTM_R | MotosTM_Q | AutosP_R | AutosP_Q | AutosTM_R | AutosTM_Q
@@ -1148,9 +1163,8 @@ function getAnnotations() {
   ACOES.forEach((a, i) => {
     if (!acoesVisiveis[a.tipo]) return;
     const cfg = ACAO_CONFIG[a.tipo];
-    const xIndex = a.dia - 1; // D+1 = index 0
-    // Linha vertical limpa (sem ícone no gráfico) — padrão dashboard Marcinho.
-    // O ícone/descrição da ação aparece na legenda e no tooltip ao passar o mouse.
+    // D+1 (campanha 2026, 31/03) = index PRE_DAYS no grafico estendido
+    const xIndex = a.dia - 1 + PRE_DAYS;
     annotations[`acao_${i}`] = {
       type: 'line',
       xMin: xIndex, xMax: xIndex,
@@ -1163,19 +1177,23 @@ function getAnnotations() {
 }
 
 function buildComp() {
-  const n=D25.length;
+  // Eixo extendido: 17 dias pre-lancamento 2025 (14/03 a 30/03) + 77 dias alinhados (31/03 a 15/06)
+  // 2025 tem dado em todo o eixo; 2026 so a partir do index PRE_DAYS (31/03)
+  const n = PRE_DAYS + D25.length; // 94
   const labels=Array.from({length:n},(_,i)=>{
-    const dt=dToDate(i+1);
+    // i=0 -> 14/03/2025; i=PRE_DAYS -> 31/03/2026 (= DATA_INICIO)
+    const dt=new Date(DATA_INICIO);
+    dt.setDate(dt.getDate() + (i - PRE_DAYS));
     const d=dt.getDate().toString().padStart(2,'0');
     const m=dt.toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
     return`${d}/${m}`;
   });
-  const s25=getSeries(D25,metricAtiva,edicaoAtiva);
-  // Posiciona cada ponto de D26 no indice correto do grafico (d-1),
-  // respeitando filtro (dias nao contidos ficam null)
+  // 2025: pre-lancamento + alinhado = 94 valores
+  const s25 = [...getSeries(D25_PRE,metricAtiva,edicaoAtiva), ...getSeries(D25,metricAtiva,edicaoAtiva)];
+  // 2026: nulls nos primeiros PRE_DAYS dias (sem dado), depois posicionado em d-1+PRE_DAYS
   const s26=Array(n).fill(null);
   D26.forEach(r=>{
-    const i=r.d-1;
+    const i=r.d-1+PRE_DAYS;
     if(i<0||i>=n)return;
     const mv=r.mv||0,mq=r.mq||0,av=r.av||0,aq=r.aq||0;
     const tv=mv+av,tq=mq+aq;
@@ -1215,9 +1233,18 @@ function buildComp() {
         const ctx=chart.ctx, xS=chart.scales.x, n=chart.data.labels.length;
         ctx.save();
         ctx.font="9px 'Barlow Condensed',sans-serif";
-        ctx.fillStyle='#777';
         ctx.textAlign='center';
-        for(let i=0;i<n;i++){const d=i+1;if((d-1)%7===0){ctx.fillText('D+'+d,xS.getPixelForValue(i),xS.bottom+13);}}
+        for(let i=0;i<n;i++){
+          const d26 = i - PRE_DAYS + 1; // D+ da campanha 2026
+          if (d26 >= 1 && (d26-1)%7===0) {
+            ctx.fillStyle='#777';
+            ctx.fillText('D+'+d26, xS.getPixelForValue(i), xS.bottom+13);
+          } else if (d26 < 1 && (i)%7===0) {
+            // pre-lancamento 2025: marcar como "pre" em roxo claro
+            ctx.fillStyle='#666';
+            ctx.fillText('pré', xS.getPixelForValue(i), xS.bottom+13);
+          }
+        }
         ctx.restore();
       }
     }],
@@ -1233,21 +1260,35 @@ function buildComp() {
           titleColor:'#C8FF00', bodyColor:'#FFF', padding:13, usePointStyle:true,
           callbacks:{
             title: items => {
-              const dia = items[0].dataIndex + 1;
-              const dt = dToDate(dia);
+              const idx = items[0].dataIndex;
+              const d26 = idx - PRE_DAYS + 1; // D+ da campanha 2026 (pode ser <=0 no pre-lancamento)
+              const dt = new Date(DATA_INICIO);
+              dt.setDate(dt.getDate() + (idx - PRE_DAYS));
               const dateStr = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-              const acoesNoDia = ACOES.filter(a => a.dia === dia && acoesVisiveis[a.tipo]);
+              if (d26 < 1) {
+                // pre-lancamento 2025: mostra so a data + label
+                return `${dateStr} · pré-lançamento 2025`;
+              }
+              const acoesNoDia = ACOES.filter(a => a.dia === d26 && acoesVisiveis[a.tipo]);
               if (acoesNoDia.length) {
                 const label = acoesNoDia.map(a=>`${ACAO_CONFIG[a.tipo].icone} ${a.titulo}`).join(' · ');
                 return `${dateStr} · ${label}`;
               }
-              return `${dateStr} · D+${dia}`;
+              return `${dateStr} · D+${d26}`;
             },
             label: ctx => {
               const idx = ctx.dataIndex;
               const is26 = ctx.dataset.label.includes('2026');
-              // D26 pode ter gaps por filtro — busca pela d=idx+1
-              const row = is26 ? (D26.find(r=>r.d===idx+1) || D26[idx]) : D25[idx];
+              // 2025: pre-lancamento (idx<PRE_DAYS) usa D25_PRE; alinhado usa D25[idx-PRE_DAYS]
+              // 2026: indice no D26 = idx - PRE_DAYS + 1
+              let row;
+              if (is26) {
+                const d26 = idx - PRE_DAYS + 1;
+                if (d26 < 1) return null;
+                row = D26.find(r=>r.d===d26) || D26[d26-1];
+              } else {
+                row = idx < PRE_DAYS ? D25_PRE[idx] : D25[idx - PRE_DAYS];
+              }
               if (!row) return null;
               const mq=row.mq||0, aq=row.aq||0, mv=row.mv||0, av=row.av||0;
               const ing = edicaoAtiva==='motos' ? mq : edicaoAtiva==='autos' ? aq : mq+aq;
@@ -1271,8 +1312,11 @@ function buildComp() {
             },
             afterBody: items => {
               const idx = items[0].dataIndex;
-              const dia = idx + 1;
-              const dateStr = dToDate(dia).toISOString().split('T')[0];
+              const d26 = idx - PRE_DAYS + 1;
+              if (d26 < 1) return []; // pre-lancamento: nao tem gasto Meta/Google de 2026
+              const dt = new Date(DATA_INICIO);
+              dt.setDate(dt.getDate() + (idx - PRE_DAYS));
+              const dateStr = dt.toISOString().split('T')[0];
               const gastoG = getGadsSpend(dateStr);
               const gastoM = getMetaSpend(dateStr);
               if (gastoG === null && gastoM === null) return [];
@@ -1287,7 +1331,7 @@ function buildComp() {
         }
       },
       scales:{
-        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:window.innerWidth<=768?6:7},autoSkip:window.innerWidth<=768,maxTicksLimit:window.innerWidth<=768?15:undefined,maxRotation:0,callback:(v,i)=>{const dt=dToDate(i+1);const d=dt.getDate();return(i===0||d===1)?d+'/'+(dt.getMonth()+1):''+d;}}},
+        x:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:window.innerWidth<=768?6:7},autoSkip:window.innerWidth<=768,maxTicksLimit:window.innerWidth<=768?15:undefined,maxRotation:0,callback:(v,i)=>{const dt=new Date(DATA_INICIO);dt.setDate(dt.getDate()+(i-PRE_DAYS));const d=dt.getDate();return(i===0||d===1)?d+'/'+(dt.getMonth()+1):''+d;}}},
         y:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:10},callback:v=>metricAtiva==='ingressos'?fmtN(v):fmtK(v)}}
       }
     }
