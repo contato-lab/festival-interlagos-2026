@@ -368,6 +368,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
     <span class="badge badge-ok">✓ Ao vivo</span>
     <span class="badge badge-pending" id="demoBadge" style="margin-left:4px">Vendas: aguardando</span>
     <span class="badge" id="periodoBadge">2026</span>
+    <span class="badge" id="diasBadge" style="background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.4);color:var(--lime)">carregando...</span>
     <span class="gen-date" id="genDate" style="font-size:.72rem;color:#888"></span>
   </div>
 </header>
@@ -1039,8 +1040,20 @@ async function fetchVendasProprio() {
 Chart.defaults.color='#555';
 Chart.defaults.font.family="'Inter',sans-serif";
 
+// ── Badge dias de campanha (dia N · faltam M) ─────────────
+const DATA_EVENTO_BADGE = new Date('2026-08-28T00:00:00');
+function updateDiasBadge() {
+  const el = document.getElementById('diasBadge'); if(!el) return;
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const inicio = new Date(DATA_INICIO); inicio.setHours(0,0,0,0);
+  const dia = Math.max(1, Math.floor((hoje - inicio) / 86400000) + 1);
+  const faltam = Math.max(0, Math.ceil((DATA_EVENTO_BADGE - hoje) / 86400000));
+  el.textContent = 'dia ' + dia + ' · faltam ' + faltam;
+}
+setInterval(updateDiasBadge, 60000);
+
 let __lastRefreshAt = null;
-function updateLastRefreshTime() { __lastRefreshAt = new Date(); renderLastRefreshLabel(); }
+function updateLastRefreshTime() { __lastRefreshAt = new Date(); renderLastRefreshLabel(); updateDiasBadge(); }
 function renderLastRefreshLabel() {
   const el = document.getElementById('genDate');
   if (!el) return;

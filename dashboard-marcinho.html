@@ -249,6 +249,7 @@ footer{
   <div class="header-title">Painel Executivo 2026</div>
   <div class="header-right">
     <span class="badge badge-live">Ao Vivo</span>
+    <span class="badge" id="diasBadge" style="background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.4);color:#C8FF00;padding:4px 10px;border-radius:6px;font-weight:700">carregando...</span>
     <span class="gen-date" id="genDate">—</span>
   </div>
 </header>
@@ -1453,8 +1454,20 @@ function renderAll() {
 /* ═══════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════ */
+// ── Badge dias de campanha (dia N · faltam M) ─────────────
+const DATA_EVENTO_BADGE = new Date('2026-08-28T00:00:00');
+function updateDiasBadge() {
+  const el = document.getElementById('diasBadge'); if(!el) return;
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const inicio = new Date(CAMP_START_2026); inicio.setHours(0,0,0,0);
+  const dia = Math.max(1, Math.floor((hoje - inicio) / 86400000) + 1);
+  const faltam = Math.max(0, Math.ceil((DATA_EVENTO_BADGE - hoje) / 86400000));
+  el.textContent = 'dia ' + dia + ' · faltam ' + faltam;
+}
+setInterval(updateDiasBadge, 60000);
+
 let __lastRefreshAt = null;
-function updateLastRefreshTime() { __lastRefreshAt = new Date(); renderLastRefreshLabel(); }
+function updateLastRefreshTime() { __lastRefreshAt = new Date(); renderLastRefreshLabel(); updateDiasBadge(); }
 function renderLastRefreshLabel() {
   const el = document.getElementById('genDate');
   if (!el) return;
