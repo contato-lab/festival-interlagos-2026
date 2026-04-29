@@ -599,35 +599,40 @@ async function carregarDados26(){
 // ════════════════════════════════════════════════════
 // CENARIOS
 // ════════════════════════════════════════════════════
+// Cenarios calibrados pela REALIDADE observada de 2026 (D+29):
+// - TKT TM pagantes ja caiu 10% vs 2025 (R\$ 99 -> R\$ 90 motos)
+// - Meia disponivel desde D+1 (em 2025 so apareceu D+58)
+// - Cortesia ainda nao foi distribuida (vira nas ultimas semanas, derruba TKT mais)
+// Por isso tkt_mult agora reflete TKT MENOR nos dias futuros, nao maior.
 const CENARIOS = {
   cons: {
     nome:'Conservador', color:'#FFB800',
-    dias_extras:.05, prog:.12, tkt_mult:1.00,
+    dias_extras:.03, prog:.08, tkt_mult:0.72,
     descricoes:{
-      ritmo:{desc:'Manter o ritmo atual de vendas (já estamos nele)'},
-      dias:{val:'+5%', desc:'Aproveitar os 57 dias a mais de campanha no vale'},
-      prog:{val:'+12%', desc:'ADSPLAY entrega no piso da expectativa nos últimos 3 meses'},
-      tkt:{val:'igual 2025', desc:'Ticket médio R$ 164 (sem evolução)'}
+      ritmo:{desc:'Mantem ritmo atual, mas assume desaceleracao no vale (junho/julho)'},
+      dias:{val:'+3%', desc:'Dias extras de campanha rendem pouco (audiencia satura)'},
+      prog:{val:'+8%', desc:'ADSPLAY entrega no piso, sem viralizacao'},
+      tkt:{val:'-28% vs 2025', desc:'TKT futuro de ~R$ 118 (cortesia agressiva + meia em alta)'}
     }
   },
   real: {
     nome:'Realista', color:'#C8FF00',
-    dias_extras:.10, prog:.22, tkt_mult:1.02,
+    dias_extras:.07, prog:.18, tkt_mult:0.82,
     descricoes:{
-      ritmo:{desc:'Manter o ritmo atual de vendas (já estamos nele)'},
-      dias:{val:'+10%', desc:'Dias extras contribuindo moderadamente no vale'},
-      prog:{val:'+22%', desc:'ADSPLAY R$ 600k rodando 90 dias = ~R$ 6,7k/dia de pressão programática'},
-      tkt:{val:'+2%', desc:'2ª edição mais madura eleva percepção de valor'}
+      ritmo:{desc:'Mantem ritmo atual ate o vale, recupera na rampa final'},
+      dias:{val:'+7%', desc:'Dias extras contribuindo no vale (fluxo continuo)'},
+      prog:{val:'+18%', desc:'ADSPLAY R$ 600k rodando 90 dias com performance media'},
+      tkt:{val:'-18% vs 2025', desc:'TKT futuro de ~R$ 134 (mistura inteira + meia + cortesia esperada)'}
     }
   },
   otim: {
     nome:'Otimista', color:'#FF4444',
-    dias_extras:.18, prog:.35, tkt_mult:1.06,
+    dias_extras:.14, prog:.28, tkt_mult:0.95,
     descricoes:{
-      ritmo:{desc:'Manter o ritmo atual (base)'},
-      dias:{val:'+18%', desc:'Dias extras com alto aproveitamento (campanha renovada)'},
-      prog:{val:'+35%', desc:'ADSPLAY performando no topo — estratégia programática viraliza no Agosto'},
-      tkt:{val:'+6%', desc:'Lineup premium + oferta segmentada puxam ticket médio'}
+      ritmo:{desc:'Ritmo atual sustentado, picos de viralizacao na rampa final'},
+      dias:{val:'+14%', desc:'Dias extras com alto aproveitamento (campanha renovada)'},
+      prog:{val:'+28%', desc:'ADSPLAY performando acima da media no agosto'},
+      tkt:{val:'-5% vs 2025', desc:'TKT futuro de ~R$ 156 (lotes crescentes seguram queda)'}
     }
   }
 };
