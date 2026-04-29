@@ -667,11 +667,26 @@ function computarEstado26(dados26){
 }
 
 function calcularCenario(c){
-  const ing_base = d25_ing_tot * STATE.fator_ing * (1+c.dias_extras);
-  const ing_prog_lift = d25_ing_ads * STATE.fator_ing * c.prog;
-  const ing_total = ing_base + ing_prog_lift;
-  const tkt = d25_tkt_tot * c.tkt_mult;
-  const rec = ing_total * tkt;
+  // Calcula EXATAMENTE como o grafico (dia-a-dia, batendo 100%):
+  //   realizado real ate hoje + projecao dia-a-dia para os dias futuros
+  // Antes usavamos uma formula macro (total_2025 * fator * uplifts) que
+  // suavizava o boom dos primeiros 29 dias, gerando divergencia com o grafico.
+  const curve = curveStretched();
+  // 1) Realizado real (D+1 ate STATE.d26_dias)
+  let acum_rec = STATE.d26_rec;
+  let acum_ing = STATE.d26_ing;
+  // 2) Projecao dos dias futuros (D+d26_dias+1 ate D+151)
+  for(let i=STATE.d26_dias;i<DIAS_TOTAL;i++){
+    let ing_dia = curve[i].ing * STATE.fator_ing * (1+c.dias_extras);
+    const dia2026 = i+1;
+    if(dia2026 >= 62) ing_dia *= (1+c.prog);
+    const tkt_dia = d25_tkt_tot * c.tkt_mult;
+    acum_ing += ing_dia;
+    acum_rec += ing_dia * tkt_dia;
+  }
+  const ing_total = acum_ing;
+  const rec = acum_rec;
+  const tkt = ing_total > 0 ? rec/ing_total : d25_tkt_tot * c.tkt_mult;
   return {
     ing_total, tkt, rec,
     vs_2025: rec/d25_rec_tot - 1,
