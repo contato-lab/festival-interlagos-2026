@@ -1055,6 +1055,23 @@ function setDelta(id, v26, v25) {
   document.getElementById(id).innerHTML=(up?'▲':'▼')+' '+Math.abs(pct)+'% vs 2025';
 }
 
+// setDelta2: dois deltas (receita + ingressos) num mesmo card
+function setDelta2(id, vR26, vR25, vI26, vI25) {
+  const el = document.getElementById(id); if(!el) return;
+  if (!vR25 && !vI25) { el.className='kpi-delta neu'; el.innerHTML='—'; return; }
+  const pctR = vR25>0 ? ((vR26-vR25)/vR25*100) : null;
+  const pctI = vI25>0 ? ((vI26-vI25)/vI25*100) : null;
+  const fmtP = (p,prefix) => {
+    if (p===null) return '';
+    const up = p>=0; const seta = up?'▲':'▼';
+    const cls = up?'up':'down';
+    return `<div class="kpi-delta ${cls}" style="display:flex;align-items:baseline;gap:4px;margin:0"><span style="font-size:.55rem;color:#888;opacity:.7;letter-spacing:.04em">${prefix}</span><span>${seta}${Math.abs(p).toFixed(1)}%</span></div>`;
+  };
+  el.className = '';
+  el.style.padding = '0';
+  el.innerHTML = `<div style="display:flex;flex-direction:column;gap:2px">${fmtP(pctR,'RECEITA')}${fmtP(pctI,'INGRESSOS')}</div>`;
+}
+
 // ═══════════════════════════════════════════════
 // FILTRO DE DATA
 // ═══════════════════════════════════════════════
@@ -1134,9 +1151,9 @@ function calcKPIs() {
   document.getElementById('kpiTkt').textContent=fmtR(tkt26);
   setDelta('kpiTktDelta',tkt26,tkt25);
   document.getElementById('kpiMotos').textContent=fmtK(s26.mv);
-  setDelta('kpiMotosDelta',s26.mv,s25.mv);
+  setDelta2('kpiMotosDelta', s26.mv, s25.mv, s26.mq, s25.mq);
   document.getElementById('kpiAutos').textContent=fmtK(s26.av);
-  setDelta('kpiAutosDelta',s26.av,s25.av);
+  setDelta2('kpiAutosDelta', s26.av, s25.av, s26.aq, s25.aq);
   // TKT Médio por evento
   const tktMotos = s26.mq ? s26.mv/s26.mq : 0;
   const tktAutos = s26.aq ? s26.av/s26.aq : 0;

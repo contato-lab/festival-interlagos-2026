@@ -1128,20 +1128,28 @@ function renderExecKPIs() {
   const ING_STYLE = 'margin-top:3px;font-size:.72rem;font-weight:600;color:var(--text);opacity:.92;letter-spacing:.02em';
   const fmtIng = q => q>0 ? q.toLocaleString('pt-BR')+' ingressos' : '';
 
-  // setKpi: valor → ingressos → %
-  const setKpi = (id, v26, v25, qty=null) => {
+  // setKpi: receita26 / receita25 / qtd26 / qtd25 -> mostra 2 deltas (receita + ingressos)
+  const setKpi = (id, v26, v25, q26=null, q25=null) => {
     const el = document.getElementById(id); if(!el) return;
-    const pct = v25>0 ? ((v26-v25)/v25*100) : null;
-    const cls = pct===null?'':pct>=0?'up':'down';
-    const dStr = pct===null?'vs 2025: aguardando':(pct>=0?'\u25b2':'\u25bc')+Math.abs(pct).toFixed(1)+'% vs 2025';
-    const qHtml = qty!==null && qty>0
-      ? `<div style="${ING_STYLE}">${fmtIng(qty)}</div>`
+    const pctR = v25>0 ? ((v26-v25)/v25*100) : null;
+    const clsR = pctR===null?'':pctR>=0?'up':'down';
+    const dR = pctR===null?'aguardando':(pctR>=0?'▲':'▼')+Math.abs(pctR).toFixed(1)+'%';
+    const pctI = (q25>0) ? ((q26-q25)/q25*100) : null;
+    const clsI = pctI===null?'':pctI>=0?'up':'down';
+    const dI = pctI===null?'':(pctI>=0?'▲':'▼')+Math.abs(pctI).toFixed(1)+'%';
+    const qHtml = q26!==null && q26>0
+      ? `<div style="${ING_STYLE}">${fmtIng(q26)}</div>`
       : '';
-    el.innerHTML = `<div class="exec-kpi-val">${execFmtK(v26)}</div>${qHtml}<div class="exec-kpi-delta ${cls}">${dStr}</div>`;
+    const deltasHtml = `
+      <div style="display:flex;flex-direction:column;gap:2px;margin-top:4px">
+        <div class="exec-kpi-delta ${clsR}" style="display:flex;align-items:baseline;gap:4px"><span style="font-size:.58rem;color:#888;opacity:.7;letter-spacing:.04em">RECEITA</span><span>${dR}</span></div>
+        ${pctI !== null ? `<div class="exec-kpi-delta ${clsI}" style="display:flex;align-items:baseline;gap:4px"><span style="font-size:.58rem;color:#888;opacity:.7;letter-spacing:.04em">INGRESSOS</span><span>${dI}</span></div>` : ''}
+      </div>`;
+    el.innerHTML = `<div class="exec-kpi-val">${execFmtK(v26)}</div>${qHtml}${deltasHtml}`;
   };
-  setKpi('exec-kpi-receita', s26.mv+s26.av, s25.mv+s25.av, s26.mq+s26.aq);
-  setKpi('exec-kpi-motos',   s26.mv,        s25.mv,        s26.mq);
-  setKpi('exec-kpi-autos',   s26.av,        s25.av,        s26.aq);
+  setKpi('exec-kpi-receita', s26.mv+s26.av, s25.mv+s25.av, s26.mq+s26.aq, s25.mq+s25.aq);
+  setKpi('exec-kpi-motos',   s26.mv,        s25.mv,        s26.mq,         s25.mq);
+  setKpi('exec-kpi-autos',   s26.av,        s25.av,        s26.aq,         s25.aq);
 
   // Card "Receita Acumulada" — ingressos da campanha toda (nao filtrado)
   const ingTotalEl = document.getElementById('exec-kpi-receita-total-ingressos');
@@ -1198,14 +1206,20 @@ function renderExecKPIs() {
     const pctEl = document.getElementById('exec-kpi-receita-total-pct');
     if (pctEl && receitaTotalCamp>0 && D26_FULL.length>0) {
       const dMin = D26_FULL[0].d, dMax = D26_FULL[D26_FULL.length-1].d;
-      const rec25Periodo = D25_CAMPAIGN.filter(r=>r.d>=dMin&&r.d<=dMax)
-        .reduce((s,r)=>s+(r.mv||0)+(r.av||0),0);
+      const rec25Periodo = D25_CAMPAIGN.filter(r=>r.d>=dMin&&r.d<=dMax).reduce((s,r)=>s+(r.mv||0)+(r.av||0),0);
+      const ing25Periodo = D25_CAMPAIGN.filter(r=>r.d>=dMin&&r.d<=dMax).reduce((s,r)=>s+(r.mq||0)+(r.aq||0),0);
+      const ing26Total   = D26_FULL.reduce((s,r)=>s+(r.mq||0)+(r.aq||0),0);
       if (rec25Periodo>0) {
-        const pct = ((receitaTotalCamp-rec25Periodo)/rec25Periodo*100);
-        const up = pct>=0;
-        const seta = up?'\u25b2':'\u25bc';
-        pctEl.className = 'exec-kpi-delta ' + (up?'up':'down');
-        pctEl.textContent = seta + Math.abs(pct).toFixed(1) + '% vs 2025';
+        const pctR = ((receitaTotalCamp-rec25Periodo)/rec25Periodo*100);
+        const upR = pctR>=0; const setaR = upR?'▲':'▼';
+        const pctI = ing25Periodo>0 ? ((ing26Total-ing25Periodo)/ing25Periodo*100) : null;
+        const upI = pctI!==null && pctI>=0; const setaI = upI?'▲':'▼';
+        pctEl.className = '';
+        pctEl.innerHTML = `
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:4px">
+            <div class="exec-kpi-delta ${upR?'up':'down'}" style="display:flex;align-items:baseline;gap:4px"><span style="font-size:.58rem;color:#888;opacity:.7;letter-spacing:.04em">RECEITA</span><span>${setaR}${Math.abs(pctR).toFixed(1)}%</span></div>
+            ${pctI!==null?`<div class="exec-kpi-delta ${upI?'up':'down'}" style="display:flex;align-items:baseline;gap:4px"><span style="font-size:.58rem;color:#888;opacity:.7;letter-spacing:.04em">INGRESSOS</span><span>${setaI}${Math.abs(pctI).toFixed(1)}%</span></div>`:''}
+          </div>`;
       } else {
         pctEl.className = 'exec-kpi-delta';
         pctEl.textContent = '—';

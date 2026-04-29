@@ -751,13 +751,28 @@ function fmtDate(d) {
   return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
 }
 function setDelta(id, v26, v25) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  if (!v25 || v25 === 0) { el.className='kpi-delta neu'; el.textContent='sem dado 2025'; return; }
-  const pct = ((v26-v25)/Math.abs(v25)*100).toFixed(1);
-  const up = parseFloat(pct) >= 0;
-  el.className = 'kpi-delta ' + (up ? 'up' : 'down');
-  el.textContent = (up ? '▲ +' : '▼ ') + pct + '% vs 2025';
+  if (!v25) { document.getElementById(id).className='kpi-delta neu'; document.getElementById(id).innerHTML='—'; return; }
+  const pct = ((v26-v25)/v25*100).toFixed(1);
+  const up = pct>=0;
+  document.getElementById(id).className='kpi-delta '+(up?'up':'down');
+  document.getElementById(id).innerHTML=(up?'▲':'▼')+' '+Math.abs(pct)+'% vs 2025';
+}
+
+// setDelta2: dois deltas (receita + ingressos) num mesmo card
+function setDelta2(id, vR26, vR25, vI26, vI25) {
+  const el = document.getElementById(id); if(!el) return;
+  if (!vR25 && !vI25) { el.className='kpi-delta neu'; el.innerHTML='—'; return; }
+  const pctR = vR25>0 ? ((vR26-vR25)/vR25*100) : null;
+  const pctI = vI25>0 ? ((vI26-vI25)/vI25*100) : null;
+  const fmtP = (p,prefix) => {
+    if (p===null) return '';
+    const up = p>=0; const seta = up?'▲':'▼';
+    const cls = up?'up':'down';
+    return `<div class="kpi-delta ${cls}" style="display:flex;align-items:baseline;gap:4px;margin:0"><span style="font-size:.55rem;color:#888;opacity:.7;letter-spacing:.04em">${prefix}</span><span>${seta}${Math.abs(p).toFixed(1)}%</span></div>`;
+  };
+  el.className = '';
+  el.style.padding = '0';
+  el.innerHTML = `<div style="display:flex;flex-direction:column;gap:2px">${fmtP(pctR,'RECEITA')}${fmtP(pctI,'INGRESSOS')}</div>`;
 }
 function tvProgramsForDay26(day26) {
   const tv = TV_GLOBO.find(t => t.day26 === day26);
@@ -1073,8 +1088,8 @@ function renderKPIs(days26) {
 
   if (has26Sales) {
     setDelta('kpiReceitaDelta', rec26, rec25);
-    setDelta('kpiMotosDelta',   s26.mv, s25.mv);
-    setDelta('kpiAutosDelta',   s26.av, s25.av);
+    setDelta2('kpiMotosDelta', s26.mv, s25.mv, s26.mq, s25.mq);
+    setDelta2('kpiAutosDelta', s26.av, s25.av, s26.aq, s25.aq);
     setDelta('kpiIngressosDelta', ing26, ing25);
   } else {
     ['kpiReceitaDelta','kpiMotosDelta','kpiAutosDelta','kpiIngressosDelta'].forEach(id=>{
