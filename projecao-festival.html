@@ -602,32 +602,32 @@ async function carregarDados26(){
 const CENARIOS = {
   cons: {
     nome:'Conservador', color:'#FFB800',
-    dias_extras:.05, prog:.12, tkt_mult:1.00,
+    dias_extras:.00, prog:.00, tkt_mult:1.00,
     descricoes:{
-      ritmo:{desc:'Manter o ritmo atual de vendas (já estamos nele)'},
-      dias:{val:'+5%', desc:'Aproveitar os 57 dias a mais de campanha no vale'},
-      prog:{val:'+12%', desc:'ADSPLAY entrega no piso da expectativa nos últimos 3 meses'},
-      tkt:{val:'igual 2025', desc:'Ticket médio R$ 164 (sem evolução)'}
+      ritmo:{desc:'Manter o ritmo atual de vendas, sem uplifts'},
+      dias:{val:'sem ganho', desc:'Dias extras de campanha sem efeito direto na receita'},
+      prog:{val:'sem ganho', desc:'ADSPLAY apenas mantem volume, sem ganho extra'},
+      tkt:{val:'igual 2025', desc:'Ticket medio R$ 164 (sem evolucao)'}
     }
   },
   real: {
     nome:'Realista', color:'#C8FF00',
-    dias_extras:.10, prog:.22, tkt_mult:1.02,
+    dias_extras:.10, prog:.10, tkt_mult:1.00,
     descricoes:{
-      ritmo:{desc:'Manter o ritmo atual de vendas (já estamos nele)'},
+      ritmo:{desc:'Manter o ritmo atual de vendas (ja estamos nele)'},
       dias:{val:'+10%', desc:'Dias extras contribuindo moderadamente no vale'},
-      prog:{val:'+22%', desc:'ADSPLAY R$ 600k rodando 90 dias = ~R$ 6,7k/dia de pressão programática'},
-      tkt:{val:'+2%', desc:'2ª edição mais madura eleva percepção de valor'}
+      prog:{val:'+10%', desc:'ADSPLAY R$ 600k rodando 90 dias com performance media'},
+      tkt:{val:'igual 2025', desc:'Ticket medio R$ 164 (sem evolucao)'}
     }
   },
   otim: {
     nome:'Otimista', color:'#FF4444',
-    dias_extras:.18, prog:.35, tkt_mult:1.06,
+    dias_extras:.20, prog:.30, tkt_mult:1.05,
     descricoes:{
-      ritmo:{desc:'Manter o ritmo atual (base)'},
-      dias:{val:'+18%', desc:'Dias extras com alto aproveitamento (campanha renovada)'},
-      prog:{val:'+35%', desc:'ADSPLAY performando no topo (estratégia programática viraliza no Agosto)'},
-      tkt:{val:'+6%', desc:'Lineup premium + oferta segmentada puxam ticket médio'}
+      ritmo:{desc:'Manter o ritmo atual com picos na rampa final'},
+      dias:{val:'+20%', desc:'Dias extras com alto aproveitamento (campanha renovada)'},
+      prog:{val:'+30%', desc:'ADSPLAY performando no topo (estrategia programatica viraliza)'},
+      tkt:{val:'+5%', desc:'Lineup premium + oferta segmentada puxam ticket medio'}
     }
   }
 };
