@@ -358,8 +358,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
           </div>
           <div class="pace-row">
             <div class="pace-row-l">
-              <div class="pace-row-lbl">Se mantiver pace atual</div>
-              <div class="pace-row-sub" id="paceProjLinearSub">projeção linear sem rampa</div>
+              <div class="pace-row-lbl">Projeção linear (ref. sem rampa)</div>
+              <div class="pace-row-sub" id="paceProjLinearSub">referência secundária · não é o modelo usado</div>
             </div>
             <div class="pace-row-val" id="paceProjLinear">—</div>
           </div>
@@ -387,7 +387,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <br>• <span style="color:#C8FF00;font-weight:700">2026 PROJETADO (verde tracejado)</span> = continuação da curva — projeção de onde vai chegar até o festival (28/08).
       <br>• <span style="color:#9B5AB4;font-weight:600">2025 ritmo real (roxo pontilhado)</span> = como 2025 vendeu dia-a-dia. Achata em 02/07 porque o festival 2025 rolou em junho. <strong>Onde 2026 fica abaixo dela = vendas mais lentas que 2025 no mesmo dia</strong> — natural, porque 2026 tem 57 dias a mais e o público distribui a compra.
       <br>• <span style="color:#C8FF00">Faixa "Rampa final"</span> = últimos 30 dias (29/07 → 28/08). É <strong>aqui que a explosão acontece</strong>: em 2025, ~60% dos ingressos foram vendidos nas últimas 4 semanas. A projeção 2026 já modela esse comportamento.
-      <br><br><strong>Índice de viabilidade:</strong> calculado com base em 4 fatores — base do cenário (conservador 70% · realista 50% · otimista 25%), pace da janela curta, projeção linear do pace atual vs meta, e % do período decorrido. Não é probabilidade estatística, é um sinalizador de dificuldade que se atualiza a cada 60s com os dados novos.
+      <br><br><strong>Índice de viabilidade:</strong> calculado com base em 4 fatores — base do cenário (conservador 70% · realista 50% · otimista 25%), pace da janela curta vs curva de 2025, distância atual vs esperado pela curva, e % do período decorrido. Não é probabilidade estatística, é um sinalizador de dificuldade que se atualiza a cada 60s com os dados novos.
     </div>
   </div>
 </div>
@@ -850,8 +850,8 @@ function calcularGapEPace(c, cenarioKey){
   const projLinear = STATE.d26_rec + paceAtual * diasRest;
   const ratioLinear = projLinear / metaRec;
 
-  // PROJECAO COM CURVA (o que a metodologia do cenario projeta)
-  const projCurva = metaRec;
+  // PROJECAO COM CURVA (dados reais ate hoje + curva histórica 2025 para os dias restantes)
+  const projCurva = serie[DIAS_TOTAL - 1];
 
   // === INDICE DE VIABILIDADE ===
   // Base por cenario: quao provavel historicamente
@@ -890,36 +890,27 @@ function calcularGapEPace(c, cenarioKey){
   else if(ratioJanela >= 0.70){jStatus='warn'; jLbl='⚠ ABAIXO'; jClass='warn';}
   else {jStatus='alert'; jLbl='⚠ MUITO ABAIXO'; jClass='alert';}
 
-  // === INSIGHT HONESTO ===
-  // Usa a projecao linear pra dizer a verdade sobre o pace atual
-  const diffLinear = projLinear - metaRec;
-  const gapLinear = metaRec - projLinear;
+  // === DIAGNÓSTICO — BASEADO NA CURVA DE 2025 ===
+  // projCurva = dados reais + curva histórica para os dias restantes (não linear)
+  // jStatus compara pace atual vs o que a curva espera nos próximos 7 dias
+
+  // % da receita total que caiu na rampa final em 2025 (últimos 30 dias de campanha)
+  const rampRec2025 = D25_CAMPAIGN.slice(64).reduce((s,d)=>s+d.mv+d.av,0);
+  const rampPct2025 = d25_rec_tot > 0 ? Math.round((rampRec2025/d25_rec_tot)*100) : 60;
 
   let insightTxt = '';
 
-  // 3 situacoes:
-  // A) Pace atual ja sustentaria a meta (projLinear >= meta): super tranquilo
-  // B) Pace atual + rampa historica da: precisa a rampa acontecer (caso normal)
-  // C) Pace atual nao chega nem com rampa: risco real
+  if(jStatus === 'good'){
+    insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>acima do esperado</strong> para este momento da curva de 2025. Seguindo o padrão histórico de aceleração, a projeção fecha em <strong>${fmtM(projCurva)}</strong> — atingindo a meta ${c.nome.toLowerCase()} com ${viabPct}% de viabilidade. O período crítico é a rampa final (ago), que historicamente concentra ~${rampPct2025}% da receita total.`;
 
-  if(ratioLinear >= 1){
-    // A — Pace atual sozinho ja fecharia o cenario
-    insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> por si só já projeta fechamento em <strong>${fmtM(projLinear)}</strong>, <strong>${fmtM(diffLinear)} acima</strong> do cenário ${c.nome.toLowerCase()}. Quando a rampa natural e o ADSPLAY entrarem (a partir do d62), tende a superar ainda mais.`;
+  } else if(jStatus === 'ok'){
+    insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>no ritmo</strong> esperado pela curva de 2025 neste estágio. Seguindo o padrão histórico, a projeção fecha em <strong>${fmtM(projCurva)}</strong>. A rampa final de agosto (historicamente ~${rampPct2025}% da receita total) é o fator decisivo para bater o cenário ${c.nome.toLowerCase()}.`;
 
-  } else if(ratioLinear >= 0.5){
-    // B — Pace atual + rampa historica
-    const rampaNec = gapLinear;
-    const rampaPct = ((metaRec/projLinear - 1) * 100).toFixed(0);
-    if(jStatus === 'good' || jStatus === 'ok'){
-      insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>${jLbl.toLowerCase().replace('✓ ','')}</strong> na janela curta. Porém, se esse ritmo se mantiver linear até o fim, fecha em <strong>${fmtM(projLinear)}</strong> (${(ratioLinear*100).toFixed(0)}% da meta). Pra bater ${c.nome.toLowerCase()}, a rampa final precisa entregar <strong>${fmtM(rampaNec)}</strong> (~${rampaPct}% acima do linear).`;
+  } else if(jStatus === 'warn'){
+    insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>abaixo do esperado</strong> para este ponto da curva de 2025. A projeção pela curva fecha em <strong>${fmtM(projCurva)}</strong>. Acelerar a mídia antes da rampa final (ago) é essencial — essa janela concentra ~${rampPct2025}% da receita historicamente.`;
 
-    } else {
-      insightTxt = `Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> está <strong>${((1-ratioJanela)*100).toFixed(0)}% abaixo</strong> do esperado na janela curta. Mantendo esse ritmo, fecha em <strong>${fmtM(projLinear)}</strong> (${(ratioLinear*100).toFixed(0)}% da meta ${c.nome.toLowerCase()}).`;
-
-    }
   } else {
-    // C — Pace atual muito longe
-    insightTxt = `🚨 Pace atual de <strong>${fmtM(paceAtual)}/dia</strong> extrapolado linear fecha em <strong>${fmtM(projLinear)}</strong> — apenas <strong>${(ratioLinear*100).toFixed(0)}%</strong> do cenário ${c.nome.toLowerCase()}. Mesmo com a rampa histórica, distância crítica da meta.`;
+    insightTxt = `<strong>⚠ Pace atual de ${fmtM(paceAtual)}/dia</strong> está <strong>muito abaixo</strong> do esperado pela curva de 2025. A projeção pela curva fecha em <strong>${fmtM(projCurva)}</strong>. Intervenção imediata na mídia é necessária — a rampa final concentra ~${rampPct2025}% da receita, mas precisa de base sólida para decolar.`;
 
   }
 
