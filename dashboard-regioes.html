@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Investimento por Região — Festival Interlagos 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --lime:#C8FF00; --lime-dim:rgba(200,255,0,0.10); --lime-border:rgba(200,255,0,0.28);
+  --purple:#7B2D8B;
+  --bg:#0A0A0A; --card:#141414; --card2:#1A1A1A;
+  --text:#FFF; --text2:#CCC; --text3:#888;
+  --positive:#00FF88; --warn:#FFB800; --negative:#FF4444;
+  --border:rgba(255,255,255,0.08);
+  --radius:14px; --rad-sm:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;padding:18px;min-height:100vh}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* Header */
+.topbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px;padding:14px 20px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius)}
+.topbar-l{display:flex;align-items:center;gap:14px}
+.logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.4rem;color:var(--lime);letter-spacing:.08em}
+.title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
+.update{font-size:.7rem;color:var(--text3)}
+.update .dot{display:inline-block;width:6px;height:6px;background:var(--positive);border-radius:50%;margin-right:5px;vertical-align:middle;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--rad-sm);padding:14px 16px}
+.kpi.hi{background:linear-gradient(135deg,rgba(200,255,0,.10) 0%,rgba(200,255,0,.02) 100%);border-color:var(--lime-border)}
+.kpi-lbl{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:6px}
+.kpi-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.6rem;color:var(--text);line-height:1}
+.kpi.hi .kpi-val{color:var(--lime)}
+.kpi-sub{font-size:.7rem;color:var(--text3);margin-top:4px}
+
+/* Section header */
+.section-h{display:flex;justify-content:space-between;align-items:center;margin:22px 0 10px;padding:0 4px}
+.section-h h2{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.1rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text);display:flex;align-items:center;gap:10px}
+.section-h h2::before{content:'';width:3px;height:18px;background:var(--lime);border-radius:2px}
+.section-h .subtitle{font-size:.75rem;color:var(--text3)}
+
+/* Tabs evento */
+.tabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:var(--rad-sm);padding:4px;margin-bottom:14px;width:fit-content}
+.tab{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:none;border:none;padding:7px 18px;border-radius:6px;cursor:pointer;transition:all .15s}
+.tab.active{background:var(--lime);color:#000}
+.tab:not(.active):hover{color:var(--text)}
+
+/* Cards plataforma */
+.platforms{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px}
+@media (max-width: 768px){.platforms{grid-template-columns:1fr}}
+.plat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden}
+.plat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--lime);opacity:.5}
+.plat-card.tm::before{background:var(--purple);opacity:.7}
+.plat-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.plat-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.1rem;text-transform:uppercase;letter-spacing:.05em;color:var(--lime)}
+.plat-card.tm .plat-name{color:#C28BD3}
+.plat-total{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.2rem;color:var(--text)}
+.plat-total small{font-size:.65rem;color:var(--text3);font-weight:600;display:block;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+
+/* Lista de regiões */
+.regions{display:flex;flex-direction:column;gap:6px}
+.region-row{display:grid;grid-template-columns:60px 1fr 70px;gap:10px;align-items:center;padding:6px 0}
+.region-uf{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--text)}
+.region-bar-wrap{height:7px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden}
+.region-bar{height:100%;background:linear-gradient(90deg,var(--lime) 0%,#80FF88 100%);border-radius:4px;transition:width .5s ease}
+.tm .region-bar{background:linear-gradient(90deg,var(--purple) 0%,#C28BD3 100%)}
+.region-pct{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.95rem;color:var(--text2);text-align:right}
+.region-amt{font-size:.7rem;color:var(--text3);font-weight:500}
+
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:.85rem}
+
+/* Footer */
+.foot{margin-top:24px;padding:14px 20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rad-sm);font-size:.72rem;color:var(--text3);line-height:1.55}
+.foot strong{color:var(--text2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="topbar">
+    <div class="topbar-l">
+      <div class="logo">LIME</div>
+      <div style="width:1px;height:20px;background:rgba(255,255,255,.12)"></div>
+      <div class="title">Investimento por Região · Festival Interlagos 2026</div>
+    </div>
+    <div class="update"><span class="dot"></span><span id="updateLabel">carregando…</span></div>
+  </div>
+
+  <!-- KPIs TOPO -->
+  <div class="kpis">
+    <div class="kpi hi"><div class="kpi-lbl">Investido (Meta + Google)</div><div class="kpi-val" id="kpiTotal">—</div><div class="kpi-sub" id="kpiSub">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">Meta Ads</div><div class="kpi-val" id="kpiMeta">—</div><div class="kpi-sub" id="kpiMetaSub">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">Google Ads</div><div class="kpi-val" id="kpiGoogle">—</div><div class="kpi-sub" id="kpiGoogleSub">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">Estados ativos</div><div class="kpi-val" id="kpiUFs">—</div><div class="kpi-sub">UFs com gasto</div></div>
+  </div>
+
+  <!-- TABS EVENTO -->
+  <div class="section-h">
+    <h2>Por Evento × Plataforma</h2>
+    <div class="subtitle" id="periodLabel">—</div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" data-evento="ALL">Todos</button>
+    <button class="tab" data-evento="MOTO">Moto (13–16/08)</button>
+    <button class="tab" data-evento="AUTO">Auto (27–30/08)</button>
+    <button class="tab" data-evento="GERAL">Geral</button>
+  </div>
+
+  <!-- CARDS PLATAFORMA -->
+  <div class="platforms">
+    <div class="plat-card" id="plat-nosso">
+      <div class="plat-head">
+        <div>
+          <div class="plat-name">Sistema Próprio</div>
+          <div style="font-size:.7rem;color:var(--text3);margin-top:3px">Site oficial</div>
+        </div>
+        <div class="plat-total" id="totalNosso">—<small>investido</small></div>
+      </div>
+      <div class="regions" id="regionsNosso"></div>
+    </div>
+
+    <div class="plat-card tm" id="plat-tm">
+      <div class="plat-head">
+        <div>
+          <div class="plat-name">Ticketmaster</div>
+          <div style="font-size:.7rem;color:var(--text3);margin-top:3px">Plataforma terceirizada</div>
+        </div>
+        <div class="plat-total" id="totalTM">—<small>investido</small></div>
+      </div>
+      <div class="regions" id="regionsTM"></div>
+    </div>
+  </div>
+
+  <!-- CONSOLIDADO POR EVENTO -->
+  <div class="section-h">
+    <h2>Consolidado Geral (Meta + Google) — % por UF</h2>
+    <div class="subtitle">Independente de plataforma</div>
+  </div>
+  <div class="platforms" style="grid-template-columns:repeat(2,1fr)">
+    <div class="plat-card">
+      <div class="plat-head">
+        <div>
+          <div class="plat-name" style="color:#FFB800">Moto</div>
+          <div style="font-size:.7rem;color:var(--text3);margin-top:3px">13 a 16 de agosto</div>
+        </div>
+        <div class="plat-total" id="totalMoto">—<small>total moto</small></div>
+      </div>
+      <div class="regions" id="regionsMoto"></div>
+    </div>
+    <div class="plat-card">
+      <div class="plat-head">
+        <div>
+          <div class="plat-name" style="color:#5DAEFF">Auto</div>
+          <div style="font-size:.7rem;color:var(--text3);margin-top:3px">27 a 30 de agosto</div>
+        </div>
+        <div class="plat-total" id="totalAuto">—<small>total auto</small></div>
+      </div>
+      <div class="regions" id="regionsAuto"></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    💡 <strong>Como funciona:</strong> dados puxados via API direto do Meta Ads e Google Ads, separados por campanha. As campanhas com <strong>[MOTO]</strong> ou <strong>[AUTO]</strong> no nome são classificadas no respectivo evento; as <strong>[GERAL]/[PMAX]/[PESQUI]/[RMKT]</strong> contam como "Geral" (atende ambos os eventos). A plataforma é detectada pela presença de "TICKET", "TM" ou "EVENTIM" no nome da campanha. Atualiza a cada 30 minutos via GitHub Actions.
+  </div>
+</div>
+
+<script>
+const fmtBRL  = v => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+const fmtBRLm = v => v >= 1000 ? 'R$ ' + (v/1000).toFixed(1) + 'k' : fmtBRL(v);
+
+let DATA = null;
+let currentEvento = 'ALL';
+
+// ── Carrega dados ───────────────────────────────────────────────────
+async function carregar() {
+  try {
+    const resp = await fetch('regions-data.json?t=' + Date.now());
+    if (!resp.ok) throw new Error('regions-data.json não encontrado');
+    DATA = await resp.json();
+  } catch(e) {
+    console.warn('Erro:', e.message);
+    document.getElementById('updateLabel').textContent = 'aguardando primeira execução do GitHub Actions…';
+    return;
+  }
+
+  document.getElementById('updateLabel').textContent = 'atualizado em ' + DATA.updated_at;
+  document.getElementById('periodLabel').textContent = `${DATA.period.start} → ${DATA.period.end}`;
+
+  renderKPIs();
+  render();
+}
+
+function renderKPIs() {
+  const meta   = (DATA.meta?.rows   || []).reduce((s,r)=>s+r.spend, 0);
+  const google = (DATA.google?.rows || []).reduce((s,r)=>s+r.spend, 0);
+  const total  = meta + google;
+
+  document.getElementById('kpiTotal').textContent  = fmtBRLm(total);
+  document.getElementById('kpiSub').textContent    = `${(DATA.meta?.rows||[]).length + (DATA.google?.rows||[]).length} linhas de dados`;
+  document.getElementById('kpiMeta').textContent   = fmtBRLm(meta);
+  document.getElementById('kpiMetaSub').textContent = total > 0 ? `${(meta/total*100).toFixed(1)}% do total` : '—';
+  document.getElementById('kpiGoogle').textContent = fmtBRLm(google);
+  document.getElementById('kpiGoogleSub').textContent = total > 0 ? `${(google/total*100).toFixed(1)}% do total` : '—';
+
+  const ufs = new Set();
+  [...(DATA.meta?.rows||[]), ...(DATA.google?.rows||[])].forEach(r => ufs.add(r.uf));
+  document.getElementById('kpiUFs').textContent = ufs.size;
+}
+
+// Filtra rows pela evento ativo (ou todos)
+function filtrarRows() {
+  const all = [...(DATA.meta?.rows||[]), ...(DATA.google?.rows||[])];
+  if (currentEvento === 'ALL') return all;
+  return all.filter(r => r.evento === currentEvento);
+}
+
+function agregarPorPlataformaUF(rows) {
+  const out = { NOSSO: {}, TICKETMASTER: {} };
+  for (const r of rows) {
+    const pl = r.plataforma || 'NOSSO';
+    out[pl][r.uf] = (out[pl][r.uf] || 0) + r.spend;
+  }
+  return out;
+}
+
+function agregarPorUF(rows) {
+  const out = {};
+  for (const r of rows) {
+    out[r.uf] = (out[r.uf] || 0) + r.spend;
+  }
+  return out;
+}
+
+function renderRegions(containerId, distribuicao, totalElId) {
+  const container = document.getElementById(containerId);
+  const total = Object.values(distribuicao).reduce((s,v)=>s+v, 0);
+
+  if (totalElId) {
+    document.getElementById(totalElId).innerHTML =
+      `${fmtBRLm(total)}<small>investido</small>`;
+  }
+
+  if (total === 0) {
+    container.innerHTML = '<div class="empty">Sem investimento neste filtro</div>';
+    return;
+  }
+
+  // Ordena por valor desc, top 8
+  const sorted = Object.entries(distribuicao).sort((a,b) => b[1]-a[1]).slice(0, 10);
+
+  container.innerHTML = sorted.map(([uf, val]) => {
+    const pct = (val/total*100);
+    return `
+      <div class="region-row">
+        <div class="region-uf">${uf}</div>
+        <div>
+          <div class="region-bar-wrap"><div class="region-bar" style="width:${pct}%"></div></div>
+          <div class="region-amt">${fmtBRLm(val)}</div>
+        </div>
+        <div class="region-pct">${pct.toFixed(1)}%</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function render() {
+  const rows = filtrarRows();
+  const platMatrix = agregarPorPlataformaUF(rows);
+
+  renderRegions('regionsNosso', platMatrix.NOSSO,        'totalNosso');
+  renderRegions('regionsTM',    platMatrix.TICKETMASTER, 'totalTM');
+
+  // Consolidado por evento (independente do filtro do tab)
+  const allRows = [...(DATA.meta?.rows||[]), ...(DATA.google?.rows||[])];
+  const motoRows = allRows.filter(r => r.evento === 'MOTO');
+  const autoRows = allRows.filter(r => r.evento === 'AUTO');
+
+  renderRegions('regionsMoto', agregarPorUF(motoRows), 'totalMoto');
+  renderRegions('regionsAuto', agregarPorUF(autoRows), 'totalAuto');
+}
+
+// Tabs
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentEvento = btn.dataset.evento;
+    if (DATA) render();
+  });
+});
+
+// Auto-refresh
+carregar();
+setInterval(carregar, 5 * 60 * 1000);  // refresh a cada 5min
+</script>
+</body>
+</html>
