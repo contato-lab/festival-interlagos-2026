@@ -1034,9 +1034,9 @@ function renderChart(key){
 
         // ── 2026 (VERDE LIME — sempre) ────────────────────────────
         // 2026 realizado (atual ate hoje)
-        {label:'2026 REALIZADO (ate hoje)', data:serieReal, borderColor:'#C8FF00', backgroundColor:'rgba(200,255,0,0.18)', borderWidth:4, pointRadius:0, tension:.25, fill:true},
+        {label:'2026 REALIZADO (D+'+STATE.d26_dias+' de 151)', data:serieReal, borderColor:'#C8FF00', backgroundColor:'rgba(200,255,0,0.18)', borderWidth:4, pointRadius:0, tension:.25, fill:true},
         // 2026 projetado (futuro) — MESMA cor lime, so dashed pra distinguir
-        {label:'2026 PROJETADO ('+c.nome+')', data:serieFuturo, borderColor:'#C8FF00', backgroundColor:'rgba(200,255,0,0.06)', borderWidth:3, borderDash:[6,4], pointRadius:0, tension:.25, fill:true}
+        {label:'2026 PROJETADO ('+c.nome+', 151 dias)', data:serieFuturo, borderColor:'#C8FF00', backgroundColor:'rgba(200,255,0,0.06)', borderWidth:3, borderDash:[6,4], pointRadius:0, tension:.25, fill:true}
       ]
     },
     options:{
