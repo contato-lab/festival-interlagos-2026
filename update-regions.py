@@ -33,18 +33,72 @@ ESTADO_PARA_UF = {
 
 # ── Classifica campanha por evento ──────────────────────────────────────────
 def classificar_evento(nome_campanha: str) -> str:
+    """Detecta MOTO/AUTO em qualquer formato: [MOTO], [VENDAS MOTO], MOTO PMAX, etc."""
     n = nome_campanha.upper()
-    if '[MOTO]' in n or 'MOTO' in n.split():
+    # MOTO: [MOTO], [VENDAS MOTO], [MOTO PMAX]
+    if 'MOTO' in n:
         return 'MOTO'
-    if '[AUTO]' in n or 'AUTO' in n.split() or 'AUTO PMAX' in n:
+    # AUTO: [AUTO], [VENDAS AUTO], [AUTO PMAX]
+    if 'AUTO' in n and 'AUTOMATIC' not in n:
         return 'AUTO'
-    return 'GERAL'  # PMAX/PESQUI/RMKT/NOVA DEMANDA — atende ambos
+    return 'GERAL'  # PMAX/PESQUI/RMKT/NOVA DEMANDA/VENDAS — atende ambos
 
-def classificar_plataforma(nome_campanha: str) -> str:
-    n = nome_campanha.upper()
-    if 'TICKET' in n or 'TM' in n.split() or 'EVENTIM' in n:
+def classificar_plataforma_por_url(url: str) -> str:
+    """Detecta plataforma pela URL de destino do anúncio."""
+    if not url:
+        return 'DESCONHECIDA'
+    u = url.lower()
+    # Ticketmaster: ticketmaster.com.br, premier.ticketmaster.com.br
+    if 'ticketmaster' in u or 'tm.com' in u:
         return 'TICKETMASTER'
-    return 'NOSSO'  # default — sistema próprio
+    # Eventim (caso usem)
+    if 'eventim' in u:
+        return 'TICKETMASTER'  # agrupado no terceirizado
+    # Site próprio: festivalinterlagos.com.br ou variantes do domínio
+    if 'festivalinterlagos' in u or 'suhaifestival' in u or 'interlagosfestival' in u:
+        return 'NOSSO'
+    return 'NOSSO'  # default cauteloso
+
+
+# ════════════════════════════════════════════════════════════════════════
+# META ADS — Mapa campaign_id → URL de destino (via ads ativos)
+# ════════════════════════════════════════════════════════════════════════
+def fetch_meta_campaign_urls():
+    """
+    Para cada campanha, busca a URL de destino majoritária.
+    Usa /ads endpoint com creative.object_story_spec.link_data.link
+    """
+    out = {}  # campaign_id -> url
+    params = {
+        'fields':       'id,campaign_id,creative{object_story_spec,effective_object_story_id}',
+        'limit':        '200',
+        'access_token': META_TOKEN,
+    }
+    url = f'https://graph.facebook.com/{API_VERSION}/{META_ACCT}/ads?{urllib.parse.urlencode(params)}'
+
+    while url:
+        try:
+            with urllib.request.urlopen(url, timeout=60) as resp:
+                data = json.loads(resp.read())
+        except Exception as e:
+            print(f'    ⚠ Erro fetch Meta ads URLs: {e}')
+            break
+
+        for ad in data.get('data', []):
+            cid = ad.get('campaign_id', '')
+            if cid in out:
+                continue  # já temos uma URL pra essa campanha
+            creative = ad.get('creative') or {}
+            spec = creative.get('object_story_spec') or {}
+            link = (spec.get('link_data') or {}).get('link') \
+                or (spec.get('video_data') or {}).get('call_to_action', {}).get('value', {}).get('link') \
+                or ''
+            if link and cid:
+                out[cid] = link
+
+        url = (data.get('paging') or {}).get('next')
+
+    return out
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -55,6 +109,12 @@ def fetch_meta_regions():
         print('  ⚠ META_TOKEN não definido, pulando Meta')
         return []
 
+    # 1) Mapa campaign_id -> URL de destino
+    print('     → buscando URLs das campanhas...')
+    url_map = fetch_meta_campaign_urls()
+    print(f'     → {len(url_map)} campanhas com URL identificada')
+
+    # 2) Insights com breakdown por região
     params = {
         'fields':         'campaign_id,campaign_name,spend',
         'breakdowns':     'region',
@@ -72,16 +132,19 @@ def fetch_meta_regions():
         for r in data.get('data', []):
             estado = r.get('region', '').strip()
             uf = ESTADO_PARA_UF.get(estado, estado[:2].upper() if estado else 'OUTROS')
+            cid = r.get('campaign_id', '')
+            cname = r.get('campaign_name', '')
+            destino = url_map.get(cid, '')
             rows.append({
-                'campaign_id':   r.get('campaign_id', ''),
-                'campaign_name': r.get('campaign_name', ''),
-                'evento':        classificar_evento(r.get('campaign_name', '')),
-                'plataforma':    classificar_plataforma(r.get('campaign_name', '')),
+                'campaign_id':   cid,
+                'campaign_name': cname,
+                'evento':        classificar_evento(cname),
+                'plataforma':    classificar_plataforma_por_url(destino),
+                'destino_url':   destino,
                 'estado':        estado,
                 'uf':            uf,
                 'spend':         float(r.get('spend', 0) or 0),
             })
-        # paginação
         paging = data.get('paging', {})
         url = paging.get('next')
 
@@ -119,7 +182,30 @@ def fetch_google_regions():
     today = date.today()
     start_date = today - timedelta(days=60)
 
-    # Query 1: gasto por campanha + region resource
+    # ── 1) URLs por campanha (via ad_group_ad.ad.final_urls) ────────────
+    print('     → buscando URLs das campanhas...')
+    url_query = f"""
+        SELECT
+            campaign.id,
+            ad_group_ad.ad.final_urls
+        FROM ad_group_ad
+        WHERE campaign.status != 'REMOVED'
+            AND campaign.name LIKE '%FESTIVAL INTERLAGOS%'
+            AND ad_group_ad.status != 'REMOVED'
+    """
+    url_response = ga_service.search_stream(customer_id=customer_id, query=url_query)
+    url_map = {}  # campaign_id -> primeira URL não vazia
+    for batch in url_response:
+        for r in batch.results:
+            cid = str(r.campaign.id)
+            if cid in url_map:
+                continue
+            urls = list(r.ad_group_ad.ad.final_urls or [])
+            if urls:
+                url_map[cid] = urls[0]
+    print(f'     → {len(url_map)} campanhas com URL identificada')
+
+    # ── 2) Spend por campanha + region resource ─────────────────────────
     query = f"""
         SELECT
             campaign.id,
@@ -173,16 +259,18 @@ def fetch_google_regions():
                 estado = canonical.split(',')[0].strip()
                 name_map[r.geo_target_constant.resource_name] = estado
 
-    # Anexa nome + UF + classificação
+    # Anexa nome + UF + classificação por URL
     enriched = []
     for r in rows:
         estado = name_map.get(r['region_resource'], 'Desconhecido')
         uf = ESTADO_PARA_UF.get(estado, estado[:2].upper() if estado else 'OUTROS')
+        destino = url_map.get(r['campaign_id'], '')
         enriched.append({
             'campaign_id':   r['campaign_id'],
             'campaign_name': r['campaign_name'],
             'evento':        classificar_evento(r['campaign_name']),
-            'plataforma':    classificar_plataforma(r['campaign_name']),
+            'plataforma':    classificar_plataforma_por_url(destino),
+            'destino_url':   destino,
             'estado':        estado,
             'uf':            uf,
             'spend':         r['spend'],
