@@ -491,11 +491,13 @@ tr:hover td{background:rgba(255,255,255,.018)}
         <div class="mk-label">Sistema Próprio</div>
         <div class="mk-val" style="color:var(--lime)" id="autosProprio">—</div>
         <div style="font-size:.72rem;color:#999;margin-top:2px" id="autosProprioQtd">—</div>
+        <div style="font-size:.62rem;color:#666;margin-top:1px;font-style:italic" id="autosProprioTkt">—</div>
       </div>
       <div class="mk">
         <div class="mk-label">Ticket Master</div>
         <div class="mk-val" style="color:#024DDF" id="autosTM">—</div>
         <div style="font-size:.72rem;color:#999;margin-top:2px" id="autosTMQtd">—</div>
+        <div style="font-size:.62rem;color:#666;margin-top:1px;font-style:italic" id="autosTMTkt">—</div>
       </div>
     </div>
   </div>
@@ -737,6 +739,10 @@ function calcKPIs() {
   document.getElementById('autosTM').textContent=fmtK(s26.at);
   document.getElementById('autosProprioQtd').textContent=fmtN(s26.apQ)+' ingressos';
   document.getElementById('autosTMQtd').textContent=fmtN(s26.atQ)+' ingressos';
+  // Ticket médio (valor / qtd)
+  const tktFmt = (v, q) => q > 0 ? 'TKT R$ ' + Math.round(v/q).toLocaleString('pt-BR') : 'TKT —';
+  document.getElementById('autosProprioTkt').textContent = tktFmt(s26.ap, s26.apQ);
+  document.getElementById('autosTMTkt').textContent      = tktFmt(s26.at, s26.atQ);
 }
 
 // ═══════════════════════════════════════════════
