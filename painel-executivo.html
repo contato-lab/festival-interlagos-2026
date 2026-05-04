@@ -747,11 +747,21 @@ const TM_WORKER_URL = 'https://ticketmaster-festival-interlagos.performance-ef2.
 async function fetchTicketmaster() {
   try {
     let res;
-    try {
-      res = await fetch(TM_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
-      if (!res.ok) throw new Error('TM Worker HTTP ' + res.status);
-    } catch(err) {
-      console.warn('[TM Worker] falhou, usando fallback ticketmaster-data.json:', err.message);
+    // Retry no Worker antes de cair pro JSON: 3 tentativas com backoff (Worker as vezes da 503 transitorio)
+    let workerErr = null;
+    for (let i = 0; i < 3; i++) {
+      try {
+        res = await fetch(TM_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
+        if (res.ok) { workerErr = null; break; }
+        throw new Error('TM Worker HTTP ' + res.status);
+      } catch(err) {
+        workerErr = err;
+        res = null;
+        if (i < 2) await new Promise(r => setTimeout(r, 800 * (i+1)));
+      }
+    }
+    if (!res) {
+      console.warn('[TM Worker] 3 tentativas falharam, usando fallback ticketmaster-data.json:', workerErr?.message);
       res = await fetch('ticketmaster-data.json?t=' + Date.now(), {cache:'no-store'});
       if (!res.ok) throw new Error('nao encontrado');
     }
@@ -791,11 +801,20 @@ const VENDAS_WORKER_URL = 'https://vendas-festival-interlagos.performance-ef2.wo
 async function fetchVendasProprio() {
   try {
     let res;
-    try {
-      res = await fetch(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
-      if (!res.ok) throw new Error('Worker HTTP ' + res.status);
-    } catch(err) {
-      console.warn('[Worker] falhou, usando fallback vendas-data.json:', err.message);
+    let workerErr = null;
+    for (let i = 0; i < 3; i++) {
+      try {
+        res = await fetch(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
+        if (res.ok) { workerErr = null; break; }
+        throw new Error('Worker HTTP ' + res.status);
+      } catch(err) {
+        workerErr = err;
+        res = null;
+        if (i < 2) await new Promise(r => setTimeout(r, 800 * (i+1)));
+      }
+    }
+    if (!res) {
+      console.warn('[Vendas Worker] 3 tentativas falharam, usando fallback vendas-data.json:', workerErr?.message);
       res = await fetch('vendas-data.json?t=' + Date.now(), {cache:'no-store'});
       if (!res.ok) throw new Error('vendas-data.json HTTP ' + res.status);
     }
@@ -1561,7 +1580,7 @@ function renderExecConversoes() {
     </div>
     <div class="exec-conv-row">
       <span class="exec-conv-label">Org\u00e2nico / Direto / Outros <span style="font-size:.6rem;color:#666">(ingressos \u2212 ADS)</span></span>
-      <span class="exec-conv-val" style="color:var(--text2)">${ingTot>0 ? orgConv.toLocaleString('pt-BR') : '\u2014'}</span>
+      <span class="exec-conv-val" style="color:var(--text2)">${ingTot>0 ? Math.round(orgConv).toLocaleString('pt-BR') : '\u2014'}</span>
     </div>
     <div class="exec-conv-row" style="border-top:1px solid rgba(200,255,0,.15);margin-top:4px;padding-top:10px">
       <span class="exec-conv-label"><strong>Total Ingressos</strong> <span style="font-size:.6rem;color:#666">planilha</span></span>

@@ -2094,11 +2094,20 @@ const TM_WORKER_URL = 'https://ticketmaster-festival-interlagos.performance-ef2.
 async function fetchTicketmaster() {
   try {
     let res;
-    try {
-      res = await fetch(TM_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
-      if (!res.ok) throw new Error('TM Worker HTTP ' + res.status);
-    } catch(err) {
-      console.warn('[TM Worker] falhou, usando fallback ticketmaster-data.json:', err.message);
+    let workerErr = null;
+    for (let i = 0; i < 3; i++) {
+      try {
+        res = await fetch(TM_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
+        if (res.ok) { workerErr = null; break; }
+        throw new Error('TM Worker HTTP ' + res.status);
+      } catch(err) {
+        workerErr = err;
+        res = null;
+        if (i < 2) await new Promise(r => setTimeout(r, 800 * (i+1)));
+      }
+    }
+    if (!res) {
+      console.warn('[TM Worker] 3 tentativas falharam, usando fallback ticketmaster-data.json:', workerErr?.message);
       res = await fetch('ticketmaster-data.json?t=' + Date.now(), {cache:'no-store'});
       if (!res.ok) throw new Error('ticketmaster-data.json HTTP ' + res.status);
     }
@@ -2151,11 +2160,20 @@ const VENDAS_WORKER_URL = 'https://vendas-festival-interlagos.performance-ef2.wo
 async function fetchVendasProprio() {
   try {
     let res;
-    try {
-      res = await fetch(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
-      if (!res.ok) throw new Error('Worker HTTP ' + res.status);
-    } catch(err) {
-      console.warn('[Worker] falhou, usando fallback vendas-data.json:', err.message);
+    let workerErr = null;
+    for (let i = 0; i < 3; i++) {
+      try {
+        res = await fetch(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
+        if (res.ok) { workerErr = null; break; }
+        throw new Error('Worker HTTP ' + res.status);
+      } catch(err) {
+        workerErr = err;
+        res = null;
+        if (i < 2) await new Promise(r => setTimeout(r, 800 * (i+1)));
+      }
+    }
+    if (!res) {
+      console.warn('[Vendas Worker] 3 tentativas falharam, usando fallback vendas-data.json:', workerErr?.message);
       res = await fetch('vendas-data.json?t=' + Date.now(), {cache:'no-store'});
       if (!res.ok) throw new Error('vendas-data.json HTTP ' + res.status);
     }
