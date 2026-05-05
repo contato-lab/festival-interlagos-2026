@@ -1126,6 +1126,8 @@ function applyFiltro(){
   updateMediaTotals(deStr, ateStr);
   // Atualiza GA4 com o mesmo range
   if(GA4_DATA) { buildGA4Sources(deStr, ateStr); buildGA4Funnel(deStr, ateStr); }
+  // Atualiza Análise de Criativos com o mesmo range (escala proporcional)
+  if(META_CREATIVES_DATA) renderCreatives();
 }
 
 function initFiltro(){
@@ -1564,14 +1566,14 @@ function buildGA4Sources(dateFrom, dateTo) {
     // Recalcula canais que temos dados diários, mantém proporção dos outros
     const fullTotal = sources.reduce((a,s) => a + s.sessions, 0);
     const filteredTotal = t ? t.sessions : fullTotal;
+    const ratio = fullTotal > 0 ? filteredTotal / fullTotal : 1;
     displaySources = sources.map(src => {
       const mappedName = _GA4_CHANNEL_MAP_REV[src.channel];
       if (mappedName && filteredChannels[mappedName] !== undefined) {
-        // Temos dados diários para este canal
-        return { channel: src.channel, sessions: filteredChannels[mappedName], conversions: 0, _exact: true };
+        // Temos dados diários para este canal — sessões exatas, conversões escaladas
+        return { channel: src.channel, sessions: filteredChannels[mappedName], conversions: Math.round((src.conversions||0) * ratio), _exact: true };
       }
       // Escala proporcional para canais sem dados diários
-      const ratio = fullTotal > 0 ? filteredTotal / fullTotal : 1;
       return { channel: src.channel, sessions: Math.round(src.sessions * ratio), conversions: Math.round((src.conversions||0) * ratio), _exact: false };
     });
   } else {
@@ -1609,13 +1611,21 @@ function buildGA4Sources(dateFrom, dateTo) {
   refDiv.innerHTML = '';
   const rawReferrers = (GA4_DATA?.influencer_breakdown?.length ? GA4_DATA.influencer_breakdown : GA4_REFERRERS.map(r=>({...r, source:r.name})));
   const INFL_CONV_RATE = 0.015;
-  // Aplica filtro de datas se disponível
+  // Aplica filtro de datas se disponível — escala proporcional sessões + conversões
   const referrers = rawReferrers.map(r => {
     if (!hasFilter || !r.daily) return r;
+    const fullSess = r.sessions || 0;
     const dailySess = Object.entries(r.daily)
       .filter(([d]) => d >= dateFrom && d <= dateTo)
       .reduce((s, [,n]) => s + n, 0);
-    return {...r, sessions: dailySess};
+    const ratio = fullSess > 0 ? dailySess / fullSess : 0;
+    const filteredConv = Math.round((r.conversions || 0) * ratio);
+    // Escala tickets também (visualizações por tipo de ingresso)
+    const filteredTickets = {};
+    if (r.tickets) {
+      Object.entries(r.tickets).forEach(([k,v]) => { filteredTickets[k] = Math.round(v * ratio); });
+    }
+    return {...r, sessions: dailySess, conversions: filteredConv, tickets: filteredTickets};
   }).filter(r => r.sessions > 0).sort((a,b) => b.sessions - a.sessions);
   referrers.forEach(r => {
     const conv    = r.conversions || 0;
@@ -2328,12 +2338,39 @@ async function fetchMetaCreatives() {
 
 function renderCreatives() {
   if (!META_CREATIVES_DATA) return;
+
+  // Calcula ratio do Meta Ads filtrado vs total da campanha (a API de criativos
+  // nao retorna breakdown diario, entao escalamos os totais proporcionalmente)
+  const de  = document.getElementById('filtroDE')?.value  || '';
+  const ate = document.getElementById('filtroATE')?.value || '';
+  let ratio = 1;
+  let isFiltered = false;
+  if (de && ate && META_DATA?.daily_series && META_DATA?.totals?.cost > 0) {
+    const filteredCost = META_DATA.daily_series
+      .filter(d => d.date >= de && d.date <= ate)
+      .reduce((s, d) => s + (d.cost || 0), 0);
+    const fullCost = META_DATA.totals.cost;
+    if (fullCost > 0 && filteredCost < fullCost) {
+      ratio = filteredCost / fullCost;
+      isFiltered = true;
+    }
+  }
+
   const sortBy = document.getElementById('creativesSortSel')?.value || 'spend';
   const creatives = [...META_CREATIVES_DATA.creatives]
+    .map(c => isFiltered ? {
+      ...c,
+      impressions: Math.round((c.impressions||0) * ratio),
+      clicks:      Math.round((c.clicks||0) * ratio),
+      spend:       (c.spend||0) * ratio,
+      purchases:   Math.round((c.purchases||0) * ratio),
+      // ctr e cpp nao mudam (sao ratios) — recalcula caso queira precisao
+      cpp: c.purchases > 0 && ratio > 0 ? ((c.spend||0) * ratio) / Math.max(1, Math.round((c.purchases||0) * ratio)) : c.cpp,
+      _scaled: true,
+    } : c)
     .filter(c => c.spend > 0 || c.impressions > 0)
     .sort((a,b) => {
       if (sortBy === 'cpp') {
-        // Sem vendas vai pro fim
         const av = a.cpp ?? 9e9, bv = b.cpp ?? 9e9;
         return av - bv;
       }
@@ -2341,7 +2378,16 @@ function renderCreatives() {
     })
     .slice(0, 20);
 
-  const tot = META_CREATIVES_DATA.totals || {};
+  const fullTot = META_CREATIVES_DATA.totals || {};
+  const tot = isFiltered ? {
+    spend:       (fullTot.spend||0) * ratio,
+    impressions: Math.round((fullTot.impressions||0) * ratio),
+    clicks:      Math.round((fullTot.clicks||0) * ratio),
+    purchases:   Math.round((fullTot.purchases||0) * ratio),
+    active_ads:  fullTot.active_ads,
+    ctr:         fullTot.ctr,  // ratio nao muda
+    cpp:         fullTot.cpp,  // ratio nao muda
+  } : fullTot;
   const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
   const fmtImp = v => v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1e3)+'K':String(v||0);
 
