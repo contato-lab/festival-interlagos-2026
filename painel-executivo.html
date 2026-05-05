@@ -372,6 +372,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
           <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(37,211,102,.9)"></span>
           <span style="color:#25D366">💬 Disparos WhatsApp</span>
         </div>
+        <div class="exec-leg-item clickable" id="exec-virLegVendas" style="display:none" onclick="execToggleAcao('virada',this)">
+          <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,107,157,.95)"></span>
+          <span style="color:#FF6B9D">💰 Post Virada de Lote</span>
+        </div>
       </div>
       <div class="exec-chart-wrap"><canvas id="exec-chartVendas"></canvas></div>
     </div>
@@ -918,6 +922,10 @@ const EXEC_WHATSAPP = [
   {date:'2026-04-23', day26:24, desc:'Disparos WhatsApp — início'},
 ];
 
+const EXEC_VIRADA = [
+  {date:'2026-04-30', day26:31, desc:'Post Virada de Lote'},
+];
+
 const EXEC_TV_GLOBO = [
   {date:'2026-04-01', day26:2, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
   {date:'2026-04-02', day26:3, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
@@ -998,7 +1006,7 @@ function execGetAllDays(invest) {
 }
 
 /* Estado de visibilidade das ações (toggle na legenda) */
-const execAcoesVisiveis = { tv: true, influencer: true, divulgacao: true, spotify: true, whatsapp: true };
+const execAcoesVisiveis = { tv: true, influencer: true, divulgacao: true, spotify: true, whatsapp: true, virada: true };
 
 function execToggleAcao(tipo, el) {
   execAcoesVisiveis[tipo] = !execAcoesVisiveis[tipo];
@@ -1056,6 +1064,16 @@ function execGetTvAnnotations(days) {
       anns['wa_'+wa.day26] = {
         type:'line', xMin:idx, xMax:idx,
         borderColor:'rgba(37,211,102,0.9)', borderWidth:2, borderDash:[4,3]
+      };
+    });
+  }
+  if(execAcoesVisiveis.virada) {
+    EXEC_VIRADA.forEach(vr => {
+      const idx = days.indexOf(vr.day26);
+      if(idx === -1) return;
+      anns['vir_'+vr.day26] = {
+        type:'line', xMin:idx, xMax:idx,
+        borderColor:'rgba(255,107,157,0.95)', borderWidth:2, borderDash:[6,4]
       };
     });
   }
@@ -1317,6 +1335,8 @@ function buildExecVendasChart() {
   if(spotLeg) spotLeg.style.display = days.some(d=>EXEC_SPOTIFY.some(t=>t.day26===d))?'flex':'none';
   const waLeg = document.getElementById('exec-waLegVendas');
   if(waLeg) waLeg.style.display = days.some(d=>EXEC_WHATSAPP.some(t=>t.day26===d))?'flex':'none';
+  const virLeg = document.getElementById('exec-virLegVendas');
+  if(virLeg) virLeg.style.display = days.some(d=>EXEC_VIRADA.some(t=>t.day26===d))?'flex':'none';
 }
 
 /* ═══ Grafico Investimento ═══ */
