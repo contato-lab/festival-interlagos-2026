@@ -911,6 +911,9 @@ const ACOES = [
 
   // ── WHATSAPP ───────────────────────────────────
   { dia:24, tipo:'whatsapp',  titulo:'Disparos WhatsApp',      desc:'Início dos disparos via WhatsApp (23/04)' },
+
+  // ── VIRADA DE LOTE ─────────────────────────────
+  { dia:31, tipo:'virada',    titulo:'Post Virada de Lote',    desc:'Post virada de lote (30/04)' },
 ];
 
 // Configuração visual por tipo
@@ -924,11 +927,12 @@ const ACAO_CONFIG = {
   email:      { cor:'#00FF88', icone:'📧', label:'E-mail MKT',          dash:[3,3] },
   spotify:    { cor:'#1DB954', icone:'🎵', label:'Link Vendas Spotify', dash:[5,3] },
   whatsapp:   { cor:'#25D366', icone:'💬', label:'Disparos WhatsApp',   dash:[4,3] },
+  virada:     { cor:'#FF6B9D', icone:'💰', label:'Virada de Lote',      dash:[6,4] },
 };
 
 // Estado de visibilidade por tipo (toggle na legenda)
 // Default: TV, divulgação e WhatsApp visíveis (ações recentes/relevantes)
-const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv' || k === 'divulgacao' || k === 'whatsapp']));
+const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv' || k === 'divulgacao' || k === 'whatsapp' || k === 'virada']));
 // Ex: 'https://docs.google.com/spreadsheets/d/SEU_ID/export?format=csv&gid=0'
 
 // ═══════════════════════════════════════════════
