@@ -101,7 +101,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .referrer-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .referrer-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--rad-sm);padding:10px 12px;display:flex;justify-content:space-between;align-items:center;transition:.2s}
 .referrer-card:hover{border-color:var(--lime-border)}
-.referrer-name{font-size:.75rem;color:#BBB;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px}
+.referrer-name{font-size:.75rem;color:#BBB;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px;cursor:help}
 .referrer-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.88rem;color:var(--lime);flex-shrink:0}
 
 /* FUNNEL */
@@ -1635,8 +1635,9 @@ function buildGA4Sources(dateFrom, dateTo) {
     const estTotal = Math.round((r.sessions||0) * INFL_CONV_RATE);
     const card = document.createElement('div');
     card.className = 'referrer-card';
+    const fullName = (r.source||r.name||'').replace(/"/g, '&quot;');
     card.innerHTML =
-      '<span class="referrer-name">'+(r.source||r.name)+'</span>'+
+      '<span class="referrer-name" title="'+fullName+'">'+(r.source||r.name)+'</span>'+
       '<span style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">'+
         '<span style="display:flex;align-items:center;gap:10px">'+
           '<span style="font-size:.65rem;color:'+(conv>0?'var(--green)':'var(--text3)')+'">'+(conv>0?conv+' conv':'—')+'</span>'+
