@@ -296,11 +296,13 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
           <div style="font-size:.58rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:2px">Sistema Próprio</div>
           <div id="exec-moto-sp-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#C8FF00">&mdash;</div>
           <div id="exec-moto-sp-ing" style="font-size:.65rem;color:#666">&mdash;</div>
+          <div id="exec-moto-sp-tkt" style="font-size:.58rem;color:#666;font-style:italic;margin-top:1px">&mdash;</div>
         </div>
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:8px 12px">
           <div style="font-size:.58rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:2px">Ticket Master</div>
           <div id="exec-moto-tm-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#2196F3">&mdash;</div>
           <div id="exec-moto-tm-ing" style="font-size:.65rem;color:#666">&mdash;</div>
+          <div id="exec-moto-tm-tkt" style="font-size:.58rem;color:#666;font-style:italic;margin-top:1px">&mdash;</div>
         </div>
       </div>
     </div>
@@ -323,11 +325,13 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
           <div style="font-size:.58rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:2px">Sistema Próprio</div>
           <div id="exec-auto-sp-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#C8FF00">&mdash;</div>
           <div id="exec-auto-sp-ing" style="font-size:.65rem;color:#666">&mdash;</div>
+          <div id="exec-auto-sp-tkt" style="font-size:.58rem;color:#666;font-style:italic;margin-top:1px">&mdash;</div>
         </div>
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:8px 12px">
           <div style="font-size:.58rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:2px">Ticket Master</div>
           <div id="exec-auto-tm-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#2196F3">&mdash;</div>
           <div id="exec-auto-tm-ing" style="font-size:.65rem;color:#666">&mdash;</div>
+          <div id="exec-auto-tm-tkt" style="font-size:.58rem;color:#666;font-style:italic;margin-top:1px">&mdash;</div>
         </div>
       </div>
     </div>
@@ -2028,6 +2032,12 @@ function buildExecTMCharts() {
   set('exec-auto-sp-ing', totSpAutoI.toLocaleString('pt-BR') + ' ingressos');
   set('exec-auto-tm-val', fmtR(totTmAutoR));
   set('exec-auto-tm-ing', totTmAutoI.toLocaleString('pt-BR') + ' ingressos');
+  // Ticket médio (valor / qtd) — em italico cinza pequeno
+  const tktFmt = (v, q) => q > 0 ? 'TKT R$ ' + Math.round(v/q).toLocaleString('pt-BR') : 'TKT —';
+  set('exec-moto-sp-tkt', tktFmt(totSpMotoR, totSpMotoI));
+  set('exec-moto-tm-tkt', tktFmt(totTmMotoR, totTmMotoI));
+  set('exec-auto-sp-tkt', tktFmt(totSpAutoR, totSpAutoI));
+  set('exec-auto-tm-tkt', tktFmt(totTmAutoR, totTmAutoI));
 }
 
 </script>
