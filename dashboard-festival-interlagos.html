@@ -2213,12 +2213,13 @@ async function fetchVendasProprio() {
     D26_FULL.sort((a, b) => a.d - b.d);
     if (document.getElementById('demoBadge')) document.getElementById('demoBadge').style.display = 'none';
     updateLastRefreshTime();
-    // Ajusta o filtro para cobrir todos os dados disponíveis
-    if (D26_FULL.length > 0) {
+    // Ajusta o filtro APENAS na primeira carga (preserva selecao do usuario nos refreshes)
+    if (D26_FULL.length > 0 && !window.__filtroInicializado) {
       const primeiro = dToDate(D26_FULL[0].d);
       const ultimo   = dToDate(D26_FULL[D26_FULL.length - 1].d);
       document.getElementById('filtroDE').value  = dateToIso(primeiro);
       document.getElementById('filtroATE').value = dateToIso(ultimo);
+      window.__filtroInicializado = true;
     }
     console.log('[vendas-data.json] Moto:', data.totals.moto_ingressos, '| Auto:', data.totals.auto_ingressos, 'ingressos | atualizado:', data.updated_at);
   } catch(e) { console.warn('[Vendas Próprias] erro:', e.message); }
