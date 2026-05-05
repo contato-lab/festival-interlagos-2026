@@ -380,6 +380,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
           <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,107,157,.95)"></span>
           <span style="color:#FF6B9D">💰 Post Virada de Lote</span>
         </div>
+        <div class="exec-leg-item clickable" id="exec-radLegVendas" style="display:none" onclick="execToggleAcao('radio',this)">
+          <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,149,0,.9)"></span>
+          <span style="color:#FF9500">📻 Rádio MIX FM SP</span>
+        </div>
       </div>
       <div class="exec-chart-wrap"><canvas id="exec-chartVendas"></canvas></div>
     </div>
@@ -557,6 +561,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="exec-leg-item clickable" id="exec-virLegTl" style="display:none" onclick="execToggleAcaoTl('virada',this)">
         <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,107,157,.95)"></span>
         <span style="color:#FF6B9D">💰 Post Virada de Lote</span>
+      </div>
+      <div class="exec-leg-item clickable" id="exec-radLegTl" style="display:none" onclick="execToggleAcaoTl('radio',this)">
+        <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,149,0,.9)"></span>
+        <span style="color:#FF9500">📻 Rádio MIX FM SP</span>
       </div>
     </div>
     <div style="position:relative;height:320px"><canvas id="exec-chartTimeline"></canvas></div>
@@ -934,6 +942,10 @@ const EXEC_VIRADA = [
   {date:'2026-04-30', day26:31, desc:'Post Virada de Lote'},
 ];
 
+const EXEC_RADIO = [
+  {date:'2026-05-04', day26:35, desc:'Rádio MIX FM SP — início (04/05 a 18/05, 100 spots)'},
+];
+
 const EXEC_TV_GLOBO = [
   {date:'2026-04-01', day26:2, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
   {date:'2026-04-02', day26:3, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
@@ -1014,7 +1026,7 @@ function execGetAllDays(invest) {
 }
 
 /* Estado de visibilidade das ações (toggle na legenda) */
-const execAcoesVisiveis = { tv: true, influencer: true, divulgacao: true, spotify: true, whatsapp: true, virada: true };
+const execAcoesVisiveis = { tv: true, influencer: true, divulgacao: true, spotify: true, whatsapp: true, virada: true, radio: true };
 
 function execToggleAcao(tipo, el) {
   execAcoesVisiveis[tipo] = !execAcoesVisiveis[tipo];
@@ -1082,6 +1094,16 @@ function execGetTvAnnotations(days) {
       anns['vir_'+vr.day26] = {
         type:'line', xMin:idx, xMax:idx,
         borderColor:'rgba(255,107,157,0.95)', borderWidth:2, borderDash:[6,4]
+      };
+    });
+  }
+  if(execAcoesVisiveis.radio) {
+    EXEC_RADIO.forEach(rd => {
+      const idx = days.indexOf(rd.day26);
+      if(idx === -1) return;
+      anns['rad_'+rd.day26] = {
+        type:'line', xMin:idx, xMax:idx,
+        borderColor:'rgba(255,149,0,0.9)', borderWidth:2, borderDash:[6,3]
       };
     });
   }
@@ -1345,6 +1367,8 @@ function buildExecVendasChart() {
   if(waLeg) waLeg.style.display = days.some(d=>EXEC_WHATSAPP.some(t=>t.day26===d))?'flex':'none';
   const virLeg = document.getElementById('exec-virLegVendas');
   if(virLeg) virLeg.style.display = days.some(d=>EXEC_VIRADA.some(t=>t.day26===d))?'flex':'none';
+  const radLeg = document.getElementById('exec-radLegVendas');
+  if(radLeg) radLeg.style.display = days.some(d=>EXEC_RADIO.some(t=>t.day26===d))?'flex':'none';
 }
 
 /* ═══ Grafico Investimento ═══ */
@@ -1950,6 +1974,8 @@ function buildExecTimelineChart() {
   if(waLegTl) waLegTl.style.display = EXEC_WHATSAPP.some(t=>days.includes(t.day26))?'flex':'none';
   const virLegTl = document.getElementById('exec-virLegTl');
   if(virLegTl) virLegTl.style.display = EXEC_VIRADA.some(t=>days.includes(t.day26))?'flex':'none';
+  const radLegTl = document.getElementById('exec-radLegTl');
+  if(radLegTl) radLegTl.style.display = EXEC_RADIO.some(t=>days.includes(t.day26))?'flex':'none';
 }
 
 let execTMView = 'receita'; // 'receita' | 'ingressos'

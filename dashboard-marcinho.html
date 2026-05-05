@@ -571,6 +571,9 @@ const ACOES_EXTRA = [
 
   // ── VIRADA DE LOTE ─────────────────────────────
   { dia:31, tipo:'virada',     titulo:'Post Virada de Lote',           desc:'Post virada de lote (30/04)' },
+
+  // ── RÁDIO MIX FM SP ────────────────────────────
+  { dia:35, tipo:'radio',      titulo:'Rádio MIX FM SP — início',      desc:'Início Rádio MIX FM SP (04/05) — 100 spots de 30s, vigência até 18/05' },
 ];
 
 // Configuração visual por tipo
@@ -601,7 +604,7 @@ const ACOES = [
 // Estado de visibilidade por tipo (toggle na legenda)
 // Default: TV + divulgação + WhatsApp ligadas (ações de maior impacto)
 const acoesVisiveis = Object.fromEntries(
-  Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv' || k === 'divulgacao' || k === 'whatsapp' || k === 'virada'])
+  Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv' || k === 'divulgacao' || k === 'whatsapp' || k === 'virada' || k === 'radio'])
 );
 
 /* ═══════════════════════════════════════════
