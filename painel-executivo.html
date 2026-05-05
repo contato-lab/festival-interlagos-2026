@@ -554,6 +554,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
         <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(37,211,102,.9)"></span>
         <span style="color:#25D366">💬 Disparos WhatsApp</span>
       </div>
+      <div class="exec-leg-item clickable" id="exec-virLegTl" style="display:none" onclick="execToggleAcaoTl('virada',this)">
+        <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,107,157,.95)"></span>
+        <span style="color:#FF6B9D">💰 Post Virada de Lote</span>
+      </div>
     </div>
     <div style="position:relative;height:320px"><canvas id="exec-chartTimeline"></canvas></div>
   </div>
@@ -1944,6 +1948,8 @@ function buildExecTimelineChart() {
   if(spotLegTl) spotLegTl.style.display = EXEC_SPOTIFY.some(t=>days.includes(t.day26))?'flex':'none';
   const waLegTl = document.getElementById('exec-waLegTl');
   if(waLegTl) waLegTl.style.display = EXEC_WHATSAPP.some(t=>days.includes(t.day26))?'flex':'none';
+  const virLegTl = document.getElementById('exec-virLegTl');
+  if(virLegTl) virLegTl.style.display = EXEC_VIRADA.some(t=>days.includes(t.day26))?'flex':'none';
 }
 
 let execTMView = 'receita'; // 'receita' | 'ingressos'
