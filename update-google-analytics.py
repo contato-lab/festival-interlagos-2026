@@ -190,7 +190,7 @@ def fetch_influencer_breakdown(client) -> list:
         "GiseleFavaro", "RafaelTogni", "RodolfinhoZ", "RodrigoRateiro",
         "SekuMello", "Vans", "lucasxaparral",
         "dinamize", "perfilfestival", "fullpower", "duasrodas",
-        "uol",
+        "uol", "viradalote",
     }
 
     TICKET_PAGES = {
