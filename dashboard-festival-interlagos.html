@@ -2418,6 +2418,23 @@ function renderTipos() {
     return out;
   };
 
+  // Por dia do evento (4 dias por edição), respeitando filtro
+  const buildPorDiaEvento = (evento, nome, canal) => {
+    const src = canal === 'tm' ? TIPOS_DATA.ticketmaster : TIPOS_DATA.proprio;
+    const item = src?.[evento]?.[nome];
+    if (!item || !item.por_dia_evento) return null;
+    const out = {};
+    Object.entries(item.por_dia_evento).forEach(([data_ev, info]) => {
+      out[data_ev] = sumByDate(info);
+    });
+    return out;
+  };
+  // Datas oficiais do evento
+  const DATAS_EVENTO = {
+    moto: ['13/08/2026', '14/08/2026', '15/08/2026', '16/08/2026'],
+    auto: ['27/08/2026', '28/08/2026', '29/08/2026', '30/08/2026'],
+  };
+
   const renderInto = (containerId, badgeId, items, evento) => {
     const c = document.getElementById(containerId);
     const b = document.getElementById(badgeId);
@@ -2437,32 +2454,65 @@ function renderTipos() {
       const corText = item.canal === 'tm' ? '#5DAEFF' : '#C8FF00';
       const canalLabel = item.canal === 'tm' ? 'TM' : 'Próprio';
       const tkt = item.qtd > 0 ? Math.round(item.rec / item.qtd) : 0;
-      const isExpansivel = item.canal === 'tm' && (item.nome === 'Street Pass' || item.nome.startsWith('Pista Premium'));
+      const temBreakdownMI = item.canal === 'tm' && (item.nome === 'Street Pass' || item.nome.startsWith('Pista Premium'));
+      const isExpansivel = true; // todos podem expandir agora (por dia do evento)
       const breakdownId = `${containerId}-bd-${idx}`;
-      const expandIcon = isExpansivel ? `<span class="exp-icon" data-target="${breakdownId}" style="font-size:.7rem;color:#666;cursor:pointer;user-select:none;flex-shrink:0;padding:0 4px;transition:transform .2s">▶</span>` : '';
-      const cursorStyle = isExpansivel ? 'cursor:pointer' : '';
-      let breakdownHtml = '';
-      if (isExpansivel) {
+      const expandIcon = `<span class="exp-icon" style="font-size:.7rem;color:#666;cursor:pointer;user-select:none;flex-shrink:0;padding:0 4px;transition:transform .2s">▶</span>`;
+      const cursorStyle = 'cursor:pointer';
+
+      // Bloco meia/inteira (só TM Street Pass / Pista Premium)
+      let blocoMI = '';
+      if (temBreakdownMI) {
         const bd = buildBreakdown(evento, item.nome) || { inteira: {qtd:0,rec:0}, meia: {qtd:0,rec:0} };
         const tot = bd.inteira.qtd + bd.meia.qtd;
         const pctInt = tot > 0 ? (bd.inteira.qtd / tot * 100).toFixed(1) : 0;
         const pctMeia = tot > 0 ? (bd.meia.qtd / tot * 100).toFixed(1) : 0;
         const tktInt = bd.inteira.qtd > 0 ? Math.round(bd.inteira.rec / bd.inteira.qtd) : 0;
         const tktMeia = bd.meia.qtd > 0 ? Math.round(bd.meia.rec / bd.meia.qtd) : 0;
-        breakdownHtml = `
-          <div id="${breakdownId}" style="display:none;margin-top:6px;padding:8px 10px;background:rgba(2,77,223,.04);border-left:2px solid rgba(2,77,223,.4);border-radius:0 4px 4px 0">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:.72rem">
+        blocoMI = `
+          <div style="padding:8px 10px;background:rgba(2,77,223,.04);border-left:2px solid rgba(2,77,223,.4);border-radius:0 4px 4px 0;margin-bottom:6px">
+            <div style="font-size:.6rem;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Tipo de ingresso</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:2px 0;font-size:.72rem">
               <span style="color:#AAA"><span style="color:var(--lime);font-weight:700">Inteira</span> · ${pctInt}%</span>
               <span style="color:#DDD;font-family:'Barlow Condensed',sans-serif;font-weight:700">${fmtBR(bd.inteira.qtd)} ing · ${fmtMoney(bd.inteira.rec)} · TKT R$ ${tktInt}</span>
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:.72rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:2px 0;font-size:.72rem">
               <span style="color:#AAA"><span style="color:#FFB800;font-weight:700">Meia</span> · ${pctMeia}%</span>
               <span style="color:#DDD;font-family:'Barlow Condensed',sans-serif;font-weight:700">${fmtBR(bd.meia.qtd)} ing · ${fmtMoney(bd.meia.rec)} · TKT R$ ${tktMeia}</span>
             </div>
           </div>`;
       }
+
+      // Bloco por dia do evento (todos)
+      let blocoDias = '';
+      const pde = buildPorDiaEvento(evento, item.nome, item.canal);
+      if (pde) {
+        const dias = DATAS_EVENTO[evento] || [];
+        const maxDia = Math.max(1, ...dias.map(d => (pde[d]?.qtd || 0)));
+        blocoDias = `
+          <div style="padding:8px 10px;background:rgba(255,255,255,.02);border-left:2px solid rgba(200,255,0,.3);border-radius:0 4px 4px 0">
+            <div style="font-size:.6rem;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Por dia do evento</div>
+            ${dias.map(d => {
+              const dd = pde[d] || { qtd: 0, rec: 0 };
+              const w = (dd.qtd / maxDia * 100);
+              const dia = d.split('/')[0];
+              return `
+                <div style="display:flex;align-items:center;gap:8px;padding:2px 0;font-size:.7rem">
+                  <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#888;flex-shrink:0;min-width:36px">${dia}/08</span>
+                  <div style="flex:1;height:4px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden">
+                    <div style="width:${w}%;height:100%;background:${corBar};border-radius:3px"></div>
+                  </div>
+                  <span style="color:#DDD;font-family:'Barlow Condensed',sans-serif;font-weight:700;flex-shrink:0;min-width:50px;text-align:right">${fmtBR(dd.qtd)} ing</span>
+                  <span style="color:#888;font-size:.65rem;flex-shrink:0;white-space:nowrap;text-align:right">${fmtMoney(dd.rec)}</span>
+                </div>`;
+            }).join('')}
+          </div>`;
+      }
+
+      const breakdownHtml = `<div id="${breakdownId}" style="display:none;margin-top:6px">${blocoMI}${blocoDias}</div>`;
+
       return `
-        <div style="display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);${cursorStyle}" ${isExpansivel ? `data-toggle="${breakdownId}"` : ''}>
+        <div style="display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);${cursorStyle}" data-toggle="${breakdownId}">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
             <div style="display:flex;align-items:center;gap:8px;min-width:0">
               ${expandIcon}

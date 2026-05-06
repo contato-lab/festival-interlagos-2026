@@ -33,22 +33,38 @@ def fetch_proprio_sales(base):
     return sales
 
 def aggregate_proprio(sales):
-    agg = defaultdict(lambda: {'qtd': 0, 'rec': 0.0, 'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0})})
+    def make():
+        return {
+            'qtd': 0, 'rec': 0.0,
+            'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0}),
+            'por_dia_evento': defaultdict(lambda: {
+                'qtd': 0, 'rec': 0.0,
+                'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0})
+            }),
+        }
+    agg = defaultdict(make)
     for v in sales:
         if str(v.get('venda_status')) != '3':
             continue
-        # Data da venda — created_at no formato "YYYY-MM-DD HH:MM:SS"
+        # Data da venda
         ds = (v.get('created_at') or '').split(' ')[0]
         if not ds or len(ds) < 10:
             continue
         for q in (v.get('qrcodes') or []):
             nome = q.get('ingresso_nome', 'Desconhecido')
             valor = float(q.get('ingresso_valor') or 0)
+            # Data do evento (campo "data" no qrcode, formato DD/MM/YYYY)
+            data_ev = q.get('data', '') or 'Sem data'
             agg[nome]['qtd'] += 1
             agg[nome]['rec'] += valor
             agg[nome]['daily'][ds]['qtd'] += 1
             agg[nome]['daily'][ds]['rec'] += valor
-    # Converte daily de defaultdict para dict serializavel
+            # Por dia do evento + dia da venda
+            de = agg[nome]['por_dia_evento'][data_ev]
+            de['qtd'] += 1
+            de['rec'] += valor
+            de['daily'][ds]['qtd'] += 1
+            de['daily'][ds]['rec'] += valor
     out = {}
     for nome, d in agg.items():
         out[nome] = {
@@ -56,6 +72,12 @@ def aggregate_proprio(sales):
             'rec': round(d['rec'], 2),
             'daily': {ds: {'qtd': dd['qtd'], 'rec': round(dd['rec'], 2)}
                       for ds, dd in d['daily'].items()},
+            'por_dia_evento': {de: {
+                'qtd': dde['qtd'],
+                'rec': round(dde['rec'], 2),
+                'daily': {ds: {'qtd': sd['qtd'], 'rec': round(sd['rec'], 2)}
+                          for ds, sd in dde['daily'].items()}
+            } for de, dde in d['por_dia_evento'].items()},
         }
     return out
 
@@ -92,6 +114,12 @@ def classify_meia_inteira(rate_name, rate_cat):
 
 
 def aggregate_tm(movements):
+    # Mapa show.id -> data do evento (DD/MM/YYYY)
+    SHOW_TO_DATE = {
+        195330: '13/08/2026', 195736: '14/08/2026', 195737: '15/08/2026', 195738: '16/08/2026',
+        195331: '27/08/2026', 195739: '28/08/2026', 195740: '29/08/2026', 195741: '30/08/2026',
+    }
+
     issuance_date = {}
     for m in movements:
         if m.get('operation') == 'ISSUANCE':
@@ -103,6 +131,10 @@ def aggregate_tm(movements):
         return {
             'qtd': 0, 'rec': 0.0,
             'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0}),
+            'por_dia_evento': defaultdict(lambda: {
+                'qtd': 0, 'rec': 0.0,
+                'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0})
+            }),
             'breakdown': {
                 'meia':    {'qtd': 0, 'rec': 0.0, 'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0})},
                 'inteira': {'qtd': 0, 'rec': 0.0, 'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0})},
@@ -141,6 +173,14 @@ def aggregate_tm(movements):
         rate_cat  = ((m.get('rate') or {}).get('category') or {}).get('name', '')
         tipo_mi = classify_meia_inteira(rate_name, rate_cat)
 
+        # Data do evento via show.id (cada movimento tem 1 show porque cada ingresso e pra 1 dia)
+        data_ev = 'Sem data'
+        for t in m.get('tickets', []):
+            sid = t.get('show', {}).get('id')
+            if sid in SHOW_TO_DATE:
+                data_ev = SHOW_TO_DATE[sid]
+                break
+
         bucket = moto if edi == 'moto' else auto
         b = bucket[prod]
         b['qtd'] += qtd
@@ -153,6 +193,12 @@ def aggregate_tm(movements):
         bd['rec'] += amt
         bd['daily'][ds]['qtd'] += qtd
         bd['daily'][ds]['rec'] += amt
+        # Por dia do evento
+        de = b['por_dia_evento'][data_ev]
+        de['qtd'] += qtd
+        de['rec'] += amt
+        de['daily'][ds]['qtd'] += qtd
+        de['daily'][ds]['rec'] += amt
 
     def to_dict(agg):
         out = {}
@@ -162,6 +208,12 @@ def aggregate_tm(movements):
                 'rec': round(d['rec'], 2),
                 'daily': {ds: {'qtd': dd['qtd'], 'rec': round(dd['rec'], 2)}
                           for ds, dd in d['daily'].items()},
+                'por_dia_evento': {de: {
+                    'qtd': dde['qtd'],
+                    'rec': round(dde['rec'], 2),
+                    'daily': {ds: {'qtd': sd['qtd'], 'rec': round(sd['rec'], 2)}
+                              for ds, sd in dde['daily'].items()}
+                } for de, dde in d['por_dia_evento'].items()},
                 'breakdown': {
                     mi: {
                         'qtd': bd['qtd'],
