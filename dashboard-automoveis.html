@@ -712,6 +712,10 @@ function applyFiltro(){
    TIPOS DE INGRESSO · AUTOS — vendas-tipos-data.json
 ═══════════════════════════════════════════════ */
 let TIPOS_DATA = null;
+window.__tiposExpand = window.__tiposExpand || new Set();
+function _tiposKey(containerId, nome) {
+  return containerId + '|auto|' + nome;
+}
 
 async function fetchTipos() {
   try {
@@ -797,7 +801,9 @@ function renderTipos() {
     const tkt = item.qtd > 0 ? Math.round(item.rec / item.qtd) : 0;
     const temBreakdownMI = item.canal === 'tm' && (item.nome === 'Street Pass' || item.nome.startsWith('Pista Premium'));
     const breakdownId = `tiposAuto-bd-${idx}`;
-    const expandIcon = `<span class="exp-icon" style="font-size:.7rem;color:#666;cursor:pointer;user-select:none;flex-shrink:0;padding:0 4px;transition:transform .2s">▶</span>`;
+    const stateKey = _tiposKey('tiposAuto', item.nome);
+    const isOpen = window.__tiposExpand.has(stateKey);
+    const expandIcon = `<span class="exp-icon" style="font-size:.7rem;color:#666;cursor:pointer;user-select:none;flex-shrink:0;padding:0 4px;transition:transform .2s;transform:${isOpen?'rotate(90deg)':'rotate(0deg)'}">▶</span>`;
 
     let blocoMI = '';
     if (temBreakdownMI) {
@@ -846,10 +852,10 @@ function renderTipos() {
         </div>`;
     }
 
-    const breakdownHtml = `<div id="${breakdownId}" style="display:none;margin-top:6px">${blocoMI}${blocoDias}</div>`;
+    const breakdownHtml = `<div id="${breakdownId}" data-state-key="${stateKey}" style="display:${isOpen?'block':'none'};margin-top:6px">${blocoMI}${blocoDias}</div>`;
 
     return `
-      <div style="display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer" data-toggle="${breakdownId}">
+      <div style="display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer" data-toggle="${breakdownId}" data-state-key="${stateKey}">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
           <div style="display:flex;align-items:center;gap:8px;min-width:0">
             ${expandIcon}
@@ -871,12 +877,17 @@ function renderTipos() {
   c.querySelectorAll('[data-toggle]').forEach(row => {
     row.addEventListener('click', () => {
       const id = row.getAttribute('data-toggle');
+      const sk = row.getAttribute('data-state-key');
       const target = document.getElementById(id);
       const icon = row.querySelector('.exp-icon');
       if (!target) return;
       const open = target.style.display !== 'none';
       target.style.display = open ? 'none' : 'block';
       if (icon) icon.style.transform = open ? 'rotate(0deg)' : 'rotate(90deg)';
+      if (sk) {
+        if (open) window.__tiposExpand.delete(sk);
+        else window.__tiposExpand.add(sk);
+      }
     });
   });
 }

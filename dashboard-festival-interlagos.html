@@ -2349,6 +2349,10 @@ if(localStorage.getItem(_AUTH_KEY)==='1'){
    VENDAS POR TIPO DE INGRESSO — vendas-tipos-data.json
 ═══════════════════════════════════════════════ */
 let TIPOS_DATA = null;
+window.__tiposExpand = window.__tiposExpand || new Set();
+function _tiposKey(containerId, evento, nome) {
+  return containerId + '|' + evento + '|' + nome;
+}
 
 async function fetchTipos() {
   try {
@@ -2457,7 +2461,9 @@ function renderTipos() {
       const temBreakdownMI = item.canal === 'tm' && (item.nome === 'Street Pass' || item.nome.startsWith('Pista Premium'));
       const isExpansivel = true; // todos podem expandir agora (por dia do evento)
       const breakdownId = `${containerId}-bd-${idx}`;
-      const expandIcon = `<span class="exp-icon" style="font-size:.7rem;color:#666;cursor:pointer;user-select:none;flex-shrink:0;padding:0 4px;transition:transform .2s">▶</span>`;
+      const stateKeyEarly = _tiposKey(containerId, evento, item.nome);
+      const isOpenEarly = window.__tiposExpand.has(stateKeyEarly);
+      const expandIcon = `<span class="exp-icon" style="font-size:.7rem;color:#666;cursor:pointer;user-select:none;flex-shrink:0;padding:0 4px;transition:transform .2s;transform:${isOpenEarly?'rotate(90deg)':'rotate(0deg)'}">▶</span>`;
       const cursorStyle = 'cursor:pointer';
 
       // Bloco meia/inteira (só TM Street Pass / Pista Premium)
@@ -2509,10 +2515,13 @@ function renderTipos() {
           </div>`;
       }
 
-      const breakdownHtml = `<div id="${breakdownId}" style="display:none;margin-top:6px">${blocoMI}${blocoDias}</div>`;
+      const stateKey = _tiposKey(containerId, evento, item.nome);
+      const isOpen = window.__tiposExpand.has(stateKey);
+      const breakdownHtml = `<div id="${breakdownId}" data-state-key="${stateKey}" style="display:${isOpen ? 'block' : 'none'};margin-top:6px">${blocoMI}${blocoDias}</div>`;
+      const iconRot = isOpen ? 'rotate(90deg)' : 'rotate(0deg)';
 
       return `
-        <div style="display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);${cursorStyle}" data-toggle="${breakdownId}">
+        <div style="display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);${cursorStyle}" data-toggle="${breakdownId}" data-state-key="${stateKey}">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
             <div style="display:flex;align-items:center;gap:8px;min-width:0">
               ${expandIcon}
@@ -2531,16 +2540,21 @@ function renderTipos() {
         </div>`;
     }).join('');
 
-    // Adiciona handler de click pra expandir/colapsar
+    // Adiciona handler de click — persiste estado em window.__tiposExpand
     c.querySelectorAll('[data-toggle]').forEach(row => {
       row.addEventListener('click', (e) => {
         const id = row.getAttribute('data-toggle');
+        const stateKey = row.getAttribute('data-state-key');
         const target = document.getElementById(id);
         const icon = row.querySelector('.exp-icon');
         if (!target) return;
         const open = target.style.display !== 'none';
         target.style.display = open ? 'none' : 'block';
         if (icon) icon.style.transform = open ? 'rotate(0deg)' : 'rotate(90deg)';
+        if (stateKey) {
+          if (open) window.__tiposExpand.delete(stateKey);
+          else window.__tiposExpand.add(stateKey);
+        }
       });
     });
   };
