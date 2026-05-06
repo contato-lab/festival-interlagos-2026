@@ -557,6 +557,30 @@ tr:hover td{background:rgba(255,255,255,.018)}
   </div>
 </div>
 
+<!-- ══ VENDAS POR TIPO DE INGRESSO ══ -->
+<div class="grid-2" style="margin-bottom:18px">
+  <!-- TIPOS MOTO -->
+  <div class="chart-card">
+    <div class="section-header">
+      <div class="section-title">🎫 Tipos de Ingresso · Motos</div>
+      <span class="badge" id="tiposMotoBadge">—</span>
+    </div>
+    <div id="tiposMotoBody" style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
+      <div style="text-align:center;color:#666;padding:30px;font-size:.78rem">Carregando…</div>
+    </div>
+  </div>
+  <!-- TIPOS AUTO -->
+  <div class="chart-card">
+    <div class="section-header">
+      <div class="section-title">🎫 Tipos de Ingresso · Autos</div>
+      <span class="badge" id="tiposAutoBadge">—</span>
+    </div>
+    <div id="tiposAutoBody" style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
+      <div style="text-align:center;color:#666;padding:30px;font-size:.78rem">Carregando…</div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ MÍDIA PAGA ══ -->
 <div>
   <div class="media-section-head">
@@ -2297,12 +2321,13 @@ function initDashboard(){
     fetchGA4Data(),
     fetchGAdsData(),
     fetchMetaData(),
-    fetchMetaCreatives()
+    fetchMetaCreatives(),
+    fetchTipos()
   ]).then(() => applyFiltro());
 
   // Vendas própria + TM: refresh a cada 30 segundos (Workers em real-time)
   setInterval(() => {
-    Promise.allSettled([fetchVendasProprio(), fetchTicketmaster()])
+    Promise.allSettled([fetchVendasProprio(), fetchTicketmaster(), fetchTipos()])
       .then(() => applyFiltro());
   }, 30000);
 
@@ -2316,6 +2341,85 @@ function initDashboard(){
 if(localStorage.getItem(_AUTH_KEY)==='1'){
   document.getElementById('loginOverlay').style.display='none';
   initDashboard();
+}
+
+/* ═══════════════════════════════════════════════
+   VENDAS POR TIPO DE INGRESSO — vendas-tipos-data.json
+═══════════════════════════════════════════════ */
+let TIPOS_DATA = null;
+
+async function fetchTipos() {
+  try {
+    const res = await fetch('vendas-tipos-data.json?t=' + Date.now(), {cache: 'no-store'});
+    if (!res.ok) throw new Error('Tipos HTTP ' + res.status);
+    TIPOS_DATA = await res.json();
+    renderTipos();
+  } catch (e) {
+    console.warn('[Tipos] erro:', e.message);
+    const m = document.getElementById('tiposMotoBody');
+    const a = document.getElementById('tiposAutoBody');
+    if (m) m.innerHTML = '<div style="text-align:center;color:#666;padding:20px;font-size:.78rem">Aguardando primeira execução do workflow…</div>';
+    if (a) a.innerHTML = '<div style="text-align:center;color:#666;padding:20px;font-size:.78rem">Aguardando primeira execução do workflow…</div>';
+  }
+}
+
+function renderTipos() {
+  if (!TIPOS_DATA) return;
+
+  // Junta Próprio + TM por evento, ordena por qtd desc
+  const buildList = (evento) => {
+    const proprio = TIPOS_DATA.proprio?.[evento] || {};
+    const tm      = TIPOS_DATA.ticketmaster?.[evento] || {};
+    const items = [];
+    Object.entries(proprio).forEach(([nome, d]) => items.push({nome, qtd: d.qtd, rec: d.rec, canal: 'proprio'}));
+    Object.entries(tm).forEach(([nome, d]) => items.push({nome, qtd: d.qtd, rec: d.rec, canal: 'tm'}));
+    return items.sort((a, b) => b.qtd - a.qtd);
+  };
+
+  const fmtBR = v => v.toLocaleString('pt-BR');
+  const fmtMoney = v => v >= 1000 ? 'R$ ' + Math.round(v/1000) + 'k' : 'R$ ' + Math.round(v);
+
+  const renderInto = (containerId, badgeId, items) => {
+    const c = document.getElementById(containerId);
+    const b = document.getElementById(badgeId);
+    if (!c) return;
+    if (!items.length) {
+      c.innerHTML = '<div style="text-align:center;color:#666;padding:20px;font-size:.78rem">Sem dados.</div>';
+      if (b) b.textContent = '0';
+      return;
+    }
+    const totalQtd = items.reduce((s, x) => s + x.qtd, 0);
+    const totalRec = items.reduce((s, x) => s + x.rec, 0);
+    if (b) b.textContent = fmtBR(totalQtd) + ' ingressos';
+    const max = Math.max(...items.map(x => x.qtd));
+
+    c.innerHTML = items.map(item => {
+      const pct = max > 0 ? (item.qtd / max * 100) : 0;
+      const corBar = item.canal === 'tm' ? '#024DDF' : '#C8FF00';
+      const corText = item.canal === 'tm' ? '#5DAEFF' : '#C8FF00';
+      const canalLabel = item.canal === 'tm' ? 'TM' : 'Próprio';
+      const tkt = item.qtd > 0 ? Math.round(item.rec / item.qtd) : 0;
+      return `
+        <div style="display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;min-width:0">
+              <span style="font-size:.55rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:3px;padding:1px 5px;color:#888;letter-spacing:.04em;flex-shrink:0">${canalLabel}</span>
+              <span style="font-size:.78rem;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.nome}">${item.nome}</span>
+            </div>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:${corText};flex-shrink:0">${fmtBR(item.qtd)}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="flex:1;height:5px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden">
+              <div style="width:${pct}%;height:100%;background:${corBar};border-radius:3px;transition:width .3s"></div>
+            </div>
+            <span style="font-size:.62rem;color:#888;font-family:'Inter',sans-serif;flex-shrink:0;min-width:60px;text-align:right">${fmtMoney(item.rec)} · TKT R$ ${tkt}</span>
+          </div>
+        </div>`;
+    }).join('');
+  };
+
+  renderInto('tiposMotoBody', 'tiposMotoBadge', buildList('moto'));
+  renderInto('tiposAutoBody', 'tiposAutoBadge', buildList('auto'));
 }
 
 /* ═══════════════════════════════════════════════

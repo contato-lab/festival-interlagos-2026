@@ -1,0 +1,45 @@
+name: Update Vendas por Tipo
+
+on:
+  schedule:
+    - cron: '5-59/10 * * * *'  # a cada 10min com offset 5
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run update script
+        env:
+          TM_API_KEY: ${{ secrets.TM_API_KEY }}
+        run: python update-vendas-tipos.py
+
+      - name: Commit vendas-tipos-data.json
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add vendas-tipos-data.json
+          if git diff --staged --quiet; then
+            echo "Sem mudancas"
+            exit 0
+          fi
+          git commit -m "chore: update vendas-tipos-data.json [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase origin main 2>&1 || git rebase --abort 2>/dev/null
+            if git push 2>&1; then exit 0; fi
+            sleep $((RANDOM % 10 + 5))
+          done
+          exit 1
