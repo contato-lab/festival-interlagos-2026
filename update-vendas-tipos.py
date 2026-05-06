@@ -33,16 +33,31 @@ def fetch_proprio_sales(base):
     return sales
 
 def aggregate_proprio(sales):
-    agg = defaultdict(lambda: {'qtd': 0, 'rec': 0.0})
+    agg = defaultdict(lambda: {'qtd': 0, 'rec': 0.0, 'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0})})
     for v in sales:
         if str(v.get('venda_status')) != '3':
+            continue
+        # Data da venda — created_at no formato "YYYY-MM-DD HH:MM:SS"
+        ds = (v.get('created_at') or '').split(' ')[0]
+        if not ds or len(ds) < 10:
             continue
         for q in (v.get('qrcodes') or []):
             nome = q.get('ingresso_nome', 'Desconhecido')
             valor = float(q.get('ingresso_valor') or 0)
             agg[nome]['qtd'] += 1
             agg[nome]['rec'] += valor
-    return dict(agg)
+            agg[nome]['daily'][ds]['qtd'] += 1
+            agg[nome]['daily'][ds]['rec'] += valor
+    # Converte daily de defaultdict para dict serializavel
+    out = {}
+    for nome, d in agg.items():
+        out[nome] = {
+            'qtd': d['qtd'],
+            'rec': round(d['rec'], 2),
+            'daily': {ds: {'qtd': dd['qtd'], 'rec': round(dd['rec'], 2)}
+                      for ds, dd in d['daily'].items()},
+        }
+    return out
 
 
 # ── TICKETMASTER ───────────────────────────────────────────
@@ -67,8 +82,17 @@ def fetch_tm_movements():
     return all_movs
 
 def aggregate_tm(movements):
-    moto = defaultdict(lambda: {'qtd': 0, 'rec': 0.0})
-    auto = defaultdict(lambda: {'qtd': 0, 'rec': 0.0})
+    # Indexa ISSUANCE por purchase.id -> data original (pra atribuir CANCELLATION/REFUND
+    # de volta na data da venda, batendo com o painel oficial do TM)
+    issuance_date = {}
+    for m in movements:
+        if m.get('operation') == 'ISSUANCE':
+            pid = (m.get('purchase') or {}).get('id')
+            if pid is not None and pid not in issuance_date:
+                issuance_date[pid] = (m.get('date') or '')[:10]
+
+    moto = defaultdict(lambda: {'qtd': 0, 'rec': 0.0, 'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0})})
+    auto = defaultdict(lambda: {'qtd': 0, 'rec': 0.0, 'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0})})
     for m in movements:
         edi = None
         for t in m.get('tickets', []):
@@ -84,13 +108,35 @@ def aggregate_tm(movements):
                 if prod: break
         if not prod: prod = 'Desconhecido'
 
+        # Data: ISSUANCE original; CANCELLATION/REFUND volta na data ISSUANCE
+        op = m.get('operation')
+        if op in ('CANCELLATION', 'REFUND'):
+            pid = (m.get('purchase') or {}).get('id')
+            ds = issuance_date.get(pid) or (m.get('date') or '')[:10]
+        else:
+            ds = (m.get('date') or '')[:10]
+        if not ds or len(ds) < 10:
+            continue
+
         amt = float(m.get('amount', 0))
         qtd = int(m.get('ticketCount', 0))
         bucket = moto if edi == 'moto' else auto
         bucket[prod]['qtd'] += qtd
         bucket[prod]['rec'] += amt
+        bucket[prod]['daily'][ds]['qtd'] += qtd
+        bucket[prod]['daily'][ds]['rec'] += amt
 
-    return dict(moto), dict(auto)
+    def to_dict(agg):
+        out = {}
+        for nome, d in agg.items():
+            out[nome] = {
+                'qtd': d['qtd'],
+                'rec': round(d['rec'], 2),
+                'daily': {ds: {'qtd': dd['qtd'], 'rec': round(dd['rec'], 2)}
+                          for ds, dd in d['daily'].items()},
+            }
+        return out
+    return to_dict(moto), to_dict(auto)
 
 
 # ── MAIN ───────────────────────────────────────────────────
@@ -110,20 +156,17 @@ def main():
     print(f'  {len(tm_movs)} movs')
     tm_moto, tm_auto = aggregate_tm(tm_movs)
 
+    # Os agregados ja vem com 'daily' incluso pelo aggregate_*
     output = {
         'updated_at': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
         'source': 'Sistema Proprio + Ticketmaster API',
         'proprio': {
-            'moto': {nome: {'qtd': d['qtd'], 'rec': round(d['rec'], 2)}
-                     for nome, d in proprio_moto.items()},
-            'auto': {nome: {'qtd': d['qtd'], 'rec': round(d['rec'], 2)}
-                     for nome, d in proprio_auto.items()},
+            'moto': proprio_moto,
+            'auto': proprio_auto,
         },
         'ticketmaster': {
-            'moto': {nome: {'qtd': d['qtd'], 'rec': round(d['rec'], 2)}
-                     for nome, d in tm_moto.items()},
-            'auto': {nome: {'qtd': d['qtd'], 'rec': round(d['rec'], 2)}
-                     for nome, d in tm_auto.items()},
+            'moto': tm_moto,
+            'auto': tm_auto,
         },
     }
 

@@ -1155,6 +1155,8 @@ function applyFiltro(){
   if(GA4_DATA) { buildGA4Sources(deStr, ateStr); buildGA4Funnel(deStr, ateStr); }
   // Atualiza Análise de Criativos com o mesmo range (escala proporcional)
   if(META_CREATIVES_DATA) renderCreatives();
+  // Atualiza Tipos de Ingresso com o mesmo range
+  if(TIPOS_DATA) renderTipos();
 }
 
 function initFiltro(){
@@ -2366,13 +2368,37 @@ async function fetchTipos() {
 function renderTipos() {
   if (!TIPOS_DATA) return;
 
-  // Junta Próprio + TM por evento, ordena por qtd desc
+  // Pega filtro ativo do dashboard
+  const de  = document.getElementById('filtroDE')?.value  || '';
+  const ate = document.getElementById('filtroATE')?.value || '';
+  const hasFilter = !!(de && ate);
+
+  // Soma daily entre dateFrom e dateTo. Se nao tiver daily, usa total.
+  const sumByDate = (info) => {
+    if (!hasFilter || !info.daily) return { qtd: info.qtd, rec: info.rec };
+    let qtd = 0, rec = 0;
+    Object.entries(info.daily).forEach(([ds, dd]) => {
+      if (ds >= de && ds <= ate) {
+        qtd += dd.qtd || 0;
+        rec += dd.rec || 0;
+      }
+    });
+    return { qtd, rec };
+  };
+
+  // Junta Próprio + TM por evento, ordena por qtd desc, filtrando por data se ativo
   const buildList = (evento) => {
     const proprio = TIPOS_DATA.proprio?.[evento] || {};
     const tm      = TIPOS_DATA.ticketmaster?.[evento] || {};
     const items = [];
-    Object.entries(proprio).forEach(([nome, d]) => items.push({nome, qtd: d.qtd, rec: d.rec, canal: 'proprio'}));
-    Object.entries(tm).forEach(([nome, d]) => items.push({nome, qtd: d.qtd, rec: d.rec, canal: 'tm'}));
+    Object.entries(proprio).forEach(([nome, d]) => {
+      const { qtd, rec } = sumByDate(d);
+      if (qtd > 0 || rec > 0) items.push({nome, qtd, rec, canal: 'proprio'});
+    });
+    Object.entries(tm).forEach(([nome, d]) => {
+      const { qtd, rec } = sumByDate(d);
+      if (qtd > 0 || rec > 0) items.push({nome, qtd, rec, canal: 'tm'});
+    });
     return items.sort((a, b) => b.qtd - a.qtd);
   };
 
