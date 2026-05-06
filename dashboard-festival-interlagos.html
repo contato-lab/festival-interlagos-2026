@@ -2377,7 +2377,7 @@ function renderTipos() {
   };
 
   const fmtBR = v => v.toLocaleString('pt-BR');
-  const fmtMoney = v => v >= 1000 ? 'R$ ' + Math.round(v/1000) + 'k' : 'R$ ' + Math.round(v);
+  const fmtMoney = v => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
 
   const renderInto = (containerId, badgeId, items) => {
     const c = document.getElementById(containerId);
@@ -2412,7 +2412,7 @@ function renderTipos() {
             <div style="flex:1;height:5px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden">
               <div style="width:${pct}%;height:100%;background:${corBar};border-radius:3px;transition:width .3s"></div>
             </div>
-            <span style="font-size:.62rem;color:#888;font-family:'Inter',sans-serif;flex-shrink:0;min-width:60px;text-align:right">${fmtMoney(item.rec)} · TKT R$ ${tkt}</span>
+            <span style="font-size:.62rem;color:#888;font-family:'Inter',sans-serif;flex-shrink:0;text-align:right;white-space:nowrap">${fmtMoney(item.rec)} · TKT R$ ${tkt}</span>
           </div>
         </div>`;
     }).join('');
