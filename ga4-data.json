@@ -1,32 +1,21 @@
 {
-  "updated_at": "2026-05-05T23:28:31.126613+00:00",
+  "updated_at": "2026-05-06T00:12:15.927148+00:00",
   "property_id": "378336436",
   "period": {
-    "start": "2026-02-04",
-    "end": "2026-05-04"
+    "start": "2026-02-05",
+    "end": "2026-05-05"
   },
   "totals": {
-    "sessions": 393221,
-    "users": 346390,
-    "new_users": 287240,
-    "pageviews": 1021637,
-    "events": 2391515,
-    "conversions": 3953.0,
-    "pages_per_session": 2.6,
-    "avg_bounce_rate": 53.66
+    "sessions": 399144,
+    "users": 351702,
+    "new_users": 291179,
+    "pageviews": 1034758,
+    "events": 2424285,
+    "conversions": 4044.0,
+    "pages_per_session": 2.59,
+    "avg_bounce_rate": 53.59
   },
   "daily_series": [
-    {
-      "date": "2026-02-04",
-      "sessions": 105,
-      "users": 93,
-      "new_users": 67,
-      "pageviews": 105,
-      "events": 335,
-      "conversions": 0.0,
-      "bounce_rate": 56.19,
-      "avg_session_s": 107.0
-    },
     {
       "date": "2026-02-05",
       "sessions": 159,
@@ -1005,67 +994,78 @@
       "conversions": 355.0,
       "bounce_rate": 46.75,
       "avg_session_s": 174.8
+    },
+    {
+      "date": "2026-05-05",
+      "sessions": 6028,
+      "users": 5405,
+      "new_users": 4006,
+      "pageviews": 13226,
+      "events": 33105,
+      "conversions": 91.0,
+      "bounce_rate": 49.7,
+      "avg_session_s": 154.5
     }
   ],
   "traffic_sources": [
     {
       "channel": "Organic Social",
-      "sessions": 88403,
-      "conversions": 20.0
+      "sessions": 88475,
+      "conversions": 21.0
     },
     {
       "channel": "Paid Social",
-      "sessions": 81100,
-      "conversions": 59.0
+      "sessions": 81763,
+      "conversions": 60.0
     },
     {
       "channel": "Direct",
-      "sessions": 79397,
-      "conversions": 1562.0
+      "sessions": 81450,
+      "conversions": 1581.0
     },
     {
       "channel": "Paid Search",
-      "sessions": 43916,
-      "conversions": 23.0
+      "sessions": 44821,
+      "conversions": 25.0
     },
     {
       "channel": "Unassigned",
-      "sessions": 43613,
-      "conversions": 16.0
+      "sessions": 44537,
+      "conversions": 17.0
     },
     {
       "channel": "Referral",
-      "sessions": 27735,
-      "conversions": 2218.0
+      "sessions": 28480,
+      "conversions": 2283.0
     },
     {
       "channel": "Organic Search",
-      "sessions": 26181,
-      "conversions": 49.0
+      "sessions": 26338,
+      "conversions": 50.0
     },
     {
       "channel": "Email",
-      "sessions": 2663,
+      "sessions": 2687,
       "conversions": 4.0
     },
     {
       "channel": "Paid Other",
-      "sessions": 2375,
+      "sessions": 2398,
       "conversions": 0.0
     },
     {
       "channel": "Affiliates",
-      "sessions": 626,
-      "conversions": 2.0
+      "sessions": 706,
+      "conversions": 3.0
     },
     {
       "channel": "Cross-network",
-      "sessions": 426,
+      "sessions": 429,
       "conversions": 0.0
     },
     {
       "channel": "Display",
-      "sessions": 82,
+      "sessions": 401,
       "conversions": 0.0
     },
     {
@@ -1077,61 +1077,56 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 542072,
-      "sessions": 282598
+      "pageviews": 548328,
+      "sessions": 285430
     },
     {
       "page": "/ingressos/",
-      "pageviews": 94836,
-      "sessions": 57063
+      "pageviews": 96120,
+      "sessions": 57955
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-moto",
-      "pageviews": 59278,
-      "sessions": 39551
+      "pageviews": 60844,
+      "sessions": 40829
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-auto",
-      "pageviews": 44835,
-      "sessions": 31223
+      "pageviews": 46617,
+      "sessions": 32456
     },
     {
       "page": "/vendas/ingressos/ride-pass",
-      "pageviews": 41944,
-      "sessions": 15817
+      "pageviews": 42301,
+      "sessions": 16025
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026",
-      "pageviews": 31792,
-      "sessions": 29229
+      "pageviews": 31892,
+      "sessions": 29382
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 23008,
-      "sessions": 11338
+      "pageviews": 23186,
+      "sessions": 11460
     },
     {
       "page": "/vendas/ingressos/sport-pass",
-      "pageviews": 22717,
-      "sessions": 12068
+      "pageviews": 22889,
+      "sessions": 12169
     },
     {
       "page": "/conta/informacoes/",
-      "pageviews": 19938,
-      "sessions": 8031
+      "pageviews": 20134,
+      "sessions": 8141
     },
     {
       "page": "/login",
-      "pageviews": 17898,
-      "sessions": 9525
+      "pageviews": 18116,
+      "sessions": 9652
     }
   ],
   "sessions_by_date": {
-    "2026-03-20": {
-      "Busca Orgânica": 112,
-      "Social Orgânico": 46,
-      "Direto pelo Link": 53
-    },
     "2026-03-21": {
       "Busca Orgânica": 109,
       "Social Orgânico": 61,
@@ -1356,17 +1351,22 @@
       "Direto pelo Link": 8162,
       "Busca Orgânica": 552,
       "Social Orgânico": 183
+    },
+    "2026-05-05": {
+      "Direto pelo Link": 2814,
+      "Busca Orgânica": 204,
+      "Social Orgânico": 135
     }
   },
   "influencer_breakdown": [
     {
       "source": "perfilfestival",
-      "sessions": 38736,
+      "sessions": 39349,
       "conversions": 0,
       "tickets": {
-        "Ride Pass": 2254,
-        "Sport Pass": 2875,
-        "Drive Pass": 2139
+        "Ride Pass": 2277,
+        "Sport Pass": 2902,
+        "Drive Pass": 2159
       },
       "daily": {
         "2026-03-31": 3805,
@@ -1403,12 +1403,13 @@
         "2026-04-29": 699,
         "2026-04-25": 663,
         "2026-04-30": 657,
-        "2026-05-02": 654
+        "2026-05-02": 654,
+        "2026-05-05": 587
       }
     },
     {
       "source": "uol",
-      "sessions": 1506,
+      "sessions": 1558,
       "conversions": 0,
       "tickets": {
         "Drive Pass": 6,
@@ -1421,21 +1422,23 @@
         "2026-05-03": 112,
         "2026-05-02": 72,
         "2026-04-30": 70,
+        "2026-05-05": 52,
         "2026-04-29": 39
       }
     },
     {
       "source": "dinamize",
-      "sessions": 882,
+      "sessions": 1006,
       "conversions": 0,
       "tickets": {
-        "Ride Pass": 122,
-        "Sport Pass": 104,
-        "Drive Pass": 60
+        "Ride Pass": 137,
+        "Sport Pass": 111,
+        "Drive Pass": 68
       },
       "daily": {
         "2026-05-04": 380,
         "2026-04-01": 248,
+        "2026-05-05": 123,
         "2026-04-02": 64,
         "2026-03-31": 53,
         "2026-04-03": 18,
@@ -1465,11 +1468,11 @@
     },
     {
       "source": "AmandaP",
-      "sessions": 478,
+      "sessions": 497,
       "conversions": 0,
       "tickets": {
-        "Ride Pass": 35,
-        "Sport Pass": 10
+        "Ride Pass": 36,
+        "Sport Pass": 11
       },
       "daily": {
         "2026-05-01": 148,
@@ -1479,6 +1482,7 @@
         "2026-03-31": 44,
         "2026-04-25": 34,
         "2026-04-16": 32,
+        "2026-05-05": 19,
         "2026-04-17": 15,
         "2026-04-08": 8,
         "2026-04-30": 3,
@@ -1493,7 +1497,7 @@
     },
     {
       "source": "fullpower",
-      "sessions": 322,
+      "sessions": 324,
       "conversions": 0,
       "tickets": {
         "Drive Pass": 28,
@@ -1532,16 +1536,17 @@
         "2026-04-06": 2,
         "2026-04-21": 2,
         "2026-04-28": 2,
+        "2026-05-05": 2,
         "2026-04-20": 1,
         "2026-04-27": 1
       }
     },
     {
       "source": "ElianaMalizia",
-      "sessions": 306,
+      "sessions": 310,
       "conversions": 0,
       "tickets": {
-        "Ride Pass": 31,
+        "Ride Pass": 32,
         "Sport Pass": 6,
         "Drive Pass": 3
       },
@@ -1555,6 +1560,7 @@
         "2026-04-08": 8,
         "2026-04-16": 8,
         "2026-04-26": 8,
+        "2026-05-05": 4,
         "2026-04-22": 3,
         "2026-04-04": 2,
         "2026-04-09": 2,
@@ -1571,7 +1577,7 @@
     },
     {
       "source": "Vans",
-      "sessions": 287,
+      "sessions": 288,
       "conversions": 0,
       "tickets": {
         "Ride Pass": 23,
@@ -1591,7 +1597,32 @@
         "2026-04-10": 1,
         "2026-04-14": 1,
         "2026-04-24": 1,
-        "2026-05-01": 1
+        "2026-05-01": 1,
+        "2026-05-05": 1
+      }
+    },
+    {
+      "source": "RodrigoRateiro",
+      "sessions": 270,
+      "conversions": 0,
+      "tickets": {
+        "Ride Pass": 12,
+        "Sport Pass": 13
+      },
+      "daily": {
+        "2026-03-31": 65,
+        "2026-04-01": 62,
+        "2026-04-09": 43,
+        "2026-04-18": 32,
+        "2026-05-05": 17,
+        "2026-04-28": 15,
+        "2026-04-10": 14,
+        "2026-04-19": 11,
+        "2026-04-29": 5,
+        "2026-04-02": 3,
+        "2026-05-04": 2,
+        "2026-04-11": 1,
+        "2026-04-12": 1
       }
     },
     {
@@ -1615,34 +1646,11 @@
       }
     },
     {
-      "source": "RodrigoRateiro",
-      "sessions": 253,
-      "conversions": 0,
-      "tickets": {
-        "Ride Pass": 12,
-        "Sport Pass": 13
-      },
-      "daily": {
-        "2026-03-31": 65,
-        "2026-04-01": 62,
-        "2026-04-09": 43,
-        "2026-04-18": 32,
-        "2026-04-28": 15,
-        "2026-04-10": 14,
-        "2026-04-19": 11,
-        "2026-04-29": 5,
-        "2026-04-02": 3,
-        "2026-05-04": 2,
-        "2026-04-11": 1,
-        "2026-04-12": 1
-      }
-    },
-    {
       "source": "RafaelTogni",
-      "sessions": 125,
+      "sessions": 130,
       "conversions": 0,
       "tickets": {
-        "Ride Pass": 15,
+        "Ride Pass": 16,
         "Sport Pass": 7
       },
       "daily": {
@@ -1654,6 +1662,7 @@
         "2026-04-27": 9,
         "2026-04-09": 8,
         "2026-05-03": 5,
+        "2026-05-05": 5,
         "2026-04-16": 4,
         "2026-04-25": 3,
         "2026-05-04": 3,
@@ -1668,7 +1677,7 @@
     },
     {
       "source": "RodolfinhoZ",
-      "sessions": 97,
+      "sessions": 101,
       "conversions": 0,
       "tickets": {
         "Ride Pass": 11,
@@ -1682,6 +1691,7 @@
         "2026-04-23": 9,
         "2026-04-09": 7,
         "2026-04-24": 4,
+        "2026-05-05": 4,
         "2026-04-10": 3,
         "2026-04-17": 2,
         "2026-05-03": 2,
@@ -1692,7 +1702,7 @@
     },
     {
       "source": "viradalote",
-      "sessions": 96,
+      "sessions": 99,
       "conversions": 0,
       "tickets": {
         "Ride Pass": 3,
@@ -1708,13 +1718,14 @@
         "2026-04-26": 4,
         "2026-05-01": 4,
         "2026-04-27": 3,
+        "2026-05-05": 3,
         "2026-04-24": 2,
         "2026-04-25": 1
       }
     },
     {
       "source": "SekuMello",
-      "sessions": 88,
+      "sessions": 91,
       "conversions": 0,
       "tickets": {
         "Ride Pass": 14,
@@ -1727,6 +1738,7 @@
         "2026-04-10": 6,
         "2026-04-30": 6,
         "2026-04-09": 3,
+        "2026-05-05": 3,
         "2026-04-03": 1
       }
     },
@@ -1752,8 +1764,27 @@
       }
     },
     {
+      "source": "GiseleFavaro",
+      "sessions": 77,
+      "conversions": 0,
+      "tickets": {
+        "Ride Pass": 9,
+        "Sport Pass": 4
+      },
+      "daily": {
+        "2026-03-31": 26,
+        "2026-05-04": 14,
+        "2026-04-01": 13,
+        "2026-04-28": 11,
+        "2026-04-16": 6,
+        "2026-05-05": 4,
+        "2026-04-17": 2,
+        "2026-04-29": 1
+      }
+    },
+    {
       "source": "DaianeGaia",
-      "sessions": 74,
+      "sessions": 75,
       "conversions": 0,
       "tickets": {
         "Ride Pass": 7,
@@ -1769,32 +1800,17 @@
         "2026-04-27": 3,
         "2026-05-04": 3,
         "2026-05-03": 2,
-        "2026-04-23": 1
-      }
-    },
-    {
-      "source": "GiseleFavaro",
-      "sessions": 73,
-      "conversions": 0,
-      "tickets": {
-        "Ride Pass": 9,
-        "Sport Pass": 4
-      },
-      "daily": {
-        "2026-03-31": 26,
-        "2026-05-04": 14,
-        "2026-04-01": 13,
-        "2026-04-28": 11,
-        "2026-04-16": 6,
-        "2026-04-17": 2,
-        "2026-04-29": 1
+        "2026-04-23": 1,
+        "2026-05-05": 1
       }
     },
     {
       "source": "DayMiguel",
-      "sessions": 65,
+      "sessions": 69,
       "conversions": 0,
-      "tickets": {},
+      "tickets": {
+        "Ride Pass": 1
+      },
       "daily": {
         "2026-04-07": 19,
         "2026-03-31": 16,
@@ -1802,21 +1818,23 @@
         "2026-04-15": 8,
         "2026-05-02": 6,
         "2026-04-25": 5,
+        "2026-05-05": 4,
         "2026-04-08": 2
       }
     },
     {
       "source": "DanielD2",
-      "sessions": 45,
+      "sessions": 51,
       "conversions": 0,
       "tickets": {
-        "Ride Pass": 8,
+        "Ride Pass": 10,
         "Sport Pass": 2
       },
       "daily": {
         "2026-04-01": 19,
         "2026-04-09": 9,
         "2026-04-10": 6,
+        "2026-05-05": 6,
         "2026-04-27": 3,
         "2026-04-28": 3,
         "2026-04-17": 2,
@@ -1863,7 +1881,7 @@
     },
     {
       "source": "lucasxaparral",
-      "sessions": 27,
+      "sessions": 31,
       "conversions": 0,
       "tickets": {},
       "daily": {
@@ -1872,6 +1890,7 @@
         "2026-03-31": 4,
         "2026-04-08": 4,
         "2026-04-27": 4,
+        "2026-05-05": 4,
         "2026-04-17": 2,
         "2026-04-28": 2,
         "2026-04-01": 1
@@ -1890,6 +1909,15 @@
         "2026-04-01": 2,
         "2026-04-27": 2,
         "2026-05-03": 1
+      }
+    },
+    {
+      "source": "KarinaSimoes",
+      "sessions": 1,
+      "conversions": 0,
+      "tickets": {},
+      "daily": {
+        "2026-05-05": 1
       }
     }
   ]
