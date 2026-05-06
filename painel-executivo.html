@@ -1807,7 +1807,19 @@ function renderTipos() {
   const fmtBR = v => v.toLocaleString('pt-BR');
   const fmtMoney = v => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
 
-  const renderInto = (containerId, badgeId, items) => {
+  const buildBreakdown = (evento, nome) => {
+    const tm = TIPOS_DATA.ticketmaster?.[evento]?.[nome];
+    if (!tm || !tm.breakdown) return null;
+    const out = {};
+    for (const mi of ['inteira', 'meia']) {
+      const info = tm.breakdown[mi];
+      if (!info) { out[mi] = { qtd: 0, rec: 0 }; continue; }
+      out[mi] = sumByDate(info);
+    }
+    return out;
+  };
+
+  const renderInto = (containerId, badgeId, items, evento) => {
     const c = document.getElementById(containerId);
     const b = document.getElementById(badgeId);
     if (!c) return;
@@ -1820,16 +1832,41 @@ function renderTipos() {
     if (b) b.textContent = fmtBR(totalQtd) + ' ingressos';
     const max = Math.max(...items.map(x => x.qtd));
 
-    c.innerHTML = items.map(item => {
+    c.innerHTML = items.map((item, idx) => {
       const pct = max > 0 ? (item.qtd / max * 100) : 0;
       const corBar = item.canal === 'tm' ? '#024DDF' : '#C8FF00';
       const corText = item.canal === 'tm' ? '#5DAEFF' : '#C8FF00';
       const canalLabel = item.canal === 'tm' ? 'TM' : 'Próprio';
       const tkt = item.qtd > 0 ? Math.round(item.rec / item.qtd) : 0;
+      const isExpansivel = item.canal === 'tm' && (item.nome === 'Street Pass' || item.nome.startsWith('Pista Premium'));
+      const breakdownId = `${containerId}-bd-${idx}`;
+      const expandIcon = isExpansivel ? `<span class="exp-icon" style="font-size:.7rem;color:#666;cursor:pointer;user-select:none;flex-shrink:0;padding:0 4px;transition:transform .2s">▶</span>` : '';
+      const cursorStyle = isExpansivel ? 'cursor:pointer' : '';
+      let breakdownHtml = '';
+      if (isExpansivel) {
+        const bd = buildBreakdown(evento, item.nome) || { inteira: {qtd:0,rec:0}, meia: {qtd:0,rec:0} };
+        const tot = bd.inteira.qtd + bd.meia.qtd;
+        const pctInt = tot > 0 ? (bd.inteira.qtd / tot * 100).toFixed(1) : 0;
+        const pctMeia = tot > 0 ? (bd.meia.qtd / tot * 100).toFixed(1) : 0;
+        const tktInt = bd.inteira.qtd > 0 ? Math.round(bd.inteira.rec / bd.inteira.qtd) : 0;
+        const tktMeia = bd.meia.qtd > 0 ? Math.round(bd.meia.rec / bd.meia.qtd) : 0;
+        breakdownHtml = `
+          <div id="${breakdownId}" style="display:none;margin-top:6px;padding:8px 10px;background:rgba(2,77,223,.04);border-left:2px solid rgba(2,77,223,.4);border-radius:0 4px 4px 0">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:.72rem">
+              <span style="color:#AAA"><span style="color:#C8FF00;font-weight:700">Inteira</span> · ${pctInt}%</span>
+              <span style="color:#DDD;font-family:'Barlow Condensed',sans-serif;font-weight:700">${fmtBR(bd.inteira.qtd)} ing · ${fmtMoney(bd.inteira.rec)} · TKT R$ ${tktInt}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:.72rem">
+              <span style="color:#AAA"><span style="color:#FFB800;font-weight:700">Meia</span> · ${pctMeia}%</span>
+              <span style="color:#DDD;font-family:'Barlow Condensed',sans-serif;font-weight:700">${fmtBR(bd.meia.qtd)} ing · ${fmtMoney(bd.meia.rec)} · TKT R$ ${tktMeia}</span>
+            </div>
+          </div>`;
+      }
       return `
-        <div style="display:flex;flex-direction:column;gap:4px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+        <div style="display:flex;flex-direction:column;gap:4px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);${cursorStyle}" ${isExpansivel ? `data-toggle="${breakdownId}"` : ''}>
           <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
             <div style="display:flex;align-items:center;gap:8px;min-width:0">
+              ${expandIcon}
               <span style="font-size:.55rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:3px;padding:1px 5px;color:#888;letter-spacing:.04em;flex-shrink:0">${canalLabel}</span>
               <span style="font-size:.78rem;color:#DDD;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.nome}">${item.nome}</span>
             </div>
@@ -1841,12 +1878,25 @@ function renderTipos() {
             </div>
             <span style="font-size:.62rem;color:#888;flex-shrink:0;white-space:nowrap;text-align:right">${fmtMoney(item.rec)} · TKT R$ ${tkt}</span>
           </div>
+          ${breakdownHtml}
         </div>`;
     }).join('');
+
+    c.querySelectorAll('[data-toggle]').forEach(row => {
+      row.addEventListener('click', () => {
+        const id = row.getAttribute('data-toggle');
+        const target = document.getElementById(id);
+        const icon = row.querySelector('.exp-icon');
+        if (!target) return;
+        const open = target.style.display !== 'none';
+        target.style.display = open ? 'none' : 'block';
+        if (icon) icon.style.transform = open ? 'rotate(0deg)' : 'rotate(90deg)';
+      });
+    });
   };
 
-  renderInto('execTiposMotoBody', 'execTiposMotoBadge', buildList('moto'));
-  renderInto('execTiposAutoBody', 'execTiposAutoBadge', buildList('auto'));
+  renderInto('execTiposMotoBody', 'execTiposMotoBadge', buildList('moto'), 'moto');
+  renderInto('execTiposAutoBody', 'execTiposAutoBadge', buildList('auto'), 'auto');
 }
 
 function execSetVendasMetric(metric, btn) {

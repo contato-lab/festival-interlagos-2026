@@ -81,9 +81,17 @@ def fetch_tm_movements():
         last_mov_id = d.get('lastMovementId', last_mov_id)
     return all_movs
 
+def classify_meia_inteira(rate_name, rate_cat):
+    """Categoria 'Meia-Entrada' explicita = meia. Resto (incluindo cotacoes e descontos
+    promocionais) = inteira."""
+    cat = (rate_cat or '').lower()
+    nome = (rate_name or '').lower()
+    if 'meia' in cat or 'meia' in nome or 'estatuto idoso' in nome:
+        return 'meia'
+    return 'inteira'
+
+
 def aggregate_tm(movements):
-    # Indexa ISSUANCE por purchase.id -> data original (pra atribuir CANCELLATION/REFUND
-    # de volta na data da venda, batendo com o painel oficial do TM)
     issuance_date = {}
     for m in movements:
         if m.get('operation') == 'ISSUANCE':
@@ -91,8 +99,18 @@ def aggregate_tm(movements):
             if pid is not None and pid not in issuance_date:
                 issuance_date[pid] = (m.get('date') or '')[:10]
 
-    moto = defaultdict(lambda: {'qtd': 0, 'rec': 0.0, 'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0})})
-    auto = defaultdict(lambda: {'qtd': 0, 'rec': 0.0, 'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0})})
+    def make_bucket():
+        return {
+            'qtd': 0, 'rec': 0.0,
+            'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0}),
+            'breakdown': {
+                'meia':    {'qtd': 0, 'rec': 0.0, 'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0})},
+                'inteira': {'qtd': 0, 'rec': 0.0, 'daily': defaultdict(lambda: {'qtd': 0, 'rec': 0.0})},
+            },
+        }
+    moto = defaultdict(make_bucket)
+    auto = defaultdict(make_bucket)
+
     for m in movements:
         edi = None
         for t in m.get('tickets', []):
@@ -108,7 +126,6 @@ def aggregate_tm(movements):
                 if prod: break
         if not prod: prod = 'Desconhecido'
 
-        # Data: ISSUANCE original; CANCELLATION/REFUND volta na data ISSUANCE
         op = m.get('operation')
         if op in ('CANCELLATION', 'REFUND'):
             pid = (m.get('purchase') or {}).get('id')
@@ -120,11 +137,22 @@ def aggregate_tm(movements):
 
         amt = float(m.get('amount', 0))
         qtd = int(m.get('ticketCount', 0))
+        rate_name = (m.get('rate') or {}).get('name', '')
+        rate_cat  = ((m.get('rate') or {}).get('category') or {}).get('name', '')
+        tipo_mi = classify_meia_inteira(rate_name, rate_cat)
+
         bucket = moto if edi == 'moto' else auto
-        bucket[prod]['qtd'] += qtd
-        bucket[prod]['rec'] += amt
-        bucket[prod]['daily'][ds]['qtd'] += qtd
-        bucket[prod]['daily'][ds]['rec'] += amt
+        b = bucket[prod]
+        b['qtd'] += qtd
+        b['rec'] += amt
+        b['daily'][ds]['qtd'] += qtd
+        b['daily'][ds]['rec'] += amt
+        # Breakdown meia/inteira
+        bd = b['breakdown'][tipo_mi]
+        bd['qtd'] += qtd
+        bd['rec'] += amt
+        bd['daily'][ds]['qtd'] += qtd
+        bd['daily'][ds]['rec'] += amt
 
     def to_dict(agg):
         out = {}
@@ -134,6 +162,14 @@ def aggregate_tm(movements):
                 'rec': round(d['rec'], 2),
                 'daily': {ds: {'qtd': dd['qtd'], 'rec': round(dd['rec'], 2)}
                           for ds, dd in d['daily'].items()},
+                'breakdown': {
+                    mi: {
+                        'qtd': bd['qtd'],
+                        'rec': round(bd['rec'], 2),
+                        'daily': {ds: {'qtd': dd['qtd'], 'rec': round(dd['rec'], 2)}
+                                  for ds, dd in bd['daily'].items()},
+                    } for mi, bd in d['breakdown'].items()
+                },
             }
         return out
     return to_dict(moto), to_dict(auto)
