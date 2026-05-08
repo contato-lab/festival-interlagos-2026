@@ -781,6 +781,40 @@ function renderTipos() {
   };
   const DATAS_EVENTO_AUTO = ['27/08/2026', '28/08/2026', '29/08/2026', '30/08/2026'];
 
+  // Reconcilia com D26_FULL (fonte dos cards Próprio + TM Auto)
+  const _isoFromD = (d) => {
+    const dt = new Date(DATA_INICIO.getTime() + (d - 1) * 86400000);
+    return dt.toISOString().slice(0, 10);
+  };
+  let exp_pq = 0, exp_pr = 0, exp_tq = 0, exp_tr = 0;
+  if (Array.isArray(D26_FULL)) {
+    D26_FULL.forEach(r => {
+      const iso = r.date || _isoFromD(r.d);
+      if (hasFilter && (iso < de || iso > ate)) return;
+      exp_pq += r.apQ || 0; exp_pr += r.ap || 0;
+      exp_tq += r.atQ || 0; exp_tr += r.at || 0;
+    });
+  }
+  const sumByCanal = (canal) => items.filter(x => x.canal === canal)
+    .reduce((s, x) => ({ qtd: s.qtd + x.qtd, rec: s.rec + x.rec }), { qtd: 0, rec: 0 });
+  const sumP = sumByCanal('proprio');
+  const sumT = sumByCanal('tm');
+  const diffP = {
+    qtd: Math.max(0, Math.round(exp_pq - sumP.qtd)),
+    rec: Math.max(0, +(exp_pr - sumP.rec).toFixed(2)),
+  };
+  const diffT = {
+    qtd: Math.max(0, Math.round(exp_tq - sumT.qtd)),
+    rec: Math.max(0, +(exp_tr - sumT.rec).toFixed(2)),
+  };
+  if (diffP.qtd > 0 || diffP.rec > 0) {
+    items.push({ nome: 'Outros · em sincronização', qtd: diffP.qtd, rec: diffP.rec, canal: 'proprio', synthetic: true });
+  }
+  if (diffT.qtd > 0 || diffT.rec > 0) {
+    items.push({ nome: 'Outros · em sincronização', qtd: diffT.qtd, rec: diffT.rec, canal: 'tm', synthetic: true });
+  }
+  items.sort((a, b) => b.qtd - a.qtd);
+
   const c = document.getElementById('tiposAutoBody');
   const b = document.getElementById('tiposAutoBadge');
   if (!c) return;
@@ -789,7 +823,9 @@ function renderTipos() {
     if (b) b.textContent = '0';
     return;
   }
-  const totalQtd = items.reduce((s,x) => s+x.qtd, 0);
+  const breakdownTotalQtd = items.reduce((s, x) => s + x.qtd, 0);
+  const expectedTotalQtd = Math.round(exp_pq + exp_tq);
+  const totalQtd = Math.max(breakdownTotalQtd, expectedTotalQtd);
   if (b) b.textContent = fmtBR(totalQtd) + ' ingressos';
   const max = Math.max(...items.map(x => x.qtd));
 
@@ -799,11 +835,14 @@ function renderTipos() {
     const corText = item.canal === 'tm' ? '#5DAEFF' : '#C8FF00';
     const canalLabel = item.canal === 'tm' ? 'TM' : 'Próprio';
     const tkt = item.qtd > 0 ? Math.round(item.rec / item.qtd) : 0;
-    const temBreakdownMI = item.canal === 'tm' && (item.nome === 'Street Pass' || item.nome.startsWith('Pista Premium'));
+    const isSynth = !!item.synthetic;
+    const temBreakdownMI = !isSynth && item.canal === 'tm' && (item.nome === 'Street Pass' || item.nome.startsWith('Pista Premium'));
     const breakdownId = `tiposAuto-bd-${idx}`;
     const stateKey = _tiposKey('tiposAuto', item.nome);
     const isOpen = window.__tiposExpand.has(stateKey);
-    const expandIcon = `<span class="exp-icon" style="font-size:.7rem;color:#666;cursor:pointer;user-select:none;flex-shrink:0;padding:0 4px;transition:transform .2s;transform:${isOpen?'rotate(90deg)':'rotate(0deg)'}">▶</span>`;
+    const expandIcon = isSynth
+      ? `<span style="font-size:.7rem;color:#444;flex-shrink:0;padding:0 4px">·</span>`
+      : `<span class="exp-icon" style="font-size:.7rem;color:#666;cursor:pointer;user-select:none;flex-shrink:0;padding:0 4px;transition:transform .2s;transform:${isOpen?'rotate(90deg)':'rotate(0deg)'}">▶</span>`;
 
     let blocoMI = '';
     if (temBreakdownMI) {
@@ -828,7 +867,7 @@ function renderTipos() {
     }
 
     let blocoDias = '';
-    const pde = buildPorDiaEvento(item.nome, item.canal);
+    const pde = isSynth ? null : buildPorDiaEvento(item.nome, item.canal);
     if (pde) {
       const dias = DATAS_EVENTO_AUTO;
       const maxDia = Math.max(1, ...dias.map(d => (pde[d]?.qtd || 0)));
@@ -852,15 +891,26 @@ function renderTipos() {
         </div>`;
     }
 
-    const breakdownHtml = `<div id="${breakdownId}" data-state-key="${stateKey}" style="display:${isOpen?'block':'none'};margin-top:6px">${blocoMI}${blocoDias}</div>`;
+    const breakdownHtml = isSynth
+      ? ''
+      : `<div id="${breakdownId}" data-state-key="${stateKey}" style="display:${isOpen?'block':'none'};margin-top:6px">${blocoMI}${blocoDias}</div>`;
+
+    const rowOpacity = isSynth ? '.55' : '1';
+    const rowFontStyle = isSynth ? 'italic' : 'normal';
+    const rowCursor = isSynth ? 'default' : 'pointer';
+    const tktLabel = isSynth ? '' : ` · TKT R$ ${tkt}`;
+    const dataAttrs = isSynth ? '' : `data-toggle="${breakdownId}" data-state-key="${stateKey}"`;
+    const tooltip = isSynth
+      ? 'Diferença entre o total dos cards (Worker em tempo real) e o detalhamento por tipo (sincroniza a cada 10min).'
+      : item.nome;
 
     return `
-      <div style="display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer" data-toggle="${breakdownId}" data-state-key="${stateKey}">
+      <div style="display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);cursor:${rowCursor};opacity:${rowOpacity};font-style:${rowFontStyle}" ${dataAttrs} title="${tooltip}">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
           <div style="display:flex;align-items:center;gap:8px;min-width:0">
             ${expandIcon}
             <span style="font-size:.55rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:3px;padding:1px 5px;color:#888;letter-spacing:.04em;flex-shrink:0">${canalLabel}</span>
-            <span style="font-size:.78rem;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.nome}">${item.nome}</span>
+            <span style="font-size:.78rem;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.nome}</span>
           </div>
           <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:${corText};flex-shrink:0">${fmtBR(item.qtd)}</span>
         </div>
@@ -868,7 +918,7 @@ function renderTipos() {
           <div style="flex:1;height:5px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden">
             <div style="width:${pct}%;height:100%;background:${corBar};border-radius:3px;transition:width .3s"></div>
           </div>
-          <span style="font-size:.62rem;color:#888;flex-shrink:0;white-space:nowrap;text-align:right">${fmtMoney(item.rec)} · TKT R$ ${tkt}</span>
+          <span style="font-size:.62rem;color:#888;flex-shrink:0;white-space:nowrap;text-align:right">${fmtMoney(item.rec)}${tktLabel}</span>
         </div>
         ${breakdownHtml}
       </div>`;

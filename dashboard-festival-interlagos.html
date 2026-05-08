@@ -2439,16 +2439,65 @@ function renderTipos() {
     auto: ['27/08/2026', '28/08/2026', '29/08/2026', '30/08/2026'],
   };
 
+  // Reconcilia o badge/totais com D26_FULL (fonte dos cards Próprio + TM, em tempo real).
+  // O vendas-tipos-data.json é gerado por um Action separado e pode ficar defasado.
+  const _isoFromD = (d) => {
+    const dt = new Date(DATA_INICIO.getTime() + (d - 1) * 86400000);
+    return dt.toISOString().slice(0, 10);
+  };
+  const _expectedTotalsForRange = (evento) => {
+    let pq = 0, pr = 0, tq = 0, tr = 0;
+    if (Array.isArray(D26_FULL)) {
+      D26_FULL.forEach(r => {
+        const iso = r.date || _isoFromD(r.d);
+        if (hasFilter && (iso < de || iso > ate)) return;
+        if (evento === 'moto') {
+          pq += r.mpQ || 0; pr += r.mp || 0;
+          tq += r.mtQ || 0; tr += r.mt || 0;
+        } else {
+          pq += r.apQ || 0; pr += r.ap || 0;
+          tq += r.atQ || 0; tr += r.at || 0;
+        }
+      });
+    }
+    return { proprio: { qtd: pq, rec: pr }, tm: { qtd: tq, rec: tr } };
+  };
+
   const renderInto = (containerId, badgeId, items, evento) => {
     const c = document.getElementById(containerId);
     const b = document.getElementById(badgeId);
     if (!c) return;
+
+    // Reconciliação com cards
+    const expected = _expectedTotalsForRange(evento);
+    const sumByCanal = (canal) => items.filter(x => x.canal === canal)
+      .reduce((s, x) => ({ qtd: s.qtd + x.qtd, rec: s.rec + x.rec }), { qtd: 0, rec: 0 });
+    const sumP = sumByCanal('proprio');
+    const sumT = sumByCanal('tm');
+    const diffP = {
+      qtd: Math.max(0, Math.round(expected.proprio.qtd - sumP.qtd)),
+      rec: Math.max(0, +(expected.proprio.rec - sumP.rec).toFixed(2)),
+    };
+    const diffT = {
+      qtd: Math.max(0, Math.round(expected.tm.qtd - sumT.qtd)),
+      rec: Math.max(0, +(expected.tm.rec - sumT.rec).toFixed(2)),
+    };
+    if (diffP.qtd > 0 || diffP.rec > 0) {
+      items.push({ nome: 'Outros · em sincronização', qtd: diffP.qtd, rec: diffP.rec, canal: 'proprio', synthetic: true });
+    }
+    if (diffT.qtd > 0 || diffT.rec > 0) {
+      items.push({ nome: 'Outros · em sincronização', qtd: diffT.qtd, rec: diffT.rec, canal: 'tm', synthetic: true });
+    }
+    items.sort((a, b) => b.qtd - a.qtd);
+
     if (!items.length) {
       c.innerHTML = '<div style="text-align:center;color:#666;padding:20px;font-size:.78rem">Sem dados.</div>';
       if (b) b.textContent = '0';
       return;
     }
-    const totalQtd = items.reduce((s, x) => s + x.qtd, 0);
+    const breakdownTotalQtd = items.reduce((s, x) => s + x.qtd, 0);
+    const expectedTotalQtd = Math.round(expected.proprio.qtd + expected.tm.qtd);
+    const totalQtd = Math.max(breakdownTotalQtd, expectedTotalQtd);
     if (b) b.textContent = fmtBR(totalQtd) + ' ingressos';
     const max = Math.max(...items.map(x => x.qtd));
 
@@ -2458,13 +2507,16 @@ function renderTipos() {
       const corText = item.canal === 'tm' ? '#5DAEFF' : '#C8FF00';
       const canalLabel = item.canal === 'tm' ? 'TM' : 'Próprio';
       const tkt = item.qtd > 0 ? Math.round(item.rec / item.qtd) : 0;
-      const temBreakdownMI = item.canal === 'tm' && (item.nome === 'Street Pass' || item.nome.startsWith('Pista Premium'));
-      const isExpansivel = true; // todos podem expandir agora (por dia do evento)
+      const isSynth = !!item.synthetic;
+      const temBreakdownMI = !isSynth && item.canal === 'tm' && (item.nome === 'Street Pass' || item.nome.startsWith('Pista Premium'));
+      const isExpansivel = !isSynth;
       const breakdownId = `${containerId}-bd-${idx}`;
       const stateKeyEarly = _tiposKey(containerId, evento, item.nome);
       const isOpenEarly = window.__tiposExpand.has(stateKeyEarly);
-      const expandIcon = `<span class="exp-icon" style="font-size:.7rem;color:#666;cursor:pointer;user-select:none;flex-shrink:0;padding:0 4px;transition:transform .2s;transform:${isOpenEarly?'rotate(90deg)':'rotate(0deg)'}">▶</span>`;
-      const cursorStyle = 'cursor:pointer';
+      const expandIcon = isSynth
+        ? `<span style="font-size:.7rem;color:#444;flex-shrink:0;padding:0 4px">·</span>`
+        : `<span class="exp-icon" style="font-size:.7rem;color:#666;cursor:pointer;user-select:none;flex-shrink:0;padding:0 4px;transition:transform .2s;transform:${isOpenEarly?'rotate(90deg)':'rotate(0deg)'}">▶</span>`;
+      const cursorStyle = isSynth ? 'cursor:default' : 'cursor:pointer';
 
       // Bloco meia/inteira (só TM Street Pass / Pista Premium)
       let blocoMI = '';
@@ -2489,9 +2541,9 @@ function renderTipos() {
           </div>`;
       }
 
-      // Bloco por dia do evento (todos)
+      // Bloco por dia do evento (todos, exceto sintético)
       let blocoDias = '';
-      const pde = buildPorDiaEvento(evento, item.nome, item.canal);
+      const pde = isSynth ? null : buildPorDiaEvento(evento, item.nome, item.canal);
       if (pde) {
         const dias = DATAS_EVENTO[evento] || [];
         const maxDia = Math.max(1, ...dias.map(d => (pde[d]?.qtd || 0)));
@@ -2517,16 +2569,26 @@ function renderTipos() {
 
       const stateKey = _tiposKey(containerId, evento, item.nome);
       const isOpen = window.__tiposExpand.has(stateKey);
-      const breakdownHtml = `<div id="${breakdownId}" data-state-key="${stateKey}" style="display:${isOpen ? 'block' : 'none'};margin-top:6px">${blocoMI}${blocoDias}</div>`;
+      const breakdownHtml = isSynth
+        ? ''
+        : `<div id="${breakdownId}" data-state-key="${stateKey}" style="display:${isOpen ? 'block' : 'none'};margin-top:6px">${blocoMI}${blocoDias}</div>`;
       const iconRot = isOpen ? 'rotate(90deg)' : 'rotate(0deg)';
 
+      const rowOpacity = isSynth ? '.55' : '1';
+      const rowFontStyle = isSynth ? 'italic' : 'normal';
+      const dataAttrs = isSynth ? '' : `data-toggle="${breakdownId}" data-state-key="${stateKey}"`;
+      const tktLabel = isSynth ? '' : ` · TKT R$ ${tkt}`;
+      const tooltip = isSynth
+        ? 'Diferença entre o total dos cards (Worker em tempo real) e o detalhamento por tipo (sincroniza a cada 10min).'
+        : item.nome;
+
       return `
-        <div style="display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);${cursorStyle}" data-toggle="${breakdownId}" data-state-key="${stateKey}">
+        <div style="display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);${cursorStyle};opacity:${rowOpacity};font-style:${rowFontStyle}" ${dataAttrs} title="${tooltip}">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
             <div style="display:flex;align-items:center;gap:8px;min-width:0">
               ${expandIcon}
               <span style="font-size:.55rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:3px;padding:1px 5px;color:#888;letter-spacing:.04em;flex-shrink:0">${canalLabel}</span>
-              <span style="font-size:.78rem;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.nome}">${item.nome}</span>
+              <span style="font-size:.78rem;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.nome}</span>
             </div>
             <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:${corText};flex-shrink:0">${fmtBR(item.qtd)}</span>
           </div>
@@ -2534,7 +2596,7 @@ function renderTipos() {
             <div style="flex:1;height:5px;background:rgba(255,255,255,.04);border-radius:3px;overflow:hidden">
               <div style="width:${pct}%;height:100%;background:${corBar};border-radius:3px;transition:width .3s"></div>
             </div>
-            <span style="font-size:.62rem;color:#888;font-family:'Inter',sans-serif;flex-shrink:0;text-align:right;white-space:nowrap">${fmtMoney(item.rec)} · TKT R$ ${tkt}</span>
+            <span style="font-size:.62rem;color:#888;font-family:'Inter',sans-serif;flex-shrink:0;text-align:right;white-space:nowrap">${fmtMoney(item.rec)}${tktLabel}</span>
           </div>
           ${breakdownHtml}
         </div>`;
