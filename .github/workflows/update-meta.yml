@@ -22,8 +22,9 @@ jobs:
 
       - name: Run Meta Ads update script
         env:
-          META_TOKEN: ${{ secrets.META_TOKEN }}
-          META_ACCT:  'act_2044706169171045'
+          META_TOKEN:      ${{ secrets.META_TOKEN }}
+          META_ACCT:       'act_2044706169171045'
+          META_ACCT_MOTOS: 'act_1326431289216611'
         run: python update-meta-ads.py
 
       - name: Run Meta Creatives update script

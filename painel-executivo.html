@@ -1630,8 +1630,18 @@ function renderExecConversoes() {
     ? ttSeries.filter(d => d.date >= execFiltFrom && d.date <= (execFiltTo||'9999-12-31'))
     : ttSeries;
   const tiktokConv = ttFiltered.reduce((s,d)=>s+(d.purchases||0), 0);
-  const adsConv   = metaConv + gadsConv + tiktokConv;
-  const totalInv  = invest.reduce((s,r)=>s+(r.meta+r.gads), 0);
+
+  // Meta Ads - Nova conta Motos: serie da conta secundaria filtrada pelo periodo.
+  // Vem do mesmo meta-data.json (campo accounts.nova_motos).
+  const motosSeries = META_DATA?.accounts?.nova_motos?.daily_series || [];
+  const motosFiltered = execFiltFrom
+    ? motosSeries.filter(d => d.date >= execFiltFrom && d.date <= (execFiltTo||'9999-12-31'))
+    : motosSeries;
+  const metaMotosConv = motosFiltered.reduce((s,d)=>s+(d.purchases||0), 0);
+  const metaMotosSpend = motosFiltered.reduce((s,d)=>s+(d.cost||0), 0);
+
+  const adsConv   = metaConv + metaMotosConv + gadsConv + tiktokConv;
+  const totalInv  = invest.reduce((s,r)=>s+(r.meta+r.gads), 0) + metaMotosSpend;
 
   // Total ingressos vendidos (planilha) no periodo
   const days2  = execGetAllDays(invest);
@@ -1649,6 +1659,10 @@ function renderExecConversoes() {
     <div class="exec-conv-row">
       <span class="exec-conv-label">Meta Ads</span>
       <span class="exec-conv-val">${Math.round(metaConv).toLocaleString('pt-BR')}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label" style="color:rgba(200,255,0,.85)">Meta ads &middot; Nova conta Motos <span style="font-size:.6rem;color:#666">novo</span></span>
+      <span class="exec-conv-val" style="color:rgba(200,255,0,.9)">${metaMotosConv > 0 ? Math.round(metaMotosConv).toLocaleString('pt-BR') : '—'}</span>
     </div>
     <div class="exec-conv-row">
       <span class="exec-conv-label">Google Ads</span>
