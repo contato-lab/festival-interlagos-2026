@@ -16,8 +16,10 @@ seção "Tipos de Ingresso" do dashboard.
 Roda via GitHub Actions a cada 2 minutos.
 """
 
+import io
 import json
 import os
+import re
 import sys
 import requests
 from collections import defaultdict
@@ -44,6 +46,11 @@ SHOW_TO_DATE = {
 OUT_VENDAS = 'vendas-data.json'
 OUT_TM     = 'ticketmaster-data.json'
 OUT_TIPOS  = 'vendas-tipos-data.json'
+
+# ── PLANILHA (fallback quando a API TM cai) ────────────────
+PLANILHA_ID  = os.environ.get('PLANILHA_LINHA_TEMPO_ID', '1jk7jjYB6n-IjkdmBUv54QEerujL_iAAP')
+PLANILHA_URL = f'https://docs.google.com/spreadsheets/d/{PLANILHA_ID}/export?format=xlsx'
+PLANILHA_YEAR = 2026
 
 
 # ╔══════════════════════════════════════════════════════════╗
@@ -405,10 +412,15 @@ def build_vendas_data(moto_by_day, auto_by_day):
     }
 
 
-def build_ticketmaster_data(totals, daily):
+def build_ticketmaster_data(totals, daily, source='api'):
+    source_label = {
+        'api':      'Ticketmaster API via getcrowder.com',
+        'planilha': 'Planilha Linha do Tempo (fallback enquanto API TM está fora)',
+    }.get(source, 'Ticketmaster API via getcrowder.com')
     return {
         'updated_at':     datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
-        'source':         'Ticketmaster API via getcrowder.com',
+        'source':         source_label,
+        'source_type':    source,
         'campaign_start': '2026-03-25',
         'moto_show_ids':  sorted(MOTO_SHOW_IDS),
         'auto_show_ids':  sorted(AUTO_SHOW_IDS),
@@ -429,6 +441,178 @@ def build_tipos_data(proprio_moto, proprio_auto, tm_moto, tm_auto):
 def write_json(path, data):
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+# ╔══════════════════════════════════════════════════════════╗
+# ║  PLANILHA (fallback quando API TM cai)                  ║
+# ╚══════════════════════════════════════════════════════════╝
+
+def _money_to_float(v):
+    """Converte 'R$ 1.234,56' ou número direto para float. Vazio -> 0."""
+    if v is None: return 0.0
+    if isinstance(v, (int, float)): return float(v)
+    s = str(v).strip()
+    if not s or s in ('-', 'R$', 'R$ 0,00', 'R$ 0'): return 0.0
+    s = s.replace('R$', '').replace(' ', '').strip()
+    # formato BR: 1.234,56 -> 1234.56
+    if ',' in s and s.rfind(',') > s.rfind('.'):
+        s = s.replace('.', '').replace(',', '.')
+    try:
+        return float(s)
+    except ValueError:
+        return 0.0
+
+
+def _parse_qtd(v):
+    if v is None: return 0
+    if isinstance(v, (int, float)): return int(v)
+    s = str(v).strip().replace('.', '').replace(',', '')
+    if not s or s == '-': return 0
+    try:
+        return int(float(s))
+    except ValueError:
+        return 0
+
+
+def _parse_week_header(header_text):
+    """Recebe 'DATA: 30 A 05/04' ou 'DATA: 27/04 A 03/05'. Retorna lista
+    de 7 datas ISO da semana (segunda a domingo) para o ano da campanha."""
+    if not header_text:
+        return None
+    m = re.search(r'(\d{1,2})(?:/(\d{1,2}))?\s*[Aa]\s*(\d{1,2})/(\d{1,2})', header_text)
+    if not m:
+        return None
+    end_d = int(m.group(3)); end_m = int(m.group(4))
+    end_date = date(PLANILHA_YEAR, end_m, end_d)
+    return [(end_date - timedelta(days=6 - i)).isoformat() for i in range(7)]
+
+
+def fetch_planilha_data():
+    """Baixa o XLSX e parseia as semanas. Devolve {tm: {moto, auto},
+    proprio: {moto, auto}} no formato {date_iso: {qtd, rec}}. Lança
+    exceção se download/parse falhar — caller decide o fallback."""
+    from openpyxl import load_workbook
+    r = requests.get(PLANILHA_URL, timeout=30)
+    r.raise_for_status()
+    wb = load_workbook(io.BytesIO(r.content), data_only=True, read_only=True)
+
+    out = {
+        'tm':      {'moto': {}, 'auto': {}},
+        'proprio': {'moto': {}, 'auto': {}},
+    }
+
+    for sheet_name in wb.sheetnames:
+        if not sheet_name.upper().startswith('SEMANA'):
+            continue
+        ws = wb[sheet_name]
+        rows = list(ws.iter_rows(values_only=True))
+        if not rows:
+            continue
+
+        # Cabeçalho com as datas (linha 0)
+        header = rows[0]
+        header_cells = [str(c) if c is not None else '' for c in header]
+        header_text = ' '.join(header_cells)
+        week_dates = _parse_week_header(header_text)
+        if not week_dates:
+            print(f'  [planilha] {sheet_name}: cabeçalho não reconhecido: "{header_text[:60]}"', file=sys.stderr)
+            continue
+
+        # Encontra cada bloco e suas linhas de VENDAS VALOR / QTD INGRESSOS
+        # Estrutura: VENDAS MOTOS -> SISTEMA PRÓPRIO -> VENDAS VALOR -> QTD -> TICKET MASTER -> VENDAS VALOR -> QTD
+        # Depois: VENDAS AUTOS -> mesmo pattern
+        section = None       # 'moto' | 'auto' | None
+        canal = None         # 'proprio' | 'tm' | None
+        for row in rows[1:]:
+            cells = [str(c).strip() if c is not None else '' for c in row]
+            label = cells[0].upper() if cells else ''
+            if not label:
+                continue
+            if 'VENDAS MOTOS' in label:
+                section, canal = 'moto', None
+                continue
+            if 'VENDAS AUTOS' in label or 'VENDAS CARROS' in label:
+                section, canal = 'auto', None
+                continue
+            if 'SISTEMA PR' in label:  # PRÓPRIO/PROPRIO
+                canal = 'proprio'; continue
+            if 'TICKET MASTER' in label or 'TICKETMASTER' in label:
+                canal = 'tm'; continue
+            # Para evitar capturar TOTAL VENDAS VALOR / TKT MÉDIO / BALANÇO / etc:
+            if label.startswith('TOTAL') or 'TKT' in label or 'BALAN' in label or 'INVEST' in label:
+                canal = None; continue
+
+            if section and canal in ('proprio', 'tm'):
+                if label.startswith('VENDAS VALOR'):
+                    for i, day_iso in enumerate(week_dates):
+                        v = _money_to_float(row[i + 1]) if i + 1 < len(row) else 0.0
+                        if v == 0 and day_iso not in out[canal][section]:
+                            continue
+                        out[canal][section].setdefault(day_iso, {'qtd': 0, 'rec': 0.0})
+                        out[canal][section][day_iso]['rec'] = v
+                elif 'QTD INGRESSOS' in label:
+                    for i, day_iso in enumerate(week_dates):
+                        q = _parse_qtd(row[i + 1]) if i + 1 < len(row) else 0
+                        if q == 0 and day_iso not in out[canal][section]:
+                            continue
+                        out[canal][section].setdefault(day_iso, {'qtd': 0, 'rec': 0.0})
+                        out[canal][section][day_iso]['qtd'] = q
+    return out
+
+
+def build_tm_data_from_planilha(planilha_tm):
+    """Constrói ticketmaster-data.json a partir do dict planilha_tm."""
+    moto_days = planilha_tm.get('moto', {})
+    auto_days = planilha_tm.get('auto', {})
+    all_dates = sorted(set(list(moto_days.keys()) + list(auto_days.keys())))
+
+    daily = []
+    totals = {'moto_receita': 0.0, 'auto_receita': 0.0, 'moto_ingressos': 0, 'auto_ingressos': 0}
+    for ds in all_dates:
+        m = moto_days.get(ds, {'qtd': 0, 'rec': 0.0})
+        a = auto_days.get(ds, {'qtd': 0, 'rec': 0.0})
+        daily.append({
+            'date': ds,
+            'moto_receita':   round(m['rec'], 2),
+            'auto_receita':   round(a['rec'], 2),
+            'moto_ingressos': m['qtd'],
+            'auto_ingressos': a['qtd'],
+        })
+        totals['moto_receita']   += m['rec']
+        totals['moto_ingressos'] += m['qtd']
+        totals['auto_receita']   += a['rec']
+        totals['auto_ingressos'] += a['qtd']
+
+    totals['moto_receita']    = round(totals['moto_receita'], 2)
+    totals['auto_receita']    = round(totals['auto_receita'], 2)
+    totals['total_receita']   = round(totals['moto_receita'] + totals['auto_receita'], 2)
+    totals['total_ingressos'] = totals['moto_ingressos'] + totals['auto_ingressos']
+
+    return totals, daily
+
+
+def build_tm_tipos_from_planilha(planilha_tm):
+    """A planilha não tem breakdown por tipo de ingresso (Street Pass, Pista
+    Premium, etc.), só Moto vs Auto. Então criamos um único bucket
+    'Ticketmaster (planilha)' por canal pra alimentar a seção Tipos.
+    Quando a API voltar, granularidade volta automaticamente."""
+    def to_bucket(days):
+        bucket = {
+            'qtd': sum(d['qtd'] for d in days.values()),
+            'rec': round(sum(d['rec'] for d in days.values()), 2),
+            'daily': {ds: {'qtd': d['qtd'], 'rec': round(d['rec'], 2)}
+                      for ds, d in days.items()},
+            'por_dia_evento': {},
+            'breakdown': {
+                'meia':    {'qtd': 0, 'rec': 0.0, 'daily': {}},
+                'inteira': {'qtd': 0, 'rec': 0.0, 'daily': {}},
+            },
+        }
+        return bucket
+
+    moto = {'Ticketmaster (planilha)': to_bucket(planilha_tm.get('moto', {}))} if planilha_tm.get('moto') else {}
+    auto = {'Ticketmaster (planilha)': to_bucket(planilha_tm.get('auto', {}))} if planilha_tm.get('auto') else {}
+    return moto, auto
 
 
 # ╔══════════════════════════════════════════════════════════╗
@@ -462,47 +646,65 @@ def main():
     proprio_moto = aggregate_proprio_tipos(moto_sales)
     proprio_auto = aggregate_proprio_tipos(auto_sales)
 
-    # ── Ticketmaster ─ tolera falha (401 token expirado, 5xx, timeout) ──
-    print('\n[3/4] Buscando movimentos Ticketmaster...')
+    # ── Ticketmaster ─ tenta API; se falhar, tenta planilha; senão, mantém antigo ──
+    print('\n[3/4] Buscando movimentos Ticketmaster (API)...')
     tm_movs = None
     tm_error = None
+    tm_source = None
     try:
         tm_movs = fetch_tm_movements()
         print(f'  {len(tm_movs)} movimentos')
+        tm_source = 'api'
     except Exception as e:
         tm_error = str(e)
-        print(f'  ⚠️  TM falhou: {tm_error}', file=sys.stderr)
-        print('  Mantendo ticketmaster-data.json e parte TM de vendas-tipos-data.json anteriores.', file=sys.stderr)
+        print(f'  ⚠️  TM API falhou: {tm_error}', file=sys.stderr)
 
     if tm_movs is not None:
         tm_totals, tm_daily = aggregate_tm_totais(tm_movs)
         tm_moto, tm_auto    = aggregate_tm_tipos(tm_movs)
-        tm_ok = True
     else:
-        # Preserva TM da execução anterior pra não zerar nada no dashboard
-        prev_tm = _load_existing(OUT_TM)
-        prev_tipos = _load_existing(OUT_TIPOS)
-        tm_totals = (prev_tm or {}).get('totals')
-        tm_daily  = (prev_tm or {}).get('daily', [])
-        tm_moto   = ((prev_tipos or {}).get('ticketmaster') or {}).get('moto', {})
-        tm_auto   = ((prev_tipos or {}).get('ticketmaster') or {}).get('auto', {})
-        tm_ok = False
+        # Fallback 1: planilha Linha do Tempo
+        print('  → tentando planilha como fallback...', file=sys.stderr)
+        planilha_ok = False
+        try:
+            planilha = fetch_planilha_data()
+            tm_totals, tm_daily = build_tm_data_from_planilha(planilha['tm'])
+            tm_moto, tm_auto    = build_tm_tipos_from_planilha(planilha['tm'])
+            print(f'  ✓ Planilha lida: {len(tm_daily)} dias TM, '
+                  f'{tm_totals["moto_ingressos"]} Moto + {tm_totals["auto_ingressos"]} Auto',
+                  file=sys.stderr)
+            tm_source = 'planilha'
+            planilha_ok = True
+        except Exception as pe:
+            print(f'  ⚠️  Planilha também falhou: {pe}', file=sys.stderr)
+
+        if not planilha_ok:
+            # Fallback 2: dados anteriores no disco (não toca em ticketmaster-data.json)
+            prev_tm = _load_existing(OUT_TM)
+            prev_tipos = _load_existing(OUT_TIPOS)
+            tm_totals = (prev_tm or {}).get('totals')
+            tm_daily  = (prev_tm or {}).get('daily', [])
+            tm_moto   = ((prev_tipos or {}).get('ticketmaster') or {}).get('moto', {})
+            tm_auto   = ((prev_tipos or {}).get('ticketmaster') or {}).get('auto', {})
+            tm_source = 'stale'
+
+    tm_ok = tm_source in ('api', 'planilha')
 
     # ── Escrita dos JSONs ──
     print('\n[4/4] Escrevendo JSONs...')
     write_json(OUT_VENDAS, build_vendas_data(moto_by_day, auto_by_day))
     if tm_ok:
-        write_json(OUT_TM, build_ticketmaster_data(tm_totals, tm_daily))
+        write_json(OUT_TM, build_ticketmaster_data(tm_totals, tm_daily, source=tm_source))
     else:
         # NÃO sobrescreve OUT_TM: timestamp ficaria mentiroso. Deixa o arquivo
         # antigo no lugar pra dashboard mostrar 'stale' via updated_at antigo.
-        print(f'  (mantendo {OUT_TM} antigo intacto — TM falhou)')
+        print(f'  (mantendo {OUT_TM} antigo intacto — API e planilha falharam)')
     write_json(OUT_TIPOS, build_tipos_data(proprio_moto, proprio_auto, tm_moto, tm_auto))
 
     print(f'\nOK Sistema Próprio atualizado em {OUT_VENDAS} e {OUT_TIPOS} (parte proprio)')
-    print(f'Ticketmaster: {"atualizado" if tm_ok else "FALHOU - usando dados anteriores"}')
-    if not tm_ok:
-        print(f'  Causa: {tm_error}')
+    print(f'Ticketmaster: source={tm_source}')
+    if tm_source == 'stale':
+        print(f'  Causa API: {tm_error}')
     print(f'Fim: {datetime.now().isoformat()}')
 
 
