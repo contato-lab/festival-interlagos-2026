@@ -435,6 +435,15 @@ def write_json(path, data):
 # ║  MAIN                                                    ║
 # ╚══════════════════════════════════════════════════════════╝
 
+def _load_existing(path):
+    """Carrega JSON existente, devolve None se não existir ou inválido."""
+    try:
+        with open(path, encoding='utf-8') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+
+
 def main():
     print('=== update-vendas-unificado.py ===')
     print(f'Início: {datetime.now().isoformat()}')
@@ -453,24 +462,47 @@ def main():
     proprio_moto = aggregate_proprio_tipos(moto_sales)
     proprio_auto = aggregate_proprio_tipos(auto_sales)
 
-    # ── Ticketmaster ─ uma única busca, dois agregados ──
+    # ── Ticketmaster ─ tolera falha (401 token expirado, 5xx, timeout) ──
     print('\n[3/4] Buscando movimentos Ticketmaster...')
-    tm_movs = fetch_tm_movements()
-    print(f'  {len(tm_movs)} movimentos')
+    tm_movs = None
+    tm_error = None
+    try:
+        tm_movs = fetch_tm_movements()
+        print(f'  {len(tm_movs)} movimentos')
+    except Exception as e:
+        tm_error = str(e)
+        print(f'  ⚠️  TM falhou: {tm_error}', file=sys.stderr)
+        print('  Mantendo ticketmaster-data.json e parte TM de vendas-tipos-data.json anteriores.', file=sys.stderr)
 
-    tm_totals, tm_daily = aggregate_tm_totais(tm_movs)
-    tm_moto, tm_auto    = aggregate_tm_tipos(tm_movs)
+    if tm_movs is not None:
+        tm_totals, tm_daily = aggregate_tm_totais(tm_movs)
+        tm_moto, tm_auto    = aggregate_tm_tipos(tm_movs)
+        tm_ok = True
+    else:
+        # Preserva TM da execução anterior pra não zerar nada no dashboard
+        prev_tm = _load_existing(OUT_TM)
+        prev_tipos = _load_existing(OUT_TIPOS)
+        tm_totals = (prev_tm or {}).get('totals')
+        tm_daily  = (prev_tm or {}).get('daily', [])
+        tm_moto   = ((prev_tipos or {}).get('ticketmaster') or {}).get('moto', {})
+        tm_auto   = ((prev_tipos or {}).get('ticketmaster') or {}).get('auto', {})
+        tm_ok = False
 
-    # ── Escrita atômica dos 3 JSONs ──
+    # ── Escrita dos JSONs ──
     print('\n[4/4] Escrevendo JSONs...')
     write_json(OUT_VENDAS, build_vendas_data(moto_by_day, auto_by_day))
-    write_json(OUT_TM,     build_ticketmaster_data(tm_totals, tm_daily))
-    write_json(OUT_TIPOS,  build_tipos_data(proprio_moto, proprio_auto, tm_moto, tm_auto))
+    if tm_ok:
+        write_json(OUT_TM, build_ticketmaster_data(tm_totals, tm_daily))
+    else:
+        # NÃO sobrescreve OUT_TM: timestamp ficaria mentiroso. Deixa o arquivo
+        # antigo no lugar pra dashboard mostrar 'stale' via updated_at antigo.
+        print(f'  (mantendo {OUT_TM} antigo intacto — TM falhou)')
+    write_json(OUT_TIPOS, build_tipos_data(proprio_moto, proprio_auto, tm_moto, tm_auto))
 
-    print('\nOK 3 arquivos gerados:')
-    print(f'  {OUT_VENDAS}')
-    print(f'  {OUT_TM}')
-    print(f'  {OUT_TIPOS}')
+    print(f'\nOK Sistema Próprio atualizado em {OUT_VENDAS} e {OUT_TIPOS} (parte proprio)')
+    print(f'Ticketmaster: {"atualizado" if tm_ok else "FALHOU - usando dados anteriores"}')
+    if not tm_ok:
+        print(f'  Causa: {tm_error}')
     print(f'Fim: {datetime.now().isoformat()}')
 
 
