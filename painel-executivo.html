@@ -1145,14 +1145,41 @@ function renderExecHojeOntem() {
   const yStr = new Date(+today - 86400000).toISOString().slice(0,10);
   const invest = buildExecD26Invest();
 
+  // Conversões e spend que NÃO entram em buildExecD26Invest:
+  //   - Meta Ads · Nova conta Motos (act_1326431289216611) — campo accounts.nova_motos
+  //   - TikTok Ads — tiktok-data.json
+  // Sem isso, o card Hoje/Ontem subreporta o real do dia.
+  const motosSeries = META_DATA?.accounts?.nova_motos?.daily_series || [];
+  const ttSeries    = TIKTOK_DATA?.daily_series || [];
+  const extraByDate = (iso) => {
+    const m = motosSeries.find(d => d.date === iso);
+    const t = ttSeries.find(d => d.date === iso);
+    return {
+      cost: (m?.cost || 0) + (t?.cost || 0),
+      conv: (m?.purchases || 0) + (t?.purchases || 0),
+    };
+  };
+
   const getInv = day => {
     const r = invest.find(x=>x.d===day);
-    return {total: r?(r.meta+r.gads):0, conv: r?(r.metaConv+r.gadsConv):0};
+    const iso = execDateOf26Day(day).toISOString().slice(0,10);
+    const extra = extraByDate(iso);
+    return {
+      total: (r?(r.meta+r.gads):0) + extra.cost,
+      conv:  (r?(r.metaConv+r.gadsConv):0) + extra.conv,
+    };
   };
   const ontem = getInv(execDayOf26(yStr));
   const hoje  = getInv(execDayOf26(todayStr));
-  const total = invest.reduce((s,r)=>s+(r.meta+r.gads),0);
-  const totalConv = invest.reduce((s,r)=>s+(r.metaConv+r.gadsConv),0);
+
+  // Totais acumulados (campanha) incluindo Nova Conta Motos + TikTok
+  const motosTotalCost = motosSeries.reduce((s,d)=>s+(d.cost||0), 0);
+  const motosTotalConv = motosSeries.reduce((s,d)=>s+(d.purchases||0), 0);
+  const ttTotalCost    = ttSeries.reduce((s,d)=>s+(d.cost||0), 0);
+  const ttTotalConv    = ttSeries.reduce((s,d)=>s+(d.purchases||0), 0);
+
+  const total = invest.reduce((s,r)=>s+(r.meta+r.gads),0) + motosTotalCost + ttTotalCost;
+  const totalConv = invest.reduce((s,r)=>s+(r.metaConv+r.gadsConv),0) + motosTotalConv + ttTotalConv;
   const dias = invest.length;
   const media = dias>0 ? total/dias : 0;
   const invest25Same = EXEC_D25_INVEST.filter(r=>r.d<=dias).reduce((s,r)=>s+r.v,0);
