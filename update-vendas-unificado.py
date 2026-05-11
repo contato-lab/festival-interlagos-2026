@@ -663,15 +663,47 @@ def main():
         tm_totals, tm_daily = aggregate_tm_totais(tm_movs)
         tm_moto, tm_auto    = aggregate_tm_tipos(tm_movs)
     else:
-        # Fallback 1: planilha Linha do Tempo
+        # Carrega dados anteriores como baseline (último snapshot bom da API)
+        prev_tm    = _load_existing(OUT_TM) or {}
+        prev_tipos = _load_existing(OUT_TIPOS) or {}
+        prev_daily = {d['date']: d for d in (prev_tm.get('daily') or [])}
+        prev_moto  = ((prev_tipos.get('ticketmaster') or {}).get('moto') or {})
+        prev_auto  = ((prev_tipos.get('ticketmaster') or {}).get('auto') or {})
+
+        # Fallback 1: planilha. Faz MERGE com o baseline (planilha sobrescreve
+        # dias que tem; baseline preserva dias que planilha não cobre — ex.:
+        # dias mais recentes que a planilha ainda não foi atualizada manualmente).
         print('  → tentando planilha como fallback...', file=sys.stderr)
         planilha_ok = False
         try:
             planilha = fetch_planilha_data()
-            tm_totals, tm_daily = build_tm_data_from_planilha(planilha['tm'])
-            tm_moto, tm_auto    = build_tm_tipos_from_planilha(planilha['tm'])
-            print(f'  ✓ Planilha lida: {len(tm_daily)} dias TM, '
-                  f'{tm_totals["moto_ingressos"]} Moto + {tm_totals["auto_ingressos"]} Auto',
+            pl_totals, pl_daily = build_tm_data_from_planilha(planilha['tm'])
+            # MERGE: parte do prev_daily, sobrescreve dias presentes na planilha
+            merged = dict(prev_daily)
+            for d in pl_daily:
+                merged[d['date']] = d
+            tm_daily = sorted(merged.values(), key=lambda x: x['date'])
+
+            # Recalcula totals do merged
+            tm_totals = {'moto_receita': 0.0, 'auto_receita': 0.0, 'moto_ingressos': 0, 'auto_ingressos': 0}
+            for d in tm_daily:
+                tm_totals['moto_receita']   += d.get('moto_receita', 0)
+                tm_totals['moto_ingressos'] += d.get('moto_ingressos', 0)
+                tm_totals['auto_receita']   += d.get('auto_receita', 0)
+                tm_totals['auto_ingressos'] += d.get('auto_ingressos', 0)
+            tm_totals['moto_receita']    = round(tm_totals['moto_receita'], 2)
+            tm_totals['auto_receita']    = round(tm_totals['auto_receita'], 2)
+            tm_totals['total_receita']   = round(tm_totals['moto_receita'] + tm_totals['auto_receita'], 2)
+            tm_totals['total_ingressos'] = tm_totals['moto_ingressos'] + tm_totals['auto_ingressos']
+
+            # vendas-tipos: NÃO sobrescreve o breakdown por tipo da API anterior.
+            # O front-end já tem reconciliação 'Outros · em sincronização' que
+            # absorve a diferença quando o total bate mais alto que a soma das
+            # barras. Granularidade volta quando API voltar.
+            tm_moto, tm_auto = prev_moto, prev_auto
+            print(f'  ✓ Planilha lida: {len(pl_daily)} dias na planilha, '
+                  f'merge resultou em {len(tm_daily)} dias totais '
+                  f'({tm_totals["moto_ingressos"]} Moto + {tm_totals["auto_ingressos"]} Auto)',
                   file=sys.stderr)
             tm_source = 'planilha'
             planilha_ok = True
@@ -679,13 +711,11 @@ def main():
             print(f'  ⚠️  Planilha também falhou: {pe}', file=sys.stderr)
 
         if not planilha_ok:
-            # Fallback 2: dados anteriores no disco (não toca em ticketmaster-data.json)
-            prev_tm = _load_existing(OUT_TM)
-            prev_tipos = _load_existing(OUT_TIPOS)
-            tm_totals = (prev_tm or {}).get('totals')
-            tm_daily  = (prev_tm or {}).get('daily', [])
-            tm_moto   = ((prev_tipos or {}).get('ticketmaster') or {}).get('moto', {})
-            tm_auto   = ((prev_tipos or {}).get('ticketmaster') or {}).get('auto', {})
+            # Fallback 2: só dados anteriores
+            tm_totals = prev_tm.get('totals')
+            tm_daily  = prev_tm.get('daily', [])
+            tm_moto   = prev_moto
+            tm_auto   = prev_auto
             tm_source = 'stale'
 
     tm_ok = tm_source in ('api', 'planilha')
