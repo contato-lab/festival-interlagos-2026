@@ -51,6 +51,9 @@ OUT_TIPOS  = 'vendas-tipos-data.json'
 PLANILHA_ID  = os.environ.get('PLANILHA_LINHA_TEMPO_ID', '1jk7jjYB6n-IjkdmBUv54QEerujL_iAAP')
 PLANILHA_URL = f'https://docs.google.com/spreadsheets/d/{PLANILHA_ID}/export?format=xlsx'
 PLANILHA_YEAR = 2026
+# SEMANA 0 começa nessa segunda-feira (data fixa da campanha).
+# SEMANA N = SEMANA 0 + N*7 dias.
+PLANILHA_SEMANA_0_START = date(2026, 3, 30)
 
 
 # ╔══════════════════════════════════════════════════════════╗
@@ -474,16 +477,32 @@ def _parse_qtd(v):
         return 0
 
 
-def _parse_week_header(header_text):
-    """Recebe 'DATA: 30 A 05/04' ou 'DATA: 27/04 A 03/05'. Retorna lista
-    de 7 datas ISO da semana (segunda a domingo) para o ano da campanha."""
+def _parse_week_header(header_text, sheet_name=None):
+    """Determina as 7 datas ISO da semana. Estratégia:
+    1) Se o NOME da aba é 'SEMANA N', usa SEMANA_0_START + N*7 dias (mais
+       confiável — é como a planilha foi estruturada desde o início).
+    2) Senão, tenta parsear 'DATA: DD A DD/MM' ou 'DATA: DD/MM A DD/MM'
+       do cabeçalho (texto livre, sujeito a erro de digitação).
+    """
+    # 1) Sheet name
+    if sheet_name:
+        m = re.search(r'SEMANA\s+(\d+)', sheet_name.upper())
+        if m:
+            week_num = int(m.group(1))
+            start = PLANILHA_SEMANA_0_START + timedelta(weeks=week_num)
+            return [(start + timedelta(days=i)).isoformat() for i in range(7)]
+
+    # 2) Header text fallback
     if not header_text:
         return None
     m = re.search(r'(\d{1,2})(?:/(\d{1,2}))?\s*[Aa]\s*(\d{1,2})/(\d{1,2})', header_text)
     if not m:
         return None
-    end_d = int(m.group(3)); end_m = int(m.group(4))
-    end_date = date(PLANILHA_YEAR, end_m, end_d)
+    try:
+        end_d = int(m.group(3)); end_m = int(m.group(4))
+        end_date = date(PLANILHA_YEAR, end_m, end_d)
+    except ValueError:
+        return None
     return [(end_date - timedelta(days=6 - i)).isoformat() for i in range(7)]
 
 
@@ -513,7 +532,7 @@ def fetch_planilha_data():
         header = rows[0]
         header_cells = [str(c) if c is not None else '' for c in header]
         header_text = ' '.join(header_cells)
-        week_dates = _parse_week_header(header_text)
+        week_dates = _parse_week_header(header_text, sheet_name=sheet_name)
         if not week_dates:
             print(f'  [planilha] {sheet_name}: cabeçalho não reconhecido: "{header_text[:60]}"', file=sys.stderr)
             continue
