@@ -366,7 +366,10 @@ def main():
 
     today      = datetime.now(timezone.utc).date()
     start_date = (today - timedelta(days=LOOKBACK_DAYS)).strftime("%Y-%m-%d")
-    end_date   = (today - timedelta(days=1)).strftime("%Y-%m-%d")  # ontem
+    # Inclui o dia de hoje. GA4 retorna dados parciais (~2h de atraso de
+    # processamento), mas é o que o usuário quer ver no gráfico em tempo
+    # quase real. A linha do tempo do dashboard mostra até hoje.
+    end_date   = today.strftime("%Y-%m-%d")
 
     print(f"Buscando série diária de {start_date} a {end_date}…")
     daily_series    = fetch_daily_series(client, start_date, end_date)
