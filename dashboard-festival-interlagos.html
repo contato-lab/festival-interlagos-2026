@@ -2577,11 +2577,11 @@ function initDashboard(){
     fetchTipos()
   ]).then(() => applyFiltro());
 
-  // Vendas própria + TM: refresh a cada 10s pra capturar webhook da planilha rápido
+  // Vendas própria + TM: refresh a cada 3s pra capturar edicao da planilha quase em tempo real
   setInterval(() => {
     Promise.allSettled([fetchVendasProprio(), fetchTicketmaster(), fetchTipos()])
       .then(() => applyFiltro());
-  }, 10000);
+  }, 3000);
 
   // Mídia (Google Ads, Meta, GA4, TikTok): a cada 30s (esses APIs têm latência grande mesmo)
   setInterval(() => {

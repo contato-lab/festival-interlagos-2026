@@ -1381,11 +1381,11 @@ function initDashboard(){
   Promise.allSettled([fetchVendasProprio(), fetchTicketmaster(), fetchTipos()])
     .then(() => applyFiltro());
 
-  // Vendas própria + TM: refresh a cada 10s pra capturar webhook da planilha rápido
+  // Vendas própria + TM: refresh a cada 3s (planilha edit -> dashboard quase em tempo real)
   setInterval(() => {
     Promise.allSettled([fetchVendasProprio(), fetchTicketmaster(), fetchTipos()])
       .then(() => applyFiltro());
-  }, 10000);
+  }, 3000);
 
   // Atualização leve a cada 30s (horário)
   setInterval(() => { updateLastRefreshTime(); }, 30000);
