@@ -690,6 +690,42 @@ Google Ads
   </div>
 </div>
 
+<!-- ══ CRESCIMENTO DE ACESSOS — GA4 DAILY ══ -->
+<div class="chart-card">
+  <div class="section-header">
+    <div class="section-title">📈 Crescimento de Acessos — Diário</div>
+    <span class="badge badge-ok" style="font-size:.68rem">✓ GA4 ao vivo</span>
+  </div>
+
+  <!-- KPIs resumo no topo -->
+  <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px">
+    <div style="flex:1;min-width:140px;padding:10px 14px;background:rgba(200,255,0,.04);border-left:2px solid var(--lime);border-radius:0 4px 4px 0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:var(--lime)" id="ga4GrowthSessions">—</div>
+      <div style="font-size:.65rem;color:#999;text-transform:uppercase;letter-spacing:.06em">Sessões no período</div>
+    </div>
+    <div style="flex:1;min-width:140px;padding:10px 14px;background:rgba(2,77,223,.05);border-left:2px solid #024DDF;border-radius:0 4px 4px 0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#5DAEFF" id="ga4GrowthUsers">—</div>
+      <div style="font-size:.65rem;color:#999;text-transform:uppercase;letter-spacing:.06em">Usuários únicos</div>
+    </div>
+    <div style="flex:1;min-width:140px;padding:10px 14px;background:rgba(255,255,255,.03);border-left:2px solid rgba(255,255,255,.2);border-radius:0 4px 4px 0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#DDD" id="ga4GrowthAvgDaily">—</div>
+      <div style="font-size:.65rem;color:#999;text-transform:uppercase;letter-spacing:.06em">Média diária (sessões)</div>
+    </div>
+    <div style="flex:1;min-width:140px;padding:10px 14px;background:rgba(255,255,255,.03);border-left:2px solid rgba(255,255,255,.2);border-radius:0 4px 4px 0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#DDD" id="ga4GrowthDelta">—</div>
+      <div style="font-size:.65rem;color:#999;text-transform:uppercase;letter-spacing:.06em">Variação 1ª vs última semana</div>
+    </div>
+  </div>
+
+  <!-- Gráfico de linha -->
+  <div style="position:relative;height:280px"><canvas id="chartGA4Growth"></canvas></div>
+
+  <div style="font-size:.66rem;color:var(--text3);margin-top:12px;display:flex;align-items:center;gap:6px">
+    <span style="color:var(--lime);font-size:.7rem">●</span>
+    Crescimento de sessões diárias · Linha verde-clara mostra média móvel de 7 dias pra suavizar o ruído.
+  </div>
+</div>
+
 <!-- ══ FONTES DE TRÁFEGO GA4 ══ -->
 <div class="chart-card">
   <div class="section-header">
@@ -1152,7 +1188,7 @@ function applyFiltro(){
   updateTikTokCard(deStr, ateStr);
   updateMediaTotals(deStr, ateStr);
   // Atualiza GA4 com o mesmo range
-  if(GA4_DATA) { buildGA4Sources(deStr, ateStr); buildGA4Funnel(deStr, ateStr); }
+  if(GA4_DATA) { buildGA4Growth(deStr, ateStr); buildGA4Sources(deStr, ateStr); buildGA4Funnel(deStr, ateStr); }
   // Atualiza Análise de Criativos com o mesmo range (escala proporcional)
   if(META_CREATIVES_DATA) renderCreatives();
   // Atualiza Tipos de Ingresso com o mesmo range
@@ -1560,6 +1596,169 @@ const _GA4_CHANNEL_MAP = {
 const _GA4_CHANNEL_MAP_REV = {};
 Object.entries(_GA4_CHANNEL_MAP).forEach(([k,v]) => { _GA4_CHANNEL_MAP_REV[v] = k; });
 
+// ── CRESCIMENTO DE ACESSOS ─────────────────────────────────
+let _ga4GrowthChart = null;
+
+function buildGA4Growth(dateFrom, dateTo) {
+  const canvas = document.getElementById('chartGA4Growth');
+  if (!canvas || !GA4_DATA?.daily_series) return;
+
+  // Filtra daily_series pelo range ativo (ou pega tudo se sem filtro)
+  let series = GA4_DATA.daily_series;
+  if (dateFrom && dateTo) {
+    series = series.filter(d => d.date >= dateFrom && d.date <= dateTo);
+  }
+  if (!series.length) return;
+
+  // Labels (dd/mm) e datasets
+  const labels = series.map(d => {
+    const [, m, dd] = d.date.split('-');
+    return dd + '/' + m;
+  });
+  const sessionsArr = series.map(d => d.sessions || 0);
+  const usersArr    = series.map(d => d.users    || 0);
+
+  // Média móvel 7 dias das sessões (suaviza ruído de fim de semana / feriado)
+  const ma7 = sessionsArr.map((_, i) => {
+    const start = Math.max(0, i - 6);
+    const window = sessionsArr.slice(start, i + 1);
+    return Math.round(window.reduce((a, b) => a + b, 0) / window.length);
+  });
+
+  // KPIs do topo
+  const totalSessions = sessionsArr.reduce((a, b) => a + b, 0);
+  const totalUsers    = usersArr.reduce((a, b) => a + b, 0);
+  const avgDaily      = series.length ? Math.round(totalSessions / series.length) : 0;
+  // Delta: média da 1ª semana vs última semana do período
+  let deltaTxt = '—';
+  if (series.length >= 14) {
+    const first7 = sessionsArr.slice(0, 7).reduce((a, b) => a + b, 0) / 7;
+    const last7  = sessionsArr.slice(-7).reduce((a, b) => a + b, 0) / 7;
+    if (first7 > 0) {
+      const pct = ((last7 - first7) / first7) * 100;
+      const arrow = pct >= 0 ? '▲' : '▼';
+      const cor   = pct >= 0 ? 'var(--lime)' : 'var(--red, #ff5050)';
+      const sign  = pct >= 0 ? '+' : '';
+      deltaTxt = `<span style="color:${cor}">${arrow} ${sign}${pct.toFixed(1)}%</span>`;
+    }
+  }
+  document.getElementById('ga4GrowthSessions').textContent = fmtN(totalSessions);
+  document.getElementById('ga4GrowthUsers').textContent    = fmtN(totalUsers);
+  document.getElementById('ga4GrowthAvgDaily').textContent = fmtN(avgDaily);
+  document.getElementById('ga4GrowthDelta').innerHTML      = deltaTxt;
+
+  if (_ga4GrowthChart) _ga4GrowthChart.destroy();
+  _ga4GrowthChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Sessões',
+          data: sessionsArr,
+          borderColor: '#C8FF00',
+          backgroundColor: 'rgba(200,255,0,0.10)',
+          borderWidth: 2,
+          tension: 0.35,
+          fill: true,
+          pointRadius: 2,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#C8FF00',
+          pointHoverBackgroundColor: '#FFF',
+        },
+        {
+          label: 'Usuários',
+          data: usersArr,
+          borderColor: '#5DAEFF',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          tension: 0.35,
+          fill: false,
+          pointRadius: 2,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#5DAEFF',
+          pointHoverBackgroundColor: '#FFF',
+        },
+        {
+          label: 'Média móvel 7d (sessões)',
+          data: ma7,
+          borderColor: 'rgba(200,255,0,0.55)',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [4, 4],
+          tension: 0.35,
+          fill: false,
+          pointRadius: 0,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 400 },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          position: 'top',
+          align: 'end',
+          labels: { color: '#AAA', font: { size: 11 }, usePointStyle: true, boxWidth: 8 },
+        },
+        tooltip: {
+          backgroundColor: '#161616',
+          borderColor: 'rgba(200,255,0,0.25)',
+          borderWidth: 1,
+          titleColor: '#C8FF00',
+          bodyColor: '#FFF',
+          padding: 12,
+          usePointStyle: true,
+          callbacks: {
+            title: (items) => {
+              const idx = items[0].dataIndex;
+              const d = series[idx];
+              return `${labels[idx]}  ·  ${fmtN(d.sessions || 0)} sessões`;
+            },
+            label: (ctx) => {
+              const idx = ctx.dataIndex;
+              const d = series[idx];
+              if (ctx.dataset.label === 'Sessões') {
+                return [
+                  `  Sessões        : ${fmtN(d.sessions || 0)}`,
+                  `  Pageviews     : ${fmtN(d.pageviews || 0)}`,
+                  `  Taxa rejeição: ${(d.bounce_rate || 0).toFixed(1)}%`,
+                ];
+              }
+              if (ctx.dataset.label === 'Usuários') {
+                return [
+                  `  Usuários      : ${fmtN(d.users || 0)}`,
+                  `  Novos          : ${fmtN(d.new_users || 0)}`,
+                ];
+              }
+              return `  Média 7d        : ${fmtN(ctx.parsed.y)}`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,0.06)', drawBorder: false },
+          ticks: {
+            color: '#888',
+            font: { size: 9 },
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: window.innerWidth <= 768 ? 8 : 14,
+          },
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(255,255,255,0.06)', drawBorder: false },
+          ticks: { color: '#888', font: { size: 10 }, callback: (v) => fmtN(v) },
+        },
+      },
+    },
+  });
+}
+
 function buildGA4Sources(dateFrom, dateTo) {
   if (!GA4_DATA) return;
   const hasFilter = dateFrom && dateTo;
@@ -1804,6 +2003,7 @@ async function fetchGA4Data() {
     GA4_DATA = data;
     _ga4DailyIdx = null; // reset index ao recarregar
     const { de, ate } = getActiveDates();
+    buildGA4Growth(de, ate);
     buildGA4Sources(de, ate);
     buildGA4Funnel(de, ate);
     console.log('✅ GA4 Data carregado:', data.totals?.sessions, 'sessões');
