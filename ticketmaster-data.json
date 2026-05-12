@@ -1,7 +1,7 @@
 {
-  "updated_at": "2026-05-12T13:00:38Z",
-  "source": "Planilha Linha do Tempo (fallback enquanto API TM está fora)",
-  "source_type": "planilha",
+  "updated_at": "2026-05-12T15:25:14Z",
+  "source": "Planilha Linha do Tempo (Apps Script direto)",
+  "source_type": "planilha_direct",
   "campaign_start": "2026-03-25",
   "moto_show_ids": [
     195330,
@@ -16,12 +16,12 @@
     195741
   ],
   "totals": {
-    "moto_receita": 445129.45,
-    "auto_receita": 340067.9,
-    "moto_ingressos": 5556,
-    "auto_ingressos": 3662,
-    "total_receita": 785197.35,
-    "total_ingressos": 9218
+    "moto_receita": 449273.45,
+    "auto_receita": 341711.9,
+    "moto_ingressos": 5576,
+    "auto_ingressos": 3676,
+    "total_receita": 790985.35,
+    "total_ingressos": 9252
   },
   "daily": [
     {
@@ -33,7 +33,7 @@
     },
     {
       "date": "2026-04-01",
-      "moto_receita": 31860.0,
+      "moto_receita": 31860,
       "auto_receita": 9625.7,
       "moto_ingressos": 1011,
       "auto_ingressos": 118
@@ -90,91 +90,91 @@
     {
       "date": "2026-04-09",
       "moto_receita": 6339.7,
-      "auto_receita": 6624.0,
+      "auto_receita": 6624,
       "moto_ingressos": 75,
       "auto_ingressos": 53
     },
     {
       "date": "2026-04-10",
-      "moto_receita": 6839.0,
-      "auto_receita": 3388.0,
+      "moto_receita": 6839,
+      "auto_receita": 3388,
       "moto_ingressos": 62,
       "auto_ingressos": 41
     },
     {
       "date": "2026-04-11",
-      "moto_receita": 6243.0,
-      "auto_receita": 2569.0,
+      "moto_receita": 6243,
+      "auto_receita": 2569,
       "moto_ingressos": 72,
       "auto_ingressos": 43
     },
     {
       "date": "2026-04-12",
-      "moto_receita": 5197.0,
-      "auto_receita": 3407.0,
+      "moto_receita": 5197,
+      "auto_receita": 3407,
       "moto_ingressos": 63,
       "auto_ingressos": 37
     },
     {
       "date": "2026-04-13",
-      "moto_receita": 4285.0,
-      "auto_receita": 3577.0,
+      "moto_receita": 4285,
+      "auto_receita": 3577,
       "moto_ingressos": 57,
       "auto_ingressos": 46
     },
     {
       "date": "2026-04-14",
-      "moto_receita": 6629.0,
-      "auto_receita": 6389.0,
+      "moto_receita": 6629,
+      "auto_receita": 6389,
       "moto_ingressos": 78,
       "auto_ingressos": 68
     },
     {
       "date": "2026-04-15",
-      "moto_receita": 5447.0,
-      "auto_receita": 4757.0,
+      "moto_receita": 5447,
+      "auto_receita": 4757,
       "moto_ingressos": 72,
       "auto_ingressos": 62
     },
     {
       "date": "2026-04-16",
-      "moto_receita": 6281.0,
-      "auto_receita": 10484.0,
+      "moto_receita": 6281,
+      "auto_receita": 10484,
       "moto_ingressos": 77,
       "auto_ingressos": 120
     },
     {
       "date": "2026-04-17",
-      "moto_receita": 7595.0,
-      "auto_receita": 8381.0,
+      "moto_receita": 7595,
+      "auto_receita": 8381,
       "moto_ingressos": 74,
       "auto_ingressos": 107
     },
     {
       "date": "2026-04-18",
-      "moto_receita": 6463.0,
-      "auto_receita": 11665.0,
+      "moto_receita": 6463,
+      "auto_receita": 11665,
       "moto_ingressos": 79,
       "auto_ingressos": 109
     },
     {
       "date": "2026-04-19",
-      "moto_receita": 8754.0,
-      "auto_receita": 11175.0,
+      "moto_receita": 8754,
+      "auto_receita": 11175,
       "moto_ingressos": 108,
       "auto_ingressos": 124
     },
     {
       "date": "2026-04-20",
-      "moto_receita": 7358.0,
-      "auto_receita": 8588.0,
+      "moto_receita": 7358,
+      "auto_receita": 8588,
       "moto_ingressos": 73,
       "auto_ingressos": 95
     },
     {
       "date": "2026-04-21",
-      "moto_receita": 5090.0,
-      "auto_receita": 7244.0,
+      "moto_receita": 5090,
+      "auto_receita": 7244,
       "moto_ingressos": 61,
       "auto_ingressos": 91
     },
@@ -194,8 +194,8 @@
     },
     {
       "date": "2026-04-24",
-      "moto_receita": 6480.0,
-      "auto_receita": 7943.0,
+      "moto_receita": 6480,
+      "auto_receita": 7943,
       "moto_ingressos": 65,
       "auto_ingressos": 72
     },
@@ -208,7 +208,7 @@
     },
     {
       "date": "2026-04-26",
-      "moto_receita": 5004.0,
+      "moto_receita": 5004,
       "auto_receita": 4192.6,
       "moto_ingressos": 59,
       "auto_ingressos": 48
@@ -258,7 +258,7 @@
     {
       "date": "2026-05-03",
       "moto_receita": 20030.1,
-      "auto_receita": 10375.0,
+      "auto_receita": 10375,
       "moto_ingressos": 189,
       "auto_ingressos": 130
     },
@@ -278,7 +278,7 @@
     },
     {
       "date": "2026-05-06",
-      "moto_receita": 10852.0,
+      "moto_receita": 10852,
       "auto_receita": 7895.8,
       "moto_ingressos": 133,
       "auto_ingressos": 78
@@ -286,20 +286,20 @@
     {
       "date": "2026-05-07",
       "moto_receita": 7972.8,
-      "auto_receita": 7020.0,
+      "auto_receita": 7020,
       "moto_ingressos": 89,
       "auto_ingressos": 64
     },
     {
       "date": "2026-05-08",
-      "moto_receita": 11526.0,
+      "moto_receita": 11526,
       "auto_receita": 6599.6,
       "moto_ingressos": 92,
       "auto_ingressos": 60
     },
     {
       "date": "2026-05-09",
-      "moto_receita": 6138.0,
+      "moto_receita": 6138,
       "auto_receita": 9849.2,
       "moto_ingressos": 57,
       "auto_ingressos": 74
@@ -307,7 +307,7 @@
     {
       "date": "2026-05-10",
       "moto_receita": 7228.6,
-      "auto_receita": 4372.0,
+      "auto_receita": 4372,
       "moto_ingressos": 81,
       "auto_ingressos": 57
     },
@@ -320,10 +320,10 @@
     },
     {
       "date": "2026-05-12",
-      "moto_receita": 1806.0,
-      "auto_receita": 782.0,
-      "moto_ingressos": 14,
-      "auto_ingressos": 8
+      "moto_receita": 5950,
+      "auto_receita": 2426,
+      "moto_ingressos": 34,
+      "auto_ingressos": 22
     }
   ]
 }
