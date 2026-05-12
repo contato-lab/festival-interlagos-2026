@@ -2136,13 +2136,13 @@ function initDashboard(){
     fetchTipos()
   ]).then(() => renderPainelExecutivo());
 
-  // Vendas própria + TM: refresh a cada 30 segundos (Workers em real-time)
+  // Vendas própria + TM: refresh a cada 10s pra capturar webhook da planilha rápido
   setInterval(() => {
     Promise.allSettled([fetchVendasProprio(), fetchTicketmaster(), fetchTipos()])
       .then(() => renderPainelExecutivo());
-  }, 30000);
+  }, 10000);
 
-  // Mídia (Google Ads, Meta, TikTok): refresh a cada 30 segundos
+  // Mídia (Google Ads, Meta, TikTok): a cada 30s (APIs têm latência maior)
   setInterval(() => {
     Promise.allSettled([fetchGAdsData(), fetchMetaData(), tiktokLoad()])
       .then(() => { renderPainelExecutivo(); });
