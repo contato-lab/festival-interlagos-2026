@@ -48,7 +48,7 @@ OUT_TM     = 'ticketmaster-data.json'
 OUT_TIPOS  = 'vendas-tipos-data.json'
 
 # ── PLANILHA (fallback quando a API TM cai) ────────────────
-PLANILHA_ID  = os.environ.get('PLANILHA_LINHA_TEMPO_ID', '1jk7jjYB6n-IjkdmBUv54QEerujL_iAAP')
+PLANILHA_ID  = os.environ.get('PLANILHA_LINHA_TEMPO_ID', '1osgyQdQlf21kbsZCt65CnrbsONTdiLyXAd32Hngvbfk')
 PLANILHA_URL = f'https://docs.google.com/spreadsheets/d/{PLANILHA_ID}/export?format=xlsx'
 PLANILHA_YEAR = 2026
 # SEMANA 0 começa nessa segunda-feira (data fixa da campanha).
