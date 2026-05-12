@@ -693,15 +693,18 @@ Google Ads
 <!-- ══ CRESCIMENTO DE ACESSOS — GA4 DAILY ══ -->
 <div class="chart-card">
   <div class="section-header">
-    <div class="section-title">📈 Crescimento de Acessos — Diário</div>
-    <span class="badge badge-ok" style="font-size:.68rem">✓ GA4 ao vivo</span>
+    <div class="section-title">📈 Crescimento de Acessos — Linha do Tempo</div>
+    <div style="display:flex;gap:8px">
+      <span class="badge" style="font-size:.62rem;background:rgba(255,255,255,.05);color:#999">Campanha completa · 31/03 → hoje</span>
+      <span class="badge badge-ok" style="font-size:.68rem">✓ GA4 ao vivo</span>
+    </div>
   </div>
 
   <!-- KPIs resumo no topo -->
   <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px">
     <div style="flex:1;min-width:140px;padding:10px 14px;background:rgba(200,255,0,.04);border-left:2px solid var(--lime);border-radius:0 4px 4px 0">
       <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:var(--lime)" id="ga4GrowthSessions">—</div>
-      <div style="font-size:.65rem;color:#999;text-transform:uppercase;letter-spacing:.06em">Sessões no período</div>
+      <div style="font-size:.65rem;color:#999;text-transform:uppercase;letter-spacing:.06em">Sessões na campanha</div>
     </div>
     <div style="flex:1;min-width:140px;padding:10px 14px;background:rgba(2,77,223,.05);border-left:2px solid #024DDF;border-radius:0 4px 4px 0">
       <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#5DAEFF" id="ga4GrowthUsers">—</div>
@@ -722,7 +725,7 @@ Google Ads
 
   <div style="font-size:.66rem;color:var(--text3);margin-top:12px;display:flex;align-items:center;gap:6px">
     <span style="color:var(--lime);font-size:.7rem">●</span>
-    Crescimento de sessões diárias · Linha verde-clara mostra média móvel de 7 dias pra suavizar o ruído.
+    Linha do tempo completa da campanha (31/03 até hoje). Não respeita o filtro de data acima — sempre mostra tudo. Linha verde-clara é a média móvel de 7 dias.
   </div>
 </div>
 
@@ -1597,17 +1600,20 @@ const _GA4_CHANNEL_MAP_REV = {};
 Object.entries(_GA4_CHANNEL_MAP).forEach(([k,v]) => { _GA4_CHANNEL_MAP_REV[v] = k; });
 
 // ── CRESCIMENTO DE ACESSOS ─────────────────────────────────
+// SEMPRE mostra do início da campanha (31/03/2026) até hoje, ignorando
+// o filtro de data global. A ideia desse card é a linha do tempo
+// COMPLETA da campanha, pra ver crescimento ao longo dos meses.
+const _GA4_GROWTH_START = '2026-03-31';
 let _ga4GrowthChart = null;
 
-function buildGA4Growth(dateFrom, dateTo) {
+function buildGA4Growth(_dateFromIgnored, _dateToIgnored) {
   const canvas = document.getElementById('chartGA4Growth');
   if (!canvas || !GA4_DATA?.daily_series) return;
 
-  // Filtra daily_series pelo range ativo (ou pega tudo se sem filtro)
-  let series = GA4_DATA.daily_series;
-  if (dateFrom && dateTo) {
-    series = series.filter(d => d.date >= dateFrom && d.date <= dateTo);
-  }
+  const today = new Date().toISOString().slice(0, 10);
+  const series = GA4_DATA.daily_series.filter(
+    (d) => d.date >= _GA4_GROWTH_START && d.date <= today
+  );
   if (!series.length) return;
 
   // Labels (dd/mm) e datasets
