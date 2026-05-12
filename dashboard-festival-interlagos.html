@@ -723,9 +723,14 @@ Google Ads
   <!-- Gráfico de linha -->
   <div style="position:relative;height:280px"><canvas id="chartGA4Growth"></canvas></div>
 
-  <div style="font-size:.66rem;color:var(--text3);margin-top:12px;display:flex;align-items:center;gap:6px">
-    <span style="color:var(--lime);font-size:.7rem">●</span>
-    Linha do tempo completa da campanha (31/03 até hoje). Não respeita o filtro de data acima — sempre mostra tudo. Linha verde-clara é a média móvel de 7 dias.
+  <div style="font-size:.66rem;color:var(--text3);margin-top:12px;line-height:1.5">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+      <span style="color:var(--lime);font-size:.7rem">●</span>
+      Linha do tempo completa da campanha (31/03 até hoje). Não respeita o filtro de data acima — sempre mostra tudo.
+    </div>
+    <div style="color:#888;padding-left:14px">
+      Linhas tracejadas verticais mostram as ações de mídia (TV, rádio, influenciadores, programática etc.) — usa a mesma legenda do gráfico de comparativo acima. Passe o mouse num dia pra ver qual ação rolou.
+    </div>
   </div>
 </div>
 
@@ -1439,6 +1444,7 @@ function buildAcoesLegend() {
       div.classList.toggle('inactive');
       buildComp();         // re-render gráfico com/sem as anotações
       buildAcoesTimeline();
+      if (GA4_DATA) buildGA4Growth(); // sincroniza marcações no gráfico GA4
     };
     el.appendChild(div);
   });
@@ -1656,6 +1662,35 @@ function buildGA4Growth(_dateFromIgnored, _dateToIgnored) {
   document.getElementById('ga4GrowthAvgDaily').textContent = fmtN(avgDaily);
   document.getElementById('ga4GrowthDelta').innerHTML      = deltaTxt;
 
+  // Monta annotations das ACOES (TV Globo, Influenciadores, Programática etc.)
+  // mapeando a.dia (D+N a partir de 31/03) pro index do series.
+  // Como series tambem comeca em 31/03, dia=1 -> index 0.
+  const seriesStart = new Date(_GA4_GROWTH_START + 'T00:00:00');
+  const ga4Annotations = {};
+  ACOES.forEach((a, i) => {
+    if (!acoesVisiveis[a.tipo]) return;
+    const cfg = ACAO_CONFIG[a.tipo];
+    if (!cfg) return;
+    const xIndex = a.dia - 1;
+    if (xIndex < 0 || xIndex >= labels.length) return;
+    ga4Annotations[`ga4_acao_${i}`] = {
+      type: 'line',
+      xMin: xIndex, xMax: xIndex,
+      borderColor: cfg.cor,
+      borderWidth: 1.5,
+      borderDash: cfg.dash,
+      label: {
+        display: false, // só linha — tooltip mostra o titulo
+        content: cfg.icone + ' ' + cfg.label,
+        position: 'start',
+        backgroundColor: 'rgba(0,0,0,.6)',
+        color: cfg.cor,
+        font: { size: 9, weight: 'bold' },
+        padding: 3,
+      },
+    };
+  });
+
   if (_ga4GrowthChart) _ga4GrowthChart.destroy();
   _ga4GrowthChart = new Chart(canvas, {
     type: 'line',
@@ -1707,6 +1742,7 @@ function buildGA4Growth(_dateFromIgnored, _dateToIgnored) {
       animation: { duration: 400 },
       interaction: { mode: 'index', intersect: false },
       plugins: {
+        annotation: { annotations: ga4Annotations },
         legend: {
           position: 'top',
           align: 'end',
@@ -1724,7 +1760,14 @@ function buildGA4Growth(_dateFromIgnored, _dateToIgnored) {
             title: (items) => {
               const idx = items[0].dataIndex;
               const d = series[idx];
-              return `${labels[idx]}  ·  ${fmtN(d.sessions || 0)} sessões`;
+              const dPlus = idx + 1;
+              const acoesNoDia = ACOES.filter(a => a.dia === dPlus && acoesVisiveis[a.tipo]);
+              const base = `${labels[idx]}  ·  D+${dPlus}  ·  ${fmtN(d.sessions || 0)} sessões`;
+              if (acoesNoDia.length) {
+                const tag = acoesNoDia.map(a => `${ACAO_CONFIG[a.tipo].icone} ${a.titulo}`).join(' · ');
+                return [base, tag];
+              }
+              return base;
             },
             label: (ctx) => {
               const idx = ctx.dataIndex;
