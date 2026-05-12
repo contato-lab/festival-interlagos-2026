@@ -714,11 +714,10 @@ Google Ads
       <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#DDD" id="ga4GrowthAvgDaily">—</div>
       <div style="font-size:.65rem;color:#999;text-transform:uppercase;letter-spacing:.06em">Média diária (sessões)</div>
     </div>
-    <div style="flex:1;min-width:140px;padding:10px 14px;background:rgba(255,255,255,.03);border-left:2px solid rgba(255,255,255,.2);border-radius:0 4px 4px 0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:#DDD" id="ga4GrowthDelta">—</div>
-      <div style="font-size:.65rem;color:#999;text-transform:uppercase;letter-spacing:.06em">Variação 1ª vs última semana</div>
-    </div>
   </div>
+
+  <!-- Legenda das ações (sincronizada com o gráfico Comparativo Dia a Dia) -->
+  <div id="ga4AcoesLegend" class="acoes-legend" style="padding:8px 10px;background:rgba(255,255,255,.02);border-radius:6px;margin-bottom:14px"></div>
 
   <!-- Gráfico de linha -->
   <div style="position:relative;height:280px"><canvas id="chartGA4Growth"></canvas></div>
@@ -1427,26 +1426,38 @@ function buildComp() {
 }
 
 // ─── Legenda de tipos de ação (com toggle) ──────────────────────────────────
+// Renderiza nos containers #acoesLegend (gráfico Comparativo) e
+// #ga4AcoesLegend (gráfico GA4 Crescimento). Click em qualquer um sincroniza
+// os dois — ambos compartilham o estado acoesVisiveis.
 function buildAcoesLegend() {
-  const el = document.getElementById('acoesLegend');
-  el.innerHTML = '';
+  const containers = ['acoesLegend', 'ga4AcoesLegend']
+    .map(id => document.getElementById(id))
+    .filter(Boolean);
+  containers.forEach(el => (el.innerHTML = ''));
+
   Object.entries(ACAO_CONFIG).forEach(([tipo, cfg]) => {
     const count = ACOES.filter(a => a.tipo === tipo).length;
     if (!count) return;
-    const div = document.createElement('div');
-    div.className = 'acao-leg-item' + (acoesVisiveis[tipo] ? '' : ' inactive');
-    div.innerHTML = `<span style="font-size:.9rem">${cfg.icone}</span>
-      <div class="acao-leg-line" style="background:${cfg.cor};width:18px;height:2px;border-radius:1px"></div>
-      <span>${cfg.label}</span>
-      <span style="background:rgba(255,255,255,0.07);border-radius:10px;padding:1px 6px;font-size:.68rem;color:var(--text3)">${count}</span>`;
-    div.onclick = () => {
+
+    const onClick = () => {
       acoesVisiveis[tipo] = !acoesVisiveis[tipo];
-      div.classList.toggle('inactive');
-      buildComp();         // re-render gráfico com/sem as anotações
+      // Re-renderiza todas as legendas pra mesma chip ficar inactive nos dois
+      buildAcoesLegend();
+      buildComp();
       buildAcoesTimeline();
-      if (GA4_DATA) buildGA4Growth(); // sincroniza marcações no gráfico GA4
+      if (GA4_DATA) buildGA4Growth();
     };
-    el.appendChild(div);
+
+    containers.forEach(el => {
+      const div = document.createElement('div');
+      div.className = 'acao-leg-item' + (acoesVisiveis[tipo] ? '' : ' inactive');
+      div.innerHTML = `<span style="font-size:.9rem">${cfg.icone}</span>
+        <div class="acao-leg-line" style="background:${cfg.cor};width:18px;height:2px;border-radius:1px"></div>
+        <span>${cfg.label}</span>
+        <span style="background:rgba(255,255,255,0.07);border-radius:10px;padding:1px 6px;font-size:.68rem;color:var(--text3)">${count}</span>`;
+      div.onclick = onClick;
+      el.appendChild(div);
+    });
   });
 }
 
@@ -1644,23 +1655,9 @@ function buildGA4Growth(_dateFromIgnored, _dateToIgnored) {
   const totalSessions = sessionsArr.reduce((a, b) => a + b, 0);
   const totalUsers    = usersArr.reduce((a, b) => a + b, 0);
   const avgDaily      = series.length ? Math.round(totalSessions / series.length) : 0;
-  // Delta: média da 1ª semana vs última semana do período
-  let deltaTxt = '—';
-  if (series.length >= 14) {
-    const first7 = sessionsArr.slice(0, 7).reduce((a, b) => a + b, 0) / 7;
-    const last7  = sessionsArr.slice(-7).reduce((a, b) => a + b, 0) / 7;
-    if (first7 > 0) {
-      const pct = ((last7 - first7) / first7) * 100;
-      const arrow = pct >= 0 ? '▲' : '▼';
-      const cor   = pct >= 0 ? 'var(--lime)' : 'var(--red, #ff5050)';
-      const sign  = pct >= 0 ? '+' : '';
-      deltaTxt = `<span style="color:${cor}">${arrow} ${sign}${pct.toFixed(1)}%</span>`;
-    }
-  }
   document.getElementById('ga4GrowthSessions').textContent = fmtN(totalSessions);
   document.getElementById('ga4GrowthUsers').textContent    = fmtN(totalUsers);
   document.getElementById('ga4GrowthAvgDaily').textContent = fmtN(avgDaily);
-  document.getElementById('ga4GrowthDelta').innerHTML      = deltaTxt;
 
   // Monta annotations das ACOES (TV Globo, Influenciadores, Programática etc.)
   // mapeando a.dia (D+N a partir de 31/03) pro index do series.
