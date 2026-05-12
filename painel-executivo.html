@@ -412,6 +412,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
           <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,149,0,.9)"></span>
           <span style="color:#FF9500">📻 Rádio MIX FM SP</span>
         </div>
+        <div class="exec-leg-item clickable" id="exec-progLegVendas" style="display:none" onclick="execToggleAcao('prog',this)">
+          <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(0,191,255,.9)"></span>
+          <span style="color:#00BFFF">🖥️ Mídia Programática</span>
+        </div>
       </div>
       <div class="exec-chart-wrap"><canvas id="exec-chartVendas"></canvas></div>
     </div>
@@ -593,6 +597,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="exec-leg-item clickable" id="exec-radLegTl" style="display:none" onclick="execToggleAcaoTl('radio',this)">
         <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,149,0,.9)"></span>
         <span style="color:#FF9500">📻 Rádio MIX FM SP</span>
+      </div>
+      <div class="exec-leg-item clickable" id="exec-progLegTl" style="display:none" onclick="execToggleAcaoTl('prog',this)">
+        <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(0,191,255,.9)"></span>
+        <span style="color:#00BFFF">🖥️ Mídia Programática</span>
       </div>
     </div>
     <div style="position:relative;height:320px"><canvas id="exec-chartTimeline"></canvas></div>
@@ -974,6 +982,10 @@ const EXEC_RADIO = [
   {date:'2026-05-04', day26:35, desc:'Rádio MIX FM SP — início (04/05 a 18/05, 100 spots)'},
 ];
 
+const EXEC_PROG = [
+  {date:'2026-05-04', day26:35, desc:'Mídia Programática Adsplay — início (04/05) — Display, Vídeo, CTV/OTT, Áudio'},
+];
+
 const EXEC_TV_GLOBO = [
   {date:'2026-04-01', day26:2, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
   {date:'2026-04-02', day26:3, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
@@ -1054,7 +1066,7 @@ function execGetAllDays(invest) {
 }
 
 /* Estado de visibilidade das ações (toggle na legenda) */
-const execAcoesVisiveis = { tv: true, influencer: true, divulgacao: true, spotify: true, whatsapp: true, virada: true, radio: true };
+const execAcoesVisiveis = { tv: true, influencer: true, divulgacao: true, spotify: true, whatsapp: true, virada: true, radio: true, prog: true };
 
 function execToggleAcao(tipo, el) {
   execAcoesVisiveis[tipo] = !execAcoesVisiveis[tipo];
@@ -1132,6 +1144,16 @@ function execGetTvAnnotations(days) {
       anns['rad_'+rd.day26] = {
         type:'line', xMin:idx, xMax:idx,
         borderColor:'rgba(255,149,0,0.9)', borderWidth:2, borderDash:[6,3]
+      };
+    });
+  }
+  if(execAcoesVisiveis.prog) {
+    EXEC_PROG.forEach(pg => {
+      const idx = days.indexOf(pg.day26);
+      if(idx === -1) return;
+      anns['prog_'+pg.day26] = {
+        type:'line', xMin:idx, xMax:idx,
+        borderColor:'rgba(0,191,255,0.9)', borderWidth:2, borderDash:[4,4]
       };
     });
   }
@@ -1424,6 +1446,8 @@ function buildExecVendasChart() {
   if(virLeg) virLeg.style.display = days.some(d=>EXEC_VIRADA.some(t=>t.day26===d))?'flex':'none';
   const radLeg = document.getElementById('exec-radLegVendas');
   if(radLeg) radLeg.style.display = days.some(d=>EXEC_RADIO.some(t=>t.day26===d))?'flex':'none';
+  const progLeg = document.getElementById('exec-progLegVendas');
+  if(progLeg) progLeg.style.display = days.some(d=>EXEC_PROG.some(t=>t.day26===d))?'flex':'none';
 }
 
 /* ═══ Grafico Investimento ═══ */
@@ -2174,9 +2198,12 @@ function execToggleAcaoTl(tipo, el) {
   execAcoesVisiveis[tipo] = !execAcoesVisiveis[tipo];
   el.classList.toggle('inactive', !execAcoesVisiveis[tipo]);
   // Sincroniza com o outro chart
-  const key = tipo==='tv'?'tv':tipo==='influencer'?'infl':tipo==='divulgacao'?'div':tipo==='spotify'?'spot':'wa';
-  const outro = document.getElementById('exec-' + key + 'LegVendas');
-  if(outro) outro.classList.toggle('inactive', !execAcoesVisiveis[tipo]);
+  const keyMap = {tv:'tv', influencer:'infl', divulgacao:'div', spotify:'spot', whatsapp:'wa', virada:'vir', radio:'rad', prog:'prog'};
+  const key = keyMap[tipo];
+  if(key) {
+    const outro = document.getElementById('exec-' + key + 'LegVendas');
+    if(outro) outro.classList.toggle('inactive', !execAcoesVisiveis[tipo]);
+  }
   buildExecTimelineChart();
   buildExecVendasChart();
 }
@@ -2314,6 +2341,8 @@ function buildExecTimelineChart() {
   if(virLegTl) virLegTl.style.display = EXEC_VIRADA.some(t=>days.includes(t.day26))?'flex':'none';
   const radLegTl = document.getElementById('exec-radLegTl');
   if(radLegTl) radLegTl.style.display = EXEC_RADIO.some(t=>days.includes(t.day26))?'flex':'none';
+  const progLegTl = document.getElementById('exec-progLegTl');
+  if(progLegTl) progLegTl.style.display = EXEC_PROG.some(t=>days.includes(t.day26))?'flex':'none';
 }
 
 let execTMView = 'receita'; // 'receita' | 'ingressos'
