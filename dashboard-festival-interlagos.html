@@ -799,7 +799,9 @@ Google Ads
     <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:#AAA;margin-bottom:10px;display:flex;align-items:center;gap:8px">
       <span style="color:#00BFFF">🖥️</span> Mídia Programática · Adsplay
     </div>
-    <div style="font-size:.62rem;color:var(--text3);margin-bottom:10px;line-height:1.6;padding:7px 10px;background:rgba(0,191,255,.04);border-left:2px solid rgba(0,191,255,.3);border-radius:0 4px 4px 0">Sessões reais e conversões diretas registradas pelo GA4 (atribuição de último clique) para cada frente da campanha Adsplay. Não inclui "view-through" — só usuários que <strong style="color:#CCC">clicaram</strong> no anúncio e chegaram ao site.</div>
+    <div style="font-size:.62rem;color:var(--text3);margin-bottom:10px;line-height:1.6;padding:7px 10px;background:rgba(0,191,255,.04);border-left:2px solid rgba(0,191,255,.3);border-radius:0 4px 4px 0">
+      Programática é <strong style="color:#5DAEFF">topo de funil</strong>: gera <em>nova demanda</em> de quem ainda não conhece o festival. O GA4 (último clique) raramente atribui venda direta a ela — quem viu o anúncio costuma voltar via busca orgânica ou direto e a venda é creditada lá. As métricas que importam aqui são <strong style="color:#CCC">sessões trazidas</strong> e <strong style="color:#CCC">% que chegaram a uma página de ingresso</strong> (sinal de interesse). Conversão direta zero é <em>esperado</em>, não indicativo de fracasso.
+    </div>
     <div class="referrer-grid" id="ga4Adsplay"></div>
   </div>
 
@@ -1971,9 +1973,16 @@ function buildGA4Sources(dateFrom, dateTo) {
       adsplayDiv.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:18px;color:#666;font-size:.72rem">Sem dados da Adsplay no período filtrado.</div>';
     } else {
       adsplay.forEach(r => {
-        const conv = r.conversions || 0;
         const tickets = r.tickets || {};
         const tktEntries = Object.entries(tickets).sort((a,b)=>b[1]-a[1]);
+        const totalTktViews = tktEntries.reduce((s,[,n])=>s+n, 0);
+        const engagement = r.sessions > 0 ? (totalTktViews / r.sessions) * 100 : 0;
+        // Cores de engajamento: <0.5% pobre, 0.5-2% médio, >2% forte
+        const engColor = engagement >= 2 ? 'var(--green)' : engagement >= 0.5 ? '#FFB800' : 'var(--text3)';
+        const engLabel = totalTktViews > 0
+          ? engagement.toFixed(2) + '% engaj.'
+          : 'sem engaj.';
+
         const card = document.createElement('div');
         card.className = 'referrer-card';
         card.style.borderLeft = '2px solid rgba(0,191,255,.5)';
@@ -1983,8 +1992,8 @@ function buildGA4Sources(dateFrom, dateTo) {
           '</span>' +
           '<span style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">' +
             '<span style="display:flex;align-items:center;gap:10px">' +
-              '<span style="font-size:.65rem;color:' + (conv > 0 ? 'var(--green)' : 'var(--text3)') + '">' +
-                (conv > 0 ? conv + ' conv' : '0 conv') +
+              '<span style="font-size:.65rem;color:' + engColor + '" title="Sessões que visitaram alguma página de ingresso (Ride/Sport/Drive Pass etc.). Indica interesse gerado pelo anúncio.">' +
+                engLabel +
               '</span>' +
               '<span class="referrer-val" style="color:#5DAEFF">' + fmtN(r.sessions) + '</span>' +
             '</span>' +
