@@ -805,6 +805,17 @@ Google Ads
     <div class="referrer-grid" id="ga4Adsplay"></div>
   </div>
 
+  <!-- Brand Lift: Impacto Indireto da Programática (+ Rádio) -->
+  <div style="margin-top:22px">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:#AAA;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      <span style="color:#FFB800">🚀</span> Brand Lift · Antes vs Depois de 04/05
+    </div>
+    <div style="font-size:.62rem;color:var(--text3);margin-bottom:10px;line-height:1.6;padding:7px 10px;background:rgba(255,184,0,.04);border-left:2px solid rgba(255,184,0,.3);border-radius:0 4px 4px 0">
+      Em <strong style="color:#CCC">04/05</strong> entraram em ação <strong style="color:#00BFFF">Mídia Programática Adsplay</strong> + <strong style="color:#FF9500">Rádio MIX FM SP</strong>. Como programática é topo de funil, o resultado dela aparece <strong style="color:#CCC">indiretamente</strong> nos canais Direto, Busca Orgânica e Social — pessoas que viram o anúncio depois pesquisam e voltam. A tabela compara a média diária dos 10 dias antes (24/04 a 03/05) vs depois (04/05 em diante) pra mostrar esse efeito.
+    </div>
+    <div id="ga4BrandLift" style="display:grid;grid-template-columns:1fr;gap:8px"></div>
+  </div>
+
   <div style="font-size:.66rem;color:var(--text3);margin-top:14px;display:flex;align-items:center;gap:6px">
     <span style="color:var(--lime);font-size:.7rem">●</span>
     Dados reais via GA4 Data API · Propriedade #378336436 · Período: <span id="ga4Period">—</span>
@@ -2012,6 +2023,135 @@ function buildGA4Sources(dateFrom, dateTo) {
       });
     }
   }
+
+  // ── Brand Lift: Antes vs Depois de 04/05 ─────────────────────────────
+  buildGA4BrandLift();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// BRAND LIFT — Impacto indireto da programática + rádio nos canais
+// Compara média diária dos 10 dias antes (24/04 a 03/05) vs após (04/05 →)
+// Mostra que programática (topo de funil) gera retorno via Direto / Busca /
+// Social — pessoas que viram o anúncio depois pesquisam e voltam ao site.
+// ═══════════════════════════════════════════════════════════════════════
+function buildGA4BrandLift() {
+  const root = document.getElementById('ga4BrandLift');
+  if (!root || !GA4_DATA?.sessions_by_date) return;
+
+  const sbd = GA4_DATA.sessions_by_date;
+  const BEFORE_START = '2026-04-24';
+  const BEFORE_END   = '2026-05-03';
+  const AFTER_START  = '2026-05-04';
+  const todayStr     = new Date().toISOString().slice(0, 10);
+  const AFTER_END    = todayStr;
+
+  // Canais a monitorar: nome interno GA4 + label + ícone + cor
+  const CHANNELS = [
+    { key: 'Direto pelo Link', label: 'Direto pelo Link',   icon: '🔗', cor: '#7B2D8B',
+      hint: 'Quem digita a URL ou clica em link salvo. Sobe quando a marca fica mais conhecida.' },
+    { key: 'Busca Orgânica',   label: 'Busca Orgânica',     icon: '🔍', cor: '#34A853',
+      hint: 'Pesquisas no Google por "Festival Interlagos". Sobe quando alguém viu o anúncio e foi pesquisar.' },
+    { key: 'Social Orgânico',  label: 'Social Orgânico',    icon: '💬', cor: '#C8FF00',
+      hint: 'Posts e perfis nas redes sociais. Sobe quando a curiosidade gera busca pelo perfil oficial.' }
+  ];
+
+  // Calcula totais por canal nos dois períodos
+  const sums = { before: {}, after: {} };
+  const counts = { before: 0, after: 0 };
+
+  Object.entries(sbd).forEach(([date, channels]) => {
+    let bucket = null;
+    if (date >= BEFORE_START && date <= BEFORE_END) bucket = 'before';
+    else if (date >= AFTER_START && date <= AFTER_END) bucket = 'after';
+    if (!bucket) return;
+    counts[bucket]++;
+    CHANNELS.forEach(ch => {
+      sums[bucket][ch.key] = (sums[bucket][ch.key] || 0) + (channels[ch.key] || 0);
+    });
+  });
+
+  const daysBefore = counts.before;
+  const daysAfter  = counts.after;
+  if (daysBefore === 0 || daysAfter === 0) {
+    root.innerHTML = '<div style="text-align:center;padding:16px;color:#666;font-size:.7rem">Dados insuficientes para comparar.</div>';
+    return;
+  }
+
+  root.innerHTML = '';
+
+  // Header com período
+  const fmtBR = s => { const [y,m,d] = s.split('-'); return d+'/'+m; };
+  const periodHdr = document.createElement('div');
+  periodHdr.style.cssText = 'display:grid;grid-template-columns:1.4fr .9fr .9fr 1fr;gap:8px;padding:4px 10px;font-size:.55rem;text-transform:uppercase;letter-spacing:.06em;color:#666;font-weight:600';
+  periodHdr.innerHTML =
+    '<div>Canal</div>' +
+    '<div style="text-align:right">Antes<br><span style="color:#888;font-weight:400;text-transform:none">'+fmtBR(BEFORE_START)+'–'+fmtBR(BEFORE_END)+' · '+daysBefore+'d</span></div>' +
+    '<div style="text-align:right">Depois<br><span style="color:#00BFFF;font-weight:400;text-transform:none">'+fmtBR(AFTER_START)+'–'+fmtBR(AFTER_END)+' · '+daysAfter+'d</span></div>' +
+    '<div style="text-align:right">Variação<br><span style="color:#888;font-weight:400;text-transform:none">média/dia</span></div>';
+  root.appendChild(periodHdr);
+
+  // Linhas por canal
+  CHANNELS.forEach(ch => {
+    const avgBefore = (sums.before[ch.key] || 0) / daysBefore;
+    const avgAfter  = (sums.after[ch.key]  || 0) / daysAfter;
+    const delta = avgBefore > 0 ? ((avgAfter - avgBefore) / avgBefore * 100) : 0;
+    const deltaAbs = avgAfter - avgBefore;
+    const isUp = delta > 0;
+    const arrow = isUp ? '▲' : (delta < 0 ? '▼' : '—');
+    const deltaCor = delta >= 20 ? 'var(--lime)' : delta > 0 ? '#4dff91' : delta < -10 ? '#FF6B6B' : '#888';
+
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:1.4fr .9fr .9fr 1fr;gap:8px;align-items:center;padding:9px 10px;background:rgba(255,255,255,.025);border-left:2px solid '+ch.cor+';border-radius:0 4px 4px 0;font-size:.72rem';
+    row.title = ch.hint;
+    row.innerHTML =
+      '<div style="display:flex;align-items:center;gap:6px">' +
+        '<span style="color:'+ch.cor+'">'+ch.icon+'</span>' +
+        '<span style="color:#DDD;font-weight:600">'+ch.label+'</span>' +
+      '</div>' +
+      '<div style="text-align:right;font-family:\'Barlow Condensed\',sans-serif;color:#999;font-size:.85rem">'+fmtN(Math.round(avgBefore))+'</div>' +
+      '<div style="text-align:right;font-family:\'Barlow Condensed\',sans-serif;color:#5DAEFF;font-weight:700;font-size:.92rem">'+fmtN(Math.round(avgAfter))+'</div>' +
+      '<div style="text-align:right;font-weight:700;color:'+deltaCor+';font-size:.78rem">' +
+        arrow+' '+(isUp?'+':'')+delta.toFixed(0)+'%' +
+        '<div style="font-size:.55rem;color:#777;font-weight:400;margin-top:1px">' +
+          (deltaAbs>=0?'+':'')+fmtN(Math.round(deltaAbs))+'/dia' +
+        '</div>' +
+      '</div>';
+    root.appendChild(row);
+  });
+
+  // Resumo / linha total
+  const totalBefore = CHANNELS.reduce((s, ch) => s + (sums.before[ch.key]||0), 0) / daysBefore;
+  const totalAfter  = CHANNELS.reduce((s, ch) => s + (sums.after[ch.key]||0),  0) / daysAfter;
+  const totalDelta  = totalBefore > 0 ? ((totalAfter - totalBefore) / totalBefore * 100) : 0;
+  const totalCor    = totalDelta >= 20 ? 'var(--lime)' : totalDelta > 0 ? '#4dff91' : '#888';
+
+  const totalRow = document.createElement('div');
+  totalRow.style.cssText = 'display:grid;grid-template-columns:1.4fr .9fr .9fr 1fr;gap:8px;align-items:center;padding:10px;margin-top:4px;background:linear-gradient(90deg,rgba(255,184,0,.08),rgba(0,191,255,.05));border-radius:4px;border:1px solid rgba(255,184,0,.15);font-size:.74rem';
+  totalRow.title = 'Soma dos 3 canais (Direto + Busca Orgânica + Social Orgânico) — o público "trazido indiretamente" pela programática e rádio.';
+  totalRow.innerHTML =
+    '<div style="display:flex;align-items:center;gap:6px;color:#FFB800;font-weight:700;text-transform:uppercase;font-size:.66rem;letter-spacing:.05em">🚀 Total Brand Lift</div>' +
+    '<div style="text-align:right;font-family:\'Barlow Condensed\',sans-serif;color:#999;font-size:.88rem">'+fmtN(Math.round(totalBefore))+'</div>' +
+    '<div style="text-align:right;font-family:\'Barlow Condensed\',sans-serif;color:#FFB800;font-weight:700;font-size:.98rem">'+fmtN(Math.round(totalAfter))+'</div>' +
+    '<div style="text-align:right;font-weight:700;color:'+totalCor+';font-size:.84rem">' +
+      (totalDelta>0?'▲ +':'')+totalDelta.toFixed(0)+'%' +
+      '<div style="font-size:.55rem;color:#777;font-weight:400;margin-top:1px">' +
+        (totalAfter-totalBefore>=0?'+':'')+fmtN(Math.round(totalAfter-totalBefore))+'/dia' +
+      '</div>' +
+    '</div>';
+  root.appendChild(totalRow);
+
+  // Insight em texto
+  const insight = document.createElement('div');
+  insight.style.cssText = 'margin-top:8px;padding:8px 10px;background:rgba(0,191,255,.05);border-left:2px solid rgba(0,191,255,.35);border-radius:0 4px 4px 0;font-size:.62rem;color:var(--text3);line-height:1.55';
+  const totalAfterAbs = Math.round(totalAfter - totalBefore);
+  if (totalDelta >= 20) {
+    insight.innerHTML = '💡 <strong style="color:#CCC">Sinal de brand lift positivo:</strong> em média <strong style="color:#FFB800">+'+fmtN(totalAfterAbs)+' sessões/dia</strong> nos 3 canais orgânicos somados após 04/05. Confirma que <strong style="color:#5DAEFF">programática + rádio</strong> estão gerando demanda no topo do funil que volta via busca e acesso direto.';
+  } else if (totalDelta > 0) {
+    insight.innerHTML = '💡 <strong style="color:#CCC">Leve aumento</strong> (+'+totalDelta.toFixed(0)+'%) nos canais orgânicos após 04/05. Brand lift modesto — pode levar mais alguns dias para estabilizar conforme a campanha programática acumula frequência.';
+  } else {
+    insight.innerHTML = '💡 <strong style="color:#CCC">Sem brand lift mensurável ainda.</strong> Pode ser cedo — programática costuma levar 2–3 semanas pra refletir indiretamente. Acompanhar a curva.';
+  }
+  root.appendChild(insight);
 }
 
 function buildGA4Funnel(dateFrom, dateTo) {
