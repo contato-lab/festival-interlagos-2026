@@ -811,7 +811,7 @@ Google Ads
       <span style="color:#FFB800">🚀</span> Brand Lift · Antes vs Depois de 04/05
     </div>
     <div style="font-size:.62rem;color:var(--text3);margin-bottom:10px;line-height:1.6;padding:7px 10px;background:rgba(255,184,0,.04);border-left:2px solid rgba(255,184,0,.3);border-radius:0 4px 4px 0">
-      Em <strong style="color:#CCC">04/05</strong> entraram em ação <strong style="color:#00BFFF">Mídia Programática Adsplay</strong> + <strong style="color:#FF9500">Rádio MIX FM SP</strong>. Como programática é topo de funil, o resultado dela aparece <strong style="color:#CCC">indiretamente</strong> nos canais Direto, Busca Orgânica e Social — pessoas que viram o anúncio depois pesquisam e voltam. A tabela compara a média diária dos 10 dias antes (24/04 a 03/05) vs depois (04/05 em diante) pra mostrar esse efeito.
+      Em <strong style="color:#CCC">04/05</strong> entraram em ação <strong style="color:#00BFFF">Mídia Programática Adsplay</strong> + <strong style="color:#FF9500">Rádio MIX FM SP</strong>. Como programática é topo de funil, o resultado dela aparece <strong style="color:#CCC">indiretamente</strong> em Direto, Busca Orgânica e Social — pessoas que viram o anúncio depois pesquisam e voltam. Compara <strong style="color:#CCC">sessões/dia + conversões/dia estimadas</strong> nos canais orgânicos. A janela <em>"depois"</em> cresce automaticamente com o tempo, e o <em>"antes"</em> se ajusta pra ter o mesmo tamanho (máx 14 dias). Responde aos filtros globais de data.
     </div>
     <div id="ga4BrandLift" style="display:grid;grid-template-columns:1fr;gap:8px"></div>
   </div>
@@ -2025,133 +2025,232 @@ function buildGA4Sources(dateFrom, dateTo) {
   }
 
   // ── Brand Lift: Antes vs Depois de 04/05 ─────────────────────────────
-  buildGA4BrandLift();
+  buildGA4BrandLift(dateFrom, dateTo);
 }
 
 // ═══════════════════════════════════════════════════════════════════════
 // BRAND LIFT — Impacto indireto da programática + rádio nos canais
-// Compara média diária dos 10 dias antes (24/04 a 03/05) vs após (04/05 →)
-// Mostra que programática (topo de funil) gera retorno via Direto / Busca /
-// Social — pessoas que viram o anúncio depois pesquisam e voltam ao site.
+// Compara sessões + conversões estimadas dos canais orgânicos (Direto,
+// Busca, Social) ANTES vs DEPOIS do launch em 04/05.
+//
+// Janela dinâmica:
+//   - "Depois" = de 04/05 até hoje (cresce com o tempo)
+//   - "Antes"  = mesmo número de dias do "depois", terminando em 03/05
+//                (capado em 14 dias pra não pegar outliers antigos)
+//
+// Filtros globais: se ativos, restringem ambas as janelas dentro do range.
+//
+// Conversões por canal não existem no breakdown diário do GA4, então
+// estimamos: sess[canal][dia] × CR_canal × (CR_dia_real / CR_média_site)
+// Isso aplica a CR típica do canal mas varia com a performance diária real.
 // ═══════════════════════════════════════════════════════════════════════
-function buildGA4BrandLift() {
+function buildGA4BrandLift(dateFrom, dateTo) {
   const root = document.getElementById('ga4BrandLift');
   if (!root || !GA4_DATA?.sessions_by_date) return;
 
   const sbd = GA4_DATA.sessions_by_date;
-  const BEFORE_START = '2026-04-24';
-  const BEFORE_END   = '2026-05-03';
-  const AFTER_START  = '2026-05-04';
-  const todayStr     = new Date().toISOString().slice(0, 10);
-  const AFTER_END    = todayStr;
+  const PIVOT = '2026-05-04'; // dia do launch programática + rádio
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const hasFilter = !!(dateFrom && dateTo);
 
-  // Canais a monitorar: nome interno GA4 + label + ícone + cor
+  // Helpers de data (UTC pra evitar timezone shenanigans)
+  const addDaysISO = (s, n) => {
+    const d = new Date(s + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + n);
+    return d.toISOString().slice(0, 10);
+  };
+  const daysBetween = (a, b) => {
+    const da = new Date(a + 'T00:00:00Z'), db = new Date(b + 'T00:00:00Z');
+    return Math.round((db - da) / 86400000) + 1;
+  };
+
+  // ── Define janela "depois" (PIVOT até hoje, recortada pelo filtro)
+  let afterStart = PIVOT;
+  let afterEnd = todayStr;
+  if (hasFilter) {
+    afterStart = dateFrom > PIVOT ? dateFrom : PIVOT;
+    afterEnd   = dateTo   < todayStr ? dateTo  : todayStr;
+  }
+  if (afterStart > afterEnd) {
+    root.innerHTML = '<div style="text-align:center;padding:14px;color:#666;font-size:.7rem">Filtro fora do período pós-programática (04/05+).</div>';
+    return;
+  }
+  const daysAfter = daysBetween(afterStart, afterEnd);
+
+  // ── Define janela "antes" — mesmo tamanho do "depois", máx 14 dias
+  const targetBefore = Math.min(daysAfter, 14);
+  let beforeEnd   = addDaysISO(PIVOT, -1);                    // 03/05
+  let beforeStart = addDaysISO(beforeEnd, -(targetBefore - 1));
+  if (hasFilter) {
+    if (dateFrom > beforeStart) beforeStart = dateFrom;
+    if (dateTo   < beforeEnd)   beforeEnd   = dateTo;
+  }
+  if (beforeStart > beforeEnd) {
+    root.innerHTML = '<div style="text-align:center;padding:14px;color:#666;font-size:.7rem">Filtro pega apenas o período pós-programática — sem baseline pra comparar.</div>';
+    return;
+  }
+  const daysBefore = daysBetween(beforeStart, beforeEnd);
+
+  // ── Canais monitorados (nome interno GA4 + ga4 traffic_sources channel)
   const CHANNELS = [
-    { key: 'Direto pelo Link', label: 'Direto pelo Link',   icon: '🔗', cor: '#7B2D8B',
-      hint: 'Quem digita a URL ou clica em link salvo. Sobe quando a marca fica mais conhecida.' },
-    { key: 'Busca Orgânica',   label: 'Busca Orgânica',     icon: '🔍', cor: '#34A853',
-      hint: 'Pesquisas no Google por "Festival Interlagos". Sobe quando alguém viu o anúncio e foi pesquisar.' },
-    { key: 'Social Orgânico',  label: 'Social Orgânico',    icon: '💬', cor: '#C8FF00',
-      hint: 'Posts e perfis nas redes sociais. Sobe quando a curiosidade gera busca pelo perfil oficial.' }
+    { key: 'Direto pelo Link', ga4: 'Direct',         label: 'Direto pelo Link', icon: '🔗', cor: '#7B2D8B' },
+    { key: 'Busca Orgânica',   ga4: 'Organic Search', label: 'Busca Orgânica',   icon: '🔍', cor: '#34A853' },
+    { key: 'Social Orgânico',  ga4: 'Organic Social', label: 'Social Orgânico',  icon: '💬', cor: '#C8FF00' }
   ];
 
-  // Calcula totais por canal nos dois períodos
-  const sums = { before: {}, after: {} };
-  const counts = { before: 0, after: 0 };
+  // ── CR média por canal (de traffic_sources globais)
+  const sources = GA4_DATA?.traffic_sources || [];
+  const crByCanal = {};
+  sources.forEach(s => {
+    crByCanal[s.channel] = s.sessions > 0 ? (s.conversions || 0) / s.sessions : 0;
+  });
 
+  // ── CR média geral do site (pra normalizar variação diária)
+  const totalsT = GA4_DATA?.totals;
+  const crSite = (totalsT && totalsT.sessions > 0) ? (totalsT.conversions || 0) / totalsT.sessions : 0;
+
+  // ── Index daily_series por data (pra pegar CR real do dia)
+  const dailyMap = {};
+  (GA4_DATA.daily_series || []).forEach(d => { dailyMap[d.date] = d; });
+
+  // Estima conversões do canal no dia D
+  // Fórmula: sessions_canal_dia × CR_canal × (CR_dia_real / CR_site)
+  // - CR_canal = taxa típica do canal (ex: Direct converte muito, Social pouco)
+  // - (CR_dia / CR_site) = "fator dia" (>1 em dias bons, <1 em ruins)
+  // Resultado: estimativa que respeita perfil do canal MAS varia com performance diária.
+  function convDiaCanal(date, ch) {
+    const sess = (sbd[date] || {})[ch.key] || 0;
+    if (sess === 0) return 0;
+    const ds = dailyMap[date];
+    let crDayFactor = 1;
+    if (ds && ds.sessions > 0 && crSite > 0) {
+      crDayFactor = ((ds.conversions || 0) / ds.sessions) / crSite;
+    }
+    return sess * (crByCanal[ch.ga4] || 0) * crDayFactor;
+  }
+
+  // ── Acumula sessões e conv estimadas por canal e bucket
+  const acc = { before: {}, after: {} };
+  CHANNELS.forEach(ch => {
+    acc.before[ch.key] = { sess: 0, conv: 0 };
+    acc.after[ch.key]  = { sess: 0, conv: 0 };
+  });
   Object.entries(sbd).forEach(([date, channels]) => {
     let bucket = null;
-    if (date >= BEFORE_START && date <= BEFORE_END) bucket = 'before';
-    else if (date >= AFTER_START && date <= AFTER_END) bucket = 'after';
+    if (date >= beforeStart && date <= beforeEnd) bucket = 'before';
+    else if (date >= afterStart && date <= afterEnd) bucket = 'after';
     if (!bucket) return;
-    counts[bucket]++;
     CHANNELS.forEach(ch => {
-      sums[bucket][ch.key] = (sums[bucket][ch.key] || 0) + (channels[ch.key] || 0);
+      acc[bucket][ch.key].sess += (channels[ch.key] || 0);
+      acc[bucket][ch.key].conv += convDiaCanal(date, ch);
     });
   });
 
-  const daysBefore = counts.before;
-  const daysAfter  = counts.after;
-  if (daysBefore === 0 || daysAfter === 0) {
-    root.innerHTML = '<div style="text-align:center;padding:16px;color:#666;font-size:.7rem">Dados insuficientes para comparar.</div>';
-    return;
-  }
-
+  // ── Render
   root.innerHTML = '';
+  const fmtBR = s => { const [, m, d] = s.split('-'); return d + '/' + m; };
+  const GRID = 'display:grid;grid-template-columns:1.3fr 1fr 1fr .85fr;gap:8px';
 
-  // Header com período
-  const fmtBR = s => { const [y,m,d] = s.split('-'); return d+'/'+m; };
-  const periodHdr = document.createElement('div');
-  periodHdr.style.cssText = 'display:grid;grid-template-columns:1.4fr .9fr .9fr 1fr;gap:8px;padding:4px 10px;font-size:.55rem;text-transform:uppercase;letter-spacing:.06em;color:#666;font-weight:600';
-  periodHdr.innerHTML =
+  const fmtConv = n => (n >= 10 ? fmtN(Math.round(n)) : n.toFixed(1));
+  const corDelta = (d, neg) => d >= 20 ? 'var(--lime)' : d > 0 ? '#4dff91' : d < (neg||-10) ? '#FF6B6B' : '#888';
+  const arrowOf = d => d > 0.5 ? '▲' : d < -0.5 ? '▼' : '—';
+
+  // Header
+  const hdr = document.createElement('div');
+  hdr.style.cssText = GRID + ';padding:4px 10px;font-size:.55rem;text-transform:uppercase;letter-spacing:.06em;color:#666;font-weight:600';
+  hdr.innerHTML =
     '<div>Canal</div>' +
-    '<div style="text-align:right">Antes<br><span style="color:#888;font-weight:400;text-transform:none">'+fmtBR(BEFORE_START)+'–'+fmtBR(BEFORE_END)+' · '+daysBefore+'d</span></div>' +
-    '<div style="text-align:right">Depois<br><span style="color:#00BFFF;font-weight:400;text-transform:none">'+fmtBR(AFTER_START)+'–'+fmtBR(AFTER_END)+' · '+daysAfter+'d</span></div>' +
-    '<div style="text-align:right">Variação<br><span style="color:#888;font-weight:400;text-transform:none">média/dia</span></div>';
-  root.appendChild(periodHdr);
+    '<div style="text-align:right">Antes<br><span style="color:#888;font-weight:400;text-transform:none">' + fmtBR(beforeStart) + '–' + fmtBR(beforeEnd) + ' · ' + daysBefore + 'd</span></div>' +
+    '<div style="text-align:right">Depois<br><span style="color:#00BFFF;font-weight:400;text-transform:none">' + fmtBR(afterStart) + '–' + fmtBR(afterEnd) + ' · ' + daysAfter + 'd</span></div>' +
+    '<div style="text-align:right">Δ<br><span style="color:#888;font-weight:400;text-transform:none">sess · conv</span></div>';
+  root.appendChild(hdr);
 
   // Linhas por canal
   CHANNELS.forEach(ch => {
-    const avgBefore = (sums.before[ch.key] || 0) / daysBefore;
-    const avgAfter  = (sums.after[ch.key]  || 0) / daysAfter;
-    const delta = avgBefore > 0 ? ((avgAfter - avgBefore) / avgBefore * 100) : 0;
-    const deltaAbs = avgAfter - avgBefore;
-    const isUp = delta > 0;
-    const arrow = isUp ? '▲' : (delta < 0 ? '▼' : '—');
-    const deltaCor = delta >= 20 ? 'var(--lime)' : delta > 0 ? '#4dff91' : delta < -10 ? '#FF6B6B' : '#888';
+    const sBef = acc.before[ch.key].sess / daysBefore;
+    const sAft = acc.after[ch.key].sess  / daysAfter;
+    const cBef = acc.before[ch.key].conv / daysBefore;
+    const cAft = acc.after[ch.key].conv  / daysAfter;
+    const dS = sBef > 0 ? ((sAft - sBef) / sBef * 100) : 0;
+    const dC = cBef > 0 ? ((cAft - cBef) / cBef * 100) : 0;
 
     const row = document.createElement('div');
-    row.style.cssText = 'display:grid;grid-template-columns:1.4fr .9fr .9fr 1fr;gap:8px;align-items:center;padding:9px 10px;background:rgba(255,255,255,.025);border-left:2px solid '+ch.cor+';border-radius:0 4px 4px 0;font-size:.72rem';
-    row.title = ch.hint;
+    row.style.cssText = GRID + ';align-items:center;padding:10px;background:rgba(255,255,255,.025);border-left:2px solid ' + ch.cor + ';border-radius:0 4px 4px 0;font-size:.7rem';
+    row.title = 'Linha superior: sessões/dia (dado real). Inferior: conversões/dia estimadas (sessões × CR do canal × fator diário real). Última coluna: variação % de cada métrica.';
     row.innerHTML =
-      '<div style="display:flex;align-items:center;gap:6px">' +
-        '<span style="color:'+ch.cor+'">'+ch.icon+'</span>' +
-        '<span style="color:#DDD;font-weight:600">'+ch.label+'</span>' +
+      // Canal
+      '<div style="display:flex;flex-direction:column;gap:2px">' +
+        '<span style="display:flex;align-items:center;gap:6px;color:#DDD;font-weight:600"><span style="color:' + ch.cor + '">' + ch.icon + '</span>' + ch.label + '</span>' +
+        '<span style="font-size:.55rem;color:#666;margin-left:18px">sessões · conv</span>' +
       '</div>' +
-      '<div style="text-align:right;font-family:\'Barlow Condensed\',sans-serif;color:#999;font-size:.85rem">'+fmtN(Math.round(avgBefore))+'</div>' +
-      '<div style="text-align:right;font-family:\'Barlow Condensed\',sans-serif;color:#5DAEFF;font-weight:700;font-size:.92rem">'+fmtN(Math.round(avgAfter))+'</div>' +
-      '<div style="text-align:right;font-weight:700;color:'+deltaCor+';font-size:.78rem">' +
-        arrow+' '+(isUp?'+':'')+delta.toFixed(0)+'%' +
-        '<div style="font-size:.55rem;color:#777;font-weight:400;margin-top:1px">' +
-          (deltaAbs>=0?'+':'')+fmtN(Math.round(deltaAbs))+'/dia' +
-        '</div>' +
+      // Antes
+      '<div style="text-align:right;display:flex;flex-direction:column;gap:2px">' +
+        '<span style="font-family:\'Barlow Condensed\',sans-serif;color:#AAA;font-size:.95rem;font-weight:700">' + fmtN(Math.round(sBef)) + '</span>' +
+        '<span style="font-size:.62rem;color:#888">~' + fmtConv(cBef) + ' conv</span>' +
+      '</div>' +
+      // Depois
+      '<div style="text-align:right;display:flex;flex-direction:column;gap:2px">' +
+        '<span style="font-family:\'Barlow Condensed\',sans-serif;color:#5DAEFF;font-size:1rem;font-weight:700">' + fmtN(Math.round(sAft)) + '</span>' +
+        '<span style="font-size:.62rem;color:#4dff91">~' + fmtConv(cAft) + ' conv</span>' +
+      '</div>' +
+      // Δ
+      '<div style="text-align:right;display:flex;flex-direction:column;gap:2px">' +
+        '<span style="font-weight:700;color:' + corDelta(dS) + ';font-size:.78rem">' + arrowOf(dS) + ' ' + (dS>0?'+':'') + dS.toFixed(0) + '%</span>' +
+        '<span style="font-weight:700;color:' + corDelta(dC) + ';font-size:.66rem">' + arrowOf(dC) + ' ' + (dC>0?'+':'') + dC.toFixed(0) + '%</span>' +
       '</div>';
     root.appendChild(row);
   });
 
-  // Resumo / linha total
-  const totalBefore = CHANNELS.reduce((s, ch) => s + (sums.before[ch.key]||0), 0) / daysBefore;
-  const totalAfter  = CHANNELS.reduce((s, ch) => s + (sums.after[ch.key]||0),  0) / daysAfter;
-  const totalDelta  = totalBefore > 0 ? ((totalAfter - totalBefore) / totalBefore * 100) : 0;
-  const totalCor    = totalDelta >= 20 ? 'var(--lime)' : totalDelta > 0 ? '#4dff91' : '#888';
+  // Total agregado
+  const totalSBef = CHANNELS.reduce((s, ch) => s + acc.before[ch.key].sess, 0) / daysBefore;
+  const totalSAft = CHANNELS.reduce((s, ch) => s + acc.after[ch.key].sess,  0) / daysAfter;
+  const totalCBef = CHANNELS.reduce((s, ch) => s + acc.before[ch.key].conv, 0) / daysBefore;
+  const totalCAft = CHANNELS.reduce((s, ch) => s + acc.after[ch.key].conv,  0) / daysAfter;
+  const dTotS = totalSBef > 0 ? ((totalSAft - totalSBef) / totalSBef * 100) : 0;
+  const dTotC = totalCBef > 0 ? ((totalCAft - totalCBef) / totalCBef * 100) : 0;
 
   const totalRow = document.createElement('div');
-  totalRow.style.cssText = 'display:grid;grid-template-columns:1.4fr .9fr .9fr 1fr;gap:8px;align-items:center;padding:10px;margin-top:4px;background:linear-gradient(90deg,rgba(255,184,0,.08),rgba(0,191,255,.05));border-radius:4px;border:1px solid rgba(255,184,0,.15);font-size:.74rem';
-  totalRow.title = 'Soma dos 3 canais (Direto + Busca Orgânica + Social Orgânico) — o público "trazido indiretamente" pela programática e rádio.';
+  totalRow.style.cssText = GRID + ';align-items:center;padding:11px 10px;margin-top:4px;background:linear-gradient(90deg,rgba(255,184,0,.08),rgba(0,191,255,.05));border-radius:4px;border:1px solid rgba(255,184,0,.18);font-size:.72rem';
+  totalRow.title = 'Soma dos 3 canais orgânicos (Direto + Busca + Social) — o público "trazido indiretamente" pela programática e rádio. Conversões agregadas estimadas.';
   totalRow.innerHTML =
-    '<div style="display:flex;align-items:center;gap:6px;color:#FFB800;font-weight:700;text-transform:uppercase;font-size:.66rem;letter-spacing:.05em">🚀 Total Brand Lift</div>' +
-    '<div style="text-align:right;font-family:\'Barlow Condensed\',sans-serif;color:#999;font-size:.88rem">'+fmtN(Math.round(totalBefore))+'</div>' +
-    '<div style="text-align:right;font-family:\'Barlow Condensed\',sans-serif;color:#FFB800;font-weight:700;font-size:.98rem">'+fmtN(Math.round(totalAfter))+'</div>' +
-    '<div style="text-align:right;font-weight:700;color:'+totalCor+';font-size:.84rem">' +
-      (totalDelta>0?'▲ +':'')+totalDelta.toFixed(0)+'%' +
-      '<div style="font-size:.55rem;color:#777;font-weight:400;margin-top:1px">' +
-        (totalAfter-totalBefore>=0?'+':'')+fmtN(Math.round(totalAfter-totalBefore))+'/dia' +
-      '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:2px">' +
+      '<span style="color:#FFB800;font-weight:700;text-transform:uppercase;font-size:.66rem;letter-spacing:.05em">🚀 Total Brand Lift</span>' +
+      '<span style="font-size:.55rem;color:#888">3 canais orgânicos somados</span>' +
+    '</div>' +
+    '<div style="text-align:right;display:flex;flex-direction:column;gap:2px">' +
+      '<span style="font-family:\'Barlow Condensed\',sans-serif;color:#AAA;font-size:.98rem;font-weight:700">' + fmtN(Math.round(totalSBef)) + '</span>' +
+      '<span style="font-size:.62rem;color:#888">~' + fmtConv(totalCBef) + ' conv</span>' +
+    '</div>' +
+    '<div style="text-align:right;display:flex;flex-direction:column;gap:2px">' +
+      '<span style="font-family:\'Barlow Condensed\',sans-serif;color:#FFB800;font-size:1.04rem;font-weight:700">' + fmtN(Math.round(totalSAft)) + '</span>' +
+      '<span style="font-size:.62rem;color:var(--lime)">~' + fmtConv(totalCAft) + ' conv</span>' +
+    '</div>' +
+    '<div style="text-align:right;display:flex;flex-direction:column;gap:2px">' +
+      '<span style="font-weight:700;color:' + corDelta(dTotS) + ';font-size:.82rem">' + arrowOf(dTotS) + ' ' + (dTotS>0?'+':'') + dTotS.toFixed(0) + '%</span>' +
+      '<span style="font-weight:700;color:' + corDelta(dTotC) + ';font-size:.68rem">' + arrowOf(dTotC) + ' ' + (dTotC>0?'+':'') + dTotC.toFixed(0) + '%</span>' +
     '</div>';
   root.appendChild(totalRow);
 
-  // Insight em texto
+  // Insight contextual
   const insight = document.createElement('div');
   insight.style.cssText = 'margin-top:8px;padding:8px 10px;background:rgba(0,191,255,.05);border-left:2px solid rgba(0,191,255,.35);border-radius:0 4px 4px 0;font-size:.62rem;color:var(--text3);line-height:1.55';
-  const totalAfterAbs = Math.round(totalAfter - totalBefore);
-  if (totalDelta >= 20) {
-    insight.innerHTML = '💡 <strong style="color:#CCC">Sinal de brand lift positivo:</strong> em média <strong style="color:#FFB800">+'+fmtN(totalAfterAbs)+' sessões/dia</strong> nos 3 canais orgânicos somados após 04/05. Confirma que <strong style="color:#5DAEFF">programática + rádio</strong> estão gerando demanda no topo do funil que volta via busca e acesso direto.';
-  } else if (totalDelta > 0) {
-    insight.innerHTML = '💡 <strong style="color:#CCC">Leve aumento</strong> (+'+totalDelta.toFixed(0)+'%) nos canais orgânicos após 04/05. Brand lift modesto — pode levar mais alguns dias para estabilizar conforme a campanha programática acumula frequência.';
+  const sessExtra = Math.round(totalSAft - totalSBef);
+  const convExtra = totalCAft - totalCBef;
+  const convExtraStr = convExtra >= 10 ? fmtN(Math.round(convExtra)) : convExtra.toFixed(1);
+  if (dTotS >= 20) {
+    insight.innerHTML = '💡 <strong style="color:#CCC">Brand lift positivo:</strong> em média <strong style="color:#FFB800">+' + fmtN(sessExtra) + ' sessões/dia</strong> nos 3 canais orgânicos após 04/05, gerando <strong style="color:var(--lime)">~+' + convExtraStr + ' conversões/dia</strong> estimadas. <strong style="color:#5DAEFF">Programática + rádio</strong> estão trazendo demanda que retorna via busca, direto e social.';
+  } else if (dTotS > 0) {
+    insight.innerHTML = '💡 <strong style="color:#CCC">Leve aumento</strong> (+' + dTotS.toFixed(0) + '% sessões) e <strong style="color:#4dff91">~+' + convExtraStr + ' conv/dia</strong> estimadas. Brand lift modesto — observar nos próximos dias conforme a campanha acumula frequência.';
   } else {
-    insight.innerHTML = '💡 <strong style="color:#CCC">Sem brand lift mensurável ainda.</strong> Pode ser cedo — programática costuma levar 2–3 semanas pra refletir indiretamente. Acompanhar a curva.';
+    insight.innerHTML = '💡 <strong style="color:#CCC">Sem brand lift mensurável</strong> no recorte atual. Programática costuma levar 2–3 semanas para refletir indiretamente.';
   }
   root.appendChild(insight);
+
+  // Nota metodológica
+  const meta = document.createElement('div');
+  meta.style.cssText = 'margin-top:6px;font-size:.55rem;color:#555;text-align:right;font-style:italic;line-height:1.4';
+  meta.innerHTML = '* Conversões estimadas: GA4 não fornece conversão diária por canal, então usamos sessões × CR média do canal × fator-dia (CR real do dia / CR média do site).';
+  root.appendChild(meta);
 }
 
 function buildGA4Funnel(dateFrom, dateTo) {
