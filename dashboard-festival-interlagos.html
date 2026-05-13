@@ -627,6 +627,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
     <div class="media-card" style="border-color:rgba(24,119,242,.25)">
       <div class="media-platform" style="color:#1877F2">
 Meta Ads
+        <span style="display:block;font-size:.5rem;font-weight:500;color:#888;letter-spacing:.04em;text-transform:none;margin-top:2px" title="Soma das contas Principal (act_2044...) + Nova Motos (act_1326...)">2 contas · Principal + Motos</span>
       </div>
       <div class="media-kpis">
         <div class="mk mk-warn"><div class="mk-label">Investimento</div><div class="mk-val" id="meta-invest">—</div></div>
@@ -2516,11 +2517,80 @@ function updateMediaTotals(dateFrom, dateTo) {
   if (ci25) ci25.textContent = '2025 (mesmos ' + dias + ' dias): ' + fmtR(invest25Same);
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// Merge multi-conta Meta Ads — soma 'principal' + 'nova_motos' (motos novo)
+// O meta-data.json traz daily_series/totals só da conta principal no top-level,
+// e a nova conta de Motos (act_1326431289216611) fica em accounts.nova_motos.
+// Fundimos as duas para que TODOS os usos de META_DATA (cards, comparativo,
+// orgânico, totalizadores) reflitam o investimento real combinado.
+// ═══════════════════════════════════════════════════════════════════════
+function _mergeMetaAccounts(data) {
+  if (!data || !data.accounts) return data;
+  const nova = data.accounts.nova_motos;
+  if (!nova || !nova.daily_series || !nova.daily_series.length) return data;
+
+  // 1) Merge daily_series por data (soma campos numéricos)
+  const principalArr = data.daily_series || data.data || [];
+  const merged = {};
+  const sumFields = ['cost', 'impressions', 'clicks', 'reach', 'purchases', 'compras',
+                     'add_to_cart', 'initiate_checkout', 'leads', 'video_views',
+                     'link_clicks', 'thruplays', 'landing_page_views'];
+  const upsert = (src) => {
+    src.forEach(d => {
+      const k = d.date;
+      if (!merged[k]) merged[k] = { date: k };
+      sumFields.forEach(f => {
+        if (d[f] != null) merged[k][f] = (merged[k][f] || 0) + (Number(d[f]) || 0);
+      });
+    });
+  };
+  upsert(principalArr);
+  upsert(nova.daily_series);
+  const mergedArr = Object.values(merged).sort((a,b) => a.date.localeCompare(b.date));
+
+  // 2) Recalcula derivados (CTR, CPC, CPA, ROAS-like) por dia
+  mergedArr.forEach(d => {
+    if (d.impressions > 0 && d.clicks != null) d.ctr = (d.clicks / d.impressions) * 100;
+    if (d.clicks > 0 && d.cost != null) d.cpc = d.cost / d.clicks;
+    const conv = d.purchases || d.compras || 0;
+    if (conv > 0 && d.cost != null) d.cpa = d.cost / conv;
+  });
+
+  // 3) Soma totals
+  const t1 = data.totals || {};
+  const t2 = nova.totals || {};
+  const totalsMerged = { ...t1 };
+  sumFields.forEach(f => {
+    if (t1[f] != null || t2[f] != null) {
+      totalsMerged[f] = (Number(t1[f]) || 0) + (Number(t2[f]) || 0);
+    }
+  });
+  if (totalsMerged.impressions > 0 && totalsMerged.clicks != null) {
+    totalsMerged.ctr = (totalsMerged.clicks / totalsMerged.impressions) * 100;
+  }
+  if (totalsMerged.clicks > 0 && totalsMerged.cost != null) {
+    totalsMerged.cpc = totalsMerged.cost / totalsMerged.clicks;
+  }
+  const convTotal = totalsMerged.purchases || totalsMerged.compras || 0;
+  if (convTotal > 0 && totalsMerged.cost != null) {
+    totalsMerged.cpa = totalsMerged.cost / convTotal;
+  }
+
+  // 4) Devolve estrutura espelhada (preserva accounts originais)
+  return {
+    ...data,
+    daily_series: mergedArr,
+    totals: totalsMerged,
+    _merged: { principal: t1, nova_motos: t2 }
+  };
+}
+
 async function fetchMetaData() {
   try {
     const res = await fetch('meta-data.json?t=' + Date.now());
     if (!res.ok) return;
-    const data = await res.json();
+    const raw = await res.json();
+    const data = _mergeMetaAccounts(raw);
     const arr = data.daily_series || data.data || [];
     if (!arr.length) return;
     META_DATA = data;
@@ -3217,18 +3287,21 @@ function renderCreatives() {
   if (!META_CREATIVES_DATA) return;
 
   // Calcula ratio do Meta Ads filtrado vs total da campanha (a API de criativos
-  // nao retorna breakdown diario, entao escalamos os totais proporcionalmente)
+  // nao retorna breakdown diario, entao escalamos os totais proporcionalmente).
+  // IMPORTANTE: os criativos vêm SÓ da conta principal — então o ratio aqui
+  // tem que usar apenas o cost da principal (não o merged com nova_motos).
   const de  = document.getElementById('filtroDE')?.value  || '';
   const ate = document.getElementById('filtroATE')?.value || '';
   let ratio = 1;
   let isFiltered = false;
-  if (de && ate && META_DATA?.daily_series && META_DATA?.totals?.cost > 0) {
-    const filteredCost = META_DATA.daily_series
+  const principalDS  = META_DATA?.accounts?.principal?.daily_series || META_DATA?.daily_series;
+  const principalTot = META_DATA?.accounts?.principal?.totals?.cost ?? META_DATA?._merged?.principal?.cost ?? META_DATA?.totals?.cost;
+  if (de && ate && principalDS && principalTot > 0) {
+    const filteredCost = principalDS
       .filter(d => d.date >= de && d.date <= ate)
       .reduce((s, d) => s + (d.cost || 0), 0);
-    const fullCost = META_DATA.totals.cost;
-    if (fullCost > 0 && filteredCost < fullCost) {
-      ratio = filteredCost / fullCost;
+    if (principalTot > 0 && filteredCost < principalTot) {
+      ratio = filteredCost / principalTot;
       isFiltered = true;
     }
   }
