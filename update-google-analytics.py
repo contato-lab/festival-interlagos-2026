@@ -275,6 +275,99 @@ def fetch_influencer_breakdown(client) -> list:
         sources[campaign]["daily"][iso_date] = sources[campaign]["daily"].get(iso_date, 0) + sess
 
     return sorted(sources.values(), key=lambda x: x["conversions"], reverse=True)
+def fetch_adsplay_breakdown(client) -> list:
+    """
+    Sessoes/conversoes/tickets por sub-campanha Adsplay (Display, Video,
+    CTV, Audio). Mesma estrutura do influencer_breakdown pra ser
+    renderizado igualzinho no dashboard.
+    """
+    ADSPLAY_CAMPAIGNS = {
+        "festival-2026_adsplay_display": "Display",
+        "festival-2026_adsplay_video":   "Vídeo Open",
+        "festival-2026_adsplay_ctv":     "CTV / OTT",
+        "festival-2026_adsplay_audio":   "Áudio",
+    }
+    TICKET_PAGES = {
+        "ride-pass":   "Ride Pass",
+        "sport-pass":  "Sport Pass",
+        "drive-pass":  "Drive Pass",
+        "street-pass": "Street Pass",
+        "fan-pass":    "Fan Pass",
+        "vip-pass":    "VIP Pass",
+        "pit-pass":    "Pit Pass",
+    }
+
+    end   = datetime.now(timezone.utc) - timedelta(days=1)
+    start = end - timedelta(days=CHANNEL_DAYS)
+    date_range = DateRange(
+        start_date=start.strftime("%Y-%m-%d"),
+        end_date=end.strftime("%Y-%m-%d"),
+    )
+
+    # Q1: sessions + conversoes por campanha
+    r1 = client.run_report(RunReportRequest(
+        property=f"properties/{PROPERTY_ID}",
+        date_ranges=[date_range],
+        dimensions=[Dimension(name="sessionCampaignName")],
+        metrics=[Metric(name="sessions"), Metric(name="conversions")],
+        limit=500,
+    ))
+    sources: dict = {}
+    for row in r1.rows:
+        campaign = row.dimension_values[0].value
+        if campaign not in ADSPLAY_CAMPAIGNS:
+            continue
+        sources[campaign] = {
+            "source":      ADSPLAY_CAMPAIGNS[campaign],
+            "campaign":    campaign,
+            "sessions":    int(row.metric_values[0].value),
+            "conversions": round(float(row.metric_values[1].value)),
+            "tickets":     {},
+            "daily":       {},
+        }
+
+    if not sources:
+        return []
+
+    # Q2: sessions por campanha + pagePath (pra detectar visualizacao de ingressos)
+    r2 = client.run_report(RunReportRequest(
+        property=f"properties/{PROPERTY_ID}",
+        date_ranges=[date_range],
+        dimensions=[Dimension(name="sessionCampaignName"), Dimension(name="pagePath")],
+        metrics=[Metric(name="sessions")],
+        limit=5000,
+    ))
+    for row in r2.rows:
+        campaign = row.dimension_values[0].value
+        page     = row.dimension_values[1].value.lower()
+        sess     = int(row.metric_values[0].value)
+        if campaign not in sources:
+            continue
+        for slug, name in TICKET_PAGES.items():
+            if slug in page:
+                sources[campaign]["tickets"][name] = sources[campaign]["tickets"].get(name, 0) + sess
+                break
+
+    # Q3: sessions por campanha + date (pra filtro de datas no dashboard)
+    r3 = client.run_report(RunReportRequest(
+        property=f"properties/{PROPERTY_ID}",
+        date_ranges=[date_range],
+        dimensions=[Dimension(name="sessionCampaignName"), Dimension(name="date")],
+        metrics=[Metric(name="sessions")],
+        limit=5000,
+    ))
+    for row in r3.rows:
+        campaign = row.dimension_values[0].value
+        raw_date = row.dimension_values[1].value  # "20260512"
+        sess     = int(row.metric_values[0].value)
+        if campaign not in sources:
+            continue
+        iso_date = f"{raw_date[:4]}-{raw_date[4:6]}-{raw_date[6:]}"
+        sources[campaign]["daily"][iso_date] = sources[campaign]["daily"].get(iso_date, 0) + sess
+
+    return sorted(sources.values(), key=lambda x: x["sessions"], reverse=True)
+
+
 def fetch_influencer_sessions(client) -> dict:
     """
     Sessões com utm_medium=influencer por data.
@@ -381,6 +474,7 @@ def main():
     sessions_by_channel  = fetch_sessions_by_date_channel(client)
     influencer_sessions  = fetch_influencer_sessions(client)
     influencer_breakdown = fetch_influencer_breakdown(client)
+    adsplay_breakdown    = fetch_adsplay_breakdown(client)
 
     # Injeta Influenciadores no mapa de canais
     for date, count in influencer_sessions.items():
@@ -401,6 +495,8 @@ def main():
         "sessions_by_date":    sessions_by_channel,
         # ↓ Top influenciadores com breakdown moto/auto
         "influencer_breakdown": influencer_breakdown,
+        # ↓ Breakdown da mídia programática Adsplay (Display, Vídeo, CTV, Áudio)
+        "adsplay_breakdown":    adsplay_breakdown,
     }
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
