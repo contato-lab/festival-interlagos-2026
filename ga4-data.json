@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-05-13T12:32:25.433141+00:00",
+  "updated_at": "2026-05-13T14:20:47.308108+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-02-12",
     "end": "2026-05-13"
   },
   "totals": {
-    "sessions": 454093,
-    "users": 400010,
-    "new_users": 328792,
-    "pageviews": 1153775,
-    "events": 2722019,
+    "sessions": 454177,
+    "users": 400090,
+    "new_users": 328850,
+    "pageviews": 1153904,
+    "events": 2722365,
     "conversions": 4804.0,
     "pages_per_session": 2.54,
-    "avg_bounce_rate": 53.21
+    "avg_bounce_rate": 53.25
   },
   "daily_series": [
     {
@@ -1008,20 +1008,20 @@
     },
     {
       "date": "2026-05-13",
-      "sessions": 283,
-      "users": 275,
-      "new_users": 198,
-      "pageviews": 534,
-      "events": 1376,
+      "sessions": 367,
+      "users": 355,
+      "new_users": 256,
+      "pageviews": 663,
+      "events": 1722,
       "conversions": 4.0,
-      "bounce_rate": 54.06,
-      "avg_session_s": 114.5
+      "bounce_rate": 57.77,
+      "avg_session_s": 97.6
     }
   ],
   "traffic_sources": [
     {
       "channel": "Paid Social",
-      "sessions": 94659,
+      "sessions": 94763,
       "conversions": 66.0
     },
     {
@@ -1036,7 +1036,7 @@
     },
     {
       "channel": "Paid Search",
-      "sessions": 53931,
+      "sessions": 53961,
       "conversions": 31.0
     },
     {
@@ -1056,12 +1056,12 @@
     },
     {
       "channel": "Affiliates",
-      "sessions": 6479,
+      "sessions": 6489,
       "conversions": 50.0
     },
     {
       "channel": "Display",
-      "sessions": 3528,
+      "sessions": 3534,
       "conversions": 0.0
     },
     {
@@ -1076,7 +1076,7 @@
     },
     {
       "channel": "Cross-network",
-      "sessions": 529,
+      "sessions": 530,
       "conversions": 0.0
     },
     {
@@ -1088,37 +1088,37 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 605450,
-      "sessions": 318139
+      "pageviews": 605514,
+      "sessions": 318200
     },
     {
       "page": "/ingressos/",
-      "pageviews": 108202,
-      "sessions": 64977
+      "pageviews": 108213,
+      "sessions": 64988
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-moto",
-      "pageviews": 72556,
+      "pageviews": 72571,
       "sessions": 49601
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-auto",
-      "pageviews": 59712,
+      "pageviews": 59735,
       "sessions": 42635
     },
     {
       "page": "/vendas/ingressos/ride-pass",
-      "pageviews": 44994,
+      "pageviews": 44995,
       "sessions": 17458
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026",
-      "pageviews": 32970,
+      "pageviews": 32971,
       "sessions": 30215
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 25218,
+      "pageviews": 25219,
       "sessions": 12434
     },
     {
@@ -1133,8 +1133,8 @@
     },
     {
       "page": "/shows/",
-      "pageviews": 20572,
-      "sessions": 15603
+      "pageviews": 20581,
+      "sessions": 15617
     }
   ],
   "sessions_by_date": {
@@ -1991,6 +1991,80 @@
       "daily": {
         "2026-05-06": 9,
         "2026-05-05": 3
+      }
+    }
+  ],
+  "adsplay_breakdown": [
+    {
+      "source": "Display",
+      "campaign": "festival-2026_adsplay_display",
+      "sessions": 3074,
+      "conversions": 0,
+      "tickets": {
+        "Drive Pass": 8,
+        "Sport Pass": 14
+      },
+      "daily": {
+        "2026-05-06": 470,
+        "2026-05-05": 403,
+        "2026-05-07": 395,
+        "2026-05-08": 386,
+        "2026-05-09": 364,
+        "2026-05-11": 352,
+        "2026-05-12": 346,
+        "2026-05-10": 285,
+        "2026-04-30": 1
+      }
+    },
+    {
+      "source": "Áudio",
+      "campaign": "festival-2026_adsplay_audio",
+      "sessions": 270,
+      "conversions": 0,
+      "tickets": {},
+      "daily": {
+        "2026-05-10": 63,
+        "2026-05-09": 49,
+        "2026-05-11": 47,
+        "2026-05-12": 37,
+        "2026-05-04": 23,
+        "2026-05-06": 20,
+        "2026-05-05": 19,
+        "2026-05-07": 9,
+        "2026-05-08": 5
+      }
+    },
+    {
+      "source": "Vídeo Open",
+      "campaign": "festival-2026_adsplay_video",
+      "sessions": 208,
+      "conversions": 0,
+      "tickets": {},
+      "daily": {
+        "2026-05-05": 46,
+        "2026-05-04": 43,
+        "2026-05-09": 27,
+        "2026-05-07": 22,
+        "2026-05-06": 20,
+        "2026-05-12": 19,
+        "2026-05-11": 12,
+        "2026-05-08": 7,
+        "2026-05-10": 7,
+        "2026-04-30": 3,
+        "2026-05-01": 2
+      }
+    },
+    {
+      "source": "CTV / OTT",
+      "campaign": "festival-2026_adsplay_ctv",
+      "sessions": 12,
+      "conversions": 0,
+      "tickets": {},
+      "daily": {
+        "2026-05-04": 7,
+        "2026-04-30": 2,
+        "2026-05-05": 2,
+        "2026-05-01": 1
       }
     }
   ]
