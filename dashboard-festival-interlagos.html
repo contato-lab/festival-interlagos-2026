@@ -2878,14 +2878,8 @@ async function fetchVendasProprio() {
     D26_FULL.sort((a, b) => a.d - b.d);
     if (document.getElementById('demoBadge')) document.getElementById('demoBadge').style.display = 'none';
     updateLastRefreshTime();
-    // Ajusta o filtro APENAS na primeira carga (preserva selecao do usuario nos refreshes)
-    if (D26_FULL.length > 0 && !window.__filtroInicializado) {
-      const primeiro = dToDate(D26_FULL[0].d);
-      const ultimo   = dToDate(D26_FULL[D26_FULL.length - 1].d);
-      document.getElementById('filtroDE').value  = dateToIso(primeiro);
-      document.getElementById('filtroATE').value = dateToIso(ultimo);
-      window.__filtroInicializado = true;
-    }
+    // NAO sobrescreve filtro aqui — initFiltro() ja seta 14d como default,
+    // e usuario pode ter clicado em outro filtro durante o load
     console.log('[vendas-data.json] Moto:', data.totals.moto_ingressos, '| Auto:', data.totals.auto_ingressos, 'ingressos | atualizado:', data.updated_at);
   } catch(e) { console.warn('[Vendas Próprias] erro:', e.message); }
 }
@@ -2962,11 +2956,19 @@ function initDashboard(){
     fetchTipos()
   ]).then(() => applyFiltro());
 
-  // Vendas própria + TM: refresh a cada 3s pra capturar edicao da planilha quase em tempo real
-  setInterval(() => {
-    Promise.allSettled([fetchVendasProprio(), fetchTicketmaster(), fetchTipos()])
-      .then(() => applyFiltro());
-  }, 3000);
+  // Vendas própria + TM: refresh a cada 5s com guard de "uma rodada por vez"
+  // (evita race condition quando TM Worker leva > 3s na cache MISS)
+  let __vendasRefreshing = false;
+  setInterval(async () => {
+    if (__vendasRefreshing) return;
+    __vendasRefreshing = true;
+    try {
+      await Promise.allSettled([fetchVendasProprio(), fetchTicketmaster(), fetchTipos()]);
+      applyFiltro();
+    } finally {
+      __vendasRefreshing = false;
+    }
+  }, 5000);
 
   // Mídia (Google Ads, Meta, GA4, TikTok): a cada 30s (esses APIs têm latência grande mesmo)
   setInterval(() => {

@@ -2160,11 +2160,19 @@ function initDashboard(){
     fetchTipos()
   ]).then(() => renderPainelExecutivo());
 
-  // Vendas própria + TM: refresh a cada 3s (planilha edit -> dashboard quase em tempo real)
-  setInterval(() => {
-    Promise.allSettled([fetchVendasProprio(), fetchTicketmaster(), fetchTipos()])
-      .then(() => renderPainelExecutivo());
-  }, 3000);
+  // Vendas própria + TM: refresh a cada 5s com guard de "uma rodada por vez"
+  // (evita race condition quando TM Worker leva > 3s na cache MISS)
+  let __vendasRefreshing = false;
+  setInterval(async () => {
+    if (__vendasRefreshing) return;
+    __vendasRefreshing = true;
+    try {
+      await Promise.allSettled([fetchVendasProprio(), fetchTicketmaster(), fetchTipos()]);
+      renderPainelExecutivo();
+    } finally {
+      __vendasRefreshing = false;
+    }
+  }, 5000);
 
   // Mídia (Google Ads, Meta, TikTok): a cada 30s (APIs têm latência maior)
   setInterval(() => {
