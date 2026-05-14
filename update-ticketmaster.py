@@ -18,7 +18,7 @@ from collections import defaultdict
 # ─── CONFIGURAÇÃO ─────────────────────────────────────────
 API_BASE      = "https://data.getcrowder.com"
 API_ENDPOINT  = "/activity/organizer"
-API_KEY       = os.environ.get("TM_API_KEY", "52087b883f65e8d2a684ee680c5beca66e425fdcc46c2b653da0fffd50088734")
+API_KEY       = os.environ.get("TM_API_KEY", "4f3a9648a77d9dbf29969726d71521d8fba8a01af91129a51ac2d8e80fc15991")
 
 # Timestamp de início da campanha: 2026-03-25 00:00:00 UTC em milissegundos
 CAMPAIGN_START_MS = 1774396800000

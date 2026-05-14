@@ -15,7 +15,7 @@
 
 const API_BASE         = 'https://data.getcrowder.com';
 const API_ENDPOINT     = '/activity/organizer';
-const API_KEY          = '52087b883f65e8d2a684ee680c5beca66e425fdcc46c2b653da0fffd50088734';
+const API_KEY          = '4f3a9648a77d9dbf29969726d71521d8fba8a01af91129a51ac2d8e80fc15991';
 const CAMPAIGN_START_MS = 1774396800000; // 2026-03-25 00:00:00 UTC
 
 const MOTO_SHOW_IDS = new Set([195330, 195736, 195737, 195738]);

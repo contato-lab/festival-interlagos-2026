@@ -83,7 +83,7 @@ def aggregate_proprio(sales):
 
 
 # ── TICKETMASTER ───────────────────────────────────────────
-TM_API_KEY = os.environ.get('TM_API_KEY', '52087b883f65e8d2a684ee680c5beca66e425fdcc46c2b653da0fffd50088734')
+TM_API_KEY = os.environ.get('TM_API_KEY', '4f3a9648a77d9dbf29969726d71521d8fba8a01af91129a51ac2d8e80fc15991')
 CAMPAIGN_START_MS = 1774396800000  # 2026-03-25
 MOTO_SHOW_IDS = {195330, 195736, 195737, 195738}
 AUTO_SHOW_IDS = {195331, 195739, 195740, 195741}
