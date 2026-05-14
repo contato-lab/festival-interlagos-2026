@@ -21,8 +21,8 @@ const CAMPAIGN_START_MS = 1774396800000; // 2026-03-25 00:00:00 UTC
 const MOTO_SHOW_IDS = new Set([195330, 195736, 195737, 195738]);
 const AUTO_SHOW_IDS = new Set([195331, 195739, 195740, 195741]);
 
-const CACHE_TTL  = 30;        // segundos - cache normal
-const STALE_TTL  = 600;       // 10min - fallback cache quando API falha
+const CACHE_TTL  = 300;       // 5min - cache normal (reduz cache MISS que demora ~25s)
+const STALE_TTL  = 3600;      // 1h - fallback cache quando API falha
 const MAX_RETRIES = 3;
 
 // ─── FETCH com retry + backoff ───────────────────────────

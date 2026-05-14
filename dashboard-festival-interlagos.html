@@ -2786,16 +2786,11 @@ async function fetchTicketmaster() {
       }
     }
     if (!res) {
-      // Se ja temos dados TM em D26_FULL (carga anterior bem-sucedida),
-      // mantem os valores atuais em vez de cair pro fallback que pode ter numeros diferentes
-      const jaTemDadosTM = D26_FULL.some(r => (r.mtQ||0) > 0 || (r.atQ||0) > 0);
-      if (jaTemDadosTM) {
-        console.warn('[TM Worker] Falhou, mantendo dados anteriores (sem flicker):', workerErr?.message);
-        return;
-      }
-      console.warn('[TM Worker] Falhou na primeira carga, usando fallback ticketmaster-data.json:', workerErr?.message);
-      res = await fetch('ticketmaster-data.json?t=' + Date.now(), {cache:'no-store'});
-      if (!res.ok) throw new Error('ticketmaster-data.json HTTP ' + res.status);
+      // Worker eh fonte unica de verdade. NUNCA cair pro fallback ticketmaster-data.json
+      // (que vem do Apps Script com numeros divergentes e causa flicker entre fontes).
+      // Se ja temos dados de carga anterior, mantem. Senao, deixa zerado e proximo refresh tenta de novo.
+      console.warn('[TM Worker] Falhou apos 3 tentativas. Mantendo dados anteriores (se houver):', workerErr?.message);
+      return;
     }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;

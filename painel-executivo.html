@@ -817,14 +817,10 @@ async function fetchTicketmaster() {
       }
     }
     if (!res) {
-      const jaTemDadosTM = D26_FULL.some(r => (r.mtQ||0) > 0 || (r.atQ||0) > 0);
-      if (jaTemDadosTM) {
-        console.warn('[TM Worker] Falhou, mantendo dados anteriores (sem flicker):', workerErr?.message);
-        return;
-      }
-      console.warn('[TM Worker] Falhou na primeira carga, usando fallback ticketmaster-data.json:', workerErr?.message);
-      res = await fetch('ticketmaster-data.json?t=' + Date.now(), {cache:'no-store'});
-      if (!res.ok) throw new Error('nao encontrado');
+      // Worker eh fonte unica de verdade. NUNCA cair pro fallback ticketmaster-data.json
+      // (que vem do Apps Script com numeros divergentes e causa flicker entre fontes).
+      console.warn('[TM Worker] Falhou apos 3 tentativas. Mantendo dados anteriores (se houver):', workerErr?.message);
+      return;
     }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
