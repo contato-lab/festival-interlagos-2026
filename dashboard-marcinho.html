@@ -348,12 +348,14 @@ footer{
       <div class="kpi-value" id="kpiMotos">—</div>
       <div class="kpi-delta neu" id="kpiMotosDelta">vs 2025</div>
       <div class="kpi-sub">acumulado no período</div>
+      <div id="kpiMotosLastSale" style="font-size:.58rem;color:#555;margin-top:4px;letter-spacing:.02em"></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">🚗 Receita Autos</div>
       <div class="kpi-value" id="kpiAutos">—</div>
       <div class="kpi-delta neu" id="kpiAutosDelta">vs 2025</div>
       <div class="kpi-sub">acumulado no período</div>
+      <div id="kpiAutosLastSale" style="font-size:.58rem;color:#555;margin-top:4px;letter-spacing:.02em"></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Ingressos Vendidos</div>
@@ -871,6 +873,11 @@ async function fetchVendasProprio() {
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
 
+    // Captura último timestamp próprio (mais recente entre o que já temos e o novo)
+    const newerOrKeep = (cur, next) => (!cur || (next && next > cur)) ? next : cur;
+    if (data.last_sale_moto_at) __lastSale.moto = newerOrKeep(__lastSale.moto, data.last_sale_moto_at);
+    if (data.last_sale_auto_at) __lastSale.auto = newerOrKeep(__lastSale.auto, data.last_sale_auto_at);
+
     const allDays = data.daily.map(row => ({
       d:   row.d,
       mp:  row.moto_receita   || 0,
@@ -922,6 +929,11 @@ async function fetchTicketmaster() {
     }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
+
+    // Captura último timestamp TM (mantém o mais recente entre próprio e TM)
+    const newerOrKeepTM = (cur, next) => (!cur || (next && next > cur)) ? next : cur;
+    if (data.last_sale_moto_at) __lastSale.moto = newerOrKeepTM(__lastSale.moto, data.last_sale_moto_at);
+    if (data.last_sale_auto_at) __lastSale.auto = newerOrKeepTM(__lastSale.auto, data.last_sale_auto_at);
 
     const tmByDay = {};
     data.daily.forEach(row => {
@@ -1125,6 +1137,7 @@ function renderKPIs(days26) {
       if(el){el.className='kpi-delta neu';el.textContent='Aguardando dados de vendas'}
     });
   }
+  updateLastSaleBadges();
 }
 
 /* ═══════════════════════════════════════════
@@ -1508,6 +1521,36 @@ function updateDiasBadge() {
   el.textContent = 'dia ' + dia + ' · faltam ' + faltam;
 }
 setInterval(updateDiasBadge, 60000);
+
+// ─── Timestamps da última venda por edição ───────────────────────────────────
+const __lastSale = { moto: null, auto: null };
+
+function timeAgo(isoStr) {
+  if (!isoStr) return null;
+  const dt = new Date(isoStr);
+  if (isNaN(dt)) return null;
+  const diffSec = Math.floor((Date.now() - dt.getTime()) / 1000);
+  if (diffSec < 10)   return '🟢 agora mesmo';
+  if (diffSec < 60)   return `🟢 há ${diffSec}s`;
+  if (diffSec < 3600) return `🟡 há ${Math.floor(diffSec / 60)}min`;
+  const h = Math.floor(diffSec / 3600);
+  const m = Math.floor((diffSec % 3600) / 60);
+  return m > 0 ? `⚪ há ${h}h ${m}min` : `⚪ há ${h}h`;
+}
+
+function updateLastSaleBadges() {
+  const ids = [
+    ['kpiMotosLastSale', __lastSale.moto],
+    ['kpiAutosLastSale', __lastSale.auto],
+  ];
+  for (const [id, ts] of ids) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    const txt = timeAgo(ts);
+    el.textContent = txt ? 'Últ. venda: ' + txt : '';
+  }
+}
+setInterval(updateLastSaleBadges, 30000);
 
 let __lastRefreshAt = null;
 function updateLastRefreshTime() { __lastRefreshAt = new Date(); renderLastRefreshLabel(); updateDiasBadge(); }
