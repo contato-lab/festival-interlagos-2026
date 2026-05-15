@@ -1,0 +1,32 @@
+name: Monitor Campanhas - Alertas Telegram
+
+on:
+  schedule:
+    # A cada 30 minutos (nos minutos :03 e :33 pra nao colidir com outros workflows)
+    - cron: '3,33 * * * *'
+  workflow_dispatch:
+    inputs:
+      force_test:
+        description: 'Rodar em modo teste (ignora hora BRT)'
+        required: false
+        default: 'false'
+
+jobs:
+  monitor:
+    name: Verificar campanhas e alertar
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verificar campanhas Meta + Google Ads
+        env:
+          TELEGRAM_TOKEN:   ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python monitor-alerts.py
