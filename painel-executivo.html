@@ -297,12 +297,14 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
           <div id="exec-moto-sp-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#C8FF00">&mdash;</div>
           <div id="exec-moto-sp-ing" style="font-size:.65rem;color:#666">&mdash;</div>
           <div id="exec-moto-sp-tkt" style="font-size:.58rem;color:#666;font-style:italic;margin-top:1px">&mdash;</div>
+          <div id="exec-moto-sp-last" style="font-size:.55rem;color:#555;margin-top:3px;letter-spacing:.02em"></div>
         </div>
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:8px 12px">
           <div style="font-size:.58rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:2px">Ticket Master</div>
           <div id="exec-moto-tm-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#2196F3">&mdash;</div>
           <div id="exec-moto-tm-ing" style="font-size:.65rem;color:#666">&mdash;</div>
           <div id="exec-moto-tm-tkt" style="font-size:.58rem;color:#666;font-style:italic;margin-top:1px">&mdash;</div>
+          <div id="exec-moto-tm-last" style="font-size:.55rem;color:#555;margin-top:3px;letter-spacing:.02em"></div>
         </div>
       </div>
     </div>
@@ -326,12 +328,14 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
           <div id="exec-auto-sp-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#C8FF00">&mdash;</div>
           <div id="exec-auto-sp-ing" style="font-size:.65rem;color:#666">&mdash;</div>
           <div id="exec-auto-sp-tkt" style="font-size:.58rem;color:#666;font-style:italic;margin-top:1px">&mdash;</div>
+          <div id="exec-auto-sp-last" style="font-size:.55rem;color:#555;margin-top:3px;letter-spacing:.02em"></div>
         </div>
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:8px 12px">
           <div style="font-size:.58rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:2px">Ticket Master</div>
           <div id="exec-auto-tm-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#2196F3">&mdash;</div>
           <div id="exec-auto-tm-ing" style="font-size:.65rem;color:#666">&mdash;</div>
           <div id="exec-auto-tm-tkt" style="font-size:.58rem;color:#666;font-style:italic;margin-top:1px">&mdash;</div>
+          <div id="exec-auto-tm-last" style="font-size:.55rem;color:#555;margin-top:3px;letter-spacing:.02em"></div>
         </div>
       </div>
     </div>
@@ -752,6 +756,37 @@ function updateDiasBadge() {
 }
 setInterval(updateDiasBadge, 60000);
 
+const __lastSale = { proprio: { moto: null, auto: null }, tm: { moto: null, auto: null } };
+
+function timeAgo(isoStr) {
+  if (!isoStr) return null;
+  const dt = new Date(isoStr);
+  if (isNaN(dt)) return null;
+  const diffSec = Math.floor((Date.now() - dt.getTime()) / 1000);
+  if (diffSec < 10)   return '🟢 agora mesmo';
+  if (diffSec < 60)   return `🟢 há ${diffSec}s`;
+  if (diffSec < 3600) return `🟡 há ${Math.floor(diffSec / 60)}min`;
+  const h = Math.floor(diffSec / 3600);
+  const m = Math.floor((diffSec % 3600) / 60);
+  return m > 0 ? `⚪ há ${h}h ${m}min` : `⚪ há ${h}h`;
+}
+
+function updateLastSaleBadges() {
+  const ids = [
+    ['exec-moto-sp-last', __lastSale.proprio.moto],
+    ['exec-moto-tm-last', __lastSale.tm.moto],
+    ['exec-auto-sp-last', __lastSale.proprio.auto],
+    ['exec-auto-tm-last', __lastSale.tm.auto],
+  ];
+  for (const [id, ts] of ids) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    const txt = timeAgo(ts);
+    el.textContent = txt ? 'Últ. venda: ' + txt : '';
+  }
+}
+setInterval(updateLastSaleBadges, 30000);
+
 let __lastRefreshAt = null;
 
 function updateLastRefreshTime() {
@@ -824,6 +859,8 @@ async function fetchTicketmaster() {
     }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
+    if (data.last_sale_moto_at) __lastSale.tm.moto = data.last_sale_moto_at;
+    if (data.last_sale_auto_at) __lastSale.tm.auto = data.last_sale_auto_at;
     const tmByDay = {};
     data.daily.forEach(row => {
       const d = Math.floor((new Date(row.date + 'T00:00:00') - DATA_INICIO) / 86400000) + 1;
@@ -882,6 +919,8 @@ async function fetchVendasProprio() {
     }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
+    if (data.last_sale_moto_at) __lastSale.proprio.moto = data.last_sale_moto_at;
+    if (data.last_sale_auto_at) __lastSale.proprio.auto = data.last_sale_auto_at;
     data.daily.forEach(row => {
       const d = row.d;
       let r = D26_FULL.find(x => x.d === d);
@@ -2450,6 +2489,7 @@ function buildExecTMCharts() {
   set('exec-moto-tm-tkt', tktFmt(totTmMotoR, totTmMotoI));
   set('exec-auto-sp-tkt', tktFmt(totSpAutoR, totSpAutoI));
   set('exec-auto-tm-tkt', tktFmt(totTmAutoR, totTmAutoI));
+  updateLastSaleBadges();
 }
 
 </script>
