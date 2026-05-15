@@ -99,6 +99,8 @@ function aggregate(movements) {
     moto_receita: 0, auto_receita: 0,
     moto_ingressos: 0, auto_ingressos: 0,
   };
+  let lastSaleMotoAt = null;
+  let lastSaleAutoAt = null;
 
   for (const mv of movements) {
     const op      = mv.operation;
@@ -126,11 +128,20 @@ function aggregate(movements) {
       daily[dateStr].moto_ingressos += tc;
       totals.moto_receita           += amount;
       totals.moto_ingressos         += tc;
+      // Rastreia última venda real (ISSUANCE com ingressos)
+      if (op === 'ISSUANCE' && tc > 0) {
+        const mvDate = mv.date || '';
+        if (!lastSaleMotoAt || mvDate > lastSaleMotoAt) lastSaleMotoAt = mvDate;
+      }
     } else if (edition === 'auto') {
       daily[dateStr].auto_receita   += amount;
       daily[dateStr].auto_ingressos += tc;
       totals.auto_receita           += amount;
       totals.auto_ingressos         += tc;
+      if (op === 'ISSUANCE' && tc > 0) {
+        const mvDate = mv.date || '';
+        if (!lastSaleAutoAt || mvDate > lastSaleAutoAt) lastSaleAutoAt = mvDate;
+      }
     }
   }
 
@@ -149,21 +160,23 @@ function aggregate(movements) {
       auto_ingressos:   daily[dateStr].auto_ingressos,
     }));
 
-  return { totals, daily: dailyList };
+  return { totals, daily: dailyList, last_sale_moto_at: lastSaleMotoAt, last_sale_auto_at: lastSaleAutoAt };
 }
 
 async function buildTmData() {
   const movements = await fetchAllMovements();
   if (!movements.length) throw new Error('Nenhum movimento retornado');
 
-  const { totals, daily } = aggregate(movements);
+  const { totals, daily, last_sale_moto_at, last_sale_auto_at } = aggregate(movements);
 
   return {
-    updated_at:     new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
-    source:         'Cloudflare Worker TM (real-time, cache 30s)',
-    campaign_start: '2026-03-25',
-    moto_show_ids:  [...MOTO_SHOW_IDS].sort(),
-    auto_show_ids:  [...AUTO_SHOW_IDS].sort(),
+    updated_at:          new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+    source:              'Cloudflare Worker TM (real-time, cache 30s)',
+    campaign_start:      '2026-03-25',
+    moto_show_ids:       [...MOTO_SHOW_IDS].sort(),
+    auto_show_ids:       [...AUTO_SHOW_IDS].sort(),
+    last_sale_moto_at,
+    last_sale_auto_at,
     totals,
     daily,
   };

@@ -511,12 +511,14 @@ tr:hover td{background:rgba(255,255,255,.018)}
         <div class="mk-val" style="color:var(--lime)" id="motosProprio">—</div>
         <div style="font-size:.72rem;color:#999;margin-top:2px" id="motosProprioQtd">—</div>
         <div style="font-size:.62rem;color:#666;margin-top:1px;font-style:italic" id="motosProprioTkt">—</div>
+        <div id="motosProprioLastSale" style="font-size:.6rem;margin-top:4px;color:#555;letter-spacing:.02em"></div>
       </div>
       <div class="mk">
         <div class="mk-label">Ticket Master</div>
         <div class="mk-val" style="color:#024DDF" id="motosTM">—</div>
         <div style="font-size:.72rem;color:#999;margin-top:2px" id="motosTMQtd">—</div>
         <div style="font-size:.62rem;color:#666;margin-top:1px;font-style:italic" id="motosTMTkt">—</div>
+        <div id="motosTMLastSale" style="font-size:.6rem;margin-top:4px;color:#555;letter-spacing:.02em"></div>
       </div>
     </div>
   </div>
@@ -546,12 +548,14 @@ tr:hover td{background:rgba(255,255,255,.018)}
         <div class="mk-val" style="color:var(--lime)" id="autosProprio">—</div>
         <div style="font-size:.72rem;color:#999;margin-top:2px" id="autosProprioQtd">—</div>
         <div style="font-size:.62rem;color:#666;margin-top:1px;font-style:italic" id="autosProprioTkt">—</div>
+        <div id="autosProprioLastSale" style="font-size:.6rem;margin-top:4px;color:#555;letter-spacing:.02em"></div>
       </div>
       <div class="mk">
         <div class="mk-label">Ticket Master</div>
         <div class="mk-val" style="color:#024DDF" id="autosTM">—</div>
         <div style="font-size:.72rem;color:#999;margin-top:2px" id="autosTMQtd">—</div>
         <div style="font-size:.62rem;color:#666;margin-top:1px;font-style:italic" id="autosTMTkt">—</div>
+        <div id="autosTMLastSale" style="font-size:.6rem;margin-top:4px;color:#555;letter-spacing:.02em"></div>
       </div>
     </div>
   </div>
@@ -1281,6 +1285,7 @@ function calcKPIs() {
   document.getElementById('motosTMTkt').textContent      = tktFmt(s26.mt, s26.mtQ);
   document.getElementById('autosProprioTkt').textContent = tktFmt(s26.ap, s26.apQ);
   document.getElementById('autosTMTkt').textContent      = tktFmt(s26.at, s26.atQ);
+  updateLastSaleBadges();
 }
 
 // ═══════════════════════════════════════════════
@@ -2795,6 +2800,10 @@ async function fetchTicketmaster() {
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
 
+    // Captura timestamps da última venda TM
+    if (data.last_sale_moto_at) __lastSale.tm.moto = data.last_sale_moto_at;
+    if (data.last_sale_auto_at) __lastSale.tm.auto = data.last_sale_auto_at;
+
     const tmByDay = {};
     data.daily.forEach(row => {
       const d = Math.floor((new Date(row.date + 'T00:00:00') - DATA_INICIO) / 86400000) + 1;
@@ -2867,6 +2876,10 @@ async function fetchVendasProprio() {
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
 
+    // Captura timestamps da última venda Sistema Próprio
+    if (data.last_sale_moto_at) __lastSale.proprio.moto = data.last_sale_moto_at;
+    if (data.last_sale_auto_at) __lastSale.proprio.auto = data.last_sale_auto_at;
+
     data.daily.forEach(row => {
       const d = row.d;
       let r = D26_FULL.find(x => x.d === d);
@@ -2909,6 +2922,41 @@ function updateDiasBadge() {
   el.textContent = 'dia ' + dia + ' · faltam ' + faltam;
 }
 setInterval(updateDiasBadge, 60000); // re-calcula a cada 1 min (vira a meia-noite)
+
+// ─── Timestamps da última venda por canal ────────────────────────────────────
+const __lastSale = { proprio: { moto: null, auto: null }, tm: { moto: null, auto: null } };
+
+// Converte ISO UTC em texto legível ("há 3min", "há 1h 10min", "agora mesmo")
+function timeAgo(isoStr) {
+  if (!isoStr) return null;
+  const dt = new Date(isoStr);
+  if (isNaN(dt)) return null;
+  const diffSec = Math.floor((Date.now() - dt.getTime()) / 1000);
+  if (diffSec < 10)   return '🟢 agora mesmo';
+  if (diffSec < 60)   return `🟢 há ${diffSec}s`;
+  if (diffSec < 3600) return `🟡 há ${Math.floor(diffSec / 60)}min`;
+  const h = Math.floor(diffSec / 3600);
+  const m = Math.floor((diffSec % 3600) / 60);
+  return m > 0 ? `⚪ há ${h}h ${m}min` : `⚪ há ${h}h`;
+}
+
+// Atualiza os 4 badges de última venda (chamado pelo calcKPIs e pelo ticker de 30s)
+function updateLastSaleBadges() {
+  const ids = [
+    ['motosProprioLastSale', __lastSale.proprio.moto],
+    ['motosTMLastSale',      __lastSale.tm.moto],
+    ['autosProprioLastSale', __lastSale.proprio.auto],
+    ['autosTMLastSale',      __lastSale.tm.auto],
+  ];
+  for (const [id, ts] of ids) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    const txt = timeAgo(ts);
+    el.textContent = txt ? 'Últ. venda: ' + txt : '';
+  }
+}
+// Ticker: re-renderiza os badges a cada 30s (o "há X min" envelhece mesmo sem novos dados)
+setInterval(updateLastSaleBadges, 30000);
 
 let __lastRefreshAt = null;
 function updateLastRefreshTime() { __lastRefreshAt = new Date(); renderLastRefreshLabel(); updateDiasBadge(); }

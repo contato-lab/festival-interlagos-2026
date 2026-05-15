@@ -99,6 +99,22 @@ function aggregateByDay(sales) {
   return byDay;
 }
 
+// Retorna o ISO UTC do created_at mais recente (BRT → UTC)
+function lastSaleAt(sales) {
+  let latest = null;
+  for (const v of sales) {
+    if (String(v.venda_status) !== '3') continue;
+    const ts = (v.created_at || '').trim();
+    if (!ts) continue;
+    if (!latest || ts > latest) latest = ts;
+  }
+  if (!latest) return null;
+  try {
+    // created_at vem em BRT (UTC-3): "2026-05-15 14:23:45"
+    return new Date(latest.replace(' ', 'T') + '-03:00').toISOString();
+  } catch { return null; }
+}
+
 async function buildVendasData() {
   const [motoToken, autoToken] = await Promise.all([getToken(API_MOTO), getToken(API_AUTO)]);
   const [motoSales, autoSales] = await Promise.all([
@@ -108,6 +124,8 @@ async function buildVendasData() {
 
   const motoByDay = aggregateByDay(motoSales);
   const autoByDay = aggregateByDay(autoSales);
+  const lastSaleMotoAt = lastSaleAt(motoSales);
+  const lastSaleAutoAt = lastSaleAt(autoSales);
 
   const daySet = new Set([
     ...Object.keys(motoByDay).map(Number),
@@ -146,9 +164,11 @@ async function buildVendasData() {
   totals.total_ingressos = totals.moto_ingressos + totals.auto_ingressos;
 
   return {
-    updated_at:     new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
-    source:         'Cloudflare Worker (real-time, cache 30s)',
-    campaign_start: '2026-03-31',
+    updated_at:          new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+    source:              'Cloudflare Worker (real-time, cache 30s)',
+    campaign_start:      '2026-03-31',
+    last_sale_moto_at:   lastSaleMotoAt,
+    last_sale_auto_at:   lastSaleAutoAt,
     totals,
     daily,
   };
