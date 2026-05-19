@@ -11,12 +11,28 @@
  * Logica de cancelamento: CANCELLATION/REFUND sao atribuidos a data
  * da ISSUANCE original (via purchase.id), nao a data do cancelamento.
  * Isso faz bater com o dashboard oficial do Ticketmaster.
+ *
+ * Timezone: a API getcrowder.com entrega timestamps em UTC. Convertemos
+ * pra BRT (UTC-3 fixo, Brasil nao usa DST desde 2019) antes de fatiar
+ * o YYYY-MM-DD. Sem isso, vendas entre 21:00-23:59 BRT caem no dia
+ * seguinte (descalibra +N/-N vs o painel oficial da TM).
  */
 
 const API_BASE         = 'https://data.getcrowder.com';
 const API_ENDPOINT     = '/activity/organizer';
 const API_KEY          = '4f3a9648a77d9dbf29969726d71521d8fba8a01af91129a51ac2d8e80fc15991';
 const CAMPAIGN_START_MS = 1774396800000; // 2026-03-25 00:00:00 UTC
+
+// Brasil/São Paulo: UTC-3 fixo (sem horário de verão desde 2019).
+// Converte um timestamp ISO da API (UTC) pra string YYYY-MM-DD em BRT,
+// para que vendas entre 21:00-23:59 BRT não caiam no dia seguinte.
+const BRT_OFFSET_MS = 3 * 60 * 60 * 1000;
+function toBrtDateStr(isoStr) {
+  if (!isoStr) return '';
+  const d = new Date(isoStr);
+  if (isNaN(d.getTime())) return (isoStr || '').slice(0, 10);
+  return new Date(d.getTime() - BRT_OFFSET_MS).toISOString().slice(0, 10);
+}
 
 const MOTO_SHOW_IDS = new Set([195330, 195736, 195737, 195738]);
 const AUTO_SHOW_IDS = new Set([195331, 195739, 195740, 195741]);
@@ -83,13 +99,13 @@ function classifyShow(tickets) {
 
 // ─── AGREGACAO ───────────────────────────────────────────
 function aggregate(movements) {
-  // Indexa ISSUANCES por purchase.id -> date_str original
+  // Indexa ISSUANCES por purchase.id -> date_str original (em BRT)
   const issuanceDateByPurchase = {};
   for (const mv of movements) {
     if (mv.operation === 'ISSUANCE') {
       const pid = mv.purchase?.id;
       if (pid != null && !(pid in issuanceDateByPurchase)) {
-        issuanceDateByPurchase[pid] = (mv.date || '').slice(0, 10);
+        issuanceDateByPurchase[pid] = toBrtDateStr(mv.date);
       }
     }
   }
@@ -111,9 +127,9 @@ function aggregate(movements) {
     let dateStr;
     if (op === 'CANCELLATION' || op === 'REFUND') {
       const pid = mv.purchase?.id;
-      dateStr = issuanceDateByPurchase[pid] || (mv.date || '').slice(0, 10);
+      dateStr = issuanceDateByPurchase[pid] || toBrtDateStr(mv.date);
     } else {
-      dateStr = (mv.date || '').slice(0, 10);
+      dateStr = toBrtDateStr(mv.date);
     }
 
     if (!daily[dateStr]) {
