@@ -1,43 +1,55 @@
 {
-  "updated_at": "2026-05-19T18:27:16.953417+00:00",
+  "updated_at": "2026-05-19T20:16:21.933419+00:00",
   "customer_id": "5879952911",
   "period": {
     "start": "2026-02-18",
     "end": "2026-05-19"
   },
   "totals": {
-    "impressions": 1241803,
-    "clicks": 59221,
-    "cost": 60281.39719899994,
+    "impressions": 1243140,
+    "clicks": 59385,
+    "cost": 60463.62650199994,
     "conversions": 2374.233562000001,
-    "ctr": 4.768952885441571,
-    "cpc": 1.0179057631414523,
-    "cost_per_conv": 25.389834498093883
+    "ctr": 4.777016265263768,
+    "cpc": 1.01816328200724,
+    "cost_per_conv": 25.466587394656635
   },
   "campaigns": [
     {
       "id": "23705408328",
       "name": "[LM] [GERAL] [PMAX] [FESTIVAL INTERLAGOS 2026] [31.03.26]",
-      "status": "ENABLED",
-      "impressions": 574195,
-      "clicks": 23618,
-      "cost": 22711.836467000005,
+      "status": "PAUSED",
+      "impressions": 574928,
+      "clicks": 23636,
+      "cost": 22735.079389000002,
       "conversions": 1132.499253,
-      "ctr": 4.1132367923788955,
-      "cpc": 0.9616325034719284,
-      "cost_per_conv": 20.054614964942502
+      "ctr": 4.111123479809646,
+      "cpc": 0.9618835415891015,
+      "cost_per_conv": 20.075138529914778
     },
     {
       "id": "23710366061",
       "name": "[LM] [GERAL] [PESQUI] [FESTIVAL INTERLAGOS 2026] [31.03.26]",
       "status": "ENABLED",
-      "impressions": 125462,
-      "clicks": 26918,
-      "cost": 26274.708237000003,
+      "impressions": 125991,
+      "clicks": 27034,
+      "cost": 26423.858924000004,
       "conversions": 962.98805,
-      "ctr": 21.455101943217866,
-      "cpc": 0.9761017994278922,
-      "cost_per_conv": 27.28456312308341
+      "ctr": 21.457088204713035,
+      "cpc": 0.9774306030924023,
+      "cost_per_conv": 27.439446339962373
+    },
+    {
+      "id": "23857745658",
+      "name": "[LM] [EXATA MARCA] [PESQUI] [FESTIVAL INTERLAGOS 2026] [19.05.26]",
+      "status": "ENABLED",
+      "impressions": 75,
+      "clicks": 30,
+      "cost": 9.835694,
+      "conversions": 0.0,
+      "ctr": 40.0,
+      "cpc": 0.3278564666666667,
+      "cost_per_conv": 0
     },
     {
       "id": "23804890046",
@@ -470,9 +482,9 @@
     },
     {
       "date": "2026-05-19",
-      "impressions": 78376,
-      "clicks": 1262,
-      "cost": 1222.613497,
+      "impressions": 79713,
+      "clicks": 1426,
+      "cost": 1404.8428000000001,
       "conversions": 2.0
     }
   ]
