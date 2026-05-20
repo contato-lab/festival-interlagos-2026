@@ -1384,7 +1384,12 @@ function renderExecKPIs() {
   }
 
   // \u2500\u2500 KPI Acessos ao Site (GA4) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
-  // Mostra total de sess\u00f5es no per\u00edodo filtrado da campanha (D+1 em diante).
+  // Total de sess\u00f5es no per\u00edodo. Quando h\u00e1 filtro de data ativo, compara
+  // com a janela imediatamente anterior do mesmo tamanho:
+  //   - Filtro de 1 dia (ex: ontem)        \u2192 vs dia anterior (anteontem)
+  //   - Filtro de 4 dias (ex: 20\u201324)       \u2192 vs 4 dias antes (16\u201319)
+  //   - Filtro de 1 m\u00eas                    \u2192 vs m\u00eas anterior
+  // Sem filtro = sem comparativo (toda a campanha n\u00e3o tem "anterior").
   const acessosEl = document.getElementById('exec-kpi-acessos');
   if (acessosEl) {
     const ga4Series = GA4_DATA?.daily_series || [];
@@ -1392,8 +1397,10 @@ function renderExecKPIs() {
       acessosEl.innerHTML = '<div class="exec-kpi-val">\u2014</div><div class="exec-kpi-delta" style="color:#666">aguardando GA4\u2026</div>';
     } else {
       const CAMP_START = '2026-03-31'; // D+1
-      const periodFrom = execFiltFrom && execFiltFrom > CAMP_START ? execFiltFrom : CAMP_START;
-      const periodTo   = execFiltTo   || new Date().toISOString().slice(0,10);
+      const todayIso   = new Date().toISOString().slice(0,10);
+      const periodFrom = execFiltFrom || CAMP_START;
+      const periodTo   = execFiltTo   || todayIso;
+      const hasFilter  = !!(execFiltFrom && execFiltTo);
 
       const inPeriod = ga4Series.filter(d => d.date >= periodFrom && d.date <= periodTo);
       const totalSess  = inPeriod.reduce((s,d) => s + (d.sessions||0), 0);
@@ -1407,8 +1414,35 @@ function renderExecKPIs() {
         return Math.round(n).toLocaleString('pt-BR');
       };
 
+      // Comparativo din\u00e2mico: janela anterior do mesmo tamanho (em dias).
+      let deltaHtml = '';
+      if (hasFilter) {
+        const addDays = (s, n) => {
+          const dt = new Date(s + 'T00:00:00Z');
+          dt.setUTCDate(dt.getUTCDate() + n);
+          return dt.toISOString().slice(0,10);
+        };
+        const daysBetween = (a, b) => {
+          const da = new Date(a + 'T00:00:00Z'), db = new Date(b + 'T00:00:00Z');
+          return Math.round((db - da) / 86400000) + 1;
+        };
+        const nDias    = daysBetween(periodFrom, periodTo);
+        const prevTo   = addDays(periodFrom, -1);
+        const prevFrom = addDays(prevTo, -(nDias - 1));
+
+        const inPrev = ga4Series.filter(d => d.date >= prevFrom && d.date <= prevTo);
+        const totalPrev = inPrev.reduce((s,d) => s + (d.sessions||0), 0);
+
+        if (totalPrev > 0) {
+          const pct = ((totalSess - totalPrev) / totalPrev) * 100;
+          const up  = pct >= 0;
+          deltaHtml = `<div class="exec-kpi-delta ${up?'up':'down'}">${up?'\u25b2':'\u25bc'}${Math.abs(pct).toFixed(1)}% vs per\u00edodo anterior</div>`;
+        }
+      }
+
       acessosEl.innerHTML = `
         <div class="exec-kpi-val">${fmtCompact(totalSess)}</div>
+        ${deltaHtml}
         <div style="margin-top:6px;font-size:.7rem;color:var(--text3);opacity:.85;letter-spacing:.02em">
           ${fmtCompact(totalUsers)} usu\u00e1rios \u00b7 ${fmtCompact(avgDay)}/dia
         </div>
