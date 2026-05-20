@@ -1387,16 +1387,20 @@ function renderExecKPIs() {
     ingTotalEl.textContent = fmtIng(ingTotalCamp);
   }
 
-  // KPI Investimento ADS com vs 2025 (Meta + Google + TikTok)
+  // KPI Investimento ADS com vs 2025 (Meta principal + Google + Meta Nova Motos + TikTok)
   // Comparação 2025 é feita por DATA CALENDÁRIO (não dia da campanha).
   // Ex: hoje 20/05/2026 → compara com 20/05/2025. Filtro 14-20/05/2026 →
   // 14-20/05/2025. Mais intuitivo pra o cliente: "no mesmo dia do mês passado".
-  const ttSeriesInv = TIKTOK_DATA?.daily_series || [];
-  const ttCostPeriodo = (execFiltFrom
-    ? ttSeriesInv.filter(d => d.date >= execFiltFrom && d.date <= (execFiltTo||'9999-12-31'))
-    : ttSeriesInv
-  ).reduce((s,d)=>s+(d.cost||0), 0);
-  const total26 = invest.reduce((s,r)=>s+(r.meta+r.gads),0) + ttCostPeriodo;
+  // IMPORTANTE: buildExecD26Invest só pega META_DATA.daily_series (conta
+  // principal), então somamos manualmente Nova Motos + TikTok aqui — mesmo
+  // padrão usado no card "Ontem" (renderExecHojeOntem).
+  const _filtroAtivo = !!(execFiltFrom && execFiltTo);
+  const _inPeriodo = (d) => !_filtroAtivo || (d.date >= execFiltFrom && d.date <= execFiltTo);
+  const ttSeriesInv    = TIKTOK_DATA?.daily_series || [];
+  const motosSeriesInv = META_DATA?.accounts?.nova_motos?.daily_series || [];
+  const ttCostPeriodo    = ttSeriesInv.filter(_inPeriodo).reduce((s,d) => s+(d.cost||0), 0);
+  const motosCostPeriodo = motosSeriesInv.filter(_inPeriodo).reduce((s,d) => s+(d.cost||0), 0);
+  const total26 = invest.reduce((s,r)=>s+(r.meta+r.gads),0) + motosCostPeriodo + ttCostPeriodo;
 
   // Define range 2025 espelhando as datas de 2026
   const _todayIso26 = new Date().toISOString().slice(0,10);
