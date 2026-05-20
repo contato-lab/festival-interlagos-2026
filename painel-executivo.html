@@ -252,6 +252,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="exec-kpi-label">&#128184; Investimento ADS</div>
       <div id="exec-kpi-invest"><div class="exec-kpi-val">&mdash;</div></div>
     </div>
+    <div class="exec-kpi" style="border-color:rgba(93,174,255,.18)">
+      <div class="exec-kpi-label">&#127760; Acessos ao Site</div>
+      <div id="exec-kpi-acessos"><div class="exec-kpi-val">&mdash;</div></div>
+    </div>
   </div>
 
   <!-- Hoje / Ontem / Campanha -->
@@ -735,6 +739,7 @@ let D26 = [];
 // ═══════════════════════════════════════════════
 let META_DATA = null;
 let GADS_DATA = null;
+let GA4_DATA  = null;
 
 // ═══════════════════════════════════════════════
 // HELPERS
@@ -971,6 +976,22 @@ async function fetchMetaData() {
     META_DATA = data;
   } catch(e) {
     // silencioso — meta-data.json ainda nao existe
+  }
+}
+
+// ═══════════════════════════════════════════════
+// GA4 — fetch ga4-data.json (acessos ao site)
+// Usado pelo card "Acessos ao Site" no exec-kpi-strip
+// ═══════════════════════════════════════════════
+async function fetchGA4() {
+  try {
+    const res = await fetch('ga4-data.json?t=' + Date.now(), {cache:'no-store'});
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.daily_series?.length) return;
+    GA4_DATA = data;
+  } catch(e) {
+    // silencioso — ga4-data.json ainda nao existe
   }
 }
 
@@ -1360,6 +1381,67 @@ function renderExecKPIs() {
     const cls = pct===null?'':pct>=0?'up':'down';
     const dStr = pct===null?'vs 2025: aguardando':(pct>=0?'\u25b2':'\u25bc')+Math.abs(pct).toFixed(1)+'% vs 2025';
     invEl.innerHTML = `<div class="exec-kpi-val">${execFmtK(total26)}</div><div class="exec-kpi-delta ${cls}">${dStr}</div>`;
+  }
+
+  // \u2500\u2500 KPI Acessos ao Site (GA4) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+  // Mostra total de sess\u00f5es no per\u00edodo filtrado da campanha (D+1 em diante)
+  // e compara com mesma janela ANTES da campanha (pr\u00e9 31/03) pra evidenciar
+  // o brand lift gerado por TV / program\u00e1tica / r\u00e1dio / influenciadores.
+  // Sem dados 2025 dispon\u00edveis no GA4 (propriedade nova), usamos "vs pr\u00e9-campanha".
+  const acessosEl = document.getElementById('exec-kpi-acessos');
+  if (acessosEl) {
+    const ga4Series = GA4_DATA?.daily_series || [];
+    if (!ga4Series.length) {
+      acessosEl.innerHTML = '<div class="exec-kpi-val">\u2014</div><div class="exec-kpi-delta" style="color:#666">aguardando GA4\u2026</div>';
+    } else {
+      const CAMP_START = '2026-03-31'; // D+1
+      // Per\u00edodo "atual" = filtro ativo OU toda a campanha
+      const periodFrom = execFiltFrom && execFiltFrom > CAMP_START ? execFiltFrom : CAMP_START;
+      const periodTo   = execFiltTo   || new Date().toISOString().slice(0,10);
+
+      const inPeriod = ga4Series.filter(d => d.date >= periodFrom && d.date <= periodTo);
+      const totalSess = inPeriod.reduce((s,d) => s + (d.sessions||0), 0);
+      const totalUsers = inPeriod.reduce((s,d) => s + (d.users||0), 0);
+      const daysIn = inPeriod.length || 1;
+      const avgDay = totalSess / daysIn;
+
+      // Baseline = mesmo n\u00famero de dias ANTES do CAMP_START (at\u00e9 2026-02-19 quando o GA4 come\u00e7a)
+      const addDays = (s, n) => {
+        const dt = new Date(s + 'T00:00:00Z');
+        dt.setUTCDate(dt.getUTCDate() + n);
+        return dt.toISOString().slice(0,10);
+      };
+      const preEnd = addDays(CAMP_START, -1); // 30/03
+      const preStart = addDays(preEnd, -(daysIn-1));
+      const inPre = ga4Series.filter(d => d.date >= preStart && d.date <= preEnd);
+      const totalPre = inPre.reduce((s,d) => s + (d.sessions||0), 0);
+      const daysPre  = inPre.length || 0;
+      const avgPre   = daysPre>0 ? (totalPre / daysPre) : 0;
+
+      // Formato compacto pra caber no card
+      const fmtCompact = n => {
+        if (n >= 1e6) return (n/1e6).toFixed(1).replace('.0','') + 'M';
+        if (n >= 1e3) return (n/1e3).toFixed(n>=10000?0:1).replace('.0','') + 'K';
+        return Math.round(n).toLocaleString('pt-BR');
+      };
+
+      let deltaHtml = '';
+      if (avgPre > 0) {
+        const pctA = ((avgDay - avgPre) / avgPre) * 100;
+        const upA  = pctA >= 0;
+        deltaHtml = `<div class="exec-kpi-delta ${upA?'up':'down'}">${upA?'\u25b2':'\u25bc'}${Math.abs(pctA).toFixed(1)}% vs pr\u00e9-campanha</div>`;
+      } else {
+        deltaHtml = `<div class="exec-kpi-delta" style="color:#888">${fmtCompact(avgDay)}/dia</div>`;
+      }
+
+      acessosEl.innerHTML = `
+        <div class="exec-kpi-val">${fmtCompact(totalSess)}</div>
+        ${deltaHtml}
+        <div style="margin-top:6px;font-size:.7rem;color:var(--text3);opacity:.75;letter-spacing:.02em">
+          ${fmtCompact(totalUsers)} usu\u00e1rios \u00b7 ${fmtCompact(avgDay)}/dia
+        </div>
+      `;
+    }
   }
 
   // Contexto dinamico
@@ -2201,7 +2283,8 @@ function initDashboard(){
     fetchGAdsData(),
     fetchMetaData(),
     tiktokLoad(),
-    fetchTipos()
+    fetchTipos(),
+    fetchGA4()
   ]).then(() => renderPainelExecutivo());
 
   // Vendas própria + TM: refresh a cada 5s com guard de "uma rodada por vez"
@@ -2218,9 +2301,9 @@ function initDashboard(){
     }
   }, 5000);
 
-  // Mídia (Google Ads, Meta, TikTok): a cada 30s (APIs têm latência maior)
+  // Mídia (Google Ads, Meta, TikTok) + GA4: a cada 30s (APIs têm latência maior)
   setInterval(() => {
-    Promise.allSettled([fetchGAdsData(), fetchMetaData(), tiktokLoad()])
+    Promise.allSettled([fetchGAdsData(), fetchMetaData(), tiktokLoad(), fetchGA4()])
       .then(() => { renderPainelExecutivo(); });
   }, 30000);
 }
