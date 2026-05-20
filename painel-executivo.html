@@ -1038,9 +1038,13 @@ const EXEC_TV_GLOBO = [
   {date:'2026-04-06', day26:7, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
 ];
 
-// Baseline 2025 (estimativa por médias semanais vindas da planilha).
-// Substituído em runtime pelo investimento-2025.json quando disponível
-// (puxado direto via API do Meta + Google Ads). Veja fetchInvestimento2025().
+// Baseline 2025: cada item tem {d, date, v}.
+//   - d:    dia da campanha (1..94, D+1 = 14/03/2025)
+//   - date: data calendário ISO (ex: '2025-05-20')
+//   - v:    investimento total (Meta + Google) naquele dia
+// Em runtime, fetchInvestimento2025() substitui pelo dado REAL via API.
+// O baseline aqui é só fallback se o JSON ainda não existir.
+const EXEC_D25_INVEST_START = new Date('2025-03-14T00:00:00Z');
 let EXEC_D25_INVEST = (() => {
   const semanas = [
     {from:1, to:3,  daily:2679.88},{from:4, to:10, daily:4350.08},
@@ -1052,7 +1056,13 @@ let EXEC_D25_INVEST = (() => {
     {from:81,to:87, daily:3830.10},{from:88,to:94, daily:3142.76},
   ];
   const arr = [];
-  semanas.forEach(s => { for(let d=s.from;d<=s.to;d++) arr.push({d, v:s.daily}); });
+  semanas.forEach(s => {
+    for(let d=s.from;d<=s.to;d++) {
+      const dt = new Date(EXEC_D25_INVEST_START);
+      dt.setUTCDate(dt.getUTCDate() + (d-1));
+      arr.push({ d, date: dt.toISOString().slice(0,10), v: s.daily });
+    }
+  });
   return arr;
 })();
 let EXEC_D25_INVEST_SOURCE = 'planilha (estimativa)';
@@ -1064,19 +1074,24 @@ async function fetchInvestimento2025() {
     const data = await res.json();
     const diario = data?.diario_por_dia_campanha || [];
     if (!diario.length) return;
-    // Substitui o array hardcoded pelos valores reais dia-a-dia
-    EXEC_D25_INVEST = diario.map(r => ({ d: r.d, v: r.total }));
+    // Substitui o array baseline pelos valores reais dia-a-dia
+    EXEC_D25_INVEST = diario.map(r => ({ d: r.d, date: r.date, v: r.total }));
     EXEC_D25_INVEST_SOURCE = 'API Meta + Google (real)';
-    // Atualiza badge visual se existir
     const badge = document.getElementById('exec-invest-source');
     if (badge) {
       badge.textContent = 'Fonte 2025: ' + EXEC_D25_INVEST_SOURCE;
       badge.style.color = '#C8FF00';
     }
     console.info('[investimento-2025] baseline real carregado:', data.totals);
-  } catch(e) {
-    // arquivo ainda não existe — segue com hardcoded
-  }
+  } catch(e) { /* arquivo ainda não existe */ }
+}
+
+// Mapeia uma data 2026 (YYYY-MM-DD) pra a mesma data calendário em 2025.
+// 2026-05-20 -> 2025-05-20. Retorna null se a string não tem prefixo "2026-".
+function _execMap2026To2025(dateStr) {
+  if (!dateStr || typeof dateStr !== 'string') return null;
+  if (!dateStr.startsWith('2026-')) return null;
+  return '2025-' + dateStr.slice(5);
 }
 
 let execChartVendas = null, execChartInvest = null;
@@ -1373,13 +1388,25 @@ function renderExecKPIs() {
   }
 
   // KPI Investimento ADS com vs 2025 (Meta + Google + TikTok)
+  // Comparação 2025 é feita por DATA CALENDÁRIO (não dia da campanha).
+  // Ex: hoje 20/05/2026 → compara com 20/05/2025. Filtro 14-20/05/2026 →
+  // 14-20/05/2025. Mais intuitivo pra o cliente: "no mesmo dia do mês passado".
   const ttSeriesInv = TIKTOK_DATA?.daily_series || [];
   const ttCostPeriodo = (execFiltFrom
     ? ttSeriesInv.filter(d => d.date >= execFiltFrom && d.date <= (execFiltTo||'9999-12-31'))
     : ttSeriesInv
   ).reduce((s,d)=>s+(d.cost||0), 0);
   const total26 = invest.reduce((s,r)=>s+(r.meta+r.gads),0) + ttCostPeriodo;
-  const total25 = EXEC_D25_INVEST.filter(r=>r.d>=minDay&&r.d<=maxDay).reduce((s,r)=>s+r.v,0);
+
+  // Define range 2025 espelhando as datas de 2026
+  const _todayIso26 = new Date().toISOString().slice(0,10);
+  const _filtFrom26 = execFiltFrom || '2026-03-31';
+  const _filtTo26   = execFiltTo   || _todayIso26;
+  const _filtFrom25 = _execMap2026To2025(_filtFrom26);
+  const _filtTo25   = _execMap2026To2025(_filtTo26);
+  const total25 = (_filtFrom25 && _filtTo25)
+    ? EXEC_D25_INVEST.filter(r => r.date >= _filtFrom25 && r.date <= _filtTo25).reduce((s,r) => s+r.v, 0)
+    : 0;
   const invEl = document.getElementById('exec-kpi-invest');
   if(invEl) {
     const pct = total25>0 ? ((total26-total25)/total25*100) : null;
