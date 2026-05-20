@@ -1,19 +1,15 @@
 #!/usr/bin/env python3
 """
-fetch-investimento-2025.py — script one-shot · VERSÃO VARREDURA TOTAL
+fetch-investimento-2025.py — script one-shot
 
-Puxa o investimento REAL da campanha 2025 (14/03 → 15/06) das duas
-plataformas via API e grava em investimento-2025.json.
+Puxa o investimento REAL da campanha 2025 (14/03 → 15/06) via API:
+- META:   act_2044706169171045 (Duas Rodas — Conta Principal)
+- GOOGLE: customer 5879952911 (Duas Rodas)
 
-Estratégia (após validação do cliente):
-- META: descobre TODAS as ad accounts que o token tem acesso e soma cada uma.
-  Em 2025 a Lime usava múltiplas contas (oficial + parceiros). Sem filtro de
-  nome — todas as campanhas com gasto entram.
-- GOOGLE: descobre TODOS os customers acessíveis via MCC e soma cada um. Sem
-  filtro de nome também.
+Confirmado pelo cliente: todas as campanhas ativas no período eram do
+Festival Interlagos. Sem filtro de nome — soma TUDO que rodou.
 
-O resultado vem como breakdown por conta + breakdown por campanha pra você
-auditar qualquer divergência contra a planilha.
+Gera investimento-2025.json com daily + breakdown por campanha.
 """
 
 import os
@@ -27,63 +23,11 @@ SINCE = '2025-03-14'
 UNTIL = '2025-06-15'
 
 # ═══════════════════════════════════════════════════════════════════════
-# META ADS — varredura de todas as contas
+# META ADS
 # ═══════════════════════════════════════════════════════════════════════
 META_TOKEN   = os.environ.get('META_TOKEN', '')
+META_ACCT    = 'act_2044706169171045'
 META_VERSION = 'v21.0'
-
-
-def meta_get(path, params=None):
-    p = dict(params or {})
-    p['access_token'] = META_TOKEN
-    url = f'https://graph.facebook.com/{META_VERSION}/{path}?{urllib.parse.urlencode(p)}'
-    with urllib.request.urlopen(url, timeout=60) as resp:
-        return json.loads(resp.read())
-
-
-def meta_list_accounts():
-    """Descobre todas as ad accounts que o token enxerga (via /me/adaccounts)."""
-    out = []
-    url_path = 'me/adaccounts'
-    params = {
-        'fields': 'id,account_id,name,account_status',
-        'limit':  '200',
-    }
-    next_url = None
-    payload = meta_get(url_path, params)
-    while payload:
-        for acct in payload.get('data', []):
-            out.append({
-                'id':     acct.get('id'),  # já vem como act_XXX
-                'name':   acct.get('name', ''),
-                'status': acct.get('account_status'),
-            })
-        next_url = (payload.get('paging') or {}).get('next')
-        if not next_url:
-            break
-        with urllib.request.urlopen(next_url, timeout=60) as resp:
-            payload = json.loads(resp.read())
-    return out
-
-
-def meta_fetch_account_insights(acct_id):
-    """Pega insights por campanha+dia da conta no período."""
-    params = {
-        'fields':         'date_start,campaign_id,campaign_name,impressions,clicks,spend,actions',
-        'time_range':     json.dumps({'since': SINCE, 'until': UNTIL}),
-        'time_increment': '1',
-        'level':          'campaign',
-        'limit':          '500',
-        'access_token':   META_TOKEN,
-    }
-    url = f'https://graph.facebook.com/{META_VERSION}/{acct_id}/insights?{urllib.parse.urlencode(params)}'
-    rows = []
-    while url:
-        with urllib.request.urlopen(url, timeout=60) as resp:
-            payload = json.loads(resp.read())
-        rows.extend(payload.get('data', []))
-        url = (payload.get('paging') or {}).get('next')
-    return rows
 
 
 def meta_purchases(actions):
@@ -99,128 +43,82 @@ def fetch_meta_2025():
         print('⚠️  META_TOKEN não definido — pulando Meta', file=sys.stderr)
         return None
 
-    print(f'📊 Meta Ads · descobrindo contas acessíveis pelo token...', flush=True)
-    try:
-        accounts = meta_list_accounts()
-    except Exception as e:
-        print(f'   ❌ falha listando contas: {e}', file=sys.stderr)
-        return None
-    print(f'   ✅ {len(accounts)} ad accounts visíveis', flush=True)
-    for a in accounts[:30]:
-        st = a.get('status')
-        # status 1=active, 2=disabled, 3=unsettled, 7=pending_risk_review, 101=closed
-        st_lbl = {1:'active',2:'disabled',3:'unsettled',7:'pending',101:'closed'}.get(st, str(st))
-        print(f'      {a["id"]:25} [{st_lbl:8}] {a["name"]}', flush=True)
-    if len(accounts) > 30:
-        print(f'      ... +{len(accounts)-30} contas (truncado)')
+    print(f'📊 Meta · {META_ACCT} · {SINCE} → {UNTIL}', flush=True)
 
-    all_by_account = []
-    daily_by_date  = {}
-    total_cost     = 0.0
-    total_imps     = 0
-    total_clicks   = 0
-    total_purch    = 0
-    all_campaigns_global = []
+    params = {
+        'fields':         'date_start,campaign_id,campaign_name,impressions,clicks,spend,actions',
+        'time_range':     json.dumps({'since': SINCE, 'until': UNTIL}),
+        'time_increment': '1',
+        'level':          'campaign',
+        'limit':          '500',
+        'access_token':   META_TOKEN,
+    }
+    url = f'https://graph.facebook.com/{META_VERSION}/{META_ACCT}/insights?{urllib.parse.urlencode(params)}'
+    rows = []
+    while url:
+        with urllib.request.urlopen(url, timeout=60) as resp:
+            payload = json.loads(resp.read())
+        rows.extend(payload.get('data', []))
+        url = (payload.get('paging') or {}).get('next')
 
-    for acct in accounts:
-        try:
-            rows = meta_fetch_account_insights(acct['id'])
-        except Exception as e:
-            err_str = str(e)[:120]
-            print(f'   ⚠️  {acct["id"]} ({acct["name"]}): {err_str}', file=sys.stderr)
-            continue
+    by_camp = {}
+    by_date = {}
+    for r in rows:
+        spend = float(r.get('spend', 0))
+        imps  = int(r.get('impressions', 0))
+        clk   = int(r.get('clicks', 0))
+        pur   = int(meta_purchases(r.get('actions')))
+        cid   = r.get('campaign_id') or 'unknown'
 
-        if not rows:
-            continue
+        if cid not in by_camp:
+            by_camp[cid] = {
+                'id':   cid,
+                'name': r.get('campaign_name', ''),
+                'cost': 0.0, 'impressions': 0, 'clicks': 0, 'purchases': 0,
+            }
+        by_camp[cid]['cost']        += spend
+        by_camp[cid]['impressions'] += imps
+        by_camp[cid]['clicks']      += clk
+        by_camp[cid]['purchases']   += pur
 
-        by_camp = {}
-        acct_cost = 0.0
-        acct_imps = 0
-        acct_clk  = 0
-        acct_pur  = 0
-        for r in rows:
-            spend = float(r.get('spend', 0))
-            imps  = int(r.get('impressions', 0))
-            clk   = int(r.get('clicks', 0))
-            pur   = int(meta_purchases(r.get('actions')))
+        d = r['date_start']
+        if d not in by_date:
+            by_date[d] = {'date': d, 'cost': 0.0, 'impressions': 0, 'clicks': 0, 'purchases': 0}
+        by_date[d]['cost']        += spend
+        by_date[d]['impressions'] += imps
+        by_date[d]['clicks']      += clk
+        by_date[d]['purchases']   += pur
 
-            acct_cost += spend
-            acct_imps += imps
-            acct_clk  += clk
-            acct_pur  += pur
-
-            cid = r.get('campaign_id') or 'unknown'
-            if cid not in by_camp:
-                by_camp[cid] = {
-                    'id':   cid,
-                    'name': r.get('campaign_name', ''),
-                    'cost': 0.0,
-                    'impressions': 0,
-                    'clicks': 0,
-                    'purchases': 0,
-                }
-            by_camp[cid]['cost']        += spend
-            by_camp[cid]['impressions'] += imps
-            by_camp[cid]['clicks']      += clk
-            by_camp[cid]['purchases']   += pur
-
-            d = r['date_start']
-            if d not in daily_by_date:
-                daily_by_date[d] = {'date': d, 'cost': 0.0, 'impressions': 0, 'clicks': 0, 'purchases': 0}
-            daily_by_date[d]['cost']        += spend
-            daily_by_date[d]['impressions'] += imps
-            daily_by_date[d]['clicks']      += clk
-            daily_by_date[d]['purchases']   += pur
-
-        # Só registra conta se gastou algo
-        if acct_cost > 0:
-            campaigns = sorted(by_camp.values(), key=lambda x: -x['cost'])
-            for c in campaigns:
-                c['cost'] = round(c['cost'], 2)
-                c['account_id']   = acct['id']
-                c['account_name'] = acct['name']
-                all_campaigns_global.append(c)
-            all_by_account.append({
-                'account_id':   acct['id'],
-                'account_name': acct['name'],
-                'cost':         round(acct_cost, 2),
-                'impressions':  acct_imps,
-                'clicks':       acct_clk,
-                'purchases':    acct_pur,
-                'campaigns':    campaigns,
-            })
-            total_cost   += acct_cost
-            total_imps   += acct_imps
-            total_clicks += acct_clk
-            total_purch  += acct_pur
-            print(f'   📦 {acct["id"]:25} {acct["name"][:35]:35} → R$ {acct_cost:>11,.2f} ({len(campaigns)} campanhas)', flush=True)
-
-    daily = sorted(daily_by_date.values(), key=lambda x: x['date'])
+    daily = sorted(by_date.values(), key=lambda x: x['date'])
     for d in daily:
         d['cost'] = round(d['cost'], 2)
+    campaigns = sorted(by_camp.values(), key=lambda x: -x['cost'])
+    for c in campaigns:
+        c['cost'] = round(c['cost'], 2)
 
-    print(f'\n   ✅ META TOTAL: R$ {total_cost:,.2f} em {len(daily)} dias · {len(all_by_account)} contas ativas', flush=True)
+    totals = {
+        'cost':        round(sum(d['cost'] for d in daily), 2),
+        'impressions': sum(d['impressions'] for d in daily),
+        'clicks':      sum(d['clicks'] for d in daily),
+        'purchases':   sum(d['purchases'] for d in daily),
+    }
+
+    print(f'   ✅ Meta: R$ {totals["cost"]:,.2f} · {len(campaigns)} campanhas · {len(daily)} dias', flush=True)
 
     return {
-        'totals': {
-            'cost':        round(total_cost, 2),
-            'impressions': total_imps,
-            'clicks':      total_clicks,
-            'purchases':   total_purch,
-        },
-        'daily':     daily,
-        'accounts':  sorted(all_by_account, key=lambda x: -x['cost']),
-        'campaigns': sorted(all_campaigns_global, key=lambda x: -x['cost'])[:50],  # top 50 pra debug
+        'account_id': META_ACCT,
+        'totals':     totals,
+        'daily':      daily,
+        'campaigns':  campaigns,
     }
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# GOOGLE ADS — varredura de todos os customers do MCC
+# GOOGLE ADS
 # ═══════════════════════════════════════════════════════════════════════
 def fetch_google_2025():
     try:
         from google.ads.googleads.client import GoogleAdsClient
-        from google.ads.googleads.errors import GoogleAdsException
     except ImportError:
         print('⚠️  google-ads-python não instalado — pulando Google', file=sys.stderr)
         return None
@@ -242,159 +140,75 @@ def fetch_google_2025():
         'use_proto_plus':    True,
     }
     client = GoogleAdsClient.load_from_dict(config)
-    login_customer_id  = os.environ['GOOGLE_ADS_LOGIN_CUSTOMER_ID']
-    main_customer_id   = os.environ['GOOGLE_ADS_CUSTOMER_ID']
+    customer_id = os.environ['GOOGLE_ADS_CUSTOMER_ID']  # 5879952911 (Duas Rodas)
 
-    print(f'\n📊 Google Ads · descobrindo customers acessíveis pelo MCC {login_customer_id}...', flush=True)
+    print(f'📊 Google · customer {customer_id} · {SINCE} → {UNTIL}', flush=True)
 
-    # Lista customers acessíveis a partir do MCC
-    customer_ids = []
-    try:
-        customer_service = client.get_service('CustomerService')
-        accessible = customer_service.list_accessible_customers()
-        # resource names tipo 'customers/1234567890'
-        for rn in accessible.resource_names:
-            customer_ids.append(rn.split('/')[-1])
-        print(f'   ✅ {len(customer_ids)} customers via list_accessible_customers', flush=True)
-    except Exception as e:
-        print(f'   ⚠️  list_accessible_customers falhou: {str(e)[:120]}', file=sys.stderr)
+    query = f"""
+        SELECT
+            campaign.id,
+            campaign.name,
+            segments.date,
+            metrics.impressions,
+            metrics.clicks,
+            metrics.cost_micros,
+            metrics.conversions
+        FROM campaign
+        WHERE segments.date BETWEEN '{SINCE}' AND '{UNTIL}'
+          AND campaign.status != 'REMOVED'
+    """
+    ga = client.get_service('GoogleAdsService')
+    response = ga.search_stream(customer_id=customer_id, query=query)
 
-    # Como o list_accessible só lista os DIRETOS, descobre também os filhos do MCC
-    try:
-        ga = client.get_service('GoogleAdsService')
-        q = """
-            SELECT customer_client.id, customer_client.descriptive_name,
-                   customer_client.manager, customer_client.status
-            FROM customer_client
-            WHERE customer_client.manager = FALSE
-        """
-        resp = ga.search(customer_id=login_customer_id, query=q)
-        for row in resp:
-            cid = str(row.customer_client.id)
-            if cid not in customer_ids:
-                customer_ids.append(cid)
-        print(f'   ✅ {len(customer_ids)} customers totais (incluindo filhos do MCC)', flush=True)
-    except Exception as e:
-        print(f'   ⚠️  enumeração de filhos do MCC falhou: {str(e)[:120]}', file=sys.stderr)
+    by_camp = {}
+    by_date = {}
+    for batch in response:
+        for row in batch.results:
+            cost = (row.metrics.cost_micros or 0) / 1_000_000.0
+            cid  = str(row.campaign.id)
+            name = row.campaign.name
+            d    = row.segments.date
 
-    # Garante que o customer principal está na lista
-    if main_customer_id not in customer_ids:
-        customer_ids.insert(0, main_customer_id)
+            if cid not in by_camp:
+                by_camp[cid] = {
+                    'id':   cid, 'name': name, 'cost': 0.0,
+                    'impressions': 0, 'clicks': 0, 'conversions': 0.0,
+                }
+            by_camp[cid]['cost']        += cost
+            by_camp[cid]['impressions'] += row.metrics.impressions or 0
+            by_camp[cid]['clicks']      += row.metrics.clicks or 0
+            by_camp[cid]['conversions'] += row.metrics.conversions or 0
 
-    all_by_account = []
-    daily_by_date  = {}
-    total_cost     = 0.0
-    total_imps     = 0
-    total_clk      = 0
-    total_conv     = 0.0
-    all_campaigns_global = []
+            if d not in by_date:
+                by_date[d] = {'date': d, 'cost': 0.0, 'impressions': 0, 'clicks': 0, 'conversions': 0.0}
+            by_date[d]['cost']        += cost
+            by_date[d]['impressions'] += row.metrics.impressions or 0
+            by_date[d]['clicks']      += row.metrics.clicks or 0
+            by_date[d]['conversions'] += row.metrics.conversions or 0
 
-    ga_service = client.get_service('GoogleAdsService')
-
-    for cid in customer_ids:
-        try:
-            query = f"""
-                SELECT
-                    customer.descriptive_name,
-                    campaign.id,
-                    campaign.name,
-                    segments.date,
-                    metrics.impressions,
-                    metrics.clicks,
-                    metrics.cost_micros,
-                    metrics.conversions
-                FROM campaign
-                WHERE segments.date BETWEEN '{SINCE}' AND '{UNTIL}'
-                  AND campaign.status != 'REMOVED'
-            """
-            response = ga_service.search_stream(customer_id=cid, query=query)
-
-            cust_name = ''
-            by_camp = {}
-            acct_cost = 0.0
-            acct_imps = 0
-            acct_clk  = 0
-            acct_conv = 0.0
-            for batch in response:
-                for row in batch.results:
-                    cust_name = row.customer.descriptive_name
-                    cost = (row.metrics.cost_micros or 0) / 1_000_000.0
-                    camp_id   = str(row.campaign.id)
-                    camp_name = row.campaign.name
-                    d = row.segments.date
-
-                    acct_cost += cost
-                    acct_imps += row.metrics.impressions or 0
-                    acct_clk  += row.metrics.clicks or 0
-                    acct_conv += row.metrics.conversions or 0
-
-                    if camp_id not in by_camp:
-                        by_camp[camp_id] = {
-                            'id':   camp_id,
-                            'name': camp_name,
-                            'cost': 0.0,
-                            'impressions': 0,
-                            'clicks': 0,
-                            'conversions': 0.0,
-                        }
-                    by_camp[camp_id]['cost']        += cost
-                    by_camp[camp_id]['impressions'] += row.metrics.impressions or 0
-                    by_camp[camp_id]['clicks']      += row.metrics.clicks or 0
-                    by_camp[camp_id]['conversions'] += row.metrics.conversions or 0
-
-                    if d not in daily_by_date:
-                        daily_by_date[d] = {'date': d, 'cost': 0.0, 'impressions': 0, 'clicks': 0, 'conversions': 0.0}
-                    daily_by_date[d]['cost']        += cost
-                    daily_by_date[d]['impressions'] += row.metrics.impressions or 0
-                    daily_by_date[d]['clicks']      += row.metrics.clicks or 0
-                    daily_by_date[d]['conversions'] += row.metrics.conversions or 0
-
-            if acct_cost > 0:
-                campaigns = sorted(by_camp.values(), key=lambda x: -x['cost'])
-                for c in campaigns:
-                    c['cost'] = round(c['cost'], 2)
-                    c['conversions'] = round(c['conversions'], 2)
-                    c['customer_id']   = cid
-                    c['customer_name'] = cust_name
-                    all_campaigns_global.append(c)
-                all_by_account.append({
-                    'customer_id':   cid,
-                    'customer_name': cust_name,
-                    'cost':          round(acct_cost, 2),
-                    'impressions':   acct_imps,
-                    'clicks':        acct_clk,
-                    'conversions':   round(acct_conv, 2),
-                    'campaigns':     campaigns,
-                })
-                total_cost += acct_cost
-                total_imps += acct_imps
-                total_clk  += acct_clk
-                total_conv += acct_conv
-                print(f'   📦 {cid:12} {cust_name[:35]:35} → R$ {acct_cost:>11,.2f} ({len(campaigns)} campanhas)', flush=True)
-        except Exception as e:
-            err = str(e)[:120]
-            # Customer pode estar sem permissão — apenas registra e segue
-            if 'PERMISSION_DENIED' in err or 'AUTHENTICATION_ERROR' in err or 'CUSTOMER_NOT_FOUND' in err:
-                continue
-            print(f'   ⚠️  {cid}: {err}', file=sys.stderr)
-
-    daily = sorted(daily_by_date.values(), key=lambda x: x['date'])
+    daily = sorted(by_date.values(), key=lambda x: x['date'])
     for d in daily:
         d['cost'] = round(d['cost'], 2)
         d['conversions'] = round(d['conversions'], 2)
+    campaigns = sorted(by_camp.values(), key=lambda x: -x['cost'])
+    for c in campaigns:
+        c['cost'] = round(c['cost'], 2)
+        c['conversions'] = round(c['conversions'], 2)
 
-    print(f'\n   ✅ GOOGLE TOTAL: R$ {total_cost:,.2f} em {len(daily)} dias · {len(all_by_account)} customers ativos', flush=True)
+    totals = {
+        'cost':        round(sum(d['cost'] for d in daily), 2),
+        'impressions': sum(d['impressions'] for d in daily),
+        'clicks':      sum(d['clicks'] for d in daily),
+        'conversions': round(sum(d['conversions'] for d in daily), 2),
+    }
+
+    print(f'   ✅ Google: R$ {totals["cost"]:,.2f} · {len(campaigns)} campanhas · {len(daily)} dias', flush=True)
 
     return {
-        'totals': {
-            'cost':        round(total_cost, 2),
-            'impressions': total_imps,
-            'clicks':      total_clk,
-            'conversions': round(total_conv, 2),
-        },
-        'daily':     daily,
-        'accounts':  sorted(all_by_account, key=lambda x: -x['cost']),
-        'campaigns': sorted(all_campaigns_global, key=lambda x: -x['cost'])[:50],
+        'customer_id': customer_id,
+        'totals':      totals,
+        'daily':       daily,
+        'campaigns':   campaigns,
     }
 
 
@@ -405,10 +219,8 @@ def build_diario_campanha(meta, google):
     start = datetime.fromisoformat(SINCE).date()
     end   = datetime.fromisoformat(UNTIL).date()
     dias  = (end - start).days + 1
-
     meta_by_date   = {d['date']: d['cost'] for d in (meta or {}).get('daily', [])}
     google_by_date = {d['date']: d['cost'] for d in (google or {}).get('daily', [])}
-
     out = []
     for i in range(dias):
         dt = start + timedelta(days=i)
@@ -428,7 +240,6 @@ def build_diario_campanha(meta, google):
 def main():
     meta   = fetch_meta_2025()
     google = fetch_google_2025()
-
     diario = build_diario_campanha(meta, google)
 
     meta_cost   = (meta or {}).get('totals', {}).get('cost', 0) or 0
