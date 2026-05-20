@@ -1,0 +1,62 @@
+name: Fetch Investimento 2025 (Meta + Google Ads)
+
+# Roda apenas sob demanda — não tem cron. Você dispara pelo GitHub:
+# Actions → "Fetch Investimento 2025" → Run workflow
+on:
+  workflow_dispatch:
+    inputs:
+      campaign_name_filter:
+        description: 'Filtro de nome de campanha (case-insensitive contains). Default: FESTIVAL INTERLAGOS'
+        required: false
+        default: 'FESTIVAL INTERLAGOS'
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Google Ads SDK
+        run: pip install google-ads==24.1.0
+
+      - name: Fetch 2025 investment
+        env:
+          META_TOKEN:                   ${{ secrets.META_TOKEN }}
+          META_ACCT:                    ${{ secrets.META_ACCT }}
+          GOOGLE_ADS_DEVELOPER_TOKEN:   ${{ secrets.GOOGLE_ADS_DEVELOPER_TOKEN }}
+          GOOGLE_ADS_CLIENT_ID:         ${{ secrets.GOOGLE_ADS_CLIENT_ID }}
+          GOOGLE_ADS_CLIENT_SECRET:     ${{ secrets.GOOGLE_ADS_CLIENT_SECRET }}
+          GOOGLE_ADS_REFRESH_TOKEN:     ${{ secrets.GOOGLE_ADS_REFRESH_TOKEN }}
+          GOOGLE_ADS_CUSTOMER_ID:       ${{ secrets.GOOGLE_ADS_CUSTOMER_ID }}
+          GOOGLE_ADS_LOGIN_CUSTOMER_ID: ${{ secrets.GOOGLE_ADS_LOGIN_CUSTOMER_ID }}
+          CAMPAIGN_NAME_FILTER:         ${{ inputs.campaign_name_filter }}
+        run: python fetch-investimento-2025.py
+
+      - name: Commit investimento-2025.json
+        run: |
+          git config user.name  "GitHub Actions"
+          git config user.email "actions@github.com"
+          [ -f investimento-2025.json ] && git add investimento-2025.json || true
+          if git diff --staged --quiet; then
+            echo "Sem mudancas em investimento-2025.json"
+            exit 0
+          fi
+          git commit -m "chore: baseline investimento 2025 via API (Meta + Google) [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase origin main 2>&1 || git rebase --abort 2>/dev/null || true
+            if git push 2>&1; then
+              echo "Push OK na tentativa $attempt"
+              exit 0
+            fi
+            echo "Push falhou na tentativa $attempt, aguardando..."
+            sleep $((RANDOM % 15 + 5))
+          done
+          exit 1

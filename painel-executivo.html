@@ -429,7 +429,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="section-header" style="margin-bottom:10px">
         <div>
           <div class="section-title">Investimento ADS — 2025 vs 2026</div>
-          <div style="font-size:.7rem;color:#666;margin-top:3px">por dia de campanha &middot; est. diaria 2025</div>
+          <div style="font-size:.7rem;color:#666;margin-top:3px">por dia de campanha &middot; <span id="exec-invest-source">Fonte 2025: planilha (estimativa)</span></div>
         </div>
         <div class="pill-group">
           <button class="pill active" onclick="execSetInvestView('diario',this)">Diario</button>
@@ -1038,7 +1038,10 @@ const EXEC_TV_GLOBO = [
   {date:'2026-04-06', day26:7, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
 ];
 
-const EXEC_D25_INVEST = (() => {
+// Baseline 2025 (estimativa por médias semanais vindas da planilha).
+// Substituído em runtime pelo investimento-2025.json quando disponível
+// (puxado direto via API do Meta + Google Ads). Veja fetchInvestimento2025().
+let EXEC_D25_INVEST = (() => {
   const semanas = [
     {from:1, to:3,  daily:2679.88},{from:4, to:10, daily:4350.08},
     {from:11,to:17, daily:4903.26},{from:18,to:24, daily:3429.32},
@@ -1052,6 +1055,29 @@ const EXEC_D25_INVEST = (() => {
   semanas.forEach(s => { for(let d=s.from;d<=s.to;d++) arr.push({d, v:s.daily}); });
   return arr;
 })();
+let EXEC_D25_INVEST_SOURCE = 'planilha (estimativa)';
+
+async function fetchInvestimento2025() {
+  try {
+    const res = await fetch('investimento-2025.json?t=' + Date.now(), {cache:'no-store'});
+    if (!res.ok) return;
+    const data = await res.json();
+    const diario = data?.diario_por_dia_campanha || [];
+    if (!diario.length) return;
+    // Substitui o array hardcoded pelos valores reais dia-a-dia
+    EXEC_D25_INVEST = diario.map(r => ({ d: r.d, v: r.total }));
+    EXEC_D25_INVEST_SOURCE = 'API Meta + Google (real)';
+    // Atualiza badge visual se existir
+    const badge = document.getElementById('exec-invest-source');
+    if (badge) {
+      badge.textContent = 'Fonte 2025: ' + EXEC_D25_INVEST_SOURCE;
+      badge.style.color = '#C8FF00';
+    }
+    console.info('[investimento-2025] baseline real carregado:', data.totals);
+  } catch(e) {
+    // arquivo ainda não existe — segue com hardcoded
+  }
+}
 
 let execChartVendas = null, execChartInvest = null;
 let execCurrentVendasMetric = 'total', execCurrentInvestView = 'diario';
@@ -2201,7 +2227,8 @@ function initDashboard(){
     fetchGAdsData(),
     fetchMetaData(),
     tiktokLoad(),
-    fetchTipos()
+    fetchTipos(),
+    fetchInvestimento2025()
   ]).then(() => renderPainelExecutivo());
 
   // Vendas própria + TM: refresh a cada 5s com guard de "uma rodada por vez"
