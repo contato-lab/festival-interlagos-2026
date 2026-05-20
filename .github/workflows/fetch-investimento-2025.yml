@@ -25,7 +25,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install Google Ads SDK
-        run: pip install google-ads==24.1.0
+        run: pip install google-ads
 
       - name: Fetch 2025 investment
         env:
