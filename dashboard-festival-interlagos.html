@@ -2465,8 +2465,11 @@ function updateMetaCard(data, dateFrom, dateTo) {
   buildSpkTimeline('spkMeta', arr, 'rgb(200,255,0)');
 }
 
-// Investimento ADS 2025 por dia de campanha (semanal, do painel-executivo)
-const D25_INVEST = (() => {
+// Investimento ADS 2025 por dia de campanha.
+// Baseline padrão = médias semanais da planilha (estimativa).
+// Em runtime, fetchInvestimento2025() substitui pelo dado REAL dia-a-dia
+// vindo da API do Meta + Google (arquivo investimento-2025.json).
+let D25_INVEST = (() => {
   const semanas = [
     {from:1, to:3,  daily:2679.88},{from:4, to:10, daily:4350.08},
     {from:11,to:17, daily:4903.26},{from:18,to:24, daily:3429.32},
@@ -2480,6 +2483,18 @@ const D25_INVEST = (() => {
   semanas.forEach(s => { for(let d=s.from;d<=s.to;d++) arr.push({d, v:s.daily}); });
   return arr;
 })();
+
+async function fetchInvestimento2025() {
+  try {
+    const res = await fetch('investimento-2025.json?t=' + Date.now(), {cache:'no-store'});
+    if (!res.ok) return;
+    const data = await res.json();
+    const diario = data?.diario_por_dia_campanha || [];
+    if (!diario.length) return;
+    D25_INVEST = diario.map(r => ({ d: r.d, v: r.total }));
+    console.info('[investimento-2025] baseline real carregado:', data.totals);
+  } catch(e) { /* arquivo ainda não existe — segue com hardcoded */ }
+}
 
 function updateMediaTotals(dateFrom, dateTo) {
   let inv=0, imp=0, clk=0, comp=0;
@@ -3009,7 +3024,8 @@ function initDashboard(){
     fetchGAdsData(),
     fetchMetaData(),
     fetchMetaCreatives(),
-    fetchTipos()
+    fetchTipos(),
+    fetchInvestimento2025()
   ]).then(() => applyFiltro());
 
   // Vendas própria + TM: refresh a cada 5s com guard de "uma rodada por vez"

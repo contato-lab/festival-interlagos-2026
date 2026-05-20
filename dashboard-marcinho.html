@@ -681,10 +681,12 @@ const D25_CAMPAIGN = [
 
 
 /* ═══════════════════════════════════════════
-   DADOS 2025 — INVESTIMENTO ADS (estimativa diária)
-   Fonte: SEMANA 0–13 da planilha 2025 (total semanal ÷ 7 dias)
+   DADOS 2025 — INVESTIMENTO ADS
+   Baseline padrão: médias semanais da planilha (estimativa).
+   Em runtime, fetchInvestimento2025() substitui pelo dado REAL
+   dia-a-dia vindo da API do Meta + Google (investimento-2025.json).
 ═══════════════════════════════════════════ */
-const D25_INVEST = (() => {
+let D25_INVEST = (() => {
   const semanas = [
     {from:1, to:3,  daily:2679.88}, // SEMANA 0 (14–16/03, 3 dias)
     {from:4, to:10, daily:4350.08}, // SEMANA 01
@@ -707,6 +709,18 @@ const D25_INVEST = (() => {
   });
   return arr;
 })();
+
+async function fetchInvestimento2025() {
+  try {
+    const res = await fetch('investimento-2025.json?t=' + Date.now(), {cache:'no-store'});
+    if (!res.ok) return;
+    const data = await res.json();
+    const diario = data?.diario_por_dia_campanha || [];
+    if (!diario.length) return;
+    D25_INVEST = diario.map(r => ({ d: r.d, v: r.total }));
+    console.info('[investimento-2025] baseline real carregado:', data.totals);
+  } catch(e) { /* arquivo ainda não existe — segue com hardcoded */ }
+}
 
 /* ═══════════════════════════════════════════
    ESTADO DO DASHBOARD
@@ -1581,7 +1595,7 @@ async function init() {
   Chart.defaults.font.size          = 11;
 
   // Buscar todos os dados em paralelo
-  await Promise.allSettled([fetchMeta(), fetchGAds(), fetchSheets()]);
+  await Promise.allSettled([fetchMeta(), fetchGAds(), fetchSheets(), fetchInvestimento2025()]);
   // Ticketmaster precisa rodar DEPOIS de fetchSheets para sobrepor os valores TM
   await fetchTicketmaster();
 
