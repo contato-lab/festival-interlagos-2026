@@ -1415,6 +1415,9 @@ function renderExecKPIs() {
       };
 
       // Comparativo din\u00e2mico: janela anterior do mesmo tamanho (em dias).
+      // Mostra as DATAS exatas do per\u00edodo comparado (dd/mm) pra ficar claro
+      // que \u00e9 comparativo dentro de 2026 \u2014 n\u00e3o "vs 2025" como o card de
+      // Investimento ADS (que tem outra l\u00f3gica).
       let deltaHtml = '';
       if (hasFilter) {
         const addDays = (s, n) => {
@@ -1426,6 +1429,7 @@ function renderExecKPIs() {
           const da = new Date(a + 'T00:00:00Z'), db = new Date(b + 'T00:00:00Z');
           return Math.round((db - da) / 86400000) + 1;
         };
+        const fmtBR = s => { const [, m, d] = s.split('-'); return d + '/' + m; };
         const nDias    = daysBetween(periodFrom, periodTo);
         const prevTo   = addDays(periodFrom, -1);
         const prevFrom = addDays(prevTo, -(nDias - 1));
@@ -1436,7 +1440,8 @@ function renderExecKPIs() {
         if (totalPrev > 0) {
           const pct = ((totalSess - totalPrev) / totalPrev) * 100;
           const up  = pct >= 0;
-          deltaHtml = `<div class="exec-kpi-delta ${up?'up':'down'}">${up?'\u25b2':'\u25bc'}${Math.abs(pct).toFixed(1)}% vs per\u00edodo anterior</div>`;
+          const prevLabel = (prevFrom === prevTo) ? fmtBR(prevFrom) : (fmtBR(prevFrom) + '\u2013' + fmtBR(prevTo));
+          deltaHtml = `<div class="exec-kpi-delta ${up?'up':'down'}">${up?'\u25b2':'\u25bc'}${Math.abs(pct).toFixed(1)}% vs ${prevLabel}</div>`;
         }
       }
 
