@@ -4,11 +4,6 @@ name: Fetch Investimento 2025 (Meta + Google Ads)
 # Actions → "Fetch Investimento 2025" → Run workflow
 on:
   workflow_dispatch:
-    inputs:
-      campaign_name_filter:
-        description: 'Filtro de nome de campanha (case-insensitive contains). Default: FESTIVAL INTERLAGOS'
-        required: false
-        default: 'FESTIVAL INTERLAGOS'
 
 jobs:
   fetch:
@@ -37,7 +32,6 @@ jobs:
           GOOGLE_ADS_REFRESH_TOKEN:     ${{ secrets.GOOGLE_ADS_REFRESH_TOKEN }}
           GOOGLE_ADS_CUSTOMER_ID:       ${{ secrets.GOOGLE_ADS_CUSTOMER_ID }}
           GOOGLE_ADS_LOGIN_CUSTOMER_ID: ${{ secrets.GOOGLE_ADS_LOGIN_CUSTOMER_ID }}
-          CAMPAIGN_NAME_FILTER:         ${{ inputs.campaign_name_filter }}
         run: python fetch-investimento-2025.py
 
       - name: Commit investimento-2025.json
