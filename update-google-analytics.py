@@ -139,6 +139,59 @@ def fetch_traffic_sources(client, start_date, end_date):
     return sources
 
 
+def fetch_source_medium_daily(client, start_date, end_date):
+    """
+    Breakdown DIÁRIO por Origem/Mídia da sessão. Permite o frontend agregar
+    respeitando o filtro de data global do dashboard.
+
+    Retorna: lista de {date, source, medium, new_users, sessions, pageviews,
+    eng_dur_total_s (duração TOTAL × sessions, pra média ponderada),
+    eng_sessions (sessões engajadas, pra recalcular eng_rate), event_count}.
+
+    Cuidado com agregação:
+    - new_users/sessions/pageviews/event_count → soma direta
+    - avg_session_s → soma de (avg × sessions) / soma de sessions
+    - engagement_rate → soma de eng_sessions / soma de sessions
+    """
+    request = RunReportRequest(
+        property=f"properties/{PROPERTY_ID}",
+        date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
+        dimensions=[
+            Dimension(name="date"),
+            Dimension(name="sessionSource"),
+            Dimension(name="sessionMedium"),
+        ],
+        metrics=[
+            Metric(name="newUsers"),
+            Metric(name="sessions"),
+            Metric(name="screenPageViews"),
+            Metric(name="userEngagementDuration"),  # total em segundos
+            Metric(name="engagedSessions"),          # pra recalcular eng_rate
+            Metric(name="eventCount"),
+        ],
+        limit=250000,
+    )
+    response = client.run_report(request)
+
+    rows = []
+    for row in response.rows:
+        v = [m.value for m in row.metric_values]
+        raw_date = row.dimension_values[0].value  # YYYYMMDD do GA4
+        iso_date = f"{raw_date[:4]}-{raw_date[4:6]}-{raw_date[6:8]}" if len(raw_date) == 8 else raw_date
+        rows.append({
+            "date":         iso_date,
+            "source":       row.dimension_values[1].value or "(direct)",
+            "medium":       row.dimension_values[2].value or "(none)",
+            "new_users":    int(v[0]),
+            "sessions":     int(v[1]),
+            "pageviews":    int(v[2]),
+            "eng_dur_s":    float(v[3]),
+            "eng_sessions": int(v[4]),
+            "event_count":  int(v[5]),
+        })
+    return rows
+
+
 def fetch_source_medium_breakdown(client, start_date, end_date):
     """
     Breakdown por Origem/Mídia da sessão (sessionSource / sessionMedium).
@@ -524,6 +577,7 @@ def main():
     influencer_breakdown = fetch_influencer_breakdown(client)
     adsplay_breakdown    = fetch_adsplay_breakdown(client)
     source_medium        = fetch_source_medium_breakdown(client, start_date, end_date)
+    source_medium_daily  = fetch_source_medium_daily(client, start_date, end_date)
 
     # Injeta Influenciadores no mapa de canais
     for date, count in influencer_sessions.items():
@@ -546,8 +600,10 @@ def main():
         "influencer_breakdown": influencer_breakdown,
         # ↓ Breakdown da mídia programática Adsplay (Display, Vídeo, CTV, Áudio)
         "adsplay_breakdown":    adsplay_breakdown,
-        # ↓ Tabela "Dados Gerais de Tráfego" — Origem/Mídia da sessão
+        # ↓ Tabela "Dados Gerais de Tráfego" — Origem/Mídia da sessão (agregado)
         "source_medium_breakdown": source_medium,
+        # ↓ Mesma info mas diária — pra frontend filtrar por data
+        "source_medium_daily":     source_medium_daily,
     }
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
