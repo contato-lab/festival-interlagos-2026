@@ -790,6 +790,32 @@ Google Ads
     </table>
   </div>
 
+  <!-- Dados Gerais de Tráfego — Origem/Mídia da sessão -->
+  <div style="margin-top:22px">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:#AAA;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      <span style="color:#A78BFA">📊</span> Dados Gerais de Tráfego
+    </div>
+    <div style="font-size:.62rem;color:var(--text3);margin-bottom:10px;line-height:1.6;padding:7px 10px;background:rgba(167,139,250,.06);border-left:2px solid rgba(167,139,250,.35);border-radius:0 4px 4px 0">
+      Visão granular do tráfego por <strong style="color:#CCC">origem / mídia</strong> (source/medium do GA4). Diferente da tabela de Canal acima (que agrupa em categorias amplas tipo "Paid Social"), aqui você vê cada origem específica: <code>ig/paid</code>, <code>google/cpc</code>, <code>programatica/cpm</code>, <code>tiktok/paid</code>, etc. Equivalente à visão "Dados Gerais de Tráfego" do dashboard Adsplay.
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="min-width:160px">Origem / Mídia</th>
+            <th>Novos usuários</th>
+            <th>Sessões</th>
+            <th>Visualizações</th>
+            <th>Duração média</th>
+            <th>Taxa de engajamento</th>
+            <th>Eventos</th>
+          </tr>
+        </thead>
+        <tbody id="ga4SourceMediumBody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- Top Referrers -->
   <div style="margin-top:22px">
     <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:#AAA;margin-bottom:10px;display:flex;align-items:center;gap:8px">
@@ -2032,6 +2058,61 @@ function buildGA4Sources(dateFrom, dateTo) {
 
   // ── Brand Lift: Antes vs Depois de 04/05 ─────────────────────────────
   buildGA4BrandLift(dateFrom, dateTo);
+
+  // ── Dados Gerais de Tráfego (Origem/Mídia) ───────────────────────────
+  buildGA4SourceMedium(dateFrom, dateTo);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DADOS GERAIS DE TRÁFEGO — tabela granular por Origem/Mídia (source/medium)
+// Equivalente à visão "Dados Gerais de Tráfego" do dashboard Adsplay no
+// Looker Studio. Mostra cada source/medium específico em vez de canal
+// agrupado (Paid Social, Organic Search, etc).
+// ═══════════════════════════════════════════════════════════════════════
+function buildGA4SourceMedium(_dateFrom, _dateTo) {
+  // Esta tabela usa dados do período completo do GA4 (não filtra por data),
+  // pois o source_medium_breakdown vem agregado da API. Se o filtro de data
+  // estiver ativo, mostramos um aviso visual no rodapé pro usuário entender.
+  const tbody = document.getElementById('ga4SourceMediumBody');
+  if (!tbody) return;
+  const rows = GA4_DATA?.source_medium_breakdown || [];
+  tbody.innerHTML = '';
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:18px;color:#666;font-size:.72rem">Aguardando atualização do GA4 com a dimensão Origem/Mídia…</td></tr>';
+    return;
+  }
+
+  // Top 20 (mesmo padrão do Looker da Adsplay — "1-10 / 78")
+  const top = rows.slice(0, 20);
+  const fmtDur = s => {
+    const m = Math.floor(s / 60), sec = Math.round(s % 60);
+    return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+  };
+  const fmtN2 = v => Math.round(v).toLocaleString('pt-BR');
+  const corEng = e => e >= 50 ? 'var(--lime)' : e >= 25 ? '#4dff91' : e >= 10 ? '#FFB800' : '#888';
+
+  top.forEach((r, idx) => {
+    const sourceLabel = (r.source || '(direct)') + ' / ' + (r.medium || '(none)');
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td style="color:#DDD"><span style="color:#666;font-size:.6rem;margin-right:6px">' + (idx+1) + '.</span>' + sourceLabel + '</td>' +
+      '<td style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;font-size:.92rem">' + fmtN2(r.new_users) + '</td>' +
+      '<td style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;font-size:.92rem;color:#5DAEFF">' + fmtN2(r.sessions) + '</td>' +
+      '<td style="color:#AAA">' + fmtN2(r.pageviews) + '</td>' +
+      '<td style="color:#AAA;font-family:\'Barlow Condensed\',sans-serif">' + fmtDur(r.avg_session_s||0) + '</td>' +
+      '<td style="color:' + corEng(r.engagement_rate||0) + ';font-weight:600">' + (r.engagement_rate||0).toFixed(2) + '%</td>' +
+      '<td style="color:#AAA">' + fmtN2(r.event_count) + '</td>';
+    tbody.appendChild(tr);
+  });
+
+  // Rodapé com contagem e nota sobre filtro de data
+  const hasFilter = _dateFrom && _dateTo;
+  const footer = document.createElement('tr');
+  footer.innerHTML = '<td colspan="7" style="text-align:right;padding:8px;color:#666;font-size:.6rem;font-style:italic;border-top:1px solid #1f1f1f">' +
+    'Mostrando ' + Math.min(20, rows.length) + ' de ' + rows.length + ' fontes' +
+    (hasFilter ? ' · ⚠️ esta tabela mostra o período completo do GA4 (não respeita o filtro de data global)' : '') +
+    '</td>';
+  tbody.appendChild(footer);
 }
 
 // ═══════════════════════════════════════════════════════════════════════
