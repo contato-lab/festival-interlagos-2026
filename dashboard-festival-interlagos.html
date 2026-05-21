@@ -796,7 +796,7 @@ Google Ads
       <span style="color:#A78BFA">📊</span> Dados Gerais de Tráfego
     </div>
     <div style="font-size:.62rem;color:var(--text3);margin-bottom:10px;line-height:1.6;padding:7px 10px;background:rgba(167,139,250,.06);border-left:2px solid rgba(167,139,250,.35);border-radius:0 4px 4px 0">
-      Visão granular do tráfego por <strong style="color:#CCC">origem / mídia</strong> (source/medium do GA4). Diferente da tabela de Canal acima (que agrupa em categorias amplas tipo "Paid Social"), aqui você vê cada origem específica: <code>ig/paid</code>, <code>google/cpc</code>, <code>programatica/cpm</code>, <code>tiktok/paid</code>, etc. Equivalente à visão "Dados Gerais de Tráfego" do dashboard Adsplay.
+      Visão granular do tráfego por <strong style="color:#CCC">origem / mídia</strong> (source/medium do GA4). Diferente da tabela de Canal acima (que agrupa em categorias amplas tipo "Paid Social"), aqui você vê cada origem específica: <code>ig/paid</code>, <code>google/cpc</code>, <code>programatica/cpm</code>, <code>tiktok/paid</code>, etc. <strong style="color:#A78BFA">Respeita o filtro de data global</strong> aplicado acima.
     </div>
     <div class="table-wrap">
       <table>
@@ -2094,10 +2094,65 @@ function buildGA4SourceMedium(dateFrom, dateTo) {
   _renderGA4SourceMediumTable();
 }
 
+// Agrega source_medium_daily por (source, medium) filtrando por range.
+// Métricas:
+//   - new_users / sessions / pageviews / event_count → SOMA
+//   - avg_session_s → SOMA(eng_dur_s) / SOMA(sessions)  [média ponderada]
+//   - engagement_rate → SOMA(eng_sessions) / SOMA(sessions) * 100
+function _aggregateSourceMediumDaily(daily, dateFrom, dateTo) {
+  const filtered = (dateFrom && dateTo)
+    ? daily.filter(d => d.date >= dateFrom && d.date <= dateTo)
+    : daily;
+  const acc = new Map();
+  filtered.forEach(d => {
+    const key = (d.source || '') + '|' + (d.medium || '');
+    let a = acc.get(key);
+    if (!a) {
+      a = { source: d.source, medium: d.medium, new_users:0, sessions:0,
+            pageviews:0, eng_dur_s:0, eng_sessions:0, event_count:0 };
+      acc.set(key, a);
+    }
+    a.new_users    += d.new_users    || 0;
+    a.sessions     += d.sessions     || 0;
+    a.pageviews    += d.pageviews    || 0;
+    a.eng_dur_s    += d.eng_dur_s    || 0;
+    a.eng_sessions += d.eng_sessions || 0;
+    a.event_count  += d.event_count  || 0;
+  });
+  const out = [];
+  acc.forEach(a => {
+    if (a.sessions === 0) return;
+    out.push({
+      source:          a.source,
+      medium:          a.medium,
+      new_users:       a.new_users,
+      sessions:        a.sessions,
+      pageviews:       a.pageviews,
+      avg_session_s:   a.sessions > 0 ? (a.eng_dur_s / a.sessions) : 0,
+      engagement_rate: a.sessions > 0 ? (a.eng_sessions / a.sessions * 100) : 0,
+      event_count:     a.event_count,
+    });
+  });
+  out.sort((a,b) => b.sessions - a.sessions);
+  return out;
+}
+
 function _renderGA4SourceMediumTable() {
   const tbody = document.getElementById('ga4SourceMediumBody');
   if (!tbody) return;
-  const rows = GA4_DATA?.source_medium_breakdown || [];
+  // Se temos daily breakdown E o filtro de data está ativo, agrega pelo range.
+  // Senão usa o agregado padrão (período inteiro do GA4).
+  const daily = GA4_DATA?.source_medium_daily || [];
+  let rows;
+  if (daily.length && _ga4SmHasFilter && _ga4SmLastFilter) {
+    const [df, dt] = _ga4SmLastFilter.split('|');
+    rows = _aggregateSourceMediumDaily(daily, df, dt);
+  } else if (daily.length) {
+    // Sem filtro → agrega tudo (período completo)
+    rows = _aggregateSourceMediumDaily(daily, null, null);
+  } else {
+    rows = GA4_DATA?.source_medium_breakdown || [];
+  }
   tbody.innerHTML = '';
   if (!rows.length) {
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:18px;color:#666;font-size:.72rem">Aguardando atualização do GA4 com a dimensão Origem/Mídia…</td></tr>';
@@ -2174,7 +2229,7 @@ function _renderGA4SourceMediumTable() {
     '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">' +
       '<div style="color:#666;font-size:.62rem">' +
         (start + 1) + ' – ' + end + ' de ' + rows.length + ' fontes' +
-        (_ga4SmHasFilter ? ' · <span style="color:#FFB800">⚠️ período completo do GA4 (não respeita filtro de data)</span>' : '') +
+        (_ga4SmHasFilter ? ' · <span style="color:var(--lime)">filtrado por data</span>' : '') +
       '</div>' +
       '<div style="display:flex;gap:4px;align-items:center">' + pageBtns.join('') + '</div>' +
     '</div>' +
