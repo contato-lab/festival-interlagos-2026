@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-21T17:47:21Z",
+  "updated_at": "2026-05-21T18:12:16Z",
   "source": "Ticketmaster API via getcrowder.com",
   "source_type": "api",
   "campaign_start": "2026-03-25",
@@ -16,12 +16,14 @@
     195741
   ],
   "totals": {
-    "moto_receita": 521321.45,
+    "moto_receita": 521537.45,
     "auto_receita": 389929.2,
-    "moto_ingressos": 5820,
+    "moto_ingressos": 5651,
     "auto_ingressos": 4167,
-    "total_receita": 911250.65,
-    "total_ingressos": 9987
+    "moto_cortesias": 171,
+    "auto_cortesias": 0,
+    "total_receita": 911466.65,
+    "total_ingressos": 9818
   },
   "daily": [
     {
@@ -29,364 +31,468 @@
       "moto_receita": 61969.7,
       "auto_receita": 31355.5,
       "moto_ingressos": 636,
-      "auto_ingressos": 293
+      "auto_ingressos": 293,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-01",
       "moto_receita": 31713.0,
       "auto_receita": 9625.7,
       "moto_ingressos": 371,
-      "auto_ingressos": 118
+      "auto_ingressos": 118,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-02",
       "moto_receita": 15121.5,
       "auto_receita": 5167.6,
       "moto_ingressos": 171,
-      "auto_ingressos": 69
+      "auto_ingressos": 69,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-03",
       "moto_receita": 8940.6,
       "auto_receita": 4615.8,
       "moto_ingressos": 114,
-      "auto_ingressos": 57
+      "auto_ingressos": 57,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-04",
       "moto_receita": 5669.4,
       "auto_receita": 1558.2,
       "moto_ingressos": 70,
-      "auto_ingressos": 23
+      "auto_ingressos": 23,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-05",
       "moto_receita": 8782.8,
       "auto_receita": 4355.2,
       "moto_ingressos": 88,
-      "auto_ingressos": 33
+      "auto_ingressos": 33,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-06",
       "moto_receita": 8430.1,
       "auto_receita": 2770.5,
       "moto_ingressos": 97,
-      "auto_ingressos": 33
+      "auto_ingressos": 33,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-07",
       "moto_receita": 8971.2,
       "auto_receita": 2772.5,
       "moto_ingressos": 93,
-      "auto_ingressos": 32
+      "auto_ingressos": 32,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-08",
       "moto_receita": 7037.5,
       "auto_receita": 1704.3,
       "moto_ingressos": 82,
-      "auto_ingressos": 19
+      "auto_ingressos": 19,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-09",
       "moto_receita": 6241.7,
       "auto_receita": 6575.0,
       "moto_ingressos": 73,
-      "auto_ingressos": 52
+      "auto_ingressos": 52,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-10",
       "moto_receita": 6838.5,
       "auto_receita": 3388.0,
       "moto_ingressos": 62,
-      "auto_ingressos": 41
+      "auto_ingressos": 41,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-11",
       "moto_receita": 6242.7,
       "auto_receita": 2568.6,
       "moto_ingressos": 72,
-      "auto_ingressos": 43
+      "auto_ingressos": 43,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-12",
       "moto_receita": 5197.0,
       "auto_receita": 3407.4,
       "moto_ingressos": 63,
-      "auto_ingressos": 37
+      "auto_ingressos": 37,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-13",
       "moto_receita": 4186.6,
       "auto_receita": 3479.0,
       "moto_ingressos": 55,
-      "auto_ingressos": 45
+      "auto_ingressos": 45,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-14",
       "moto_receita": 6628.8,
       "auto_receita": 6388.9,
       "moto_ingressos": 78,
-      "auto_ingressos": 68
+      "auto_ingressos": 68,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-15",
       "moto_receita": 5446.9,
       "auto_receita": 4757.0,
       "moto_ingressos": 72,
-      "auto_ingressos": 62
+      "auto_ingressos": 62,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-16",
       "moto_receita": 6280.9,
       "auto_receita": 10483.5,
       "moto_ingressos": 77,
-      "auto_ingressos": 120
+      "auto_ingressos": 120,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-17",
       "moto_receita": 7595.1,
       "auto_receita": 8381.2,
       "moto_ingressos": 74,
-      "auto_ingressos": 107
+      "auto_ingressos": 107,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-18",
       "moto_receita": 6463.2,
       "auto_receita": 11665.2,
       "moto_ingressos": 79,
-      "auto_ingressos": 109
+      "auto_ingressos": 109,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-19",
       "moto_receita": 8754.4,
       "auto_receita": 11175.3,
       "moto_ingressos": 108,
-      "auto_ingressos": 124
+      "auto_ingressos": 124,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-20",
       "moto_receita": 7357.9,
       "auto_receita": 8588.0,
       "moto_ingressos": 73,
-      "auto_ingressos": 95
+      "auto_ingressos": 95,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-21",
       "moto_receita": 5090.2,
       "auto_receita": 7243.9,
       "moto_ingressos": 61,
-      "auto_ingressos": 91
+      "auto_ingressos": 91,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-22",
       "moto_receita": 6431.8,
       "auto_receita": 5389.1,
       "moto_ingressos": 66,
-      "auto_ingressos": 75
+      "auto_ingressos": 75,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-23",
       "moto_receita": 8575.2,
       "auto_receita": 6668.2,
       "moto_ingressos": 83,
-      "auto_ingressos": 75
+      "auto_ingressos": 75,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-24",
       "moto_receita": 6480.0,
       "auto_receita": 7943.0,
       "moto_ingressos": 65,
-      "auto_ingressos": 72
+      "auto_ingressos": 72,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-25",
       "moto_receita": 6493.7,
       "auto_receita": 10231.6,
       "moto_ingressos": 76,
-      "auto_ingressos": 79
+      "auto_ingressos": 79,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-26",
       "moto_receita": 5004.0,
       "auto_receita": 4192.6,
       "moto_ingressos": 59,
-      "auto_ingressos": 48
+      "auto_ingressos": 48,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-27",
       "moto_receita": 6555.3,
       "auto_receita": 4674.6,
       "moto_ingressos": 75,
-      "auto_ingressos": 69
+      "auto_ingressos": 69,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-28",
       "moto_receita": 5463.5,
       "auto_receita": 7293.6,
       "moto_ingressos": 61,
-      "auto_ingressos": 74
+      "auto_ingressos": 74,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-29",
       "moto_receita": 3794.6,
       "auto_receita": 4730.4,
       "moto_ingressos": 51,
-      "auto_ingressos": 51
+      "auto_ingressos": 51,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-04-30",
       "moto_receita": 5211.7,
       "auto_receita": 6250.5,
-      "moto_ingressos": 80,
-      "auto_ingressos": 73
+      "moto_ingressos": 60,
+      "auto_ingressos": 73,
+      "moto_cortesias": 20,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-01",
       "moto_receita": 8440.8,
       "auto_receita": 11021.3,
       "moto_ingressos": 97,
-      "auto_ingressos": 102
+      "auto_ingressos": 102,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-02",
       "moto_receita": 7386.8,
       "auto_receita": 7881.5,
       "moto_ingressos": 86,
-      "auto_ingressos": 72
+      "auto_ingressos": 72,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-03",
       "moto_receita": 20030.1,
       "auto_receita": 10375.0,
       "moto_ingressos": 189,
-      "auto_ingressos": 130
+      "auto_ingressos": 130,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-04",
       "moto_receita": 36184.8,
       "auto_receita": 28695.3,
       "moto_ingressos": 409,
-      "auto_ingressos": 325
+      "auto_ingressos": 325,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-05",
       "moto_receita": 25965.45,
       "auto_receita": 27479.2,
       "moto_ingressos": 298,
-      "auto_ingressos": 311
+      "auto_ingressos": 311,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-06",
       "moto_receita": 10852.0,
       "auto_receita": 7895.8,
       "moto_ingressos": 133,
-      "auto_ingressos": 78
+      "auto_ingressos": 78,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-07",
       "moto_receita": 7972.8,
       "auto_receita": 6912.0,
       "moto_ingressos": 89,
-      "auto_ingressos": 63
+      "auto_ingressos": 63,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-08",
       "moto_receita": 11526.0,
       "auto_receita": 6599.6,
       "moto_ingressos": 92,
-      "auto_ingressos": 60
+      "auto_ingressos": 60,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-09",
       "moto_receita": 6138.0,
       "auto_receita": 9849.2,
       "moto_ingressos": 57,
-      "auto_ingressos": 74
+      "auto_ingressos": 74,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-10",
       "moto_receita": 7228.6,
       "auto_receita": 4372.0,
       "moto_ingressos": 81,
-      "auto_ingressos": 57
+      "auto_ingressos": 57,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-11",
       "moto_receita": 7369.4,
       "auto_receita": 7765.6,
       "moto_ingressos": 75,
-      "auto_ingressos": 80
+      "auto_ingressos": 80,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-12",
       "moto_receita": 12355.0,
       "auto_receita": 6670.8,
       "moto_ingressos": 96,
-      "auto_ingressos": 73
+      "auto_ingressos": 73,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-13",
       "moto_receita": 10597.2,
       "auto_receita": 4741.2,
       "moto_ingressos": 92,
-      "auto_ingressos": 58
+      "auto_ingressos": 58,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-14",
       "moto_receita": 6600.6,
       "auto_receita": 2956.0,
       "moto_ingressos": 67,
-      "auto_ingressos": 38
+      "auto_ingressos": 38,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-15",
       "moto_receita": 7423.6,
       "auto_receita": 8669.8,
       "moto_ingressos": 71,
-      "auto_ingressos": 62
+      "auto_ingressos": 62,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-16",
       "moto_receita": 6741.6,
       "auto_receita": 5105.6,
       "moto_ingressos": 72,
-      "auto_ingressos": 57
+      "auto_ingressos": 57,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-17",
       "moto_receita": 5554.6,
       "auto_receita": 5218.0,
       "moto_ingressos": 62,
-      "auto_ingressos": 49
+      "auto_ingressos": 49,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-18",
       "moto_receita": 11408.8,
       "auto_receita": 6326.0,
       "moto_ingressos": 116,
-      "auto_ingressos": 68
+      "auto_ingressos": 68,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-19",
       "moto_receita": 6625.0,
       "auto_receita": 6225.8,
       "moto_ingressos": 75,
-      "auto_ingressos": 56
+      "auto_ingressos": 56,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-20",
       "moto_receita": 8273.4,
       "auto_receita": 3587.8,
       "moto_ingressos": 87,
-      "auto_ingressos": 45
+      "auto_ingressos": 45,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     },
     {
       "date": "2026-05-21",
-      "moto_receita": 3677.4,
+      "moto_receita": 3893.4,
       "auto_receita": 2181.8,
-      "moto_ingressos": 191,
-      "auto_ingressos": 22
+      "moto_ingressos": 42,
+      "auto_ingressos": 22,
+      "moto_cortesias": 151,
+      "auto_cortesias": 0
     }
   ]
 }
