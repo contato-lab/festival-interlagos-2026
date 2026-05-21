@@ -1179,23 +1179,44 @@ let META_DATA = null; // meta-data.json (quando conectado)
 
 // ═══════════════════════════════════════════════
 // ALERTAS DE SISTEMA — banner no topo do dashboard
-// Detecta: 1) APIs TM/Sistema Próprio fora do ar (após 3 retries)
-//          2) Meta/Google parados de gastar após 12h se ontem teve gasto
+// Detecta: 1) APIs TM/Sistema Próprio fora do ar (após N falhas consecutivas)
+//          2) Meta/Google parados de gastar após 12h BRT se ontem teve >R$500
 // ═══════════════════════════════════════════════
+function _brtNow() { return new Date(Date.now() - 3 * 3600 * 1000); }
+function _brtISO(dt) { return new Date(dt.getTime() - 3 * 3600 * 1000).toISOString().slice(0, 10); }
+
+const ALERT_FAIL_THRESHOLD = 2;
+const ALERT_MIN_SPEND_ONTEM = 500;
+
 const _systemStatus = {
-  tm:      { ok: true, error: null, lastCheck: null },
-  proprio: { ok: true, error: null, lastCheck: null },
+  tm:      { ok: true, error: null, lastCheck: null, failCount: 0 },
+  proprio: { ok: true, error: null, lastCheck: null, failCount: 0 },
 };
+
+function _markSystemOk(key) {
+  _systemStatus[key].ok = true;
+  _systemStatus[key].error = null;
+  _systemStatus[key].lastCheck = Date.now();
+  _systemStatus[key].failCount = 0;
+}
+function _markSystemFail(key, err) {
+  _systemStatus[key].failCount++;
+  _systemStatus[key].lastCheck = Date.now();
+  _systemStatus[key].error = err;
+  if (_systemStatus[key].failCount >= ALERT_FAIL_THRESHOLD) {
+    _systemStatus[key].ok = false;
+  }
+}
 
 function checkSystemAlerts() {
   const banner = document.getElementById('systemAlertBanner');
   if (!banner) return;
   const alerts = [];
   const now = new Date();
-  const hora = now.getHours();
-  const hojeISO  = now.toISOString().slice(0, 10);
-  const ontemDt = new Date(now.getTime() - 86400000);
-  const ontemISO = ontemDt.toISOString().slice(0, 10);
+  const brt = _brtNow();
+  const hora = brt.getUTCHours();
+  const hojeISO  = _brtISO(now);
+  const ontemISO = _brtISO(new Date(now.getTime() - 86400000));
 
   if (_systemStatus.tm.lastCheck && !_systemStatus.tm.ok) {
     alerts.push({
@@ -1215,7 +1236,7 @@ function checkSystemAlerts() {
     const arr = META_DATA.daily_series || META_DATA.data || [];
     const h = arr.find(d => d.date === hojeISO);
     const o = arr.find(d => d.date === ontemISO);
-    if (h && (h.cost || 0) === 0 && o && (o.cost || 0) > 100) {
+    if (h && (h.cost || 0) === 0 && o && (o.cost || 0) > ALERT_MIN_SPEND_ONTEM) {
       alerts.push({
         level: 'orange',
         title: 'META ADS PARADO',
@@ -1227,7 +1248,7 @@ function checkSystemAlerts() {
     const arr = GADS_DATA.daily_series || [];
     const h = arr.find(d => d.date === hojeISO);
     const o = arr.find(d => d.date === ontemISO);
-    if (h && (h.cost || 0) === 0 && o && (o.cost || 0) > 100) {
+    if (h && (h.cost || 0) === 0 && o && (o.cost || 0) > ALERT_MIN_SPEND_ONTEM) {
       alerts.push({
         level: 'orange',
         title: 'GOOGLE ADS PARADO',
@@ -3089,21 +3110,14 @@ async function fetchTicketmaster() {
       }
     }
     if (!res) {
-      // Worker eh fonte unica de verdade. NUNCA cair pro fallback ticketmaster-data.json
-      // (que vem do Apps Script com numeros divergentes e causa flicker entre fontes).
-      // Se ja temos dados de carga anterior, mantem. Senao, deixa zerado e proximo refresh tenta de novo.
       console.warn('[TM Worker] Falhou apos 3 tentativas. Mantendo dados anteriores (se houver):', workerErr?.message);
-      _systemStatus.tm.ok = false;
-      _systemStatus.tm.error = workerErr?.message || 'fetch falhou';
-      _systemStatus.tm.lastCheck = Date.now();
+      _markSystemFail('tm', workerErr?.message || 'fetch falhou');
       checkSystemAlerts();
       return;
     }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
-    _systemStatus.tm.ok = true;
-    _systemStatus.tm.error = null;
-    _systemStatus.tm.lastCheck = Date.now();
+    _markSystemOk('tm');
 
     // Captura timestamps da última venda TM
     if (data.last_sale_moto_at) __lastSale.tm.moto = data.last_sale_moto_at;
@@ -3145,9 +3159,7 @@ async function fetchTicketmaster() {
     console.log('TM conectada:', data.daily.length, 'dias');
   } catch(e) {
     console.warn('fetchTicketmaster erro:', e.message);
-    _systemStatus.tm.ok = false;
-    _systemStatus.tm.error = e.message;
-    _systemStatus.tm.lastCheck = Date.now();
+    _markSystemFail('tm', e.message);
     checkSystemAlerts();
   }
 }
@@ -3174,13 +3186,10 @@ async function fetchVendasProprio() {
       }
     }
     if (!res) {
-      // Se ja temos dados Sistema Proprio em D26_FULL, mantem em vez de cair pro fallback
       const jaTemDadosProprio = D26_FULL.some(r => (r.mpQ||0) > 0 || (r.apQ||0) > 0);
       if (jaTemDadosProprio) {
         console.warn('[Vendas Worker] Falhou, mantendo dados anteriores (sem flicker):', workerErr?.message);
-        _systemStatus.proprio.ok = false;
-        _systemStatus.proprio.error = workerErr?.message || 'fetch falhou';
-        _systemStatus.proprio.lastCheck = Date.now();
+        _markSystemFail('proprio', workerErr?.message || 'fetch falhou');
         checkSystemAlerts();
         return;
       }
@@ -3190,9 +3199,7 @@ async function fetchVendasProprio() {
     }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
-    _systemStatus.proprio.ok = true;
-    _systemStatus.proprio.error = null;
-    _systemStatus.proprio.lastCheck = Date.now();
+    _markSystemOk('proprio');
 
     // Captura timestamps da última venda Sistema Próprio
     if (data.last_sale_moto_at) __lastSale.proprio.moto = data.last_sale_moto_at;
@@ -3222,9 +3229,7 @@ async function fetchVendasProprio() {
     console.log('[vendas-data.json] Moto:', data.totals.moto_ingressos, '| Auto:', data.totals.auto_ingressos, 'ingressos | atualizado:', data.updated_at);
   } catch(e) {
     console.warn('[Vendas Próprias] erro:', e.message);
-    _systemStatus.proprio.ok = false;
-    _systemStatus.proprio.error = e.message;
-    _systemStatus.proprio.lastCheck = Date.now();
+    _markSystemFail('proprio', e.message);
     checkSystemAlerts();
   }
 }

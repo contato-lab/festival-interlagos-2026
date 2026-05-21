@@ -727,23 +727,44 @@ async function fetchInvestimento2025() {
 
 /* ═══════════════════════════════════════════
    ALERTAS DE SISTEMA — banner no topo
-   1) APIs TM/Sistema Próprio fora do ar (após 3 retries)
-   2) Meta/Google parados de gastar após 12h se ontem teve gasto
+   1) APIs TM/Sistema Próprio fora do ar (após N falhas consecutivas)
+   2) Meta/Google parados de gastar após 12h BRT se ontem teve >R$500
 ═══════════════════════════════════════════ */
+function _brtNow() { return new Date(Date.now() - 3 * 3600 * 1000); }
+function _brtISO(dt) { return new Date(dt.getTime() - 3 * 3600 * 1000).toISOString().slice(0, 10); }
+
+const ALERT_FAIL_THRESHOLD = 2;
+const ALERT_MIN_SPEND_ONTEM = 500;
+
 const _systemStatus = {
-  tm:      { ok: true, error: null, lastCheck: null },
-  proprio: { ok: true, error: null, lastCheck: null },
+  tm:      { ok: true, error: null, lastCheck: null, failCount: 0 },
+  proprio: { ok: true, error: null, lastCheck: null, failCount: 0 },
 };
+
+function _markSystemOk(key) {
+  _systemStatus[key].ok = true;
+  _systemStatus[key].error = null;
+  _systemStatus[key].lastCheck = Date.now();
+  _systemStatus[key].failCount = 0;
+}
+function _markSystemFail(key, err) {
+  _systemStatus[key].failCount++;
+  _systemStatus[key].lastCheck = Date.now();
+  _systemStatus[key].error = err;
+  if (_systemStatus[key].failCount >= ALERT_FAIL_THRESHOLD) {
+    _systemStatus[key].ok = false;
+  }
+}
 
 function checkSystemAlerts() {
   const banner = document.getElementById('systemAlertBanner');
   if (!banner) return;
   const alerts = [];
   const now = new Date();
-  const hora = now.getHours();
-  const hojeISO  = now.toISOString().slice(0, 10);
-  const ontemDt = new Date(now.getTime() - 86400000);
-  const ontemISO = ontemDt.toISOString().slice(0, 10);
+  const brt = _brtNow();
+  const hora = brt.getUTCHours();
+  const hojeISO  = _brtISO(now);
+  const ontemISO = _brtISO(new Date(now.getTime() - 86400000));
 
   if (_systemStatus.tm.lastCheck && !_systemStatus.tm.ok) {
     alerts.push({
@@ -759,18 +780,17 @@ function checkSystemAlerts() {
       msg:   'Vendas próprias podem estar desatualizadas. Erro: ' + (_systemStatus.proprio.error || 'sem detalhe'),
     });
   }
-  // Meta/Google: marcinho guarda em D26_INVEST (por dia da campanha) e em row.date também
   if (hora >= 12 && typeof D26_INVEST !== 'undefined') {
     const h = D26_INVEST.find(r => r.date === hojeISO);
     const o = D26_INVEST.find(r => r.date === ontemISO);
-    if (h && (h.meta || 0) === 0 && o && (o.meta || 0) > 100) {
+    if (h && (h.meta || 0) === 0 && o && (o.meta || 0) > ALERT_MIN_SPEND_ONTEM) {
       alerts.push({
         level: 'orange',
         title: 'META ADS PARADO',
         msg:   'Sem gasto hoje (ontem foi R$ ' + Math.round(o.meta).toLocaleString('pt-BR') + '). Verifique se as campanhas estão ativas.',
       });
     }
-    if (h && (h.gads || 0) === 0 && o && (o.gads || 0) > 100) {
+    if (h && (h.gads || 0) === 0 && o && (o.gads || 0) > ALERT_MIN_SPEND_ONTEM) {
       alerts.push({
         level: 'orange',
         title: 'GOOGLE ADS PARADO',
@@ -956,18 +976,14 @@ async function fetchVendasProprio() {
     }
     if (!res) {
       console.warn('[Vendas Worker] 3 tentativas falharam, usando fallback vendas-data.json:', workerErr?.message);
-      _systemStatus.proprio.ok = false;
-      _systemStatus.proprio.error = workerErr?.message || 'fetch falhou';
-      _systemStatus.proprio.lastCheck = Date.now();
+      _markSystemFail('proprio', workerErr?.message || 'fetch falhou');
       checkSystemAlerts();
       res = await fetch('vendas-data.json?t=' + Date.now(), {cache:'no-store'});
       if (!res.ok) throw new Error('vendas-data.json HTTP ' + res.status);
     }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
-    _systemStatus.proprio.ok = true;
-    _systemStatus.proprio.error = null;
-    _systemStatus.proprio.lastCheck = Date.now();
+    _markSystemOk('proprio');
 
     // Captura último timestamp próprio (mais recente entre o que já temos e o novo)
     const newerOrKeep = (cur, next) => (!cur || (next && next > cur)) ? next : cur;
@@ -997,9 +1013,7 @@ async function fetchVendasProprio() {
     console.log('[vendas-data.json] Moto:', data.totals.moto_ingressos, '| Auto:', data.totals.auto_ingressos, 'ingressos | atualizado:', data.updated_at);
   } catch(e) {
     console.warn('[Vendas Próprias] erro:', e.message);
-    _systemStatus.proprio.ok = false;
-    _systemStatus.proprio.error = e.message;
-    _systemStatus.proprio.lastCheck = Date.now();
+    _markSystemFail('proprio', e.message);
     checkSystemAlerts();
   }
 }
@@ -1026,18 +1040,14 @@ async function fetchTicketmaster() {
     }
     if (!res) {
       console.warn('[TM Worker] 3 tentativas falharam, usando fallback ticketmaster-data.json:', workerErr?.message);
-      _systemStatus.tm.ok = false;
-      _systemStatus.tm.error = workerErr?.message || 'fetch falhou';
-      _systemStatus.tm.lastCheck = Date.now();
+      _markSystemFail('tm', workerErr?.message || 'fetch falhou');
       checkSystemAlerts();
       res = await fetch('ticketmaster-data.json?t=' + Date.now(), {cache:'no-store'});
       if (!res.ok) throw new Error('ticketmaster-data.json nao encontrado');
     }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
-    _systemStatus.tm.ok = true;
-    _systemStatus.tm.error = null;
-    _systemStatus.tm.lastCheck = Date.now();
+    _markSystemOk('tm');
 
     // Captura último timestamp TM (mantém o mais recente entre próprio e TM)
     const newerOrKeepTM = (cur, next) => (!cur || (next && next > cur)) ? next : cur;
@@ -1082,9 +1092,7 @@ async function fetchTicketmaster() {
     console.log('✅ Ticketmaster conectado:', data.daily.length, 'dias');
   } catch(e) {
     console.warn('fetchTicketmaster erro:', e.message);
-    _systemStatus.tm.ok = false;
-    _systemStatus.tm.error = e.message;
-    _systemStatus.tm.lastCheck = Date.now();
+    _markSystemFail('tm', e.message);
     checkSystemAlerts();
   }
 }
