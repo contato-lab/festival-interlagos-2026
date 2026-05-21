@@ -185,6 +185,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   </div>
 </div>
 
+<!-- BANNER DE ALERTAS DE SISTEMA -->
+<div id="systemAlertBanner" style="display:none;position:sticky;top:0;z-index:1000;padding:10px 18px;font-family:'Inter',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.02em;box-shadow:0 4px 20px rgba(0,0,0,.4)"></div>
+
 <!-- HEADER -->
 <header class="header">
   <div class="header-brand">
@@ -737,6 +740,89 @@ let META_DATA = null;
 let GADS_DATA = null;
 
 // ═══════════════════════════════════════════════
+// ALERTAS DE SISTEMA — banner no topo
+// Detecta: 1) APIs TM/Sistema Próprio fora do ar (após 3 retries)
+//          2) Meta/Google parados de gastar após 12h se ontem teve gasto
+// ═══════════════════════════════════════════════
+const _systemStatus = {
+  tm:      { ok: true, error: null, lastCheck: null },
+  proprio: { ok: true, error: null, lastCheck: null },
+};
+
+function checkSystemAlerts() {
+  const banner = document.getElementById('systemAlertBanner');
+  if (!banner) return;
+  const alerts = [];
+  const now = new Date();
+  const hora = now.getHours();
+  const hojeISO  = now.toISOString().slice(0, 10);
+  const ontemDt = new Date(now.getTime() - 86400000);
+  const ontemISO = ontemDt.toISOString().slice(0, 10);
+
+  // 1. TM API fora do ar (após retry)
+  if (_systemStatus.tm.lastCheck && !_systemStatus.tm.ok) {
+    alerts.push({
+      level: 'red',
+      title: 'API TICKETMASTER FORA DO AR',
+      msg:   'Vendas TM podem estar desatualizadas. Erro: ' + (_systemStatus.tm.error || 'sem detalhe'),
+    });
+  }
+  // 2. Sistema Próprio API fora do ar
+  if (_systemStatus.proprio.lastCheck && !_systemStatus.proprio.ok) {
+    alerts.push({
+      level: 'red',
+      title: 'API SISTEMA PRÓPRIO FORA DO AR',
+      msg:   'Vendas próprias podem estar desatualizadas. Erro: ' + (_systemStatus.proprio.error || 'sem detalhe'),
+    });
+  }
+  // 3. Meta parado de gastar (após 12h, com gasto ontem)
+  if (hora >= 12 && META_DATA) {
+    const arr = META_DATA.daily_series || META_DATA.data || [];
+    const h = arr.find(d => d.date === hojeISO);
+    const o = arr.find(d => d.date === ontemISO);
+    if (h && (h.cost || 0) === 0 && o && (o.cost || 0) > 100) {
+      alerts.push({
+        level: 'orange',
+        title: 'META ADS PARADO',
+        msg:   'Sem gasto hoje (ontem foi R$ ' + Math.round(o.cost).toLocaleString('pt-BR') + '). Verifique se as campanhas estão ativas.',
+      });
+    }
+  }
+  // 4. Google parado de gastar (após 12h, com gasto ontem)
+  if (hora >= 12 && GADS_DATA) {
+    const arr = GADS_DATA.daily_series || [];
+    const h = arr.find(d => d.date === hojeISO);
+    const o = arr.find(d => d.date === ontemISO);
+    if (h && (h.cost || 0) === 0 && o && (o.cost || 0) > 100) {
+      alerts.push({
+        level: 'orange',
+        title: 'GOOGLE ADS PARADO',
+        msg:   'Sem gasto hoje (ontem foi R$ ' + Math.round(o.cost).toLocaleString('pt-BR') + '). Verifique se as campanhas estão ativas.',
+      });
+    }
+  }
+
+  if (!alerts.length) {
+    banner.style.display = 'none';
+    banner.innerHTML = '';
+    return;
+  }
+  // Render
+  banner.style.display = 'block';
+  banner.style.background = alerts.some(a => a.level === 'red') ? '#7a1f1f' : '#7a5a1f';
+  banner.style.color = '#fff';
+  banner.innerHTML = alerts.map(a =>
+    '<div style="display:flex;align-items:center;gap:10px;padding:4px 0">' +
+      '<span style="font-size:1rem">' + (a.level === 'red' ? '🔴' : '🟡') + '</span>' +
+      '<span><strong>' + a.title + '</strong> · ' + a.msg + '</span>' +
+    '</div>'
+  ).join('');
+}
+
+// Roda a cada 60s
+setInterval(checkSystemAlerts, 60000);
+
+// ═══════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════
 const fmtR = v => 'R$ '+v.toLocaleString('pt-BR',{maximumFractionDigits:0});
@@ -855,10 +941,17 @@ async function fetchTicketmaster() {
       // Worker eh fonte unica de verdade. NUNCA cair pro fallback ticketmaster-data.json
       // (que vem do Apps Script com numeros divergentes e causa flicker entre fontes).
       console.warn('[TM Worker] Falhou apos 3 tentativas. Mantendo dados anteriores (se houver):', workerErr?.message);
+      _systemStatus.tm.ok = false;
+      _systemStatus.tm.error = workerErr?.message || 'fetch falhou';
+      _systemStatus.tm.lastCheck = Date.now();
+      checkSystemAlerts();
       return;
     }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
+    _systemStatus.tm.ok = true;
+    _systemStatus.tm.error = null;
+    _systemStatus.tm.lastCheck = Date.now();
     if (data.last_sale_moto_at) __lastSale.tm.moto = data.last_sale_moto_at;
     if (data.last_sale_auto_at) __lastSale.tm.auto = data.last_sale_auto_at;
     const tmByDay = {};
@@ -879,7 +972,13 @@ async function fetchTicketmaster() {
     D26_FULL.sort((a,b)=>a.d-b.d);
     updateLastRefreshTime();
     console.log('TM conectada:', data.daily.length, 'dias');
-  } catch(e) { console.warn('fetchTicketmaster erro:', e.message); }
+  } catch(e) {
+    console.warn('fetchTicketmaster erro:', e.message);
+    _systemStatus.tm.ok = false;
+    _systemStatus.tm.error = e.message;
+    _systemStatus.tm.lastCheck = Date.now();
+    checkSystemAlerts();
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -911,6 +1010,10 @@ async function fetchVendasProprio() {
       const jaTemDadosProprio = D26_FULL.some(r => (r.mpQ||0) > 0 || (r.apQ||0) > 0);
       if (jaTemDadosProprio) {
         console.warn('[Vendas Worker] Falhou, mantendo dados anteriores (sem flicker):', workerErr?.message);
+        _systemStatus.proprio.ok = false;
+        _systemStatus.proprio.error = workerErr?.message || 'fetch falhou';
+        _systemStatus.proprio.lastCheck = Date.now();
+        checkSystemAlerts();
         return;
       }
       console.warn('[Vendas Worker] Falhou na primeira carga, usando fallback vendas-data.json:', workerErr?.message);
@@ -919,6 +1022,9 @@ async function fetchVendasProprio() {
     }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
+    _systemStatus.proprio.ok = true;
+    _systemStatus.proprio.error = null;
+    _systemStatus.proprio.lastCheck = Date.now();
     if (data.last_sale_moto_at) __lastSale.proprio.moto = data.last_sale_moto_at;
     if (data.last_sale_auto_at) __lastSale.proprio.auto = data.last_sale_auto_at;
     data.daily.forEach(row => {
@@ -940,7 +1046,13 @@ async function fetchVendasProprio() {
     D26_FULL.sort((a, b) => a.d - b.d);
     updateLastRefreshTime();
     console.log('[vendas-data.json] Moto:', data.totals.moto_ingressos, '| Auto:', data.totals.auto_ingressos, 'ingressos | atualizado:', data.updated_at);
-  } catch(e) { console.warn('[Vendas Próprias] erro:', e.message); }
+  } catch(e) {
+    console.warn('[Vendas Próprias] erro:', e.message);
+    _systemStatus.proprio.ok = false;
+    _systemStatus.proprio.error = e.message;
+    _systemStatus.proprio.lastCheck = Date.now();
+    checkSystemAlerts();
+  }
 }
 
 // ═══════════════════════════════════════════════
