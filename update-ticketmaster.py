@@ -103,7 +103,9 @@ def aggregate(movements):
         "moto_receita": 0.0,
         "auto_receita": 0.0,
         "moto_ingressos": 0,
-        "auto_ingressos": 0
+        "auto_ingressos": 0,
+        "moto_cortesias": 0,
+        "auto_cortesias": 0,
     })
 
     totals = {
@@ -112,7 +114,9 @@ def aggregate(movements):
         "moto_ingressos": 0,
         "auto_ingressos": 0,
         "total_receita":  0.0,
-        "total_ingressos": 0
+        "total_ingressos": 0,
+        "moto_cortesias": 0,
+        "auto_cortesias": 0,
     }
 
     for mv in movements:
@@ -121,26 +125,37 @@ def aggregate(movements):
         tc       = int(mv.get("ticketCount", 0))
         edition  = classify_show(mv.get("tickets", []))
 
+        # Cortesias / vouchers: ISSUANCE com R$ 0 não são vendas comerciais.
+        # Em 21/05/2026 entraram 151 cortesias de moto que infláram o número
+        # de "ingressos vendidos" do dia (de 35 reais pra 186). Separamos.
+        is_cortesia = (op == "ISSUANCE" and amount == 0 and tc > 0)
+
         if op in ("CANCELLATION", "REFUND"):
             pid = (mv.get("purchase") or {}).get("id")
             date_str = issuance_date_by_purchase.get(pid)
             if not date_str:
-                # Fallback: ISSUANCE original nao foi achada (compra anterior
-                # ao inicio da campanha) -> usa data do proprio cancelamento
                 date_str = mv.get("date", "")[:10]
         else:
             date_str = mv.get("date", "")[:10]
 
         if edition == "moto":
-            daily[date_str]["moto_receita"]   += amount
-            daily[date_str]["moto_ingressos"] += tc
-            totals["moto_receita"]            += amount
-            totals["moto_ingressos"]          += tc
+            if is_cortesia:
+                daily[date_str]["moto_cortesias"] += tc
+                totals["moto_cortesias"]          += tc
+            else:
+                daily[date_str]["moto_receita"]   += amount
+                daily[date_str]["moto_ingressos"] += tc
+                totals["moto_receita"]            += amount
+                totals["moto_ingressos"]          += tc
         elif edition == "auto":
-            daily[date_str]["auto_receita"]   += amount
-            daily[date_str]["auto_ingressos"] += tc
-            totals["auto_receita"]            += amount
-            totals["auto_ingressos"]          += tc
+            if is_cortesia:
+                daily[date_str]["auto_cortesias"] += tc
+                totals["auto_cortesias"]          += tc
+            else:
+                daily[date_str]["auto_receita"]   += amount
+                daily[date_str]["auto_ingressos"] += tc
+                totals["auto_receita"]            += amount
+                totals["auto_ingressos"]          += tc
 
     totals["total_receita"]   = totals["moto_receita"] + totals["auto_receita"]
     totals["total_ingressos"] = totals["moto_ingressos"] + totals["auto_ingressos"]
@@ -158,7 +173,9 @@ def aggregate(movements):
             "moto_receita":   round(d["moto_receita"], 2),
             "auto_receita":   round(d["auto_receita"], 2),
             "moto_ingressos": d["moto_ingressos"],
-            "auto_ingressos": d["auto_ingressos"]
+            "auto_ingressos": d["auto_ingressos"],
+            "moto_cortesias": d["moto_cortesias"],
+            "auto_cortesias": d["auto_cortesias"],
         })
 
     return totals, daily_list

@@ -114,6 +114,7 @@ function aggregate(movements) {
   const totals = {
     moto_receita: 0, auto_receita: 0,
     moto_ingressos: 0, auto_ingressos: 0,
+    moto_cortesias: 0, auto_cortesias: 0,  // rastreio separado
   };
   let lastSaleMotoAt = null;
   let lastSaleAutoAt = null;
@@ -123,6 +124,18 @@ function aggregate(movements) {
     const amount  = parseFloat(mv.amount || 0);
     const tc      = parseInt(mv.ticketCount || 0);
     const edition = classifyShow(mv.tickets);
+
+    // ──────────────────────────────────────────────────────────────────
+    // CORTESIAS / VOUCHERS: movimentações ISSUANCE com valor ZERO não
+    // são vendas comerciais — são cortesias pra imprensa, patrocinador,
+    // equipe, etc. Contar elas no "ingressos vendidos" infla o número e
+    // descalibra o TKT médio (ex: 21/05/2026 teve 151 cortesias de moto
+    // junto com 35 vendas reais, fazendo o TKT cair de ~R$ 90 pra R$ 17).
+    // Mantemos contagem separada pra rastreabilidade.
+    // CANCELLATION/REFUND com amount 0 são processados normalmente
+    // (estornos zerados podem acontecer).
+    // ──────────────────────────────────────────────────────────────────
+    const isCortesia = (op === 'ISSUANCE' && amount === 0 && tc > 0);
 
     let dateStr;
     if (op === 'CANCELLATION' || op === 'REFUND') {
@@ -136,27 +149,37 @@ function aggregate(movements) {
       daily[dateStr] = {
         moto_receita: 0, auto_receita: 0,
         moto_ingressos: 0, auto_ingressos: 0,
+        moto_cortesias: 0, auto_cortesias: 0,
       };
     }
 
     if (edition === 'moto') {
-      daily[dateStr].moto_receita   += amount;
-      daily[dateStr].moto_ingressos += tc;
-      totals.moto_receita           += amount;
-      totals.moto_ingressos         += tc;
-      // Rastreia última venda real (ISSUANCE com ingressos)
-      if (op === 'ISSUANCE' && tc > 0) {
-        const mvDate = mv.date || '';
-        if (!lastSaleMotoAt || mvDate > lastSaleMotoAt) lastSaleMotoAt = mvDate;
+      if (isCortesia) {
+        daily[dateStr].moto_cortesias += tc;
+        totals.moto_cortesias         += tc;
+      } else {
+        daily[dateStr].moto_receita   += amount;
+        daily[dateStr].moto_ingressos += tc;
+        totals.moto_receita           += amount;
+        totals.moto_ingressos         += tc;
+        if (op === 'ISSUANCE' && tc > 0) {
+          const mvDate = mv.date || '';
+          if (!lastSaleMotoAt || mvDate > lastSaleMotoAt) lastSaleMotoAt = mvDate;
+        }
       }
     } else if (edition === 'auto') {
-      daily[dateStr].auto_receita   += amount;
-      daily[dateStr].auto_ingressos += tc;
-      totals.auto_receita           += amount;
-      totals.auto_ingressos         += tc;
-      if (op === 'ISSUANCE' && tc > 0) {
-        const mvDate = mv.date || '';
-        if (!lastSaleAutoAt || mvDate > lastSaleAutoAt) lastSaleAutoAt = mvDate;
+      if (isCortesia) {
+        daily[dateStr].auto_cortesias += tc;
+        totals.auto_cortesias         += tc;
+      } else {
+        daily[dateStr].auto_receita   += amount;
+        daily[dateStr].auto_ingressos += tc;
+        totals.auto_receita           += amount;
+        totals.auto_ingressos         += tc;
+        if (op === 'ISSUANCE' && tc > 0) {
+          const mvDate = mv.date || '';
+          if (!lastSaleAutoAt || mvDate > lastSaleAutoAt) lastSaleAutoAt = mvDate;
+        }
       }
     }
   }
@@ -174,6 +197,8 @@ function aggregate(movements) {
       auto_receita:     Math.round(daily[dateStr].auto_receita * 100) / 100,
       moto_ingressos:   daily[dateStr].moto_ingressos,
       auto_ingressos:   daily[dateStr].auto_ingressos,
+      moto_cortesias:   daily[dateStr].moto_cortesias,
+      auto_cortesias:   daily[dateStr].auto_cortesias,
     }));
 
   return { totals, daily: dailyList, last_sale_moto_at: lastSaleMotoAt, last_sale_auto_at: lastSaleAutoAt };
