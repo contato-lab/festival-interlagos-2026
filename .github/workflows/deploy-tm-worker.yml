@@ -1,0 +1,36 @@
+name: Deploy Ticketmaster Worker
+
+# Faz deploy automático do Worker no Cloudflare sempre que o código mudar.
+# Pré-requisito: secret CLOUDFLARE_API_TOKEN configurado no repo.
+# Como criar o token:
+#   1. https://dash.cloudflare.com/profile/api-tokens
+#   2. Create Token → template "Edit Cloudflare Workers"
+#   3. Copia o token e adiciona em Settings → Secrets → Actions
+#      como CLOUDFLARE_API_TOKEN
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare-worker/worker-ticketmaster.js'
+      - 'cloudflare-worker/wrangler-tm.toml'
+      - '.github/workflows/deploy-tm-worker.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: cloudflare-worker
+          wranglerVersion: '3'
+          command: deploy --config wrangler-tm.toml
