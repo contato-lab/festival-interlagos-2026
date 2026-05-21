@@ -2067,12 +2067,27 @@ function buildGA4Sources(dateFrom, dateTo) {
 // DADOS GERAIS DE TRÁFEGO — tabela granular por Origem/Mídia (source/medium)
 // Equivalente à visão "Dados Gerais de Tráfego" do dashboard Adsplay no
 // Looker Studio. Mostra cada source/medium específico em vez de canal
-// agrupado (Paid Social, Organic Search, etc).
+// agrupado (Paid Social, Organic Search, etc). Paginada em 15 fontes/pág.
 // ═══════════════════════════════════════════════════════════════════════
-function buildGA4SourceMedium(_dateFrom, _dateTo) {
-  // Esta tabela usa dados do período completo do GA4 (não filtra por data),
-  // pois o source_medium_breakdown vem agregado da API. Se o filtro de data
-  // estiver ativo, mostramos um aviso visual no rodapé pro usuário entender.
+const GA4_SM_PAGE_SIZE = 15;
+let _ga4SmPage = 1;
+let _ga4SmHasFilter = false;
+
+function ga4SmGoToPage(n) {
+  const rows = GA4_DATA?.source_medium_breakdown || [];
+  const totalPages = Math.max(1, Math.ceil(rows.length / GA4_SM_PAGE_SIZE));
+  _ga4SmPage = Math.max(1, Math.min(totalPages, n));
+  _renderGA4SourceMediumTable();
+}
+
+function buildGA4SourceMedium(dateFrom, dateTo) {
+  _ga4SmHasFilter = !!(dateFrom && dateTo);
+  // Sempre reseta pra página 1 quando o filtro/dados mudam
+  _ga4SmPage = 1;
+  _renderGA4SourceMediumTable();
+}
+
+function _renderGA4SourceMediumTable() {
   const tbody = document.getElementById('ga4SourceMediumBody');
   if (!tbody) return;
   const rows = GA4_DATA?.source_medium_breakdown || [];
@@ -2082,8 +2097,12 @@ function buildGA4SourceMedium(_dateFrom, _dateTo) {
     return;
   }
 
-  // Top 20 (mesmo padrão do Looker da Adsplay — "1-10 / 78")
-  const top = rows.slice(0, 20);
+  const totalPages = Math.max(1, Math.ceil(rows.length / GA4_SM_PAGE_SIZE));
+  if (_ga4SmPage > totalPages) _ga4SmPage = totalPages;
+  const start = (_ga4SmPage - 1) * GA4_SM_PAGE_SIZE;
+  const end   = Math.min(start + GA4_SM_PAGE_SIZE, rows.length);
+  const slice = rows.slice(start, end);
+
   const fmtDur = s => {
     const m = Math.floor(s / 60), sec = Math.round(s % 60);
     return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
@@ -2091,11 +2110,12 @@ function buildGA4SourceMedium(_dateFrom, _dateTo) {
   const fmtN2 = v => Math.round(v).toLocaleString('pt-BR');
   const corEng = e => e >= 50 ? 'var(--lime)' : e >= 25 ? '#4dff91' : e >= 10 ? '#FFB800' : '#888';
 
-  top.forEach((r, idx) => {
+  slice.forEach((r, i) => {
+    const globalIdx = start + i + 1;
     const sourceLabel = (r.source || '(direct)') + ' / ' + (r.medium || '(none)');
     const tr = document.createElement('tr');
     tr.innerHTML =
-      '<td style="color:#DDD"><span style="color:#666;font-size:.6rem;margin-right:6px">' + (idx+1) + '.</span>' + sourceLabel + '</td>' +
+      '<td style="color:#DDD"><span style="color:#666;font-size:.6rem;margin-right:6px">' + globalIdx + '.</span>' + sourceLabel + '</td>' +
       '<td style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;font-size:.92rem">' + fmtN2(r.new_users) + '</td>' +
       '<td style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;font-size:.92rem;color:#5DAEFF">' + fmtN2(r.sessions) + '</td>' +
       '<td style="color:#AAA">' + fmtN2(r.pageviews) + '</td>' +
@@ -2105,13 +2125,53 @@ function buildGA4SourceMedium(_dateFrom, _dateTo) {
     tbody.appendChild(tr);
   });
 
-  // Rodapé com contagem e nota sobre filtro de data
-  const hasFilter = _dateFrom && _dateTo;
+  // ─── Footer com paginação ───────────────────────────────────────────
+  // Mostra até 7 botões de página com elipsis quando há muitas
+  const pageBtns = [];
+  const addBtn = (n, label, disabled=false) => {
+    const active = (n === _ga4SmPage && label === String(n));
+    const bg    = active ? 'background:rgba(167,139,250,.25);border-color:#A78BFA;color:#A78BFA' : 'background:rgba(255,255,255,.03);border-color:#2a2a2a;color:#AAA';
+    const cur   = disabled ? 'cursor:default;opacity:.3' : 'cursor:pointer';
+    const click = disabled ? '' : (' onclick="ga4SmGoToPage(' + n + ')"');
+    return '<button' + click + ' style="' + bg + ';border:1px solid;padding:3px 8px;border-radius:4px;font-size:.62rem;font-weight:600;font-family:inherit;min-width:24px;' + cur + '">' + label + '</button>';
+  };
+
+  // Lógica de "windowing" igual ao Google/Looker: 1 ... 4 5 6 ... 10
+  const windowSize = 5;
+  let pages = [];
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    const halfWin = Math.floor(windowSize / 2);
+    let mid_start = Math.max(2, _ga4SmPage - halfWin);
+    let mid_end   = Math.min(totalPages - 1, _ga4SmPage + halfWin);
+    if (mid_start > 2) pages.push('...');
+    for (let i = mid_start; i <= mid_end; i++) pages.push(i);
+    if (mid_end < totalPages - 1) pages.push('...');
+    pages.push(totalPages);
+  }
+
+  pageBtns.push(addBtn(_ga4SmPage - 1, '‹', _ga4SmPage === 1));
+  pages.forEach(p => {
+    if (p === '...') {
+      pageBtns.push('<span style="color:#555;font-size:.62rem;padding:0 4px">…</span>');
+    } else {
+      pageBtns.push(addBtn(p, String(p)));
+    }
+  });
+  pageBtns.push(addBtn(_ga4SmPage + 1, '›', _ga4SmPage === totalPages));
+
   const footer = document.createElement('tr');
-  footer.innerHTML = '<td colspan="7" style="text-align:right;padding:8px;color:#666;font-size:.6rem;font-style:italic;border-top:1px solid #1f1f1f">' +
-    'Mostrando ' + Math.min(20, rows.length) + ' de ' + rows.length + ' fontes' +
-    (hasFilter ? ' · ⚠️ esta tabela mostra o período completo do GA4 (não respeita o filtro de data global)' : '') +
-    '</td>';
+  footer.innerHTML = '<td colspan="7" style="padding:10px 8px;border-top:1px solid #1f1f1f">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">' +
+      '<div style="color:#666;font-size:.62rem">' +
+        (start + 1) + ' – ' + end + ' de ' + rows.length + ' fontes' +
+        (_ga4SmHasFilter ? ' · <span style="color:#FFB800">⚠️ período completo do GA4 (não respeita filtro de data)</span>' : '') +
+      '</div>' +
+      '<div style="display:flex;gap:4px;align-items:center">' + pageBtns.join('') + '</div>' +
+    '</div>' +
+  '</td>';
   tbody.appendChild(footer);
 }
 
