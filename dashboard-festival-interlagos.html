@@ -2072,6 +2072,7 @@ function buildGA4Sources(dateFrom, dateTo) {
 const GA4_SM_PAGE_SIZE = 15;
 let _ga4SmPage = 1;
 let _ga4SmHasFilter = false;
+let _ga4SmLastFilter = null; // guarda o último (dateFrom|dateTo) aplicado
 
 function ga4SmGoToPage(n) {
   const rows = GA4_DATA?.source_medium_breakdown || [];
@@ -2082,8 +2083,14 @@ function ga4SmGoToPage(n) {
 
 function buildGA4SourceMedium(dateFrom, dateTo) {
   _ga4SmHasFilter = !!(dateFrom && dateTo);
-  // Sempre reseta pra página 1 quando o filtro/dados mudam
-  _ga4SmPage = 1;
+  // Reseta pra página 1 SÓ quando o filtro de data muda de fato.
+  // Sem essa proteção, o auto-refresh do dashboard (a cada 3-30s) jogava
+  // o usuário de volta pra página 1 sempre — bug reportado.
+  const filterKey = (dateFrom || '') + '|' + (dateTo || '');
+  if (filterKey !== _ga4SmLastFilter) {
+    _ga4SmPage = 1;
+    _ga4SmLastFilter = filterKey;
+  }
   _renderGA4SourceMediumTable();
 }
 
