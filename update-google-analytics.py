@@ -139,6 +139,54 @@ def fetch_traffic_sources(client, start_date, end_date):
     return sources
 
 
+def fetch_source_medium_breakdown(client, start_date, end_date):
+    """
+    Breakdown por Origem/Mídia da sessão (sessionSource / sessionMedium).
+    Equivalente à tabela "Dados Gerais de Tráfego" do dashboard Adsplay no
+    Looker Studio. Retorna lista ordenada por sessões desc, ex:
+    [
+      {"source":"ig","medium":"paid","new_users":22535,"sessions":31655,
+       "pageviews":0,"avg_session_s":55,"engagement_rate":23.42,
+       "event_count":112547},
+      ...
+    ]
+    """
+    request = RunReportRequest(
+        property=f"properties/{PROPERTY_ID}",
+        date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
+        dimensions=[
+            Dimension(name="sessionSource"),
+            Dimension(name="sessionMedium"),
+        ],
+        metrics=[
+            Metric(name="newUsers"),
+            Metric(name="sessions"),
+            Metric(name="screenPageViews"),
+            Metric(name="averageSessionDuration"),
+            Metric(name="engagementRate"),
+            Metric(name="eventCount"),
+        ],
+        limit=200,
+    )
+    response = client.run_report(request)
+
+    rows = []
+    for row in response.rows:
+        v = [m.value for m in row.metric_values]
+        rows.append({
+            "source":          row.dimension_values[0].value or "(direct)",
+            "medium":          row.dimension_values[1].value or "(none)",
+            "new_users":       int(v[0]),
+            "sessions":        int(v[1]),
+            "pageviews":       int(v[2]),
+            "avg_session_s":   round(float(v[3]), 1),
+            "engagement_rate": round(float(v[4]) * 100, 2),
+            "event_count":     int(v[5]),
+        })
+    rows.sort(key=lambda r: r["sessions"], reverse=True)
+    return rows
+
+
 def fetch_sessions_by_date_channel(client) -> dict:
     """
     Sessões por data × canal — usado pela tabela Menções Gerais no dashboard.
@@ -475,6 +523,7 @@ def main():
     influencer_sessions  = fetch_influencer_sessions(client)
     influencer_breakdown = fetch_influencer_breakdown(client)
     adsplay_breakdown    = fetch_adsplay_breakdown(client)
+    source_medium        = fetch_source_medium_breakdown(client, start_date, end_date)
 
     # Injeta Influenciadores no mapa de canais
     for date, count in influencer_sessions.items():
@@ -497,6 +546,8 @@ def main():
         "influencer_breakdown": influencer_breakdown,
         # ↓ Breakdown da mídia programática Adsplay (Display, Vídeo, CTV, Áudio)
         "adsplay_breakdown":    adsplay_breakdown,
+        # ↓ Tabela "Dados Gerais de Tráfego" — Origem/Mídia da sessão
+        "source_medium_breakdown": source_medium,
     }
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
