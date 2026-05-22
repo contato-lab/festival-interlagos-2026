@@ -363,16 +363,24 @@ def main():
     remktg = data['top_remarketing_principal']
     periodo = data['periodo']
 
-    # Baixa thumbnails
+    # Baixa thumbnails (agora os criativos sao agregados — chave eh creative_id
+    # ou post_id ou nome normalizado — nao tem mais ad_id no nivel raiz)
     os.makedirs('_thumbs', exist_ok=True)
     todos = top10 + remktg
     print(f'Baixando {len(todos)} thumbnails...')
     for ad in todos:
         url = ad.get('thumbnail_url') or ad.get('image_url') or ''
+        # Constroi um filename estavel baseado em creative_id ou post_id ou primeiro ad_id da lista
+        key_parts = [
+            ad.get('creative_id', ''),
+            ad.get('post_id', ''),
+            (ad.get('instances') or [{}])[0].get('ad_id', '') if ad.get('instances') else '',
+        ]
+        thumb_key = next((p for p in key_parts if p), 'no_id_' + str(hash(ad.get('ad_name_display', 'x'))))
         if not url:
             ad['_local_thumb'] = ''
             continue
-        dest = os.path.join('_thumbs', f"{ad['ad_id']}.jpg")
+        dest = os.path.join('_thumbs', f"{thumb_key}.jpg")
         if os.path.exists(dest) and os.path.getsize(dest) > 100:
             ad['_local_thumb'] = dest
             continue
