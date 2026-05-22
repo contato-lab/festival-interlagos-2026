@@ -193,7 +193,10 @@ def slide_overview_tabela(prs, titulo, subtitulo, ads):
             elif col_label == 'CTR':
                 run.text = f"{ad['ctr']}%"; run.font.color.rgb = COR_TEXT
             elif col_label == 'Anúncio':
-                run.text = (ad['ad_name'] or '')[:65]; run.font.color.rgb = COR_TEXT
+                nome = ad.get('ad_name_display') or ad.get('ad_name') or ''
+                n_inst = ad.get('n_instances', 1)
+                inst_tag = f' ({n_inst} adsets)' if n_inst > 1 else ''
+                run.text = (nome[:55] + inst_tag); run.font.color.rgb = COR_TEXT
             run.font.size = Pt(10); run.font.name = 'Calibri'
             x += w
         y += row_h
@@ -214,25 +217,29 @@ def slide_criativo(prs, rank, ad, badge_label, total):
     run.font.size = Pt(11); run.font.bold = True; run.font.color.rgb = COR_BG_ESCURO
     run.font.name = 'Arial Black'
 
-    # Nome do anúncio
-    nome = (ad['ad_name'] or '(sem nome)').strip()
-    add_text(slide, Inches(0.6), Inches(0.95), Inches(12), Inches(0.9),
-             nome, font_size=28, bold=True, color=COR_TEXT, font_name='Arial Black')
+    # Nome do anúncio + badge "rodou em X conjuntos"
+    nome = (ad.get('ad_name_display') or '(sem nome)').strip()
+    add_text(slide, Inches(0.6), Inches(0.95), Inches(9), Inches(0.7),
+             nome, font_size=24, bold=True, color=COR_TEXT, font_name='Arial Black')
+
+    n_inst = ad.get('n_instances', 1)
+    sub = f'Rodou em {n_inst} adset{"s" if n_inst > 1 else ""} · Compras somadas de TODAS as instâncias'
+    add_text(slide, Inches(0.6), Inches(1.5), Inches(9), Inches(0.3),
+             sub, font_size=11, color=COR_LIME, font_name='Calibri')
 
     # Thumbnail (esquerda)
     thumb_path = ad.get('_local_thumb', '')
     if thumb_path and os.path.exists(thumb_path):
         try:
             slide.shapes.add_picture(thumb_path, Inches(0.6), Inches(2.0),
-                                     width=Inches(4.5), height=Inches(4.5))
+                                     width=Inches(4.0), height=Inches(4.0))
         except Exception as e:
             print(f'   ! falha inserindo imagem {thumb_path}: {e}')
-            # Placeholder
-            ph = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.6), Inches(2.0), Inches(4.5), Inches(4.5))
+            ph = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.6), Inches(2.0), Inches(4.0), Inches(4.0))
             ph.fill.solid(); ph.fill.fore_color.rgb = RGBColor(0x22, 0x22, 0x22)
             ph.line.color.rgb = RGBColor(0x44, 0x44, 0x44)
     else:
-        ph = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.6), Inches(2.0), Inches(4.5), Inches(4.5))
+        ph = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.6), Inches(2.0), Inches(4.0), Inches(4.0))
         ph.fill.solid(); ph.fill.fore_color.rgb = RGBColor(0x22, 0x22, 0x22)
         ph.line.color.rgb = RGBColor(0x44, 0x44, 0x44)
         tf = ph.text_frame
@@ -249,51 +256,66 @@ def slide_criativo(prs, rank, ad, badge_label, total):
         ('Impressões',f"{ad['impressions']:,}".replace(',', '.'), COR_TEXT),
         ('Cliques',   f"{ad['clicks']:,}".replace(',', '.'),      COR_TEXT),
     ]
-    kpi_left = Inches(5.6)
+    kpi_left = Inches(5.0)
     kpi_top  = Inches(2.0)
-    kpi_w    = Inches(3.7)
-    kpi_h    = Inches(1.2)
-    gap      = Inches(0.15)
+    kpi_w    = Inches(4.0)
+    kpi_h    = Inches(1.0)
+    gap      = Inches(0.12)
 
     for i, (label, value, color) in enumerate(kpi_data):
         row = i // 2
         col = i % 2
         x = kpi_left + (kpi_w + gap) * col
         y = kpi_top  + (kpi_h + gap) * row
-        # Box
         box = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, x, y, kpi_w, kpi_h)
         box.fill.solid(); box.fill.fore_color.rgb = RGBColor(0x16, 0x16, 0x16)
         box.line.color.rgb = RGBColor(0x33, 0x33, 0x33)
         box.line.width = Pt(0.75)
-        # Label
-        add_text(slide, x, y + Inches(0.1), kpi_w, Inches(0.3),
-                 label.upper(), font_size=10, color=COR_TEXT_DIM,
+        add_text(slide, x, y + Inches(0.08), kpi_w, Inches(0.3),
+                 label.upper(), font_size=9, color=COR_TEXT_DIM,
                  font_name='Arial', align=PP_ALIGN.CENTER)
-        # Value
-        add_text(slide, x, y + Inches(0.4), kpi_w, Inches(0.7),
-                 value, font_size=22, bold=True, color=color,
+        add_text(slide, x, y + Inches(0.35), kpi_w, Inches(0.6),
+                 value, font_size=18, bold=True, color=color,
                  font_name='Arial Black', align=PP_ALIGN.CENTER)
 
-    # Bloco inferior: metadata + link
-    meta_top = Inches(6.65)
-    add_text(slide, Inches(5.6), meta_top, Inches(7.2), Inches(0.3),
-             f"📁 Conta: {ad['account']}  ·  Adset: {(ad['adset_name'] or '')[:60]}",
-             font_size=10, color=COR_TEXT_DIM, font_name='Calibri')
-    add_text(slide, Inches(5.6), meta_top + Inches(0.25), Inches(7.2), Inches(0.3),
-             f"🎯 Campanha: {(ad['campaign_name'] or '')[:80]}",
+    # Mini-lista dos adsets onde rodou
+    inst_top  = Inches(5.4)
+    instances = ad.get('instances', [])
+    # Mostra até 4 adsets com mais compras
+    top_inst = sorted(instances, key=lambda x: -x.get('purchases', 0))[:4]
+    add_text(slide, Inches(0.6), inst_top, Inches(12.2), Inches(0.3),
+             '📊 ONDE ESTE CRIATIVO RODOU (top adsets por compra)',
+             font_size=10, bold=True, color=COR_LIME, font_name='Arial')
+
+    y = inst_top + Inches(0.35)
+    for inst in top_inst:
+        line = f"• [{inst.get('purchases', 0)} compras]  {inst.get('adset_name','')[:60]}  ·  {inst.get('campaign_name','')[:50]}"
+        add_text(slide, Inches(0.6), y, Inches(12.2), Inches(0.25),
+                 line, font_size=9, color=COR_TEXT, font_name='Calibri')
+        y += Inches(0.23)
+
+    if len(instances) > 4:
+        add_text(slide, Inches(0.6), y, Inches(12.2), Inches(0.25),
+                 f'  ... + {len(instances) - 4} adset(s) com menos compras',
+                 font_size=9, color=COR_TEXT_DIM, font_name='Calibri')
+
+    # Bloco inferior: link pra Biblioteca
+    link_top = Inches(6.85)
+    add_text(slide, Inches(0.6), link_top, Inches(8), Inches(0.3),
+             f"📁 Conta: {ad['account']}  ·  {ad.get('n_instances',1)} adset(s)",
              font_size=10, color=COR_TEXT_DIM, font_name='Calibri')
 
-    # Link clicável
-    account_num = ad['account_id'].replace('act_', '')
-    link_url = f"https://business.facebook.com/adsmanager/manage/ads/edit?act={account_num}&selected_ad_ids={ad['ad_id']}"
-    tb = slide.shapes.add_textbox(Inches(5.6), meta_top + Inches(0.55), Inches(7.2), Inches(0.3))
-    tf = tb.text_frame
-    p = tf.paragraphs[0]
-    run = p.add_run()
-    run.text = '🔗 Abrir no Meta Ads Manager →'
-    run.font.size = Pt(11); run.font.bold = True; run.font.color.rgb = COR_LIME
-    run.font.name = 'Arial'
-    run.hyperlink.address = link_url
+    # Link clicável pra Biblioteca de Anúncios (público)
+    library_url = ad.get('library_url') or ''
+    if library_url:
+        tb = slide.shapes.add_textbox(Inches(0.6), link_top + Inches(0.3), Inches(12.2), Inches(0.3))
+        tf = tb.text_frame
+        p = tf.paragraphs[0]
+        run = p.add_run()
+        run.text = '🔗 Ver este criativo na Biblioteca de Anúncios do Meta (público) →'
+        run.font.size = Pt(12); run.font.bold = True; run.font.color.rgb = COR_LIME
+        run.font.name = 'Arial'
+        run.hyperlink.address = library_url
 
 
 def slide_insights(prs, top10, remktg):
