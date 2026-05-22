@@ -12,10 +12,12 @@
  * da ISSUANCE original (via purchase.id), nao a data do cancelamento.
  * Isso faz bater com o dashboard oficial do Ticketmaster.
  *
- * Timezone: a API getcrowder.com entrega timestamps em UTC. Convertemos
- * pra BRT (UTC-3 fixo, Brasil nao usa DST desde 2019) antes de fatiar
- * o YYYY-MM-DD. Sem isso, vendas entre 21:00-23:59 BRT caem no dia
- * seguinte (descalibra +N/-N vs o painel oficial da TM).
+ * Timezone: a API getcrowder.com entrega timestamps em UTC, e o PAINEL
+ * OFICIAL da Ticketmaster agrupa as vendas por dia UTC (não BRT). Pra
+ * que nosso dashboard mostre o mesmo número que o painel oficial, também
+ * fatiamos a data em UTC. Antes convertíamos pra BRT mas isso causava
+ * divergência: vendas BRT 21:00-23:59 viravam dia anterior no nosso vs
+ * dia seguinte no painel TM (ex: 21/05 21:04 BRT = 22/05 00:04 UTC).
  */
 
 const API_BASE         = 'https://data.getcrowder.com';
@@ -23,15 +25,13 @@ const API_ENDPOINT     = '/activity/organizer';
 const API_KEY          = '4f3a9648a77d9dbf29969726d71521d8fba8a01af91129a51ac2d8e80fc15991';
 const CAMPAIGN_START_MS = 1774396800000; // 2026-03-25 00:00:00 UTC
 
-// Brasil/São Paulo: UTC-3 fixo (sem horário de verão desde 2019).
-// Converte um timestamp ISO da API (UTC) pra string YYYY-MM-DD em BRT,
-// para que vendas entre 21:00-23:59 BRT não caiam no dia seguinte.
-const BRT_OFFSET_MS = 3 * 60 * 60 * 1000;
-function toBrtDateStr(isoStr) {
+// Converte um timestamp ISO (UTC) pra string YYYY-MM-DD em UTC.
+// Mantém a convenção do painel oficial da Ticketmaster.
+function toUtcDateStr(isoStr) {
   if (!isoStr) return '';
   const d = new Date(isoStr);
   if (isNaN(d.getTime())) return (isoStr || '').slice(0, 10);
-  return new Date(d.getTime() - BRT_OFFSET_MS).toISOString().slice(0, 10);
+  return d.toISOString().slice(0, 10);
 }
 
 const MOTO_SHOW_IDS = new Set([195330, 195736, 195737, 195738]);
@@ -99,13 +99,13 @@ function classifyShow(tickets) {
 
 // ─── AGREGACAO ───────────────────────────────────────────
 function aggregate(movements) {
-  // Indexa ISSUANCES por purchase.id -> date_str original (em BRT)
+  // Indexa ISSUANCES por purchase.id -> date_str original (em UTC)
   const issuanceDateByPurchase = {};
   for (const mv of movements) {
     if (mv.operation === 'ISSUANCE') {
       const pid = mv.purchase?.id;
       if (pid != null && !(pid in issuanceDateByPurchase)) {
-        issuanceDateByPurchase[pid] = toBrtDateStr(mv.date);
+        issuanceDateByPurchase[pid] = toUtcDateStr(mv.date);
       }
     }
   }
@@ -140,9 +140,9 @@ function aggregate(movements) {
     let dateStr;
     if (op === 'CANCELLATION' || op === 'REFUND') {
       const pid = mv.purchase?.id;
-      dateStr = issuanceDateByPurchase[pid] || toBrtDateStr(mv.date);
+      dateStr = issuanceDateByPurchase[pid] || toUtcDateStr(mv.date);
     } else {
-      dateStr = toBrtDateStr(mv.date);
+      dateStr = toUtcDateStr(mv.date);
     }
 
     if (!daily[dateStr]) {
@@ -244,8 +244,10 @@ export default {
 
     const cache         = caches.default;
     const baseUrl       = new URL(request.url).toString().split('?')[0];
-    const cacheKey      = new Request(baseUrl + '?v=fresh', request);
-    const staleCacheKey = new Request(baseUrl + '?v=stale', request);
+    // Bump esse sufixo quando mudar lógica de agregação pra invalidar cache no edge.
+    // v2 = UTC ao invés de BRT (2026-05-22).
+    const cacheKey      = new Request(baseUrl + '?v=fresh-utc-v2', request);
+    const staleCacheKey = new Request(baseUrl + '?v=stale-utc-v2', request);
 
     // 1) Cache fresco?
     let cached = await cache.match(cacheKey);
