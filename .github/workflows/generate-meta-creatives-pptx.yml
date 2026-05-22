@@ -15,18 +15,27 @@ jobs:
           python-version: '3.11'
       - name: Install deps
         run: pip install python-pptx Pillow
+      - name: Install LibreOffice (pra converter PPTX -> PDF)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libreoffice-impress fonts-noto-color-emoji
       - name: Generate PPTX
         run: python generate-meta-creatives-pptx.py
-      - name: Commit pptx
+      - name: Convert PPTX -> PDF
+        run: |
+          soffice --headless --convert-to pdf top-criativos-meta.pptx
+          ls -la top-criativos-meta.pdf
+      - name: Commit pptx + pdf
         run: |
           git config user.name  "GitHub Actions"
           git config user.email "actions@github.com"
           [ -f top-criativos-meta.pptx ] && git add top-criativos-meta.pptx || true
+          [ -f top-criativos-meta.pdf ]  && git add top-criativos-meta.pdf  || true
           if git diff --staged --quiet; then
             echo "Sem mudancas"
             exit 0
           fi
-          git commit -m "chore: gera top-criativos-meta.pptx [skip ci]"
+          git commit -m "chore: gera top-criativos-meta.pptx + pdf [skip ci]"
           for attempt in 1 2 3 4 5; do
             git pull --rebase origin main 2>&1 || git rebase --abort 2>/dev/null || true
             if git push 2>&1; then exit 0; fi
