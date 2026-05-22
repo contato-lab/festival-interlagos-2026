@@ -1,0 +1,45 @@
+name: Analyze Meta Creatives (Top 10 últimos N dias)
+
+on:
+  workflow_dispatch:
+    inputs:
+      lookback_days:
+        description: 'Dias pra trás (default 10)'
+        required: false
+        default: '10'
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run analysis
+        env:
+          META_TOKEN:    ${{ secrets.META_TOKEN }}
+          LOOKBACK_DAYS: ${{ inputs.lookback_days }}
+        run: python analyze-meta-creatives.py
+
+      - name: Commit analise-meta-criativos.json
+        run: |
+          git config user.name  "GitHub Actions"
+          git config user.email "actions@github.com"
+          [ -f analise-meta-criativos.json ] && git add analise-meta-criativos.json || true
+          if git diff --staged --quiet; then
+            echo "Sem mudancas"
+            exit 0
+          fi
+          git commit -m "chore: analise meta criativos top N [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase origin main 2>&1 || git rebase --abort 2>/dev/null || true
+            if git push 2>&1; then exit 0; fi
+            sleep $((RANDOM % 10 + 5))
+          done
+          exit 1
