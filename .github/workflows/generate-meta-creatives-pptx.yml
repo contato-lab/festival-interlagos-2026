@@ -1,0 +1,35 @@
+name: Generate Meta Creatives PPTX
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install python-pptx Pillow
+      - name: Generate PPTX
+        run: python generate-meta-creatives-pptx.py
+      - name: Commit pptx
+        run: |
+          git config user.name  "GitHub Actions"
+          git config user.email "actions@github.com"
+          [ -f top-criativos-meta.pptx ] && git add top-criativos-meta.pptx || true
+          if git diff --staged --quiet; then
+            echo "Sem mudancas"
+            exit 0
+          fi
+          git commit -m "chore: gera top-criativos-meta.pptx [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase origin main 2>&1 || git rebase --abort 2>/dev/null || true
+            if git push 2>&1; then exit 0; fi
+            sleep $((RANDOM % 10 + 5))
+          done
+          exit 1
