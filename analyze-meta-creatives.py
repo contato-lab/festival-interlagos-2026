@@ -125,10 +125,11 @@ def main():
     # TOP 10 GERAL (todas campanhas, 2 contas)
     top10 = sorted(com_compra, key=lambda x: -x['purchases'])[:10]
 
-    # REMARKETING (conta principal apenas)
-    remktg = [a for a in principal
-              if 'REMARKETING' in (a['campaign_name'] or '').upper()
-              and a['purchases'] > 0]
+    # REMARKETING (conta principal apenas) — campanha usa [RMKT] no nome
+    def is_remktg(name):
+        u = (name or '').upper()
+        return ('RMKT' in u) or ('REMARKETING' in u) or ('REMKT' in u)
+    remktg = [a for a in principal if is_remktg(a['campaign_name']) and a['purchases'] > 0]
     remktg_sorted = sorted(remktg, key=lambda x: -x['purchases'])[:10]
 
     # Busca thumbnails dos top
