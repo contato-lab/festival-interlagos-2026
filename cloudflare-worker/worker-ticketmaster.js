@@ -115,6 +115,7 @@ function aggregate(movements) {
     moto_receita: 0, auto_receita: 0,
     moto_ingressos: 0, auto_ingressos: 0,
     moto_cortesias: 0, auto_cortesias: 0,  // rastreio separado
+    orphan_refunds: 0,                      // diagnostico: estornos sem issuance no batch
   };
   let lastSaleMotoAt = null;
   let lastSaleAutoAt = null;
@@ -126,22 +127,36 @@ function aggregate(movements) {
     const edition = classifyShow(mv.tickets);
 
     // ──────────────────────────────────────────────────────────────────
-    // CORTESIAS / VOUCHERS: movimentações ISSUANCE com valor ZERO não
-    // são vendas comerciais — são cortesias pra imprensa, patrocinador,
-    // equipe, etc. Contar elas no "ingressos vendidos" infla o número e
-    // descalibra o TKT médio (ex: 21/05/2026 teve 151 cortesias de moto
-    // junto com 35 vendas reais, fazendo o TKT cair de ~R$ 90 pra R$ 17).
-    // Mantemos contagem separada pra rastreabilidade.
-    // CANCELLATION/REFUND com amount 0 são processados normalmente
-    // (estornos zerados podem acontecer).
+    // CORTESIAS / VOUCHERS: qualquer movimentação com amount=0 e tc!=0 é
+    // cortesia. Inclui:
+    //   - ISSUANCE de cortesia (tc>0): emissão pra imprensa, patrocinador, etc
+    //   - REFUND/CANCELLATION de cortesia (tc<0): retirada de cortesia
+    // Tratar simétrico evita o bug onde CANCELAMENTO DE CORTESIA era
+    // subtraído de moto_ingressos (vendas), gerando contagem negativa
+    // no dia do cancelamento (ex: 25/05/2026 mostrou -42 motos quando
+    // 100 cortesias foram canceladas — antes elas nunca tinham entrado
+    // em moto_ingressos, mas o cancelamento estava saindo de lá).
+    // Mantemos cortesias em contagem separada pra rastreabilidade e pra
+    // o TKT médio não ser descalibrado.
     // ──────────────────────────────────────────────────────────────────
-    const isCortesia = (op === 'ISSUANCE' && amount === 0 && tc > 0);
+    const isCortesia = (amount === 0 && tc !== 0);
 
     let dateStr;
-    if (op === 'CANCELLATION' || op === 'REFUND') {
+    if ((op === 'CANCELLATION' || op === 'REFUND') && !isCortesia) {
+      // Cancelamento de venda real — atribuir à data da ISSUANCE original
+      // pra bater com o painel oficial da Ticketmaster.
       const pid = mv.purchase?.id;
-      dateStr = issuanceDateByPurchase[pid] || toUtcDateStr(mv.date);
+      // Se a ISSUANCE original não está no batch (compra de campanha
+      // anterior ou purchase.id null), IGNORAR o estorno pra não inflar
+      // negativos no dia do cancelamento.
+      if (pid == null || !(pid in issuanceDateByPurchase)) {
+        totals.orphan_refunds++;
+        continue;
+      }
+      dateStr = issuanceDateByPurchase[pid];
     } else {
+      // ISSUANCE (venda ou cortesia) e cancelamento de cortesia: usa a
+      // data do próprio movimento.
       dateStr = toUtcDateStr(mv.date);
     }
 
@@ -193,10 +208,12 @@ function aggregate(movements) {
     .sort()
     .map(dateStr => ({
       date:             dateStr,
-      moto_receita:     Math.round(daily[dateStr].moto_receita * 100) / 100,
-      auto_receita:     Math.round(daily[dateStr].auto_receita * 100) / 100,
-      moto_ingressos:   daily[dateStr].moto_ingressos,
-      auto_ingressos:   daily[dateStr].auto_ingressos,
+      moto_receita:     Math.max(0, Math.round(daily[dateStr].moto_receita * 100) / 100),
+      auto_receita:     Math.max(0, Math.round(daily[dateStr].auto_receita * 100) / 100),
+      // Defensivo: nunca expor contagem negativa (sinal de bug). Se aparecer
+      // negativo, é melhor mostrar 0 do que confundir o usuario com -42.
+      moto_ingressos:   Math.max(0, daily[dateStr].moto_ingressos),
+      auto_ingressos:   Math.max(0, daily[dateStr].auto_ingressos),
       moto_cortesias:   daily[dateStr].moto_cortesias,
       auto_cortesias:   daily[dateStr].auto_cortesias,
     }));
@@ -246,8 +263,10 @@ export default {
     const baseUrl       = new URL(request.url).toString().split('?')[0];
     // Bump esse sufixo quando mudar lógica de agregação pra invalidar cache no edge.
     // v2 = UTC ao invés de BRT (2026-05-22).
-    const cacheKey      = new Request(baseUrl + '?v=fresh-utc-v2', request);
-    const staleCacheKey = new Request(baseUrl + '?v=stale-utc-v2', request);
+    // v3 = ignora REFUND/CANCELLATION orfaos + clamp em 0 (2026-05-25).
+    // v4 = trata cancelamento de cortesia como cortesia (nao como venda).
+    const cacheKey      = new Request(baseUrl + '?v=fresh-utc-v4', request);
+    const staleCacheKey = new Request(baseUrl + '?v=stale-utc-v4', request);
 
     // 1) Cache fresco?
     let cached = await cache.match(cacheKey);
