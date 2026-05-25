@@ -345,6 +345,34 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 
   </div><!-- /exec-tm-section -->
 
+  <!-- ══ CORTESIAS — separadas, NÃO entram em vendas ══ -->
+  <!-- Cor laranja proposital pra diferenciar visualmente de venda real.   -->
+  <!-- Apenas Ticket Master (Sistema Próprio não tem conceito de cortesia). -->
+  <div class="exec-charts-grid" style="margin-top:12px;grid-template-columns:1fr" id="exec-cortesias-section">
+    <div class="exec-chart-card">
+      <div class="section-header" style="margin-bottom:10px">
+        <div>
+          <div class="section-title">&#127873; Cortesias
+            <span style="font-weight:600;font-size:.6rem;color:#ff9d00;margin-left:10px;padding:3px 8px;border:1px solid #ff9d00;border-radius:10px;letter-spacing:.06em;vertical-align:middle">NÃO ENTRAM EM VENDAS</span>
+          </div>
+          <div style="font-size:.7rem;color:#666;margin-top:4px">Imprensa, patrocinador, equipe e convidados &middot; Apenas Ticket Master</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px">
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:14px 16px">
+          <div style="font-size:.6rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:4px">&#127949;&#65039; Motos &middot; Cortesias</div>
+          <div id="exec-cortesias-moto-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.9rem;color:#ff9d00;line-height:1">&mdash;</div>
+          <div id="exec-cortesias-moto-meta" style="font-size:.65rem;color:#888;margin-top:6px">&mdash;</div>
+        </div>
+        <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:14px 16px">
+          <div style="font-size:.6rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:4px">&#128663; Autos &middot; Cortesias</div>
+          <div id="exec-cortesias-auto-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.9rem;color:#ff9d00;line-height:1">&mdash;</div>
+          <div id="exec-cortesias-auto-meta" style="font-size:.65rem;color:#888;margin-top:6px">&mdash;</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ══ TIPOS DE INGRESSO ══ -->
   <div class="exec-charts-grid" style="margin-top:12px" id="exec-tipos-section">
     <div class="exec-chart-card">
@@ -739,6 +767,39 @@ let D26 = [];
 let META_DATA = null;
 let GADS_DATA = null;
 
+// Estado de CORTESIAS isolado das vendas. Nunca somar cortesias em
+// totals de venda — sao linhas paralelas no agregado da TM (imprensa,
+// patrocinador, equipe). Esse objeto SO alimenta o card de cortesias.
+const TM_CORTESIAS = {
+  moto: 0, auto: 0,           // total acumulado da campanha (liquido: emitidas - canceladas)
+  motoHoje: 0, autoHoje: 0,   // cortesias do dia (UTC)
+  motoVendas: 0, autoVendas: 0, // total de VENDAS REAIS — usado SO pra mostrar % do total emitido
+};
+
+function renderCortesiasCard() {
+  const elMv = document.getElementById('exec-cortesias-moto-val');
+  const elAv = document.getElementById('exec-cortesias-auto-val');
+  const elMm = document.getElementById('exec-cortesias-moto-meta');
+  const elAm = document.getElementById('exec-cortesias-auto-meta');
+  if (!elMv || !elAv) return;
+  const fmt = n => (n || 0).toLocaleString('pt-BR');
+  elMv.textContent = fmt(TM_CORTESIAS.moto);
+  elAv.textContent = fmt(TM_CORTESIAS.auto);
+  // % do total emitido = cortesias / (cortesias + vendas). Mostra o
+  // peso das cortesias no total de ingressos circulando, sem afetar
+  // o numero de venda em si.
+  const motoTotalEmitido = TM_CORTESIAS.moto + TM_CORTESIAS.motoVendas;
+  const autoTotalEmitido = TM_CORTESIAS.auto + TM_CORTESIAS.autoVendas;
+  const motoPct = motoTotalEmitido > 0 ? (TM_CORTESIAS.moto / motoTotalEmitido * 100) : 0;
+  const autoPct = autoTotalEmitido > 0 ? (TM_CORTESIAS.auto / autoTotalEmitido * 100) : 0;
+  elMm.innerHTML =
+    'Hoje: <b style="color:#ccc">' + fmt(TM_CORTESIAS.motoHoje) + '</b>' +
+    ' &middot; ' + motoPct.toFixed(1) + '% do total emitido';
+  elAm.innerHTML =
+    'Hoje: <b style="color:#ccc">' + fmt(TM_CORTESIAS.autoHoje) + '</b>' +
+    ' &middot; ' + autoPct.toFixed(1) + '% do total emitido';
+}
+
 // ═══════════════════════════════════════════════
 // ALERTAS DE SISTEMA — banner no topo
 // Detecta: 1) APIs TM/Sistema Próprio fora do ar (após 3 falhas consecutivas)
@@ -988,6 +1049,19 @@ async function fetchTicketmaster() {
       const d = Math.floor((new Date(row.date + 'T00:00:00') - DATA_INICIO) / 86400000) + 1;
       tmByDay[d] = { mt: row.moto_receita||0, at: row.auto_receita||0, mtQ: row.moto_ingressos||0, atQ: row.auto_ingressos||0 };
     });
+
+    // CORTESIAS — guardadas em estado totalmente separado de vendas.
+    // Nunca somar cortesias em ingressos/receita. So aparecem no card proprio.
+    TM_CORTESIAS.moto       = (data.totals && data.totals.moto_cortesias) || 0;
+    TM_CORTESIAS.auto       = (data.totals && data.totals.auto_cortesias) || 0;
+    TM_CORTESIAS.motoVendas = (data.totals && data.totals.moto_ingressos) || 0;
+    TM_CORTESIAS.autoVendas = (data.totals && data.totals.auto_ingressos) || 0;
+    // Cortesias de hoje (UTC, igual o agregado do worker)
+    const todayUTC = new Date().toISOString().slice(0,10);
+    const hojeRow  = data.daily.find(r => r.date === todayUTC);
+    TM_CORTESIAS.motoHoje = hojeRow ? (hojeRow.moto_cortesias || 0) : 0;
+    TM_CORTESIAS.autoHoje = hojeRow ? (hojeRow.auto_cortesias || 0) : 0;
+    renderCortesiasCard();
     D26_FULL.forEach(r => {
       const tm = tmByDay[r.d] || {mt:0,at:0,mtQ:0,atQ:0};
       r.mt=tm.mt; r.at=tm.at; r.mtQ=tm.mtQ; r.atQ=tm.atQ;
