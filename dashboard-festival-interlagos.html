@@ -1185,12 +1185,15 @@ let META_DATA = null; // meta-data.json (quando conectado)
 function _brtNow() { return new Date(Date.now() - 3 * 3600 * 1000); }
 function _brtISO(dt) { return new Date(dt.getTime() - 3 * 3600 * 1000).toISOString().slice(0, 10); }
 
-const ALERT_FAIL_THRESHOLD = 2;
+// failCount=3 + lastFail recente: só alerta após ~15-30s de problema real
+// e que aconteceu nos últimos 5min (evita banner stuck em aba inativa).
+const ALERT_FAIL_THRESHOLD = 3;
 const ALERT_MIN_SPEND_ONTEM = 500;
+const ALERT_STALE_MS = 5 * 60 * 1000;
 
 const _systemStatus = {
-  tm:      { ok: true, error: null, lastCheck: null, failCount: 0 },
-  proprio: { ok: true, error: null, lastCheck: null, failCount: 0 },
+  tm:      { ok: true, error: null, lastCheck: null, lastFail: null, failCount: 0 },
+  proprio: { ok: true, error: null, lastCheck: null, lastFail: null, failCount: 0 },
 };
 
 function _markSystemOk(key) {
@@ -1203,8 +1206,13 @@ function _markSystemOk(key) {
   checkSystemAlerts();
 }
 function _markSystemFail(key, err) {
+  // Se usuário está offline, não conta como falha da API
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    return;
+  }
   _systemStatus[key].failCount++;
   _systemStatus[key].lastCheck = Date.now();
+  _systemStatus[key].lastFail = Date.now();
   _systemStatus[key].error = err;
   if (_systemStatus[key].failCount >= ALERT_FAIL_THRESHOLD) {
     _systemStatus[key].ok = false;
@@ -1222,18 +1230,20 @@ function checkSystemAlerts() {
   const hojeISO  = _brtISO(now);
   const ontemISO = _brtISO(new Date(now.getTime() - 86400000));
 
-  if (_systemStatus.tm.lastCheck && !_systemStatus.tm.ok) {
+  // Só mostra se: bateu threshold + falha foi recente (<5min)
+  const _isRecentFail = (s) => s.lastFail && (Date.now() - s.lastFail) < ALERT_STALE_MS;
+  if (!_systemStatus.tm.ok && _isRecentFail(_systemStatus.tm)) {
     alerts.push({
       level: 'red',
-      title: 'API TICKETMASTER FORA DO AR',
-      msg:   'Vendas TM podem estar desatualizadas. Erro: ' + (_systemStatus.tm.error || 'sem detalhe'),
+      title: 'VENDAS TM COM ATRASO NA ATUALIZAÇÃO',
+      msg:   'Não conseguimos atualizar as vendas da Ticketmaster agora. Tentando novamente. Detalhe: ' + (_systemStatus.tm.error || 'sem detalhe'),
     });
   }
-  if (_systemStatus.proprio.lastCheck && !_systemStatus.proprio.ok) {
+  if (!_systemStatus.proprio.ok && _isRecentFail(_systemStatus.proprio)) {
     alerts.push({
       level: 'red',
-      title: 'API SISTEMA PRÓPRIO FORA DO AR',
-      msg:   'Vendas próprias podem estar desatualizadas. Erro: ' + (_systemStatus.proprio.error || 'sem detalhe'),
+      title: 'VENDAS PRÓPRIAS COM ATRASO NA ATUALIZAÇÃO',
+      msg:   'Não conseguimos atualizar as vendas do sistema próprio agora. Tentando novamente. Detalhe: ' + (_systemStatus.proprio.error || 'sem detalhe'),
     });
   }
   if (hora >= 12 && META_DATA) {

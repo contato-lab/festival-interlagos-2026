@@ -751,13 +751,14 @@ function _brtISO(dt) { return new Date(dt.getTime() - 3 * 3600 * 1000).toISOStri
 
 // failCount: só alerta após N falhas consecutivas pra evitar piscar em blip de 503.
 // Worker do CF tem 3 retries internos, então cada fetch já = 3 tentativas.
-// failCount=2 = 2 fetches consecutivos falharam = ~10s de problema real.
-const ALERT_FAIL_THRESHOLD = 2;
+// failCount=3 = 3 fetches consecutivos falharam = ~15-30s de problema real.
+const ALERT_FAIL_THRESHOLD = 3;
 const ALERT_MIN_SPEND_ONTEM = 500; // R$ — pra reduzir FP com campanhas pequenas
+const ALERT_STALE_MS = 5 * 60 * 1000; // só alerta se a falha for recente (<5min)
 
 const _systemStatus = {
-  tm:      { ok: true, error: null, lastCheck: null, failCount: 0 },
-  proprio: { ok: true, error: null, lastCheck: null, failCount: 0 },
+  tm:      { ok: true, error: null, lastCheck: null, lastFail: null, failCount: 0 },
+  proprio: { ok: true, error: null, lastCheck: null, lastFail: null, failCount: 0 },
 };
 
 function _markSystemOk(key) {
@@ -770,8 +771,14 @@ function _markSystemOk(key) {
   checkSystemAlerts();
 }
 function _markSystemFail(key, err) {
+  // Se o usuário está offline (sem internet), não é erro da API — é a rede
+  // dele. Ignora pra não dar falso positivo.
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    return;
+  }
   _systemStatus[key].failCount++;
   _systemStatus[key].lastCheck = Date.now();
+  _systemStatus[key].lastFail = Date.now();
   _systemStatus[key].error = err;
   if (_systemStatus[key].failCount >= ALERT_FAIL_THRESHOLD) {
     _systemStatus[key].ok = false;
@@ -789,18 +796,22 @@ function checkSystemAlerts() {
   const hojeISO  = _brtISO(now);
   const ontemISO = _brtISO(new Date(now.getTime() - 86400000));
 
-  if (_systemStatus.tm.lastCheck && !_systemStatus.tm.ok) {
+  // Só mostra alerta se: (1) bateu o threshold, (2) houve falha recente (<5min).
+  // O check de "lastFail recente" evita banner stuck caso o usuário deixe a
+  // aba aberta e o setInterval pare de rodar (tab inativa).
+  const _isRecentFail = (s) => s.lastFail && (Date.now() - s.lastFail) < ALERT_STALE_MS;
+  if (!_systemStatus.tm.ok && _isRecentFail(_systemStatus.tm)) {
     alerts.push({
       level: 'red',
-      title: 'API TICKETMASTER FORA DO AR',
-      msg:   'Vendas TM podem estar desatualizadas. Erro: ' + (_systemStatus.tm.error || 'sem detalhe'),
+      title: 'VENDAS TM COM ATRASO NA ATUALIZAÇÃO',
+      msg:   'Não conseguimos atualizar as vendas da Ticketmaster agora. Tentando novamente. Detalhe: ' + (_systemStatus.tm.error || 'sem detalhe'),
     });
   }
-  if (_systemStatus.proprio.lastCheck && !_systemStatus.proprio.ok) {
+  if (!_systemStatus.proprio.ok && _isRecentFail(_systemStatus.proprio)) {
     alerts.push({
       level: 'red',
-      title: 'API SISTEMA PRÓPRIO FORA DO AR',
-      msg:   'Vendas próprias podem estar desatualizadas. Erro: ' + (_systemStatus.proprio.error || 'sem detalhe'),
+      title: 'VENDAS PRÓPRIAS COM ATRASO NA ATUALIZAÇÃO',
+      msg:   'Não conseguimos atualizar as vendas do sistema próprio agora. Tentando novamente. Detalhe: ' + (_systemStatus.proprio.error || 'sem detalhe'),
     });
   }
   if (hora >= 12 && META_DATA) {
