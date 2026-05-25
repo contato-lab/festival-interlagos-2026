@@ -746,6 +746,7 @@ function _markSystemOk(key) {
   _systemStatus[key].error = null;
   _systemStatus[key].lastCheck = Date.now();
   _systemStatus[key].failCount = 0;
+  checkSystemAlerts();
 }
 function _markSystemFail(key, err) {
   _systemStatus[key].failCount++;
@@ -754,6 +755,7 @@ function _markSystemFail(key, err) {
   if (_systemStatus[key].failCount >= ALERT_FAIL_THRESHOLD) {
     _systemStatus[key].ok = false;
   }
+  checkSystemAlerts();
 }
 
 function checkSystemAlerts() {
