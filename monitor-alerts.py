@@ -194,6 +194,24 @@ def main():
     alertas  = []
     erros    = []
 
+    # Modo teste: ignora verificacoes reais, manda so um ping pra confirmar
+    # que o bot ta funcionando e o chat_id ta certo. Acionado pelo input
+    # force_test=true no workflow_dispatch.
+    force_test = os.environ.get('FORCE_TEST', '').lower() in ('true', '1', 'yes')
+    if force_test:
+        msg = (
+            f"✅ <b>TESTE - Monitor de Campanhas</b>\n"
+            f"📅 {hoje} | {hora_str} BRT\n"
+            f"{'─' * 30}\n\n"
+            f"Se vc esta lendo isso, o bot esta funcionando e o chat_id"
+            f" esta correto.\n\n"
+            f"<i>Em uso real, mensagens so chegam quando algo da problema"
+            f" (Meta sem gasto, CPP alto, Google parado, etc).</i>"
+        )
+        send_telegram(msg)
+        print(f'[Monitor] TESTE — ping enviado ao Telegram.')
+        sys.exit(0)
+
     print(f'[Monitor] {hoje} {hora_str} BRT — iniciando verificacao...')
 
     # Meta Ads
