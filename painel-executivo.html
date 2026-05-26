@@ -185,8 +185,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   </div>
 </div>
 
-<!-- BANNER DE ALERTAS DE SISTEMA -->
-<div id="systemAlertBanner" style="display:none;position:sticky;top:0;z-index:1000;padding:10px 18px;font-family:'Inter',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.02em;box-shadow:0 4px 20px rgba(0,0,0,.4)"></div>
 
 <!-- HEADER -->
 <header class="header">
@@ -801,124 +799,6 @@ function renderCortesiasCard() {
 }
 
 // ═══════════════════════════════════════════════
-// ALERTAS DE SISTEMA — banner no topo
-// Detecta: 1) APIs TM/Sistema Próprio fora do ar (após 3 falhas consecutivas)
-//          2) Meta/Google parados de gastar após 12h BRT se ontem teve >R$500
-// ═══════════════════════════════════════════════
-// Helpers de timezone — BRT (UTC-3, fixo) pra evitar bug de "hoje vira amanhã"
-// entre 21h-23h59 quando toISOString() retorna UTC.
-function _brtNow() { return new Date(Date.now() - 3 * 3600 * 1000); }
-function _brtISO(dt) { return new Date(dt.getTime() - 3 * 3600 * 1000).toISOString().slice(0, 10); }
-
-// failCount: só alerta após N falhas consecutivas pra evitar piscar em blip de 503.
-// Worker do CF tem 3 retries internos, então cada fetch já = 3 tentativas.
-// failCount=3 = 3 fetches consecutivos falharam = ~15-30s de problema real.
-const ALERT_FAIL_THRESHOLD = 3;
-const ALERT_MIN_SPEND_ONTEM = 500; // R$ — pra reduzir FP com campanhas pequenas
-const ALERT_STALE_MS = 5 * 60 * 1000; // só alerta se a falha for recente (<5min)
-
-const _systemStatus = {
-  tm:      { ok: true, error: null, lastCheck: null, lastFail: null, failCount: 0 },
-  proprio: { ok: true, error: null, lastCheck: null, lastFail: null, failCount: 0 },
-};
-
-function _markSystemOk(key) {
-  _systemStatus[key].ok = true;
-  _systemStatus[key].error = null;
-  _systemStatus[key].lastCheck = Date.now();
-  _systemStatus[key].failCount = 0;
-  // Re-renderiza imediatamente. Sem isso, banner de erro ficava stuck por
-  // até 60s mesmo após a API recuperar (até o próximo setInterval rodar).
-  checkSystemAlerts();
-}
-function _markSystemFail(key, err) {
-  // Se o usuário está offline (sem internet), não é erro da API — é a rede
-  // dele. Ignora pra não dar falso positivo.
-  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-    return;
-  }
-  _systemStatus[key].failCount++;
-  _systemStatus[key].lastCheck = Date.now();
-  _systemStatus[key].lastFail = Date.now();
-  _systemStatus[key].error = err;
-  if (_systemStatus[key].failCount >= ALERT_FAIL_THRESHOLD) {
-    _systemStatus[key].ok = false;
-  }
-  checkSystemAlerts();
-}
-
-function checkSystemAlerts() {
-  const banner = document.getElementById('systemAlertBanner');
-  if (!banner) return;
-  const alerts = [];
-  const now = new Date();
-  const brt = _brtNow();
-  const hora = brt.getUTCHours();
-  const hojeISO  = _brtISO(now);
-  const ontemISO = _brtISO(new Date(now.getTime() - 86400000));
-
-  // Só mostra alerta se: (1) bateu o threshold, (2) houve falha recente (<5min).
-  // O check de "lastFail recente" evita banner stuck caso o usuário deixe a
-  // aba aberta e o setInterval pare de rodar (tab inativa).
-  const _isRecentFail = (s) => s.lastFail && (Date.now() - s.lastFail) < ALERT_STALE_MS;
-  if (!_systemStatus.tm.ok && _isRecentFail(_systemStatus.tm)) {
-    alerts.push({
-      level: 'red',
-      title: 'VENDAS TM COM ATRASO NA ATUALIZAÇÃO',
-      msg:   'Não conseguimos atualizar as vendas da Ticketmaster agora. Tentando novamente. Detalhe: ' + (_systemStatus.tm.error || 'sem detalhe'),
-    });
-  }
-  if (!_systemStatus.proprio.ok && _isRecentFail(_systemStatus.proprio)) {
-    alerts.push({
-      level: 'red',
-      title: 'VENDAS PRÓPRIAS COM ATRASO NA ATUALIZAÇÃO',
-      msg:   'Não conseguimos atualizar as vendas do sistema próprio agora. Tentando novamente. Detalhe: ' + (_systemStatus.proprio.error || 'sem detalhe'),
-    });
-  }
-  if (hora >= 12 && META_DATA) {
-    const arr = META_DATA.daily_series || META_DATA.data || [];
-    const h = arr.find(d => d.date === hojeISO);
-    const o = arr.find(d => d.date === ontemISO);
-    if (h && (h.cost || 0) === 0 && o && (o.cost || 0) > ALERT_MIN_SPEND_ONTEM) {
-      alerts.push({
-        level: 'orange',
-        title: 'META ADS PARADO',
-        msg:   'Sem gasto hoje (ontem foi R$ ' + Math.round(o.cost).toLocaleString('pt-BR') + '). Verifique se as campanhas estão ativas.',
-      });
-    }
-  }
-  if (hora >= 12 && GADS_DATA) {
-    const arr = GADS_DATA.daily_series || [];
-    const h = arr.find(d => d.date === hojeISO);
-    const o = arr.find(d => d.date === ontemISO);
-    if (h && (h.cost || 0) === 0 && o && (o.cost || 0) > ALERT_MIN_SPEND_ONTEM) {
-      alerts.push({
-        level: 'orange',
-        title: 'GOOGLE ADS PARADO',
-        msg:   'Sem gasto hoje (ontem foi R$ ' + Math.round(o.cost).toLocaleString('pt-BR') + '). Verifique se as campanhas estão ativas.',
-      });
-    }
-  }
-
-  if (!alerts.length) {
-    banner.style.display = 'none';
-    banner.innerHTML = '';
-    return;
-  }
-  banner.style.display = 'block';
-  banner.style.background = alerts.some(a => a.level === 'red') ? '#7a1f1f' : '#7a5a1f';
-  banner.style.color = '#fff';
-  banner.innerHTML = alerts.map(a =>
-    '<div style="display:flex;align-items:center;gap:10px;padding:4px 0">' +
-      '<span style="font-size:1rem">' + (a.level === 'red' ? '🔴' : '🟡') + '</span>' +
-      '<span><strong>' + a.title + '</strong> · ' + a.msg + '</span>' +
-    '</div>'
-  ).join('');
-}
-
-setInterval(checkSystemAlerts, 60000);
-
-// ═══════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════
 const fmtR = v => 'R$ '+v.toLocaleString('pt-BR',{maximumFractionDigits:0});
@@ -1035,13 +915,10 @@ async function fetchTicketmaster() {
     }
     if (!res) {
       console.warn('[TM Worker] Falhou apos 3 tentativas. Mantendo dados anteriores (se houver):', workerErr?.message);
-      _markSystemFail('tm', workerErr?.message || 'fetch falhou');
-      checkSystemAlerts();
       return;
     }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
-    _markSystemOk('tm');
     if (data.last_sale_moto_at) __lastSale.tm.moto = data.last_sale_moto_at;
     if (data.last_sale_auto_at) __lastSale.tm.auto = data.last_sale_auto_at;
     const tmByDay = {};
@@ -1077,8 +954,6 @@ async function fetchTicketmaster() {
     console.log('TM conectada:', data.daily.length, 'dias');
   } catch(e) {
     console.warn('fetchTicketmaster erro:', e.message);
-    _markSystemFail('tm', e.message);
-    checkSystemAlerts();
   }
 }
 
@@ -1111,8 +986,6 @@ async function fetchVendasProprio() {
       const jaTemDadosProprio = D26_FULL.some(r => (r.mpQ||0) > 0 || (r.apQ||0) > 0);
       if (jaTemDadosProprio) {
         console.warn('[Vendas Worker] Falhou, mantendo dados anteriores (sem flicker):', workerErr?.message);
-        _markSystemFail('proprio', workerErr?.message || 'fetch falhou');
-        checkSystemAlerts();
         return;
       }
       console.warn('[Vendas Worker] Falhou na primeira carga, usando fallback vendas-data.json:', workerErr?.message);
@@ -1121,7 +994,6 @@ async function fetchVendasProprio() {
     }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
-    _markSystemOk('proprio');
     if (data.last_sale_moto_at) __lastSale.proprio.moto = data.last_sale_moto_at;
     if (data.last_sale_auto_at) __lastSale.proprio.auto = data.last_sale_auto_at;
     data.daily.forEach(row => {
@@ -1145,8 +1017,6 @@ async function fetchVendasProprio() {
     console.log('[vendas-data.json] Moto:', data.totals.moto_ingressos, '| Auto:', data.totals.auto_ingressos, 'ingressos | atualizado:', data.updated_at);
   } catch(e) {
     console.warn('[Vendas Próprias] erro:', e.message);
-    _markSystemFail('proprio', e.message);
-    checkSystemAlerts();
   }
 }
 
