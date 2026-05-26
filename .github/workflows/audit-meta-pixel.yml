@@ -1,0 +1,37 @@
+name: Audit Meta Pixel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run audit
+        env:
+          META_TOKEN:       ${{ secrets.META_TOKEN }}
+          META_ACCT:        act_2044706169171045
+          META_ACCT_MOTOS:  act_1326431289216611
+        run: python audit-meta-pixel.py
+      - name: Commit report
+        run: |
+          git config user.name  "GitHub Actions"
+          git config user.email "actions@github.com"
+          [ -f audit-meta-pixel.json ] && git add audit-meta-pixel.json || true
+          if git diff --staged --quiet; then
+            echo "Sem mudancas"
+            exit 0
+          fi
+          git commit -m "chore: audit-meta-pixel.json [skip ci]"
+          for attempt in 1 2 3; do
+            git pull --rebase origin main 2>&1 || git rebase --abort 2>/dev/null || true
+            if git push 2>&1; then exit 0; fi
+            sleep $((RANDOM % 5 + 3))
+          done
+          exit 1
