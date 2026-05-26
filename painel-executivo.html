@@ -1197,7 +1197,7 @@ function execFmtK(n) {
   return 'R$ ' + Math.round(n).toLocaleString('pt-BR');
 }
 
-/* Constroi D26_INVEST a partir de META_DATA + GADS_DATA (reutiliza os fetches do dashboard principal) */
+/* Constroi D26_INVEST a partir de META_DATA + GADS_DATA + TIKTOK_DATA (reutiliza os fetches do dashboard principal) */
 function buildExecD26Invest(from, to) {
   const map = {};
   const add = (series, field) => {
@@ -1206,14 +1206,16 @@ function buildExecD26Invest(from, to) {
       if(to   && d.date > to)   return;
       const day = execDayOf26(d.date);
       if(day < 1) return;
-      if(!map[day]) map[day] = {d:day, meta:0, gads:0, metaConv:0, gadsConv:0};
+      if(!map[day]) map[day] = {d:day, meta:0, gads:0, tiktok:0, metaConv:0, gadsConv:0, tiktokConv:0};
       map[day][field] += d.cost||0;
-      if(field==='meta') map[day].metaConv += d.purchases||d.conversions||0;
-      if(field==='gads') map[day].gadsConv += d.conversions||0;
+      if(field==='meta')   map[day].metaConv   += d.purchases||d.conversions||0;
+      if(field==='gads')   map[day].gadsConv   += d.conversions||0;
+      if(field==='tiktok') map[day].tiktokConv += d.purchases||0;
     });
   };
-  if(META_DATA) add(META_DATA.daily_series||META_DATA.data, 'meta');
-  if(GADS_DATA) add(GADS_DATA.daily_series, 'gads');
+  if(META_DATA)   add(META_DATA.daily_series||META_DATA.data, 'meta');
+  if(GADS_DATA)   add(GADS_DATA.daily_series, 'gads');
+  if(TIKTOK_DATA) add(TIKTOK_DATA.daily_series, 'tiktok');
   return Object.values(map).sort((a,b)=>a.d-b.d);
 }
 
@@ -1634,7 +1636,7 @@ function buildExecInvestChart() {
   const days = execGetAllDays(invest); if(!days.length) return;
   const view = execCurrentInvestView;
   const labels = days.map(d => 'D+'+d);
-  const inv26 = d => { const r=invest.find(x=>x.d===d); return r?(r.meta+r.gads):0; };
+  const inv26 = d => { const r=invest.find(x=>x.d===d); return r?(r.meta+r.gads+(r.tiktok||0)):0; };
   const inv25 = d => { const r=EXEC_D25_INVEST.find(x=>x.d===d); return r?r.v:0; };
   let d26,d25;
   if(view==='acumulado'){let s26=0,s25=0; d26=days.map(d=>{s26+=inv26(d);return s26}); d25=days.map(d=>{s25+=inv25(d);return s25});}
@@ -1870,7 +1872,8 @@ function renderExecConversoes() {
   const metaMotosSpend = motosFiltered.reduce((s,d)=>s+(d.cost||0), 0);
 
   const adsConv   = metaConv + metaMotosConv + gadsConv + tiktokConv;
-  const totalInv  = invest.reduce((s,r)=>s+(r.meta+r.gads), 0) + metaMotosSpend;
+  const tiktokSpend = ttFiltered.reduce((s,d)=>s+(d.cost||0), 0);
+  const totalInv  = invest.reduce((s,r)=>s+(r.meta+r.gads), 0) + metaMotosSpend + tiktokSpend;
 
   // Total ingressos vendidos (planilha) no periodo
   const days2  = execGetAllDays(invest);

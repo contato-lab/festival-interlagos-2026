@@ -525,6 +525,7 @@ footer{
 ═══════════════════════════════════════════ */
 const META_URL   = 'meta-data.json';
 const GADS_URL   = 'google-ads-data.json';
+const TIKTOK_URL = 'tiktok-data.json';
 
 // Google Sheets — mesma planilha do dashboard principal
 const SHEET_ID   = '1jk7jjYB6n-IjkdmBUv54QEerujL_iAAP';
@@ -840,7 +841,7 @@ async function fetchMeta() {
       const d = dayOf26(row.date);
       const existing = D26_INVEST.find(x=>x.d===d);
       if (existing) { existing.meta = row.cost; existing.metaConv = row.purchases||0; }
-      else D26_INVEST.push({d, date:row.date, meta:row.cost, gads:0, metaConv:row.purchases||0, gadsConv:0});
+      else D26_INVEST.push({d, date:row.date, meta:row.cost, gads:0, tiktok:0, metaConv:row.purchases||0, gadsConv:0, tiktokConv:0});
     });
   } catch(e) { console.warn('Meta fetch failed:', e.message); }
 }
@@ -853,10 +854,24 @@ async function fetchGAds() {
       const d = dayOf26(row.date);
       const existing = D26_INVEST.find(x=>x.d===d);
       if (existing) { existing.gads = row.cost; existing.gadsConv = row.conversions||0; }
-      else D26_INVEST.push({d, date:row.date, meta:0, gads:row.cost, metaConv:0, gadsConv:row.conversions||0});
+      else D26_INVEST.push({d, date:row.date, meta:0, gads:row.cost, tiktok:0, metaConv:0, gadsConv:row.conversions||0, tiktokConv:0});
     });
     D26_INVEST.sort((a,b)=>a.d-b.d);
   } catch(e) { console.warn('GAds fetch failed:', e.message); }
+}
+
+async function fetchTiktok() {
+  try {
+    const json = await fetch(TIKTOK_URL+'?t='+Date.now()).then(r=>r.json());
+    if (!json.daily_series || json.daily_series.length === 0) return;
+    json.daily_series.forEach(row => {
+      const d = dayOf26(row.date);
+      const existing = D26_INVEST.find(x=>x.d===d);
+      if (existing) { existing.tiktok = row.cost; existing.tiktokConv = row.purchases||0; }
+      else D26_INVEST.push({d, date:row.date, meta:0, gads:0, tiktok:row.cost, metaConv:0, gadsConv:0, tiktokConv:row.purchases||0});
+    });
+    D26_INVEST.sort((a,b)=>a.d-b.d);
+  } catch(e) { console.warn('TikTok fetch failed:', e.message); }
 }
 
 // ═══════════════════════════════════════════════
@@ -1057,13 +1072,14 @@ function renderHojeOntem() {
   const todayDay = dayOf26(todayStr);
   const yDay     = dayOf26(yStr);
 
-  // Helper: get invest+conv for a campaign day
+  // Helper: get invest+conv for a campaign day (Meta + Google + TikTok)
   function getDay(day) {
     const inv = D26_INVEST.find(r=>r.d===day);
-    const meta = inv ? (inv.meta||0) : 0;
-    const gads = inv ? (inv.gads||0) : 0;
-    const total = meta + gads;
-    const conv  = inv ? ((inv.metaConv||0) + (inv.gadsConv||0)) : 0;
+    const meta   = inv ? (inv.meta||0)   : 0;
+    const gads   = inv ? (inv.gads||0)   : 0;
+    const tiktok = inv ? (inv.tiktok||0) : 0;
+    const total = meta + gads + tiktok;
+    const conv  = inv ? ((inv.metaConv||0) + (inv.gadsConv||0) + (inv.tiktokConv||0)) : 0;
     const cpa   = (total>0 && conv>0) ? total/conv : null;
     return {total, conv, cpa};
   }
@@ -1094,10 +1110,10 @@ function renderHojeOntem() {
       t.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   }
 
-  // Acumulado
-  const totalInvest26 = D26_INVEST.reduce((a,r)=>(r.d<todayDay?a:a)+(r.d<=todayDay?((r.meta||0)+(r.gads||0)):0), 0);
+  // Acumulado (Meta + Google + TikTok)
+  const totalInvest26 = D26_INVEST.reduce((a,r)=>(r.d<todayDay?a:a)+(r.d<=todayDay?((r.meta||0)+(r.gads||0)+(r.tiktok||0)):0), 0);
   // Fix: proper sum
-  const totalInv = D26_INVEST.filter(r=>r.d<todayDay).reduce((a,r)=>a+(r.meta||0)+(r.gads||0),0) + (hoje.total||0);
+  const totalInv = D26_INVEST.filter(r=>r.d<todayDay).reduce((a,r)=>a+(r.meta||0)+(r.gads||0)+(r.tiktok||0),0) + (hoje.total||0);
   const dias = todayDay;
   const media = dias > 0 ? totalInv/dias : 0;
 
@@ -1164,8 +1180,8 @@ function renderKPIs(days26) {
 ═══════════════════════════════════════════ */
 function renderConversoes(days26) {
   const inv = D26_INVEST.filter(r=>days26.includes(r.d));
-  const totalConv  = inv.reduce((a,r)=>a+(r.metaConv||0)+(r.gadsConv||0),0);
-  const totalInvR  = inv.reduce((a,r)=>a+(r.meta||0)+(r.gads||0),0);
+  const totalConv  = inv.reduce((a,r)=>a+(r.metaConv||0)+(r.gadsConv||0)+(r.tiktokConv||0),0);
+  const totalInvR  = inv.reduce((a,r)=>a+(r.meta||0)+(r.gads||0)+(r.tiktok||0),0);
   const cpa = totalConv>0 && totalInvR>0 ? totalInvR/totalConv : null;
 
   // 2025 — conversões digitais (aproximado pelo CPA médio histórico = R$26.16, total ingressos / invest)
@@ -1382,7 +1398,7 @@ function buildInvestChart(days26) {
 
   function inv26(d) {
     const r = D26_INVEST.find(x=>x.d===d);
-    return r ? (r.meta||0)+(r.gads||0) : 0;
+    return r ? (r.meta||0)+(r.gads||0)+(r.tiktok||0) : 0;
   }
   function inv25(d) {
     const r = D25_INVEST.find(x=>x.d===d);
@@ -1600,7 +1616,7 @@ async function init() {
   Chart.defaults.font.size          = 11;
 
   // Buscar todos os dados em paralelo
-  await Promise.allSettled([fetchMeta(), fetchGAds(), fetchSheets(), fetchInvestimento2025()]);
+  await Promise.allSettled([fetchMeta(), fetchGAds(), fetchTiktok(), fetchSheets(), fetchInvestimento2025()]);
   // Ticketmaster precisa rodar DEPOIS de fetchSheets para sobrepor os valores TM
   await fetchTicketmaster();
 
@@ -1610,7 +1626,7 @@ async function init() {
 
 // Auto-refresh a cada 5 minutos
 setInterval(async () => {
-  await Promise.allSettled([fetchMeta(), fetchGAds()]);
+  await Promise.allSettled([fetchMeta(), fetchGAds(), fetchTiktok()]);
   await fetchTicketmaster();
   renderAll();
 }, 5 * 60 * 1000);
