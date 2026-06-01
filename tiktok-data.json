@@ -1,15 +1,15 @@
 {
-  "updated_at": "2026-05-26T23:59:00Z",
-  "source": "TikTok Ads Manager (manual - print do painel 26/05, aguardando aprovacao API)",
+  "updated_at": "2026-06-03T12:00:00Z",
+  "source": "TikTok Ads Manager (manual - prints do painel 27/05 a 31/05, aguardando aprovacao API)",
   "campaign_start": "2026-03-31",
-  "note": "Totais reais do TikTok Ads Manager distribuidos uniformemente: 31/03-30/04 (31 dias) + 01/05-26/05 (26 dias). Sera substituido pela API automatica assim que o acesso for aprovado.",
+  "note": "Totais reais do TikTok Ads Manager: 31/03-30/04 e 01/05-26/05 distribuidos uniformemente. 27/05 a 31/05 com dados diarios reais. Sera substituido pela API automatica assim que o acesso for aprovado.",
   "totals": {
-    "cost": 17996.43,
-    "impressions": 2453512,
-    "clicks": 68847,
+    "cost": 19185.58,
+    "impressions": 2602872,
+    "clicks": 69491,
     "add_to_cart": 0,
-    "purchases": 435,
-    "ctr": 2.81
+    "purchases": 497,
+    "ctr": 2.67
   },
   "daily_series": [
     {
@@ -467,6 +467,46 @@
       "clicks": 183,
       "add_to_cart": 0,
       "purchases": 10.94
+    },
+    {
+      "date": "2026-05-27",
+      "cost": 248.85,
+      "impressions": 25867,
+      "clicks": 123,
+      "add_to_cart": 0,
+      "purchases": 16
+    },
+    {
+      "date": "2026-05-28",
+      "cost": 191.38,
+      "impressions": 20084,
+      "clicks": 109,
+      "add_to_cart": 0,
+      "purchases": 9
+    },
+    {
+      "date": "2026-05-29",
+      "cost": 197.16,
+      "impressions": 20920,
+      "clicks": 90,
+      "add_to_cart": 0,
+      "purchases": 19
+    },
+    {
+      "date": "2026-05-30",
+      "cost": 193.26,
+      "impressions": 25884,
+      "clicks": 108,
+      "add_to_cart": 0,
+      "purchases": 10
+    },
+    {
+      "date": "2026-05-31",
+      "cost": 358.50,
+      "impressions": 56605,
+      "clicks": 214,
+      "add_to_cart": 0,
+      "purchases": 8
     }
   ]
 }
