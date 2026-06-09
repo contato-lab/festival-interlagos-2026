@@ -2286,6 +2286,7 @@ function execSetInvestView(view, btn) {
 }
 
 /* ═══ D+N shortcuts ═══ */
+let execDplusExpanded = false; // mantem o estado "ver semanas anteriores" entre re-renders; so muda no clique do botao
 function buildExecDplusBar() {
   const bar = document.getElementById('exec-dplus-bar');
   if(!bar) return;
@@ -2321,18 +2322,15 @@ function buildExecDplusBar() {
   const recentWeeks = hasOlder ? weeks.slice(-RECENT) : weeks;
   const olderWeeks  = hasOlder ? weeks.slice(0, weeks.length-RECENT) : [];
 
-  // Auto-expandir se o dia selecionado estiver numa semana antiga (escondida)
-  const activeInOlder = activeIso && olderWeeks.some(({days}) => days.some(d => {
-    if(d>maxDay || !allDays.includes(d)) return false;
-    return execDateOf26Day(d).toISOString().slice(0,10) === activeIso;
-  }));
+  // Estado de expansao PERSISTENTE entre re-renders: so muda quando o usuario clica no botao.
+  if(!hasOlder) execDplusExpanded = false; // sem semanas antigas, nao ha o que expandir
+  const open = execDplusExpanded;
 
   const recentHtml = recentWeeks.map(renderWeek).join('');
   const olderHtml  = olderWeeks.map(renderWeek).join('');
 
   let topHtml = '';
   if(hasOlder){
-    const open = !!activeInOlder;
     const hintTxt = open
       ? 'Mostrando <b>todas as semanas</b> da campanha'
       : 'Mostrando as <b>\u00faltimas 3 semanas</b>';
@@ -2345,7 +2343,7 @@ function buildExecDplusBar() {
       + `</div>`;
   }
 
-  const olderDisplay = activeInOlder ? 'flex' : 'none';
+  const olderDisplay = open ? 'flex' : 'none';
   bar.innerHTML = `<span class="exec-dplus-label">Dia exato</span>${topHtml}`
     + `<div class="exec-dplus-weeks">`
     + (hasOlder ? `<div class="exec-dplus-older" id="exec-dplus-older" style="display:${olderDisplay}">${olderHtml}</div>` : '')
@@ -2357,6 +2355,7 @@ function toggleExecDplusOlder() {
   const hint  = document.getElementById('exec-dplus-hint-text');
   if(!older) return;
   const willShow = older.style.display === 'none';
+  execDplusExpanded = willShow; // persiste a escolha do usuario entre re-renders
   older.style.display = willShow ? 'flex' : 'none';
   if(btn)  btn.innerHTML  = willShow
     ? 'Ver menos <span class="exec-dplus-caret">\u25b4</span>'
