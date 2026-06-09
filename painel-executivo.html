@@ -108,6 +108,13 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .exec-dplus-btn:hover{border-color:rgba(200,255,0,.4);color:var(--lime)}
 .exec-dplus-btn.active{background:rgba(200,255,0,.15);border-color:var(--lime);color:var(--lime)}
 .exec-dplus-btn.empty{border-color:transparent;color:transparent;cursor:default;pointer-events:none}
+.exec-dplus-hint{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;flex-wrap:wrap}
+.exec-dplus-hint-text{font-size:.66rem;color:#9a9a9a;letter-spacing:.02em}
+.exec-dplus-hint-text b{color:var(--lime);font-weight:700}
+.exec-dplus-more{background:rgba(200,255,0,.13);border:1px solid var(--lime);color:var(--lime);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.74rem;letter-spacing:.05em;text-transform:uppercase;padding:5px 16px;border-radius:6px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 0 0 0 rgba(200,255,0,.4)}
+.exec-dplus-more:hover{background:var(--lime);color:#0a0a0a;box-shadow:0 2px 12px rgba(200,255,0,.35)}
+.exec-dplus-more .exec-dplus-caret{font-size:.85em;line-height:1}
+.exec-dplus-older{display:flex;flex-direction:column;gap:3px}
 
 /* LOGIN */
 .login-overlay{position:fixed;inset:0;background:#0A0A0A;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column}
@@ -2295,7 +2302,7 @@ function buildExecDplusBar() {
 
   const activeIso = (execFiltFrom && execFiltFrom===execFiltTo) ? execFiltFrom : null;
 
-  const weeksHtml = weeks.map(({w, days}) => {
+  const renderWeek = ({w, days}) => {
     const btns = days.map(d => {
       if(d > maxDay || !allDays.includes(d)) {
         return `<button class="exec-dplus-btn empty">\u2014</button>`;
@@ -2307,9 +2314,56 @@ function buildExecDplusBar() {
       return `<button class="exec-dplus-btn${isActive}" id="exec-dplus-${d}" onclick="setExecDayPreset(${d},'${iso}')" title="${lbl}">D+${d}</button>`;
     }).join('');
     return `<div class="exec-dplus-week"><span class="exec-dplus-week-lbl">S${w+1}</span>${btns}</div>`;
-  }).join('');
+  };
 
-  bar.innerHTML = `<span class="exec-dplus-label">Dia exato</span><div class="exec-dplus-weeks">${weeksHtml}</div>`;
+  const RECENT = 3;
+  const hasOlder = weeks.length > RECENT;
+  const recentWeeks = hasOlder ? weeks.slice(-RECENT) : weeks;
+  const olderWeeks  = hasOlder ? weeks.slice(0, weeks.length-RECENT) : [];
+
+  // Auto-expandir se o dia selecionado estiver numa semana antiga (escondida)
+  const activeInOlder = activeIso && olderWeeks.some(({days}) => days.some(d => {
+    if(d>maxDay || !allDays.includes(d)) return false;
+    return execDateOf26Day(d).toISOString().slice(0,10) === activeIso;
+  }));
+
+  const recentHtml = recentWeeks.map(renderWeek).join('');
+  const olderHtml  = olderWeeks.map(renderWeek).join('');
+
+  let topHtml = '';
+  if(hasOlder){
+    const open = !!activeInOlder;
+    const hintTxt = open
+      ? 'Mostrando <b>todas as semanas</b> da campanha'
+      : 'Mostrando as <b>\u00faltimas 3 semanas</b>';
+    const btnTxt = open
+      ? 'Ver menos <span class="exec-dplus-caret">\u25b4</span>'
+      : 'Ver semanas anteriores <span class="exec-dplus-caret">\u25be</span>';
+    topHtml = `<div class="exec-dplus-hint">`
+      + `<span class="exec-dplus-hint-text" id="exec-dplus-hint-text">${hintTxt}</span>`
+      + `<button class="exec-dplus-more" id="exec-dplus-more-btn" onclick="toggleExecDplusOlder()">${btnTxt}</button>`
+      + `</div>`;
+  }
+
+  const olderDisplay = activeInOlder ? 'flex' : 'none';
+  bar.innerHTML = `<span class="exec-dplus-label">Dia exato</span>${topHtml}`
+    + `<div class="exec-dplus-weeks">`
+    + (hasOlder ? `<div class="exec-dplus-older" id="exec-dplus-older" style="display:${olderDisplay}">${olderHtml}</div>` : '')
+    + `${recentHtml}</div>`;
+}
+function toggleExecDplusOlder() {
+  const older = document.getElementById('exec-dplus-older');
+  const btn   = document.getElementById('exec-dplus-more-btn');
+  const hint  = document.getElementById('exec-dplus-hint-text');
+  if(!older) return;
+  const willShow = older.style.display === 'none';
+  older.style.display = willShow ? 'flex' : 'none';
+  if(btn)  btn.innerHTML  = willShow
+    ? 'Ver menos <span class="exec-dplus-caret">\u25b4</span>'
+    : 'Ver semanas anteriores <span class="exec-dplus-caret">\u25be</span>';
+  if(hint) hint.innerHTML = willShow
+    ? 'Mostrando <b>todas as semanas</b> da campanha'
+    : 'Mostrando as <b>\u00faltimas 3 semanas</b>';
 }
 function setExecDayPreset(d, iso) {
   execFiltFrom = iso; execFiltTo = iso;
