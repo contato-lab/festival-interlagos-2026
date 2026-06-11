@@ -407,7 +407,7 @@ function render(){
   if(P.busca){
     const bh=(P.historico_busca||[]).map(h=>h.share_transacional);
     const serpTxt=P.serp?` · página de resultados ${P.serp.health}% limpa`:'';
-    pres+=`<div class="kpi"><div class="n">Busca da marca<span class="qm" data-tip="Percentual das sugestões do Google (autocomplete) com intenção de compra: ingressos, datas, valores, cupom. Quanto maior, mais a busca da marca é de gente querendo comprar. Com a chave do Google, soma também a saúde da página de resultados.">?</span></div>
+    pres+=`<div class="kpi"><div class="n">Busca da marca<span class="qm" data-tip="Percentual das sugestões do Google (autocomplete) com intenção de compra: ingressos, datas, valores, cupom. Quanto maior, mais a busca da marca é de gente querendo comprar. Com a chave da Brave, soma também a saúde da página de resultados (quem rankeia pela marca).">?</span></div>
       <div class="vrow"><div class="v">${P.busca.share_transacional}%</div>${stBadge(P.busca.share_transacional,60)}</div>
       ${spark(bh,'#C8FF00',60)}<div class="s">sugestões transacionais · saudável: 60%+${serpTxt}</div></div>`;
   } else pres+=aguarda('Busca da marca','próxima varredura (sem chave)');
@@ -426,7 +426,7 @@ function render(){
 
   // Status das integrações
   const I=P.integracoes||{google_news:!!P.feed_auto_total,reddit:!!P.feed_auto_total,autocomplete:!!P.busca,busca_google_pse:!!P.serp,brave:false,apify_social:!!P.social_proprio};
-  const fontes2=[['Google News',I.google_news],['Reddit',I.reddit],['Autocomplete Google',I.autocomplete],['Busca Google (PSE)',I.busca_google_pse],['Brave Search',I.brave],['Apify (IG/TikTok)',I.apify_social]];
+  const fontes2=[['Google News',I.google_news],['Reddit',I.reddit],['Autocomplete Google',I.autocomplete],['Brave (busca web + saúde da busca)',I.brave],['Apify (IG/TikTok)',I.apify_social]];
   document.getElementById('integ').innerHTML='<b style="color:var(--tx2);text-transform:uppercase;letter-spacing:.06em;font-size:.6rem">Integrações da varredura:</b> '+
     fontes2.map(f=>`<span class="pill ${f[1]?'pos':'neu'}">${f[0]} ${f[1]?'✓ ativa':'· aguardando chave'}</span>`).join(' ');
 }

@@ -151,12 +151,13 @@ def google_pse(pulse):
         print(f'[serp] {e}', file=sys.stderr)
 
 
-def brave(feed, vistos):
+def brave(feed, vistos, pulse):
     key = os.environ.get('BRAVE_API_KEY')
     if not key:
         return 0
     add = 0
     try:
+        # 1) descoberta de mencoes novas (ultima semana)
         url = ('https://api.search.brave.com/res/v1/web/search?count=20&freshness=pw&q='
                + urllib.parse.quote('"festival interlagos"'))
         data = json.loads(fetch(url, headers={'X-Subscription-Token': key, 'Accept': 'application/json'}))
@@ -169,6 +170,26 @@ def brave(feed, vistos):
                 vistos.add(l)
                 add += 1
         print(f'[brave] +{add}')
+        # 2) saude da busca: quem rankeia pelas buscas da marca (web inteira, sem filtro de data)
+        top, riscos = [], []
+        owned = 0
+        for q in ['festival interlagos', 'suhai festival interlagos']:
+            u2 = 'https://api.search.brave.com/res/v1/web/search?count=10&country=br&q=' + urllib.parse.quote(q)
+            d2 = json.loads(fetch(u2, headers={'X-Subscription-Token': key, 'Accept': 'application/json'}))
+            for r in (d2.get('web', {}).get('results') or [])[:10]:
+                link, title = r.get('url', ''), (r.get('title') or '').strip()
+                tipo = 'própria' if OWNED.search(link) else ('risco' if RISCO.search(link) else 'imprensa/terceiros')
+                if tipo == 'própria':
+                    owned += 1
+                if tipo == 'risco':
+                    riscos.append({'titulo': title, 'url': link})
+                top.append({'q': q, 'titulo': title, 'url': link, 'tipo': tipo})
+        if top:
+            health = round((len([t for t in top if t['tipo'] != 'risco']) / len(top)) * 100)
+            pulse['serp'] = {'updated_at': HOJE, 'fonte': 'Brave Search', 'top': top[:20],
+                             'health': health, 'owned_top': owned, 'riscos': riscos}
+            hist_append(pulse, 'historico_serp', {'health': health, 'owned': owned, 'riscos': len(riscos)})
+            print(f'[brave-serp] saúde {health}%, {owned} próprios, {len(riscos)} de risco')
     except Exception as e:
         print(f'[brave] {e}', file=sys.stderr)
     return add
@@ -223,7 +244,7 @@ def main():
 
     feed = pulse.get('feed_auto', [])
     vistos = {m.get('url') for m in feed}
-    n = google_news(feed, vistos) + reddit(feed, vistos) + brave(feed, vistos)
+    n = google_news(feed, vistos) + reddit(feed, vistos) + brave(feed, vistos, pulse)
     feed = feed[-300:]
     pulse['feed_auto'] = feed
     pulse['feed_auto_updated_at'] = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
