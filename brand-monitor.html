@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brand Monitor — Festival Interlagos 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --lime:#C8FF00; --lime-dim:rgba(200,255,0,0.12); --lime-border:rgba(200,255,0,0.25);
+  --purple:#7B2D8B; --purple-dim:rgba(123,45,139,0.18);
+  --bg:#0A0A0A; --card:#141414; --card2:#1A1A1A;
+  --text:#FFFFFF; --text2:#CCCCCC; --text3:#888888;
+  --green:#00FF88; --red:#FF4444; --warn:#FFB800; --blue:#00BFFF;
+  --border:rgba(255,255,255,0.07); --radius:14px; --rad-sm:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;min-height:100vh}
+.header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);background:#0D0D0D;position:sticky;top:0;z-index:100}
+.header-brand{display:flex;align-items:center;gap:12px}
+.lime-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.6rem;color:var(--lime);letter-spacing:.08em}
+.sep{color:var(--text3)}
+.client-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.1rem;color:var(--text2);letter-spacing:.04em}
+.header-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.3rem;text-transform:uppercase;letter-spacing:.06em;text-align:center}
+.badge{background:var(--lime-dim);border:1px solid var(--lime-border);border-radius:20px;color:var(--lime);padding:4px 14px;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
+.gen-date{font-size:.72rem;color:#888}
+.main{padding:28px 32px;display:flex;flex-direction:column;gap:24px;max-width:1500px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.25rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.section-sub{font-size:.74rem;color:var(--text3);margin-bottom:16px}
+
+/* SCORE HERO */
+.score-grid{display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:center}
+.score-ring{position:relative;width:240px;height:240px;margin:0 auto}
+.score-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-num .val{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:4.2rem;line-height:1}
+.score-num .lbl{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
+.subscores{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.subscore{background:var(--card2);border:1px solid var(--border);border-radius:var(--rad-sm);padding:14px 16px}
+.subscore .name{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.subscore .val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.7rem;margin:4px 0}
+.subscore .bar{height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.subscore .bar i{display:block;height:100%;border-radius:3px}
+.subscore .why{font-size:.68rem;color:var(--text3);margin-top:7px;line-height:1.4}
+
+/* FUNIL */
+.funnel{display:flex;flex-direction:column;gap:6px}
+.fstep{display:grid;grid-template-columns:210px 1fr 130px 110px;align-items:center;gap:14px}
+.fstep .flbl{font-size:.8rem;color:var(--text2);text-align:right}
+.fstep .fbarwrap{height:30px;background:rgba(255,255,255,.04);border-radius:6px;overflow:hidden}
+.fstep .fbar{height:100%;background:linear-gradient(90deg,var(--purple),var(--lime));border-radius:6px;min-width:2px}
+.fstep .fval{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.05rem;text-align:right}
+.fstep .frate{font-size:.7rem;color:var(--text3);text-align:right}
+
+/* TABELA */
+table{width:100%;border-collapse:collapse}
+th{font-size:.66rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;text-align:right;padding:8px 10px;border-bottom:1px solid var(--border)}
+th:first-child{text-align:left}
+td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.85rem;text-align:right}
+td:first-child{text-align:left;color:var(--text2)}
+tr.hl td{background:rgba(200,255,0,.05)}
+.pill{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.68rem;font-weight:600}
+.pill.pos{background:rgba(0,255,136,.12);color:var(--green)}
+.pill.neu{background:rgba(255,184,0,.12);color:var(--warn)}
+.pill.neg{background:rgba(255,68,68,.12);color:var(--red)}
+
+/* GRID 2 col */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:1000px){.grid2{grid-template-columns:1fr}.score-grid{grid-template-columns:1fr}}
+
+/* MENÇÕES */
+.mencoes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.mencao{background:var(--card2);border:1px solid var(--border);border-radius:var(--rad-sm);padding:14px 16px}
+.mencao .frente{font-size:.64rem;color:var(--lime);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.mencao .titulo{font-size:.85rem;font-weight:600;margin:6px 0 4px 0;line-height:1.35}
+.mencao .meta{font-size:.68rem;color:var(--text3)}
+.mencao .resumo{font-size:.74rem;color:var(--text2);margin-top:7px;line-height:1.45}
+.veredito{border-left:4px solid var(--lime);background:rgba(200,255,0,.05);border-radius:6px;padding:16px 20px;line-height:1.55}
+.alerta{border-left:4px solid var(--warn);background:rgba(255,184,0,.05);border-radius:6px;padding:14px 18px;line-height:1.5;font-size:.86rem}
+.chart-box{position:relative;height:280px}
+.loading{color:var(--text3);font-size:.8rem;padding:20px;text-align:center}
+.frente-resumo{background:var(--card2);border:1px solid var(--border);border-radius:var(--rad-sm);padding:14px 16px;margin-bottom:10px}
+.frente-resumo .nome{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.95rem;text-transform:uppercase;letter-spacing:.04em}
+.frente-resumo .corpo{font-size:.78rem;color:var(--text2);margin-top:5px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-brand"><span class="lime-logo">LIME</span><span class="sep">|</span><span class="client-name">FESTIVAL INTERLAGOS 2026</span></div>
+  <div class="header-title">Brand Monitor — Força da Marca</div>
+  <div style="display:flex;align-items:center;gap:10px"><span class="badge">AO VIVO</span><span class="gen-date" id="gen-date">—</span></div>
+</div>
+<div class="main">
+
+  <!-- BRAND SCORE -->
+  <div class="card">
+    <div class="section-title">Brand Score</div>
+    <div class="section-sub">Índice composto de força da marca · 0 a 100 · calculado ao vivo dos dados de tráfego, vendas, mídia e da varredura de menções na internet</div>
+    <div class="score-grid">
+      <div class="score-ring"><canvas id="scoreChart"></canvas>
+        <div class="score-num"><div class="val" id="score-val">—</div><div class="lbl">de 100</div></div>
+      </div>
+      <div class="subscores" id="subscores"><div class="loading">Calculando…</div></div>
+    </div>
+  </div>
+
+  <!-- VEREDITO BOLHA -->
+  <div class="card">
+    <div class="section-title">Estamos furando a bolha?</div>
+    <div class="section-sub">Leitura combinada: demanda própria (busca direta e orgânica), menções espontâneas e auditoria cética da varredura</div>
+    <div class="veredito" id="veredito"><div class="loading">Carregando varredura…</div></div>
+  </div>
+
+  <!-- FUNIL -->
+  <div class="card">
+    <div class="section-title">Funil Completo da Campanha</div>
+    <div class="section-sub" id="funil-sub">Da impressão de mídia até o ingresso vendido · todas as fontes somadas</div>
+    <div class="funnel" id="funnel"><div class="loading">Carregando…</div></div>
+  </div>
+
+  <div class="grid2">
+    <!-- FONTES DE VENDA -->
+    <div class="card">
+      <div class="section-title">Fontes de Venda</div>
+      <div class="section-sub">Conversões atribuídas por cada plataforma (pixel próprio) + visão GA4 (último clique). As duas leituras se complementam.</div>
+      <table id="fontes-table"><thead><tr><th>Fonte</th><th>Vendas atrib.</th><th>Investimento</th><th>CPA</th></tr></thead><tbody></tbody></table>
+      <div class="alerta" style="margin-top:14px" id="fontes-leitura">—</div>
+    </div>
+    <!-- PAGO vs ORGANICO -->
+    <div class="card">
+      <div class="section-title">Dependência de Mídia Paga</div>
+      <div class="section-sub">Share semanal de sessões por origem. Furar a bolha = a faixa verde (direto + orgânico) crescer sozinha.</div>
+      <div class="chart-box"><canvas id="mixChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- VOZ DA MARCA -->
+  <div class="card">
+    <div class="section-title">Voz da Marca na Internet</div>
+    <div class="section-sub" id="pulse-sub">Varredura multi-frente: imprensa, YouTube, comunidades, redes sociais, busca, reclamações, benchmark e rastro do offline</div>
+    <div id="frentes-resumo"></div>
+    <div class="mencoes-grid" id="mencoes"></div>
+  </div>
+
+</div>
+<script>
+const fmt = n => (n||0).toLocaleString('pt-BR');
+const fmtR = n => 'R$ ' + (n||0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+const pct = (a,b) => b ? (a/b*100) : 0;
+
+const state = { ga:null, meta:null, gads:null, tt:null, vd:null, tm:null, pulse:null };
+
+async function loadAll(){
+  const get = async (u, opt) => { try { const r = await fetch(u + (u.includes('?')?'':'?t='+Date.now()), {cache:'no-store'}); return r.ok ? await r.json() : null; } catch(e){ return null; } };
+  [state.ga, state.meta, state.gads, state.tt, state.vd, state.pulse] = await Promise.all([
+    get('ga4-data.json'), get('meta-data.json'), get('google-ads-data.json'),
+    get('tiktok-data.json'), get('vendas-data.json'), get('brand-pulse-data.json')
+  ]);
+  try { const r = await fetch('https://ticketmaster-festival-interlagos.performance-ef2.workers.dev/?t='+Date.now(), {cache:'no-store'}); state.tm = r.ok ? await r.json() : null; } catch(e){}
+  render();
+}
+
+function classCanal(s, m){
+  s=(s||'').toLowerCase(); m=(m||'').toLowerCase();
+  if(m.match(/paid|cpc|ppc|ads|cpm|awareness|affiliate|display|tiktok/)) return 'pago';
+  if(s==='(direct)' && m==='(none)') return 'direto';
+  if(m.match(/organic/) || s==='organico') return 'organico';
+  return 'outros';
+}
+
+function weeklyMix(){
+  const weeks = {};
+  (state.ga.source_medium_daily||[]).forEach(r=>{
+    const d = new Date(r.date+'T12:00:00');
+    const monday = new Date(d); monday.setDate(d.getDate() - ((d.getDay()+6)%7));
+    const wk = monday.toISOString().slice(0,10);
+    if(!weeks[wk]) weeks[wk] = {pago:0, direto:0, organico:0, outros:0};
+    weeks[wk][classCanal(r.source, r.medium)] += r.sessions;
+  });
+  return Object.keys(weeks).sort().map(k=>({wk:k, ...weeks[k]}))
+    .filter(w => (w.pago+w.direto+w.organico+w.outros) > 1000);
+}
+
+function calcScores(){
+  const mix = weeklyMix();
+  const last4 = mix.slice(-4);
+  // 1. Demanda propria: share de direto+organico nas ultimas 4 semanas (0-35% -> 0-100) + tendencia
+  let shareNP = 0;
+  if(last4.length){
+    const np = last4.reduce((a,w)=>a+w.direto+w.organico,0);
+    const tot = last4.reduce((a,w)=>a+w.pago+w.direto+w.organico+w.outros,0);
+    shareNP = pct(np, tot);
+  }
+  const sDemanda = Math.min(100, Math.round(shareNP/35*100));
+  // 2. Eficiencia de midia: CPA blended vs ticket medio (CPA <= 15% do TKT = 100)
+  const custoTot = (state.meta?.totals?.cost||0) + (state.gads?.totals?.cost||0) + (state.tt?.totals?.cost||0);
+  const convTot = (state.meta?.totals?.purchases||0) + (state.gads?.totals?.conversions||0) + (state.tt?.totals?.purchases||0);
+  const recTot = (state.vd?.totals?.total_receita||0) + (state.tm?.totals?.total_receita||0);
+  const ingTot = (state.vd?.totals?.total_ingressos||0) + (state.tm?.totals?.total_ingressos||0);
+  const cpa = convTot ? custoTot/convTot : 0;
+  const tkt = ingTot ? recTot/ingTot : 0;
+  const sEficiencia = tkt ? Math.max(0, Math.min(100, Math.round(100 - (cpa/tkt - 0.10) * 250 ))) : 50;
+  // 3. Funil: conversao usuarios -> ingressos (2% = 60, 3.5%+ = 100)
+  const users = state.ga?.totals?.users || 0;
+  const convRate = pct(ingTot, users);
+  const sFunil = Math.max(0, Math.min(100, Math.round(convRate/3.5*100)));
+  // 4. Trafego pago performando: ROAS midia trackeada (receita/custo: 10x+ = 100)
+  const roas = custoTot ? recTot/custoTot : 0;
+  const sRoas = Math.max(0, Math.min(100, Math.round(roas/15*100)));
+  // 5. Voz da marca: da varredura (score embutido no JSON) ou neutro 50
+  const sVoz = state.pulse?.voz_score ?? 50;
+  const pesos = {demanda:.22, eficiencia:.20, funil:.18, roas:.18, voz:.22};
+  const total = Math.round(sDemanda*pesos.demanda + sEficiencia*pesos.eficiencia + sFunil*pesos.funil + sRoas*pesos.roas + sVoz*pesos.voz);
+  return { total,
+    subs: [
+      {name:'Demanda própria', val:sDemanda, why:`${shareNP.toFixed(1)}% das sessões das últimas 4 semanas vieram de busca direta ou orgânica (referência saudável: 35%+)`},
+      {name:'Eficiência de mídia', val:sEficiencia, why:`CPA combinado ${fmtR(cpa)} contra ticket médio ${fmtR(tkt)} (${pct(cpa,tkt).toFixed(0)}% do ticket)`},
+      {name:'Conversão de funil', val:sFunil, why:`${convRate.toFixed(2)}% dos ${fmt(users)} usuários viraram ingresso (meta de excelência: 3,5%)`},
+      {name:'Retorno de mídia', val:sRoas, why:`Cada R$ 1 em mídia digital trackeada retorna ${roas.toFixed(1)} em receita (referência: 15x)`},
+      {name:'Voz da marca', val:sVoz, why: state.pulse?.voz_why || 'Aguardando varredura de menções'},
+    ], cpa, tkt, roas, custoTot, convTot, recTot, ingTot, convRate };
+}
+
+function render(){
+  if(!state.ga){ document.getElementById('subscores').innerHTML = '<div class="loading">Erro ao carregar ga4-data.json</div>'; return; }
+  document.getElementById('gen-date').textContent = 'Dados: ' + (state.ga.updated_at||'').slice(0,10);
+  const S = calcScores();
+
+  // Score ring
+  document.getElementById('score-val').textContent = S.total;
+  document.getElementById('score-val').style.color = S.total>=70 ? 'var(--green)' : S.total>=45 ? 'var(--lime)' : 'var(--warn)';
+  new Chart(document.getElementById('scoreChart'), { type:'doughnut',
+    data:{ datasets:[{ data:[S.total, 100-S.total], backgroundColor:['#C8FF00','rgba(255,255,255,.06)'], borderWidth:0, cutout:'78%' }] },
+    options:{ plugins:{legend:{display:false},tooltip:{enabled:false}}, responsive:true, maintainAspectRatio:true } });
+
+  // Subscores
+  document.getElementById('subscores').innerHTML = S.subs.map(s=>{
+    const c = s.val>=70?'var(--green)':s.val>=45?'var(--lime)':s.val>=25?'var(--warn)':'var(--red)';
+    return `<div class="subscore"><div class="name">${s.name}</div><div class="val" style="color:${c}">${s.val}</div>
+      <div class="bar"><i style="width:${s.val}%;background:${c}"></i></div><div class="why">${s.why}</div></div>`;
+  }).join('');
+
+  // Funil
+  const meta = state.meta?.totals||{}, ga = state.ga.totals||{};
+  const imps = (meta.impressions||0) + (state.gads?.totals?.impressions||0) + (state.tt?.totals?.impressions||0);
+  const clicks = (meta.clicks||0) + (state.gads?.totals?.clicks||0) + (state.tt?.totals?.clicks||0);
+  const prodViews = (state.ga.top_pages||[]).filter(p=>/\/vendas\/ingressos\/|\/event\//.test(p.page)).reduce((a,p)=>a+p.pageviews,0);
+  const steps = [
+    {lbl:'Impressões de mídia digital', val:imps, note:'Meta + Google + TikTok (sem programática, rádio, TV e metrô)'},
+    {lbl:'Cliques em anúncio', val:clicks, rate:pct(clicks,imps).toFixed(2)+'% CTR'},
+    {lbl:'Sessões no site', val:ga.sessions, rate:''},
+    {lbl:'Visitas a página de ingresso', val:prodViews, rate:pct(prodViews,ga.pageviews).toFixed(1)+'% dos pageviews'},
+    {lbl:'Adições ao carrinho (Meta)', val:meta.add_to_cart||0, rate:''},
+    {lbl:'Checkouts iniciados (Meta)', val:meta.checkout||0, rate:''},
+    {lbl:'Ingressos vendidos', val:S.ingTot, rate:S.convRate.toFixed(2)+'% dos usuários'},
+  ];
+  const maxLog = Math.log10(Math.max(...steps.map(s=>s.val||1)));
+  document.getElementById('funnel').innerHTML = steps.map(s=>{
+    const w = Math.max(2, (Math.log10(Math.max(s.val,1))/maxLog)*100);
+    return `<div class="fstep"><div class="flbl">${s.lbl}</div>
+      <div class="fbarwrap"><div class="fbar" style="width:${w}%"></div></div>
+      <div class="fval">${fmt(s.val)}</div><div class="frate">${s.rate||s.note||''}</div></div>`;
+  }).join('');
+  document.getElementById('funil-sub').textContent = `Receita total: ${fmtR(S.recTot)} · ${fmt(S.ingTot)} ingressos · investimento digital trackeado: ${fmtR(S.custoTot)} · retorno ${S.roas.toFixed(1)}x`;
+
+  // Fontes de venda
+  const fontes = [
+    {n:'Google Ads', v:Math.round(state.gads?.totals?.conversions||0), c:state.gads?.totals?.cost||0},
+    {n:'Meta Ads', v:state.meta?.totals?.purchases||0, c:state.meta?.totals?.cost||0},
+    {n:'TikTok Ads', v:state.tt?.totals?.purchases||0, c:state.tt?.totals?.cost||0},
+  ].sort((a,b)=>b.v-a.v);
+  const ga4src = (state.ga.traffic_sources||[]).slice().sort((a,b)=>b.conversions-a.conversions).slice(0,4);
+  let html = fontes.map((f,i)=>`<tr${i===0?' class="hl"':''}><td>${f.n} <span style="color:var(--text3);font-size:.68rem">(pixel)</span></td><td>${fmt(f.v)}</td><td>${fmtR(f.c)}</td><td>${f.v?fmtR(f.c/f.v):'—'}</td></tr>`).join('');
+  html += `<tr><td colspan="4" style="color:var(--text3);font-size:.7rem;padding-top:14px">VISÃO GA4 (último clique) — onde a venda fecha:</td></tr>`;
+  html += ga4src.map(s=>`<tr><td>${s.channel}</td><td>${fmt(s.conversions)}</td><td>—</td><td>—</td></tr>`).join('');
+  document.querySelector('#fontes-table tbody').innerHTML = html;
+  const lider = fontes[0];
+  document.getElementById('fontes-leitura').innerHTML = `<b>Leitura:</b> ${lider.n} lidera em volume atribuído com CPA de ${fmtR(lider.c/lider.v)}. No GA4, "${ga4src[0]?.channel}" concentra o fechamento, o que indica que a mídia gera a demanda e boa parte do público volta direto (ou via Ticketmaster) pra concluir a compra. A venda nasce no anúncio e fecha no direto.`;
+
+  // Mix chart
+  const mix = weeklyMix();
+  new Chart(document.getElementById('mixChart'), { type:'line',
+    data:{ labels: mix.map(w=>w.wk.slice(8,10)+'/'+w.wk.slice(5,7)),
+      datasets:[
+        {label:'% Direto + Orgânico', data: mix.map(w=>pct(w.direto+w.organico, w.pago+w.direto+w.organico+w.outros)), borderColor:'#00FF88', backgroundColor:'rgba(0,255,136,.12)', fill:true, tension:.35},
+        {label:'% Pago', data: mix.map(w=>pct(w.pago, w.pago+w.direto+w.organico+w.outros)), borderColor:'#FF4444', backgroundColor:'rgba(255,68,68,.06)', fill:true, tension:.35},
+      ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#CCC'}}},
+      scales:{ x:{ticks:{color:'#777'},grid:{color:'rgba(255,255,255,.04)'}}, y:{min:0,max:100,ticks:{color:'#777',callback:v=>v+'%'},grid:{color:'rgba(255,255,255,.04)'}} } } });
+
+  // Voz da marca
+  if(state.pulse){
+    document.getElementById('pulse-sub').textContent = 'Última varredura: ' + (state.pulse.updated_at||'').slice(0,10) + ' · ' + (state.pulse.total_mencoes||0) + ' menções catalogadas';
+    const v = state.pulse.veredito||{};
+    const cor = v.furou_bolha==='sim'?'var(--green)':v.furou_bolha==='parcialmente'?'var(--warn)':'var(--red)';
+    document.getElementById('veredito').innerHTML =
+      `<div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.5rem;color:${cor};text-transform:uppercase;margin-bottom:8px">${(v.furou_bolha||'?').replace('nao','não')}</div>
+       <div style="margin-bottom:10px">${v.justificativa||''}</div>
+       <div style="font-size:.8rem;color:var(--text2)"><b style="color:var(--green)">Fortes:</b> ${(v.pontos_fortes||[]).join(' · ')}</div>
+       <div style="font-size:.8rem;color:var(--text2);margin-top:5px"><b style="color:var(--warn)">Fracos:</b> ${(v.pontos_fracos||[]).join(' · ')}</div>
+       <div style="font-size:.8rem;color:var(--text2);margin-top:5px"><b style="color:var(--red)">Riscos:</b> ${(v.riscos||[]).join(' · ')}</div>`;
+    document.getElementById('frentes-resumo').innerHTML = (state.pulse.frentes||[]).map(f=>
+      `<div class="frente-resumo"><div class="nome">${f.nome}</div><div class="corpo"><b>Volume:</b> ${f.volume} · <b>Sentimento:</b> ${f.sentimento}<br>${f.conclusao}</div></div>`).join('');
+    document.getElementById('mencoes').innerHTML = (state.pulse.mencoes_destaque||[]).map(m=>
+      `<div class="mencao"><div class="frente">${m.frente}</div><div class="titulo">${m.url?`<a href="${m.url}" target="_blank" style="color:#fff;text-decoration:none">${m.titulo}</a>`:m.titulo}</div>
+       <div class="meta">${m.fonte}${m.alcance?' · '+m.alcance:''}${m.data?' · '+m.data:''} <span class="pill ${m.sentimento==='positivo'?'pos':m.sentimento==='negativo'?'neg':'neu'}">${m.sentimento}</span></div>
+       <div class="resumo">${m.resumo||''}</div></div>`).join('');
+  } else {
+    document.getElementById('veredito').innerHTML = '<div class="loading">brand-pulse-data.json ainda não gerado. Rode a varredura de menções pra alimentar esta seção.</div>';
+  }
+}
+loadAll();
+</script>
+</body>
+</html>
