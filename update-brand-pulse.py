@@ -72,7 +72,7 @@ def reddit():
             out.append({'canal': 'Comunidades', 'fonte': 'r/' + (p.get('subreddit') or '?'),
                         'titulo': t, 'url': 'https://reddit.com' + (p.get('permalink') or ''),
                         'data': datetime.fromtimestamp(p.get('created_utc', 0), tz=timezone.utc).strftime('%Y-%m-%d'),
-                        'engajamento': f"{p.get('score',0)} pts / {p.get('num_comments',0)} comentarios",
+                        'engajamento': f"{p.get('score',0)} pts / {p.get('num_comments',0)} comentários",
                         'sentimento': sentimento_basico(t + ' ' + (p.get('selftext') or '')[:300])})
     return out
 
