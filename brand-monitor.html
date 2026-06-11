@@ -178,10 +178,18 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
     </div>
   </div>
 
+  <!-- PRESENÇA PRÓPRIA + BUSCA -->
+  <div class="kpis" style="grid-template-columns:repeat(3,1fr)" id="presenca"></div>
+
   <!-- MENÇÕES -->
   <div class="card">
     <div class="h">Menções <b>em destaque</b> <span class="qm" data-tip="O que a internet publicou sobre a marca. Itens marcados como 'novo' chegam do robô que varre Google News e Reddit 2x ao dia; os demais são da varredura profunda. Clique pra abrir a matéria.">?</span> <span style="font-weight:400;font-size:.68rem;text-transform:none;letter-spacing:0;color:var(--tx3)" id="men-note"></span></div>
     <div class="mengrid" id="mencoes"></div>
+  </div>
+
+  <!-- INTEGRAÇÕES -->
+  <div class="card" style="padding:13px 22px">
+    <div id="integ" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:.66rem;color:var(--tx3)"></div>
   </div>
 
 </div>
@@ -391,6 +399,36 @@ function render(){
        <div class="t">${m.url?`<a href="${m.url}" target="_blank">${m.titulo}</a>`:m.titulo}</div>
        <div class="meta">${m.fonte} <span class="pill ${m.sentimento==='positivo'?'pos':m.sentimento==='negativo'?'neg':'neu'}">${m.sentimento}</span></div></div>`).join('');
   }
+
+  // Presença própria + saúde da busca
+  const P=S.pulse||{};
+  const aguarda=(t,chave)=>`<div class="kpi"><div class="n">${t}</div><div class="v" style="color:var(--tx3);font-size:1.05rem;font-family:'Inter';font-weight:600">aguardando ${chave}</div><div class="s">ativa sozinha quando a chave entrar no GitHub</div></div>`;
+  let pres='';
+  if(P.busca){
+    const bh=(P.historico_busca||[]).map(h=>h.share_transacional);
+    const serpTxt=P.serp?` · página de resultados ${P.serp.health}% limpa`:'';
+    pres+=`<div class="kpi"><div class="n">Busca da marca<span class="qm" data-tip="Percentual das sugestões do Google (autocomplete) com intenção de compra: ingressos, datas, valores, cupom. Quanto maior, mais a busca da marca é de gente querendo comprar. Com a chave do Google, soma também a saúde da página de resultados.">?</span></div>
+      <div class="vrow"><div class="v">${P.busca.share_transacional}%</div>${stBadge(P.busca.share_transacional,60)}</div>
+      ${spark(bh,'#C8FF00',60)}<div class="s">sugestões transacionais · saudável: 60%+${serpTxt}</div></div>`;
+  } else pres+=aguarda('Busca da marca','próxima varredura (sem chave)');
+  const ig=(P.social_proprio||{}).instagram, tt=(P.social_proprio||{}).tiktok;
+  if(ig){
+    const hh=(P.historico_social||[]).map(h=>h.ig);
+    pres+=`<div class="kpi"><div class="n">Instagram oficial<span class="qm" data-tip="Seguidores do @festival.interlagos medidos automaticamente via Apify. Saudável: crescendo semana a semana.">?</span></div>
+      <div class="vrow"><div class="v">${fmt(ig.followers)}</div></div>${spark(hh,'#9B6BFF',null)}<div class="s">${fmt(ig.posts)} posts · saudável: crescente</div></div>`;
+  } else pres+=aguarda('Instagram oficial','token Apify');
+  if(tt){
+    const hh=(P.historico_social||[]).map(h=>h.tt);
+    pres+=`<div class="kpi"><div class="n">TikTok oficial<span class="qm" data-tip="Seguidores do @festivalinterlagos medidos automaticamente via Apify. Saudável: crescendo semana a semana.">?</span></div>
+      <div class="vrow"><div class="v">${fmt(tt.followers)}</div></div>${spark(hh,'#4DA8FF',null)}<div class="s">saudável: crescente</div></div>`;
+  } else pres+=aguarda('TikTok oficial','token Apify');
+  document.getElementById('presenca').innerHTML=pres;
+
+  // Status das integrações
+  const I=P.integracoes||{google_news:!!P.feed_auto_total,reddit:!!P.feed_auto_total,autocomplete:!!P.busca,busca_google_pse:!!P.serp,brave:false,apify_social:!!P.social_proprio};
+  const fontes2=[['Google News',I.google_news],['Reddit',I.reddit],['Autocomplete Google',I.autocomplete],['Busca Google (PSE)',I.busca_google_pse],['Brave Search',I.brave],['Apify (IG/TikTok)',I.apify_social]];
+  document.getElementById('integ').innerHTML='<b style="color:var(--tx2);text-transform:uppercase;letter-spacing:.06em;font-size:.6rem">Integrações da varredura:</b> '+
+    fontes2.map(f=>`<span class="pill ${f[1]?'pos':'neu'}">${f[0]} ${f[1]?'✓ ativa':'· aguardando chave'}</span>`).join(' ');
 }
 loadAll();
 setInterval(loadAll, 5*60*1000); // tempo real: re-busca tudo a cada 5 minutos

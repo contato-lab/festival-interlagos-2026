@@ -18,7 +18,12 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Varredura de mencoes (Google News + Reddit)
+      - name: Varredura de mencoes e sinais de marca
+        env:
+          GOOGLE_PSE_KEY: ${{ secrets.GOOGLE_PSE_KEY }}
+          GOOGLE_PSE_CX: ${{ secrets.GOOGLE_PSE_CX }}
+          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: python update-brand-pulse.py
 
       - name: Commit
