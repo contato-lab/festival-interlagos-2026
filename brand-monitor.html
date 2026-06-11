@@ -149,13 +149,13 @@ const fmt = n => (n||0).toLocaleString('pt-BR');
 const fmtR = n => 'R$ ' + (n||0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
 const pct = (a,b) => b ? (a/b*100) : 0;
 
-const state = { ga:null, meta:null, gads:null, tt:null, vd:null, tm:null, pulse:null };
+const state = { ga:null, meta:null, gads:null, tt:null, vd:null, tm:null, pulse:null, ap:null };
 
 async function loadAll(){
   const get = async (u, opt) => { try { const r = await fetch(u + (u.includes('?')?'':'?t='+Date.now()), {cache:'no-store'}); return r.ok ? await r.json() : null; } catch(e){ return null; } };
-  [state.ga, state.meta, state.gads, state.tt, state.vd, state.pulse] = await Promise.all([
+  [state.ga, state.meta, state.gads, state.tt, state.vd, state.pulse, state.ap] = await Promise.all([
     get('ga4-data.json'), get('meta-data.json'), get('google-ads-data.json'),
-    get('tiktok-data.json'), get('vendas-data.json'), get('brand-pulse-data.json')
+    get('tiktok-data.json'), get('vendas-data.json'), get('brand-pulse-data.json'), get('adsplay-data.json')
   ]);
   render(); // primeira pintura sem esperar o worker da TM (cold start pode demorar)
   try { const r = await fetch('https://ticketmaster-festival-interlagos.performance-ef2.workers.dev/?t='+Date.now(), {cache:'no-store'}); state.tm = r.ok ? await r.json() : null; } catch(e){}
@@ -216,9 +216,9 @@ function calcScores(){
   return { total,
     subs: [
       {name:'Demanda própria', val:sDemanda, why:`${shareNP.toFixed(1)}% das sessões das últimas 4 semanas vieram de busca direta ou orgânica (referência saudável: 35%+)`},
-      {name:'Eficiência de mídia', val:sEficiencia, why:`CPA combinado ${fmtR(cpa)} contra ticket médio ${fmtR(tkt)} (${pct(cpa,tkt).toFixed(0)}% do ticket)`},
+      {name:'Eficiência de mídia', val:sEficiencia, why:`CPA da mídia de performance (Meta, Google, TikTok) ${fmtR(cpa)} contra ticket médio ${fmtR(tkt)} (${pct(cpa,tkt).toFixed(0)}% do ticket)`},
       {name:'Conversão de funil', val:sFunil, why:`${convRate.toFixed(2)}% dos ${fmt(users)} usuários viraram ingresso (meta de excelência: 3,5%)`},
-      {name:'Retorno de mídia', val:sRoas, why:`Cada R$ 1 em mídia digital trackeada retorna ${roas.toFixed(1)} em receita (referência: 15x)`},
+      {name:'Retorno de mídia', val:sRoas, why:`Cada R$ 1 em mídia de performance retorna ${roas.toFixed(1)} em receita (referência: 15x). A programática ADSPLAY fica fora desta conta por ser awareness`},
       {name:'Voz da marca', val:sVoz, why: state.pulse?.voz_why || 'Aguardando varredura de menções'},
     ], cpa, tkt, roas, custoTot, convTot, recTot, ingTot, convRate };
 }
@@ -245,11 +245,12 @@ function render(){
 
   // Funil
   const meta = state.meta?.totals||{}, ga = state.ga.totals||{};
-  const imps = (meta.impressions||0) + (state.gads?.totals?.impressions||0) + (state.tt?.totals?.impressions||0);
-  const clicks = (meta.clicks||0) + (state.gads?.totals?.clicks||0) + (state.tt?.totals?.clicks||0);
+  const apT = state.ap?.totals||{};
+  const imps = (meta.impressions||0) + (state.gads?.totals?.impressions||0) + (state.tt?.totals?.impressions||0) + (apT.impressions||0);
+  const clicks = (meta.clicks||0) + (state.gads?.totals?.clicks||0) + (state.tt?.totals?.clicks||0) + (apT.clicks||0);
   const prodViews = (state.ga.top_pages||[]).filter(p=>/\/vendas\/ingressos\/|\/event\//.test(p.page)).reduce((a,p)=>a+p.pageviews,0);
   const steps = [
-    {lbl:'Impressões de mídia digital', val:imps, note:'Meta + Google + TikTok (sem programática, rádio, TV e metrô)'},
+    {lbl:'Impressões de mídia digital', val:imps, note:'Meta + Google + TikTok + ADSPLAY programática (sem rádio, TV e metrô)'},
     {lbl:'Cliques em anúncio', val:clicks, rate:pct(clicks,imps).toFixed(2)+'% CTR'},
     {lbl:'Sessões no site', val:ga.sessions, rate:''},
     {lbl:'Visitas a página de ingresso', val:prodViews, rate:pct(prodViews,ga.pageviews).toFixed(1)+'% dos pageviews'},
@@ -264,7 +265,9 @@ function render(){
       <div class="fbarwrap"><div class="fbar" style="width:${w}%"></div></div>
       <div class="fval">${fmt(s.val)}</div><div class="frate">${s.rate||s.note||''}</div></div>`;
   }).join('');
-  document.getElementById('funil-sub').textContent = `Receita total: ${fmtR(S.recTot)} · ${fmt(S.ingTot)} ingressos · investimento digital trackeado: ${fmtR(S.custoTot)} · retorno ${S.roas.toFixed(1)}x`;
+  const custoAll = S.custoTot + (apT.cost||0);
+  const roasAll = custoAll ? S.recTot/custoAll : 0;
+  document.getElementById('funil-sub').textContent = `Receita total: ${fmtR(S.recTot)} · ${fmt(S.ingTot)} ingressos · mídia digital total (com programática): ${fmtR(custoAll)} · retorno total ${roasAll.toFixed(1)}x · retorno sobre performance ${S.roas.toFixed(1)}x`;
 
   // Fontes de venda
   const fontes = [
@@ -274,6 +277,10 @@ function render(){
   ].sort((a,b)=>b.v-a.v);
   const ga4src = (state.ga.traffic_sources||[]).slice().sort((a,b)=>b.conversions-a.conversions).slice(0,4);
   let html = fontes.map((f,i)=>`<tr${i===0?' class="hl"':''}><td>${f.n} <span style="color:var(--text3);font-size:.68rem">(pixel)</span></td><td>${fmt(f.v)}</td><td>${fmtR(f.c)}</td><td>${f.v?fmtR(f.c/f.v):'—'}</td></tr>`).join('');
+  if(state.ap){
+    html += `<tr><td>ADSPLAY Programática <span style="color:var(--text3);font-size:.68rem">(awareness)</span></td><td>—</td><td>${fmtR(apT.cost)}</td><td>—</td></tr>`;
+    html += `<tr><td colspan="4" style="color:var(--text3);font-size:.68rem">↳ Vídeo, Display, CTV, DOOH e Áudio: ${fmt(apT.impressions)} impressões e ${fmt(apT.clicks)} cliques no período. Papel de alcance: a venda que ela gera fecha em busca, direto e remarketing, não no clique.</td></tr>`;
+  }
   html += `<tr><td colspan="4" style="color:var(--text3);font-size:.7rem;padding-top:14px">VISÃO GA4 (último clique) — onde a venda fecha:</td></tr>`;
   html += ga4src.map(s=>`<tr><td>${s.channel}</td><td>${fmt(s.conversions)}</td><td>—</td><td>—</td></tr>`).join('');
   document.querySelector('#fontes-table tbody').innerHTML = html;

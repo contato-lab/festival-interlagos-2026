@@ -1,0 +1,20 @@
+{
+  "updated_at": "2026-06-11T14:30:00Z",
+  "source": "ADSPLAY Looker Studio (snapshot manual)",
+  "period": { "start": "2026-04-01", "end": "2026-06-11" },
+  "totals": {
+    "cost": 145543.77,
+    "impressions": 8302667,
+    "clicks": 53570,
+    "attributed_conversions": 1,
+    "assisted_traffic": 6072
+  },
+  "by_media": [
+    { "media": "Video", "cost": 53575.98, "impressions": 2699244, "clicks": 40901, "ctr": 3.62, "reach": 1351641, "complete_views": 1630015, "vtr": 60.39, "budget": 105000 },
+    { "media": "Display", "cost": 35838.73, "impressions": 5097217, "clicks": 10660, "ctr": 0.63, "reach": 2643336, "cpm": 7.03, "budget": 80000 },
+    { "media": "CTV/OTT", "cost": 24033.29, "impressions": 283719, "clicks": 11, "reach": 93847, "complete_views": 277588, "vtr": 97.84, "budget": 50000 },
+    { "media": "DOOH", "cost": 23851.81, "impressions": 91860, "clicks": 0, "insertions": 11868, "cpm": 259.65, "budget": 100000 },
+    { "media": "Audio", "cost": 8243.96, "impressions": 130627, "clicks": 1998, "ctr": 1.53, "reach": 65338, "complete_listens": 101354, "cvr": 79.47, "budget": 15000 }
+  ],
+  "note": "Midia de awareness/alcance. Conversao direta nao e o objetivo: o papel e gerar demanda que fecha em busca, direto e remarketing. GA4 registra ~33,7 mil sessoes da programatica no periodo."
+}
