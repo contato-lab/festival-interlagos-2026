@@ -157,8 +157,9 @@ async function loadAll(){
     get('ga4-data.json'), get('meta-data.json'), get('google-ads-data.json'),
     get('tiktok-data.json'), get('vendas-data.json'), get('brand-pulse-data.json')
   ]);
+  render(); // primeira pintura sem esperar o worker da TM (cold start pode demorar)
   try { const r = await fetch('https://ticketmaster-festival-interlagos.performance-ef2.workers.dev/?t='+Date.now(), {cache:'no-store'}); state.tm = r.ok ? await r.json() : null; } catch(e){}
-  render();
+  if (state.tm) render(); // re-pinta com receita/ingressos da TM somados
 }
 
 function classCanal(s, m){
@@ -230,7 +231,8 @@ function render(){
   // Score ring
   document.getElementById('score-val').textContent = S.total;
   document.getElementById('score-val').style.color = S.total>=70 ? 'var(--green)' : S.total>=45 ? 'var(--lime)' : 'var(--warn)';
-  new Chart(document.getElementById('scoreChart'), { type:'doughnut',
+  if(window.__scoreChart) window.__scoreChart.destroy();
+  window.__scoreChart = new Chart(document.getElementById('scoreChart'), { type:'doughnut',
     data:{ datasets:[{ data:[S.total, 100-S.total], backgroundColor:['#C8FF00','rgba(255,255,255,.06)'], borderWidth:0, cutout:'78%' }] },
     options:{ plugins:{legend:{display:false},tooltip:{enabled:false}}, responsive:true, maintainAspectRatio:true } });
 
@@ -280,7 +282,8 @@ function render(){
 
   // Mix chart
   const mix = weeklyMix();
-  new Chart(document.getElementById('mixChart'), { type:'line',
+  if(window.__mixChart) window.__mixChart.destroy();
+  window.__mixChart = new Chart(document.getElementById('mixChart'), { type:'line',
     data:{ labels: mix.map(w=>w.wk.slice(8,10)+'/'+w.wk.slice(5,7)),
       datasets:[
         {label:'% Direto + Orgânico', data: mix.map(w=>pct(w.direto+w.organico, w.pago+w.direto+w.organico+w.outros)), borderColor:'#00FF88', backgroundColor:'rgba(0,255,136,.12)', fill:true, tension:.35},
