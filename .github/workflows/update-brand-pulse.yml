@@ -1,0 +1,31 @@
+name: Brand Pulse (varredura de mencoes)
+
+on:
+  schedule:
+    - cron: '0 11,21 * * *'  # 08h e 18h BRT, 2x ao dia
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  pulse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Varredura de mencoes (Google News + Reddit)
+        run: python update-brand-pulse.py
+
+      - name: Commit
+        run: |
+          git config user.name "brand-pulse-bot"
+          git config user.email "actions@github.com"
+          git add brand-pulse-data.json
+          git diff --cached --quiet || git commit -m "chore: feed de mencoes automatico [skip ci]"
+          git pull --rebase origin main
+          git push
