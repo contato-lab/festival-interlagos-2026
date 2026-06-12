@@ -319,7 +319,7 @@ function render(){
     {n:'Retorno',v:sRo,m:roas.toFixed(0)+'x sobre performance',sp:spark(ws.map(w=>w.roas),'#2BE080',10),bd:stBadge(roas,10),ref:'você <b>'+roas.toFixed(1)+'x</b> · saudável <b>10x+</b>',tip:'Receita por R$ 1 investido em Meta, Google e TikTok, semana a semana. Linha pontilhada: 10x.'}];
   document.getElementById('pillars').innerHTML=pil.map(p=>
     `<div class="pillar"><div class="n">${p.n}<span class="qm" data-tip="${p.tip}">?</span></div>
-     <div class="vrow"><div class="v" style="color:${colorOf(p.v)}">${p.v}</div>${p.bd}</div>
+     <div class="vrow"><div class="v" style="color:${colorOf(p.v)}">${p.v}<span style="font-size:.85rem;color:var(--tx3);font-weight:600"> /100</span></div>${p.bd}</div>
      ${p.sp}
      <div class="bar"><i style="width:${p.v}%;background:${colorOf(p.v)}"></i><span class="tick" style="left:70%"></span></div>
      <div class="ref">${p.ref}</div>
