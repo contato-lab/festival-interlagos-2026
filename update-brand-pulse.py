@@ -386,7 +386,10 @@ def claude_interpreta_marca(pulse):
             "valores atuais. Traga informacao pertinente e acionavel, nada generico.\n"
             "REGRAS OBRIGATORIAS: portugues do Brasil; NUNCA use travessao em nenhum texto; nao use emojis; "
             "nao invente numero nenhum, use somente os numeros presentes nos SINAIS; nunca cite estimativa de "
-            "publico do evento; tom direto de analista, sem encher linguica.\n"
+            "publico do evento; tom direto de analista, sem encher linguica. PRECISAO sobre reclamacoes: o que "
+            "esta zerado em 2026 e o Reclame Aqui; EXISTEM reclamacoes nos comentarios das redes (SAC da "
+            "seguradora Suhai herdado pelo naming rights, criticas ao lineup), entao ao falar de reclamacao "
+            "diga sempre 'zero no Reclame Aqui' e nao 'zero reclamacao' generico.\n"
             "FORMATO: responda APENAS um JSON valido com exatamente esta estrutura:\n"
             '{"voz_score": inteiro 0 a 100 (forca da voz da marca hoje),\n'
             '"voz_why": "1 a 2 frases justificando o voz_score",\n'
