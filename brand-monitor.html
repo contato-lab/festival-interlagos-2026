@@ -198,7 +198,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
   <!-- MIX + VOZ -->
   <div class="duo">
     <div class="card">
-      <div class="h">Demanda <b>própria vs paga</b> <span class="qm" data-tip="Evolução semanal do tráfego do site. Verde: gente que chega sozinha (busca ou digitando o site). Vermelho: gente trazida por anúncio. Verde subindo = marca ganhando força própria, é a assinatura de furar a bolha.">?</span> <span style="font-weight:400;font-size:.68rem;text-transform:none;letter-spacing:0;color:var(--tx3)">· % das sessões semanais</span></div>
+      <div class="h">De onde vem o <b>tráfego</b> <span class="qm" data-tip="Evolução semanal das SESSÕES do site (visitas, não vendas). Verde: quem chega sozinho (busca, direto, social orgânico, email). Vermelho: quem vem por anúncio pago. Atenção: o anúncio traz muito volume de visita mas converte pouco, por isso aqui a fatia paga é maior que na seção de vendas. Para força de marca, olhe a Demanda própria (que é por venda).">?</span> <span style="font-weight:400;font-size:.68rem;text-transform:none;letter-spacing:0;color:var(--tx3)">· visitas, não vendas</span></div>
       <div class="cbx"><canvas id="mix"></canvas></div>
     </div>
     <div class="card">
@@ -277,7 +277,8 @@ function weeklySeries(){
   const ks=Object.keys(W).sort();
   // descarta semana parcial corrente se tiver menos de 3 dias de dados? mantemos tudo; ultima semana pode estar parcial
   return ks.map(k=>{const w=W[k];return {wk:k,rec:w.rec,ing:w.ing,custo:w.custo,conv:w.conv,sess:w.sess,
-    roas:w.custo?w.rec/w.custo:null,cpa:w.conv?w.custo/w.conv:null,convRate:w.sess?w.ing/w.sess*100:null,shareNP:w.sess?w.np/w.sess*100:null}})
+    roas:w.custo?w.rec/w.custo:null,cpa:w.conv?w.custo/w.conv:null,convRate:w.sess?w.ing/w.sess*100:null,shareNP:w.sess?w.np/w.sess*100:null,
+    vendaPropria:w.ing>0?Math.max(0,(w.ing-w.conv)/w.ing*100):null}})
     .filter(w=>w.sess>500||w.rec>1000);
 }
 function spark(vals,color,goal,goalMaxBetter=true){
@@ -316,7 +317,9 @@ function render(){
   const ing=(S.vd?.totals?.total_ingressos||0)+(tmT.total_ingressos||0);
   const cpa=conv?custo/conv:0, tkt=ing?rec/ing:0, roas=custo?rec/custo:0;
   const users=S.ga.totals?.users||0, convRate=pct(ing,users);
-  const sDem=Math.min(100,Math.round(shareNP/35*100));
+  // demanda propria = % das VENDAS que chegam sem midia paga (mesma base de "quem gera a venda"), nao trafego
+  const vendaPropriaPct=ing>0?Math.max(0,Math.min(100,Math.round((ing-conv)/ing*100))):null;
+  const sDem=vendaPropriaPct!==null?vendaPropriaPct:50;
   const sEf=tkt?Math.max(0,Math.min(100,Math.round(100-(cpa/tkt-0.10)*250))):50;
   const sFu=Math.max(0,Math.min(100,Math.round(convRate/3.5*100)));
   const sRo=Math.max(0,Math.min(100,Math.round(roas/15*100)));
@@ -337,7 +340,7 @@ function render(){
   const vozHist=(S.pulse?.historico||[]).map(h=>h.voz);
   const pil=[
     {n:'Voz da marca',v:sVo,m:'menções, imprensa e reputação',sp:spark(vozHist,'#C8FF00',60),bd:stBadge(sVo,60),ref:'você <b>'+sVo+'</b> · saudável <b>60+</b>',tip:'O que falam da marca na internet: imprensa, redes, comunidades e reclamações. Atualizado pela IA a cada varredura.'+(S.pulse?.voz_why?' Leitura atual: '+esc(S.pulse.voz_why):'')},
-    {n:'Demanda própria',v:sDem,m:shareNP.toFixed(0)+'% do tráfego vem sozinho',sp:spark(ws.map(w=>w.shareNP),'#2BE080',35),bd:stBadge(shareNP,35),ref:'você <b>'+shareNP.toFixed(0)+'%</b> · saudável <b>35%+</b>',tip:'Quanto do tráfego chega sem anúncio: busca, direto, social orgânico do perfil e email/CRM. Navegação interna entre páginas do próprio site não entra na conta. A linha pontilhada é a meta de 35%.'},
+    {n:'Demanda própria',v:sDem,m:(vendaPropriaPct??'—')+'% das vendas sem mídia paga',sp:spark(ws.map(w=>w.vendaPropria),'#2BE080',35),bd:stBadge(sDem,35),ref:'você <b>'+(vendaPropriaPct??'—')+'%</b> · saudável <b>35%+</b>',tip:'Fatia das vendas de ingressos que NÃO foi atribuída a anúncio pago (Meta, Google, TikTok). É o restante que chega por acesso direto, busca orgânica e indicação. Mesma base da seção "Quem gera a venda". Quanto maior, mais a marca vende sozinha. Meta: 35%+.'},
     {n:'Eficiência',v:sEf,m:'CPA '+fmtR(cpa)+' por venda',sp:spark(ws.map(w=>w.cpa),'#4DA8FF',cpaGoal,false),bd:stBadge(cpa,cpaGoal,false),ref:'você <b>'+fmtR(cpa)+'</b> · saudável <b>até '+fmtR(cpaGoal)+'</b>',tip:'Custo por venda (CPA) semanal. Saudável: consumir no máximo 15% do ticket médio. Aqui, quanto MENOR a linha, melhor.'},
     {n:'Funil',v:sFu,m:convRate.toFixed(1)+'% dos visitantes compram',sp:spark(ws.map(w=>w.convRate),'#9B6BFF',3),bd:stBadge(convRate,2.5),ref:'você <b>'+convRate.toFixed(1)+'%</b> · saudável <b>2,5%+</b>',tip:'Percentual de visitantes que compram, semana a semana. Linha pontilhada: 3% (excelência).'},
     {n:'Retorno',v:sRo,m:roas.toFixed(0)+'x sobre performance',sp:spark(ws.map(w=>w.roas),'#2BE080',10),bd:stBadge(roas,10),ref:'você <b>'+roas.toFixed(1)+'x</b> · saudável <b>10x+</b>',tip:'Receita por R$ 1 investido em Meta, Google e TikTok, semana a semana. Linha pontilhada: 10x.'}];
@@ -367,7 +370,7 @@ function render(){
     {n:'Receita',v:fmtR(rec),s:fmt(ing)+' ingressos'+(recDelta!==null?' · semana '+(recDelta>=0?'+':'')+recDelta.toFixed(0)+'%':''),sp:spark(ws.map(w=>w.rec),'#C8FF00',null),bd:recDelta===null?'':(recDelta>=0?'<span class="badge-st bs-bom">SUBINDO</span>':'<span class="badge-st bs-at">CAINDO</span>'),tip:'Receita total: site próprio + Ticketmaster. A linha mostra a receita semana a semana; o % compara as duas últimas semanas completas.'},
     {n:'Retorno performance',v:roas?roas.toFixed(1)+'x':'—',s:'saudável: 10x ou mais',sp:spark(ws.map(w=>w.roas),'#2BE080',10),bd:stBadge(roas,10),tip:'Receita por R$ 1 investido em Meta, Google e TikTok. Linha pontilhada: meta de 10x.'},
     {n:'CPA médio',v:fmtR2(cpa),s:'saudável: até '+fmtR(cpaGoal)+' (15% do ticket)',sp:spark(ws.map(w=>w.cpa),'#4DA8FF',cpaGoal,false),bd:stBadge(cpa,cpaGoal,false),tip:'Custo por venda nas plataformas de performance. Quanto menor, melhor. Linha pontilhada: teto saudável de 15% do ticket médio.'},
-    {n:'Demanda própria',v:shareNP.toFixed(0)+'%',s:'saudável: 35% ou mais',sp:spark(ws.map(w=>w.shareNP),'#2BE080',35),bd:stBadge(shareNP,35),tip:'Fatia das sessões que chega sem anúncio: busca, direto, social orgânico do perfil e email/CRM. Termômetro de força própria da marca. Linha pontilhada: 35%.'},
+    {n:'Demanda própria',v:(vendaPropriaPct??'—')+'%',s:'das vendas sem mídia paga · saudável: 35%+',sp:spark(ws.map(w=>w.vendaPropria),'#2BE080',35),bd:stBadge(sDem,35),tip:'Fatia das vendas de ingressos não atribuída a anúncio pago. Mesma base da seção "Quem gera a venda". Termômetro de força própria da marca. Linha pontilhada: 35%.'},
     {n:'Menções 2026',v:S.pulse?.total_mencoes??'—',s:'saudável: crescente a cada varredura',sp:spark(menHist,'#C8FF00',null),bd:'',tip:'Menções catalogadas pela varredura. A linha cresce a cada nova varredura profunda; o robô diário soma menções novas entre varreduras.'},
     {n:'Sentimento positivo',v:sent,s:(sentPos+sentNeg)?sentPos+' positivas vs '+sentNeg+' negativas · saudável: 70%+':'saudável: 70% ou mais',sp:spark(sentHist,'#2BE080',70),bd:sentPct!==null?stBadge(sentPct,70):'',tip:'Entre menções e comentários com opinião (positivos ou negativos), quantos % são positivos. Neutros ficam de fora da conta. Linha pontilhada: 70%.'}];
   document.getElementById('kpis').innerHTML=kp.map(k=>

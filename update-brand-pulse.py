@@ -228,6 +228,24 @@ def sentimento_comentario(txt):
     return 'neutro'
 
 
+# reclamacao da seguradora Suhai (patrocinadora, marca diferente do festival) que vaza pelo naming rights
+SEGURO = re.compile(r'seguradora|sinistro|vistoria|ap[óo]lice|indeniza|guincho|oficina|reembolso|cobertura|'
+                    r've[íi]culo\s+(parado|segurado)|carro\s+parado|caminh[ãa]o.*parado|me\s+bateram|bateu\s+atr[áa]s|'
+                    r'acidente|aguardando\s+(vistoria|laudo)|prote[çc][ãa]o\s+veicular|conserto', re.I)
+# contexto que confirma que o comentario e sobre o FESTIVAL (e nao sobre o seguro)
+FESTIVAL_CTX = re.compile(r'ingresso|festival|interlagos|line.?up|lineup|show|test.?ride|pista|evento|palco|'
+                          r'pulseira|portaria|meia.?entrada|estacionamento|grade|atra[çc][ãa]o|camarote|'
+                          r'\bpasse\b|\bmoto\b|\bcarro\b|expo', re.I)
+
+def eh_comentario_festival(txt):
+    """False quando o comentario e reclamacao da seguradora Suhai (sinistro, oficina, vistoria) sem
+    relacao com o festival. Esse dashboard e do Festival Interlagos, nao do SAC da seguradora."""
+    t = txt or ''
+    if SEGURO.search(t) and not FESTIVAL_CTX.search(t):
+        return False
+    return True
+
+
 def claude_classifica(comentarios):
     """Classifica sentimento e gera resumo via Claude API (Haiku). Retorna (labels, resumo) ou (None, None).
     So roda se ANTHROPIC_API_KEY existir; custo estimado: centavos por dia."""
@@ -242,7 +260,10 @@ def claude_classifica(comentarios):
                   "(ex: m&$#@) são negativos; críticas ao lineup/shows são negativas; reclamações da "
                   "seguradora Suhai são negativas; dúvidas são neutras; empolgação (bora, já comprei, "
                   "emojis de amor/fogo) é positiva. "
-                  "Tarefa 2: um resumo de no máximo 2 frases dos temas dominantes, em português, sem travessão. "
+                  "Tarefa 2: um resumo de no máximo 2 frases dos temas dominantes SOBRE O FESTIVAL "
+                  "(ingressos, line-up, test rides, organização), em português, sem travessão. IGNORE "
+                  "no resumo qualquer reclamação sobre a seguradora Suhai (sinistro, oficina, vistoria): "
+                  "isso é da seguradora patrocinadora, não do festival. "
                   'Responda APENAS JSON válido: {"sentimentos": ["..."], "resumo": "..."}.\n\nComentários:\n'
                   + json.dumps([c.get('texto', '') for c in comentarios], ensure_ascii=False))
         body = json.dumps({'model': 'claude-haiku-4-5-20251001', 'max_tokens': 1200,
@@ -544,9 +565,11 @@ def social_comments(pulse):
                     merged[k]['data'] = it['data']
             else:
                 merged[k] = dict(it)
-        # descarta comentario com data conhecida ha mais de 30 dias; ordena do mais antigo ao mais novo
+        # descarta: reclamacao da seguradora (nao e do festival) e comentario com mais de 30 dias
         corte = (datetime.now(timezone.utc) - timedelta(days=30)).strftime('%Y-%m-%d')
-        lst = [c for c in merged.values() if not c.get('data') or c['data'] >= corte]
+        lst = [c for c in merged.values()
+               if eh_comentario_festival(c.get('texto'))
+               and (not c.get('data') or c['data'] >= corte)]
         lst.sort(key=lambda c: c.get('data') or '')
         old = lst[-30:]
         # sentimento fino + resumo automatico via Claude API (quando a chave existir)
