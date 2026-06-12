@@ -203,6 +203,12 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
     <div class="mengrid" id="mencoes"></div>
   </div>
 
+  <!-- O QUE ESTÃO COMENTANDO -->
+  <div class="card">
+    <div class="h">O que estão <b>comentando</b> <span class="qm" data-tip="Comentários públicos coletados automaticamente 1x ao dia: posts mais recentes do Instagram oficial, vídeos do TikTok oficial e vídeos de criadores no YouTube. O sentimento é classificado automaticamente; a leitura qualitativa entra a cada varredura profunda.">?</span> <span style="font-weight:400;font-size:.68rem;text-transform:none;letter-spacing:0;color:var(--tx3)" id="com-note"></span></div>
+    <div id="comentarios" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px"></div>
+  </div>
+
   <!-- INTEGRAÇÕES -->
   <div class="card" style="padding:13px 22px">
     <div id="integ" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:.66rem;color:var(--tx3)"></div>
@@ -488,9 +494,31 @@ function render(){
   } else pres+=aguarda('TikTok oficial','token Apify');
   document.getElementById('presenca').innerHTML=pres;
 
+  // Comentários sociais
+  const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const SC=P.social_comentarios;
+  const platDefs=[['instagram','Instagram','#9B6BFF'],['tiktok','TikTok','#4DA8FF'],['youtube','YouTube','#FF5C5C']];
+  if(SC&&SC.plataformas){
+    document.getElementById('com-note').textContent='· coleta diária automática · atualizado '+(SC.updated_at||'');
+    document.getElementById('comentarios').innerHTML=platDefs.map(([k,nome,cor])=>{
+      const pc=SC.plataformas[k];
+      if(!pc||!pc.coletados) return `<div class="men"><div class="f" style="color:${cor}">${nome}</div><div class="meta" style="margin-top:6px">sem comentários coletados ainda</div></div>`;
+      const pct=Math.round(pc.positivos/pc.coletados*100);
+      const resumo=(SC.resumo||{})[k];
+      const list=(pc.comentarios||[]).slice(-6).reverse();
+      return `<div class="men"><div class="f" style="color:${cor}">${nome} · ${pc.coletados} comentários · ${pct}% positivos${pc.negativos?` · <span style="color:var(--red)">${pc.negativos} negativos ⚠</span>`:''}</div>
+        ${resumo?`<div style="font-size:.72rem;color:var(--tx2);margin:7px 0;line-height:1.45;border-left:2px solid ${cor};padding-left:8px">${esc(resumo)}</div>`:''}
+        ${list.map(c=>`<div style="border-top:1px solid var(--line);padding:7px 0">
+          <div style="font-size:.73rem;line-height:1.4">${esc(c.texto)}</div>
+          <div class="meta" style="margin-top:3px">@${esc(c.autor)}${c.likes?' · '+fmt(c.likes)+' curtidas':''} <span class="pill ${c.sentimento==='positivo'?'pos':c.sentimento==='negativo'?'neg':'neu'}">${c.sentimento}</span></div></div>`).join('')}</div>`;
+    }).join('');
+  } else {
+    document.getElementById('comentarios').innerHTML='<div style="font-size:.74rem;color:var(--tx3)">Primeira coleta acontece na próxima rodada do robô.</div>';
+  }
+
   // Status das integrações
   const I=P.integracoes||{google_news:!!P.feed_auto_total,reddit:!!P.feed_auto_total,autocomplete:!!P.busca,busca_google_pse:!!P.serp,brave:false,apify_social:!!P.social_proprio};
-  const fontes2=[['Google News',I.google_news],['Reddit',I.reddit],['Autocomplete Google',I.autocomplete],['Brave (busca web + saúde da busca)',I.brave],['Apify (IG/TikTok)',I.apify_social]];
+  const fontes2=[['Google News',I.google_news],['Reddit',I.reddit],['Autocomplete Google',I.autocomplete],['Brave (busca web + saúde da busca)',I.brave],['Apify (IG/TikTok)',I.apify_social],['Comentários sociais',!!SC]];
   document.getElementById('integ').innerHTML='<b style="color:var(--tx2);text-transform:uppercase;letter-spacing:.06em;font-size:.6rem">Integrações da varredura:</b> '+
     fontes2.map(f=>`<span class="pill ${f[1]?'pos':'neu'}">${f[0]} ${f[1]?'✓ ativa':'· aguardando chave'}</span>`).join(' ');
 }

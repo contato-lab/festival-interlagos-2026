@@ -195,6 +195,94 @@ def brave(feed, vistos, pulse):
     return add
 
 
+def apify_call(actor, payload, token, timeout=300):
+    url = f'https://api.apify.com/v2/acts/{actor}/run-sync-get-dataset-items?token={token}'
+    req = urllib.request.Request(url, data=json.dumps(payload).encode(),
+                                 headers={**UA, 'Content-Type': 'application/json'})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.loads(r.read())
+
+
+def social_comments(pulse):
+    """Coleta comentarios publicos (IG oficial, TikTok oficial, videos de criadores no YouTube).
+    Roda 1x ao dia (execucao da manha) para caber nos creditos gratis do Apify."""
+    token = os.environ.get('APIFY_TOKEN')
+    if not token:
+        return
+    hour = datetime.now(timezone.utc).hour
+    if not (hour < 15 or os.environ.get('FORCE_COMMENTS')):
+        return
+    sc = pulse.get('social_comentarios', {})
+    plats = sc.setdefault('plataformas', {})
+
+    def push(plat, items):
+        old = (plats.get(plat) or {}).get('comentarios', [])
+        seen = {(c.get('autor'), c.get('texto')) for c in old}
+        for it in items:
+            k = (it.get('autor'), it.get('texto'))
+            if k not in seen:
+                old.append(it)
+                seen.add(k)
+        old = old[-30:]
+        pos = len([c for c in old if c.get('sentimento') == 'positivo'])
+        neg = len([c for c in old if c.get('sentimento') == 'negativo'])
+        plats[plat] = {'coletados': len(old), 'positivos': pos, 'negativos': neg,
+                       'comentarios': old, 'updated_at': HOJE}
+
+    # Instagram: comentarios dos 3 posts mais recentes do perfil oficial
+    try:
+        posts = apify_call('apify~instagram-post-scraper',
+                           {'username': ['festival.interlagos'], 'resultsLimit': 3}, token)
+        urls = [p.get('url') for p in posts if p.get('url')][:3]
+        if urls:
+            coms = apify_call('apify~instagram-comment-scraper',
+                              {'directUrls': urls, 'resultsLimit': 30}, token)
+            items = [{'texto': (c.get('text') or '')[:220], 'autor': c.get('ownerUsername') or '?',
+                      'likes': c.get('likesCount') or 0, 'sentimento': sentimento(c.get('text')),
+                      'origem': 'post oficial'} for c in coms if c.get('text')]
+            push('instagram', items)
+            print(f'[coment-ig] {len(items)} comentarios')
+    except Exception as e:
+        print(f'[coment-ig] {e}', file=sys.stderr)
+
+    # TikTok: comentarios dos 3 videos mais recentes do perfil oficial
+    try:
+        vids = apify_call('clockworks~tiktok-profile-scraper',
+                          {'profiles': ['festivalinterlagos'], 'resultsPerPage': 3,
+                           'shouldDownloadVideos': False, 'shouldDownloadCovers': False,
+                           'shouldDownloadSubtitles': False}, token)
+        vurls = [v.get('webVideoUrl') for v in vids if v.get('webVideoUrl')][:3]
+        if vurls:
+            coms = apify_call('clockworks~tiktok-comments-scraper',
+                              {'postURLs': vurls, 'commentsPerPost': 10}, token)
+            items = [{'texto': (c.get('text') or '')[:220], 'autor': c.get('uniqueId') or '?',
+                      'likes': c.get('diggCount') or 0, 'sentimento': sentimento(c.get('text')),
+                      'origem': 'vídeo oficial'} for c in coms if c.get('text')]
+            push('tiktok', items)
+            print(f'[coment-tt] {len(items)} comentarios')
+    except Exception as e:
+        print(f'[coment-tt] {e}', file=sys.stderr)
+
+    # YouTube: comentarios dos videos de criadores monitorados (lista atualizada nas varreduras)
+    try:
+        vlist = pulse.get('videos_monitorados') or []
+        if vlist:
+            coms = apify_call('streamers~youtube-comments-scraper',
+                              {'startUrls': [{'url': u} for u in vlist[:3]], 'maxComments': 10}, token)
+            items = [{'texto': (c.get('comment') or c.get('text') or '')[:220],
+                      'autor': c.get('author') or c.get('authorName') or '?',
+                      'likes': c.get('voteCount') or c.get('likes') or 0,
+                      'sentimento': sentimento(c.get('comment') or c.get('text')),
+                      'origem': 'vídeo de criador'} for c in coms if (c.get('comment') or c.get('text'))]
+            push('youtube', items)
+            print(f'[coment-yt] {len(items)} comentarios')
+    except Exception as e:
+        print(f'[coment-yt] {e}', file=sys.stderr)
+
+    sc['updated_at'] = HOJE
+    pulse['social_comentarios'] = sc
+
+
 def apify(pulse):
     token = os.environ.get('APIFY_TOKEN')
     if not token:
@@ -254,6 +342,7 @@ def main():
     autocomplete(pulse)
     google_pse(pulse)
     apify(pulse)
+    social_comments(pulse)
 
     pulse['integracoes'] = {
         'google_news': True, 'reddit': True, 'autocomplete': 'busca' in pulse,
