@@ -270,18 +270,31 @@ def _limpa(x):
     return x
 
 
+def _ga4_classe(r):
+    """Mesma regua do dashboard (classCanal): self-referral fora da conta; social proprio e email contam como demanda propria."""
+    s, m = (r.get('source') or '').lower(), (r.get('medium') or '').lower()
+    if 'festivalinterlagos.com.br' in s:
+        return 'self'
+    if re.search(r'paid|cpc|ppc|ads|cpm|awareness|affiliate|display|tiktok', m):
+        return 'pago'
+    if (s == '(direct)' and m == '(none)') or 'organic' in m or s == 'organico':
+        return 'proprio'
+    if re.search(r'social|story', m) or s == 'ig' or 'instagram' in s:
+        return 'proprio'
+    if re.search(r'email', m) or re.search(r'salesforce|crm|abertura|^eml', s):
+        return 'proprio'
+    return 'outros'
+
+
 def _ga4_share_proprio():
-    """Share de trafego proprio (organico + direto) em duas janelas: lancamento e ultimos 14 dias."""
+    """Share de trafego proprio (direto + organico + social do perfil + email) em duas janelas,
+    excluindo navegacao interna entre subdominios do proprio site."""
     try:
         with open('ga4-data.json', encoding='utf-8') as f:
             rows = [r for r in (json.load(f).get('source_medium_daily') or []) if isinstance(r, dict)]
         datas = sorted({r.get('date') for r in rows if r.get('date')})
         if len(datas) < 7:
             return None
-
-        def proprio(r):
-            s, m = (r.get('source') or '').lower(), (r.get('medium') or '').lower()
-            return (s == '(direct)' and m == '(none)') or 'organic' in m
 
         def share(dset):
             tot = own = 0
@@ -291,8 +304,11 @@ def _ga4_share_proprio():
                         sess = int(r.get('sessions') or 0)
                     except (TypeError, ValueError):
                         continue
+                    cl = _ga4_classe(r)
+                    if cl == 'self':
+                        continue
                     tot += sess
-                    own += sess if proprio(r) else 0
+                    own += sess if cl == 'proprio' else 0
             return round(own / tot * 100) if tot else None
 
         return {'lancamento_pct': share(set(datas[:14])), 'ultimos_14_dias_pct': share(set(datas[-14:]))}

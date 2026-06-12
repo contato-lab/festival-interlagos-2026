@@ -251,15 +251,18 @@ async function loadAll(){
 }
 
 function classCanal(s,m){s=(s||'').toLowerCase();m=(m||'').toLowerCase();
+  if(s.indexOf('festivalinterlagos.com.br')>=0)return 'self'; // navegacao entre subdominios proprios: nao e aquisicao
   if(m.match(/paid|cpc|ppc|ads|cpm|awareness|affiliate|display|tiktok/))return 'pago';
   if(s==='(direct)'&&m==='(none)')return 'direto';
   if(m.match(/organic/)||s==='organico')return 'organico';
+  if(m.match(/social|story/)||s==='ig'||s.indexOf('instagram')>=0)return 'proprio';   // social organico do perfil
+  if(m.match(/email/)||s.match(/salesforce|crm|abertura|^eml/))return 'proprio';      // email e CRM
   return 'outros'}
 function weeklyMix(){const w={};(S.ga.source_medium_daily||[]).forEach(r=>{
   const d=new Date(r.date+'T12:00:00');const mo=new Date(d);mo.setDate(d.getDate()-((d.getDay()+6)%7));
-  const k=mo.toISOString().slice(0,10);if(!w[k])w[k]={pago:0,direto:0,organico:0,outros:0};
+  const k=mo.toISOString().slice(0,10);if(!w[k])w[k]={pago:0,direto:0,organico:0,proprio:0,outros:0,self:0};
   w[k][classCanal(r.source,r.medium)]+=r.sessions});
-  return Object.keys(w).sort().map(k=>({wk:k,...w[k]})).filter(x=>(x.pago+x.direto+x.organico+x.outros)>1000)}
+  return Object.keys(w).sort().map(k=>({wk:k,...w[k]})).filter(x=>(x.pago+x.direto+x.organico+x.proprio+x.outros)>1000)}
 
 function weekKey(dstr){const d=new Date(dstr+'T12:00:00');const mo=new Date(d);mo.setDate(d.getDate()-((d.getDay()+6)%7));return mo.toISOString().slice(0,10)}
 function weeklySeries(){
@@ -270,7 +273,7 @@ function weeklySeries(){
   (S.meta?.daily_series||[]).forEach(r=>{add(r.date,'custo',r.cost||0);add(r.date,'conv',r.purchases||0)});
   (S.gads?.daily_series||[]).forEach(r=>{add(r.date,'custo',r.cost||0);add(r.date,'conv',r.conversions||0)});
   (S.tt?.daily_series||[]).forEach(r=>{add(r.date,'custo',r.cost||0);add(r.date,'conv',r.purchases||0)});
-  (S.ga?.source_medium_daily||[]).forEach(r=>{add(r.date,'sess',r.sessions||0);if(classCanal(r.source,r.medium)!=='pago'&&(classCanal(r.source,r.medium)==='direto'||classCanal(r.source,r.medium)==='organico'))add(r.date,'np',r.sessions||0)});
+  (S.ga?.source_medium_daily||[]).forEach(r=>{const cl=classCanal(r.source,r.medium);if(cl==='self')return;add(r.date,'sess',r.sessions||0);if(cl==='direto'||cl==='organico'||cl==='proprio')add(r.date,'np',r.sessions||0)});
   const ks=Object.keys(W).sort();
   // descarta semana parcial corrente se tiver menos de 3 dias de dados? mantemos tudo; ultima semana pode estar parcial
   return ks.map(k=>{const w=W[k];return {wk:k,rec:w.rec,ing:w.ing,custo:w.custo,conv:w.conv,sess:w.sess,
@@ -304,7 +307,7 @@ function render(){
   if(!S.ga)return;
   const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const mix=weeklyMix(), last4=mix.slice(-4);
-  const np=last4.reduce((a,w)=>a+w.direto+w.organico,0), tt4=last4.reduce((a,w)=>a+w.pago+w.direto+w.organico+w.outros,0);
+  const np=last4.reduce((a,w)=>a+w.direto+w.organico+(w.proprio||0),0), tt4=last4.reduce((a,w)=>a+w.pago+w.direto+w.organico+(w.proprio||0)+w.outros,0);
   const shareNP=pct(np,tt4);
   const custo=(S.meta?.totals?.cost||0)+(S.gads?.totals?.cost||0)+(S.tt?.totals?.cost||0);
   const conv=(S.meta?.totals?.purchases||0)+(S.gads?.totals?.conversions||0)+(S.tt?.totals?.purchases||0);
@@ -334,7 +337,7 @@ function render(){
   const vozHist=(S.pulse?.historico||[]).map(h=>h.voz);
   const pil=[
     {n:'Voz da marca',v:sVo,m:'menções, imprensa e reputação',sp:spark(vozHist,'#C8FF00',60),bd:stBadge(sVo,60),ref:'você <b>'+sVo+'</b> · saudável <b>60+</b>',tip:'O que falam da marca na internet: imprensa, redes, comunidades e reclamações. Atualizado pela IA a cada varredura.'+(S.pulse?.voz_why?' Leitura atual: '+esc(S.pulse.voz_why):'')},
-    {n:'Demanda própria',v:sDem,m:shareNP.toFixed(0)+'% do tráfego vem sozinho',sp:spark(ws.map(w=>w.shareNP),'#2BE080',35),bd:stBadge(shareNP,35),ref:'você <b>'+shareNP.toFixed(0)+'%</b> · saudável <b>35%+</b>',tip:'Quanto do tráfego chega sem anúncio (busca + direto), semana a semana desde o lançamento. A linha pontilhada é a meta de 35%.'},
+    {n:'Demanda própria',v:sDem,m:shareNP.toFixed(0)+'% do tráfego vem sozinho',sp:spark(ws.map(w=>w.shareNP),'#2BE080',35),bd:stBadge(shareNP,35),ref:'você <b>'+shareNP.toFixed(0)+'%</b> · saudável <b>35%+</b>',tip:'Quanto do tráfego chega sem anúncio: busca, direto, social orgânico do perfil e email/CRM. Navegação interna entre páginas do próprio site não entra na conta. A linha pontilhada é a meta de 35%.'},
     {n:'Eficiência',v:sEf,m:'CPA '+fmtR(cpa)+' por venda',sp:spark(ws.map(w=>w.cpa),'#4DA8FF',cpaGoal,false),bd:stBadge(cpa,cpaGoal,false),ref:'você <b>'+fmtR(cpa)+'</b> · saudável <b>até '+fmtR(cpaGoal)+'</b>',tip:'Custo por venda (CPA) semanal. Saudável: consumir no máximo 15% do ticket médio. Aqui, quanto MENOR a linha, melhor.'},
     {n:'Funil',v:sFu,m:convRate.toFixed(1)+'% dos visitantes compram',sp:spark(ws.map(w=>w.convRate),'#9B6BFF',3),bd:stBadge(convRate,2.5),ref:'você <b>'+convRate.toFixed(1)+'%</b> · saudável <b>2,5%+</b>',tip:'Percentual de visitantes que compram, semana a semana. Linha pontilhada: 3% (excelência).'},
     {n:'Retorno',v:sRo,m:roas.toFixed(0)+'x sobre performance',sp:spark(ws.map(w=>w.roas),'#2BE080',10),bd:stBadge(roas,10),ref:'você <b>'+roas.toFixed(1)+'x</b> · saudável <b>10x+</b>',tip:'Receita por R$ 1 investido em Meta, Google e TikTok, semana a semana. Linha pontilhada: 10x.'}];
@@ -364,7 +367,7 @@ function render(){
     {n:'Receita',v:fmtR(rec),s:fmt(ing)+' ingressos'+(recDelta!==null?' · semana '+(recDelta>=0?'+':'')+recDelta.toFixed(0)+'%':''),sp:spark(ws.map(w=>w.rec),'#C8FF00',null),bd:recDelta===null?'':(recDelta>=0?'<span class="badge-st bs-bom">SUBINDO</span>':'<span class="badge-st bs-at">CAINDO</span>'),tip:'Receita total: site próprio + Ticketmaster. A linha mostra a receita semana a semana; o % compara as duas últimas semanas completas.'},
     {n:'Retorno performance',v:roas?roas.toFixed(1)+'x':'—',s:'saudável: 10x ou mais',sp:spark(ws.map(w=>w.roas),'#2BE080',10),bd:stBadge(roas,10),tip:'Receita por R$ 1 investido em Meta, Google e TikTok. Linha pontilhada: meta de 10x.'},
     {n:'CPA médio',v:fmtR2(cpa),s:'saudável: até '+fmtR(cpaGoal)+' (15% do ticket)',sp:spark(ws.map(w=>w.cpa),'#4DA8FF',cpaGoal,false),bd:stBadge(cpa,cpaGoal,false),tip:'Custo por venda nas plataformas de performance. Quanto menor, melhor. Linha pontilhada: teto saudável de 15% do ticket médio.'},
-    {n:'Demanda própria',v:shareNP.toFixed(0)+'%',s:'saudável: 35% ou mais',sp:spark(ws.map(w=>w.shareNP),'#2BE080',35),bd:stBadge(shareNP,35),tip:'Fatia das sessões que chega sem anúncio (busca + direto). Termômetro de força própria da marca. Linha pontilhada: 35%.'},
+    {n:'Demanda própria',v:shareNP.toFixed(0)+'%',s:'saudável: 35% ou mais',sp:spark(ws.map(w=>w.shareNP),'#2BE080',35),bd:stBadge(shareNP,35),tip:'Fatia das sessões que chega sem anúncio: busca, direto, social orgânico do perfil e email/CRM. Termômetro de força própria da marca. Linha pontilhada: 35%.'},
     {n:'Menções 2026',v:S.pulse?.total_mencoes??'—',s:'saudável: crescente a cada varredura',sp:spark(menHist,'#C8FF00',null),bd:'',tip:'Menções catalogadas pela varredura. A linha cresce a cada nova varredura profunda; o robô diário soma menções novas entre varreduras.'},
     {n:'Sentimento positivo',v:sent,s:(sentPos+sentNeg)?sentPos+' positivas vs '+sentNeg+' negativas · saudável: 70%+':'saudável: 70% ou mais',sp:spark(sentHist,'#2BE080',70),bd:sentPct!==null?stBadge(sentPct,70):'',tip:'Entre menções e comentários com opinião (positivos ou negativos), quantos % são positivos. Neutros ficam de fora da conta. Linha pontilhada: 70%.'}];
   document.getElementById('kpis').innerHTML=kp.map(k=>
@@ -428,8 +431,8 @@ function render(){
   if(window.__m)window.__m.destroy();
   window.__m=new Chart(document.getElementById('mix'),{type:'line',
     data:{labels:mix.map(w=>w.wk.slice(8,10)+'/'+w.wk.slice(5,7)),datasets:[
-      {label:'Própria (direto + orgânico)',data:mix.map(w=>pct(w.direto+w.organico,w.pago+w.direto+w.organico+w.outros)),borderColor:'#2BE080',backgroundColor:'rgba(43,224,128,.15)',fill:true,tension:.4,borderWidth:2,pointRadius:0},
-      {label:'Paga',data:mix.map(w=>pct(w.pago,w.pago+w.direto+w.organico+w.outros)),borderColor:'#FF5C5C',backgroundColor:'rgba(255,92,92,.07)',fill:true,tension:.4,borderWidth:2,pointRadius:0}]},
+      {label:'Própria (direto + orgânico + social + email)',data:mix.map(w=>pct(w.direto+w.organico+(w.proprio||0),w.pago+w.direto+w.organico+(w.proprio||0)+w.outros)),borderColor:'#2BE080',backgroundColor:'rgba(43,224,128,.15)',fill:true,tension:.4,borderWidth:2,pointRadius:0},
+      {label:'Paga',data:mix.map(w=>pct(w.pago,w.pago+w.direto+w.organico+(w.proprio||0)+w.outros)),borderColor:'#FF5C5C',backgroundColor:'rgba(255,92,92,.07)',fill:true,tension:.4,borderWidth:2,pointRadius:0}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#A8AFB8',boxWidth:18,font:{size:10}}}},
       scales:{x:{ticks:{color:'#5C636C',font:{size:9}},grid:{display:false}},y:{min:0,max:100,ticks:{color:'#5C636C',callback:v=>v+'%',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
 

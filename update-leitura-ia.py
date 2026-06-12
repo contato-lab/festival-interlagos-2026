@@ -62,16 +62,23 @@ def monta_fatos():
     rec7prev = sum_daily(vd.get('daily'), d7prev, ['moto_receita', 'auto_receita']) + sum_daily(tm.get('daily'), d7prev, ['moto_receita', 'auto_receita'])
     delta7 = round((rec7 / rec7prev - 1) * 100) if rec7prev else None
 
-    # mix pago vs proprio (GA4 ultimos 14 dias)
-    pago = naopago = 0
+    # mix pago vs proprio (GA4, mesma regua do brand monitor: self-referral fora, social/email proprios contam)
+    pago = proprio = outros = 0
     for r in ga.get('source_medium_daily', [])[-2000:]:
         s, m = (r.get('source') or '').lower(), (r.get('medium') or '').lower()
         sess = r.get('sessions', 0) or 0
-        if re.search(r'paid|cpc|ads|cpm|awareness|affiliate|display|tiktok', m):
+        if 'festivalinterlagos.com.br' in s:
+            continue
+        if re.search(r'paid|cpc|ppc|ads|cpm|awareness|affiliate|display|tiktok', m):
             pago += sess
-        elif (s == '(direct)' and m == '(none)') or 'organic' in m or s == 'organico':
-            naopago += sess
-    share_prop = round(naopago / (pago + naopago) * 100) if (pago + naopago) else None
+        elif ((s == '(direct)' and m == '(none)') or 'organic' in m or s == 'organico'
+              or re.search(r'social|story|email', m) or s == 'ig' or 'instagram' in s
+              or re.search(r'salesforce|crm|abertura|^eml', s)):
+            proprio += sess
+        else:
+            outros += sess
+    tot_sess = pago + proprio + outros
+    share_prop = round(proprio / tot_sess * 100) if tot_sess else None
 
     # canal que mais converte (GA4 ultimo clique)
     ts = sorted(ga.get('traffic_sources', []), key=lambda x: x.get('conversions', 0), reverse=True)
