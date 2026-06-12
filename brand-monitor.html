@@ -140,21 +140,6 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
   <!-- KPIs -->
   <div class="kpis" id="kpis"></div>
 
-  <!-- FLUXO DE HOJE -->
-  <div class="card">
-    <div class="h">Fluxo de <b>hoje</b> <span class="qm" data-tip="O dia em andamento: de onde veio o tráfego e quanto já vendeu. O ▲ compara a FATIA de cada origem hoje contra a fatia média dos 7 dias anteriores: é o detector de pico (post de influenciador, matéria, ação nova) e funciona mesmo com o dia incompleto.">?</span> <span style="font-weight:400;font-size:.68rem;text-transform:none;letter-spacing:0;color:var(--tx3)" id="hoje-note"></span></div>
-    <div class="duo" style="grid-template-columns:280px 1fr;align-items:start">
-      <div id="hoje-kpis"></div>
-      <div>
-        <div style="font-size:.64rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:8px">Origens do tráfego de hoje · vs média 7 dias</div>
-        <div id="hoje-fontes"></div>
-      </div>
-    </div>
-    <div style="margin-top:14px">
-      <div style="font-size:.64rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:8px">Influenciadores e perfis hoje (UTM)</div>
-      <div id="hoje-influ" style="display:flex;gap:8px;flex-wrap:wrap"></div>
-    </div>
-  </div>
 
   <!-- BOLHA + AÇÕES -->
   <div class="duo">
@@ -347,54 +332,6 @@ function render(){
     {n:'Sentimento positivo',v:sent,s:'saudável: 70% ou mais',sp:spark(sentHist,'#2BE080',70),bd:stBadge(43/55*100,70),tip:'Percentual das menções do ano com tom positivo. Linha pontilhada: 70%. Em 2026 não há nenhuma menção negativa de consumidor.'}];
   document.getElementById('kpis').innerHTML=kp.map(k=>
     `<div class="kpi"><div class="n">${k.n}<span class="qm" data-tip="${k.tip}">?</span></div><div class="vrow"><div class="v">${k.v}</div>${k.bd}</div>${k.sp}<div class="s">${k.s}</div></div>`).join('');
-
-  // Fluxo de hoje
-  const smd=S.ga.source_medium_daily||[];
-  const hoje=smd.map(r=>r.date).sort().pop();
-  if(hoje){
-    const d0=new Date(hoje+'T12:00:00');
-    const prevDates=new Set(); for(let i=1;i<=7;i++){const d=new Date(d0);d.setDate(d0.getDate()-i);prevDates.add(d.toISOString().slice(0,10));}
-    const agg={},prev={};
-    smd.forEach(r=>{const k=r.source+' / '+r.medium;
-      if(r.date===hoje)agg[k]=(agg[k]||0)+r.sessions;
-      else if(prevDates.has(r.date))prev[k]=(prev[k]||0)+r.sessions;});
-    const totHoje=Object.values(agg).reduce((a,b)=>a+b,0);
-    const totPrev=Object.values(prev).reduce((a,b)=>a+b,0);
-    // compara a FATIA da origem hoje vs a fatia media dos 7 dias (funciona com dia parcial)
-    const rows=Object.keys(agg).map(k=>({k,s:agg[k],shareH:totHoje?agg[k]/totHoje:0,shareP:totPrev?(prev[k]||0)/totPrev:0})).sort((a,b)=>b.s-a.s).slice(0,8);
-    const mxh=rows.length?rows[0].s:1;
-    document.getElementById('hoje-fontes').innerHTML=rows.map(r=>{
-      let spike='';
-      if(r.s>=10){
-        if(r.shareP<=0){ spike='<span class="badge-st bs-ok">NOVO</span>'; }
-        else { const ratio=r.shareH/r.shareP;
-          spike=ratio>=1.8?`<span class="badge-st bs-at">▲ ${ratio.toFixed(1)}x</span>`:(ratio<=0.55?`<span class="badge-st" style="background:rgba(255,255,255,.06);color:var(--tx3)">▼ ${ratio.toFixed(1)}x</span>`:''); }
-      }
-      return `<div class="srcrow" style="grid-template-columns:215px 1fr 60px 90px"><div class="n" title="${r.k}">${r.k.length>27?r.k.slice(0,27)+'…':r.k}</div><div class="bw"><div class="b" style="width:${(r.s/mxh*100).toFixed(1)}%;background:var(--lime)"></div></div><div class="v">${fmt(r.s)}</div><div class="c">${spike}</div></div>`;
-    }).join('');
-    const vdH=(S.vd?.daily||[]).find(r=>r.date===hoje)||{};
-    const tmH=(S.tm?.daily||[]).find(r=>r.date===hoje)||{};
-    const ingH=(vdH.moto_ingressos||0)+(vdH.auto_ingressos||0)+(tmH.moto_ingressos||0)+(tmH.auto_ingressos||0);
-    const recH=(vdH.moto_receita||0)+(vdH.auto_receita||0)+(tmH.moto_receita||0)+(tmH.auto_receita||0);
-    const mH=(S.meta?.daily_series||[]).find(r=>r.date===hoje)||{};
-    const gH=(S.gads?.daily_series||[]).find(r=>r.date===hoje)||{};
-    const tH=(S.tt?.daily_series||[]).find(r=>r.date===hoje)||{};
-    document.getElementById('hoje-kpis').innerHTML=
-      `<div class="kpi" style="margin-bottom:10px"><div class="n">Vendas de hoje</div><div class="v">${fmt(ingH)} <span style="font-size:.85rem;color:var(--tx2);font-family:'Inter';font-weight:600">ingressos</span></div><div class="s">${fmtR(recH)} · próprio + Ticketmaster</div></div>
-       <div class="kpi"><div class="n">Pixels hoje</div>
-         <div class="s" style="margin-top:7px;line-height:1.7">Meta <b style="color:var(--tx)">${fmt(mH.purchases||0)}</b> · Google <b style="color:var(--tx)">${fmt(Math.round(gH.conversions||0))}</b> · TikTok <b style="color:var(--tx)">${fmt(tH.purchases||0)}</b><br>sessões no site: <b style="color:var(--tx)">${fmt(totHoje)}</b></div></div>`;
-    document.getElementById('hoje-note').textContent='· dados de '+hoje.slice(8,10)+'/'+hoje.slice(5,7)+' (parcial · GA4 atualiza a cada 30 min)';
-    const inf=(S.ga.influencer_breakdown||[]).map(i=>{
-      const sH=(i.daily||{})[hoje]||0;
-      let pSum=0; prevDates.forEach(d=>{pSum+=((i.daily||{})[d]||0)});
-      return {n:i.source,s:sH,shareH:totHoje?sH/totHoje:0,shareP:totPrev?pSum/totPrev:0};
-    }).filter(i=>i.s>0).sort((a,b)=>b.s-a.s).slice(0,8);
-    document.getElementById('hoje-influ').innerHTML=inf.length?inf.map(i=>{
-      const ratio=(i.shareP>0&&i.s>=5)?i.shareH/i.shareP:null; // badge so com volume minimo
-      const tag=ratio!==null&&ratio>=1.8?` · ▲ ${ratio.toFixed(1)}x acima da média`:'';
-      return `<span class="pill ${ratio!==null&&ratio>=1.8?'pos':'neu'}" style="font-size:.7rem;padding:5px 12px">${i.n}: ${fmt(i.s)} ${i.s===1?'sessão':'sessões'}${tag}</span>`;
-    }).join(''):'<span style="font-size:.72rem;color:var(--tx3)">nenhuma sessão via influenciador registrada hoje até agora</span>';
-  }
 
   // selo bolha + chips
   if(S.pulse){
