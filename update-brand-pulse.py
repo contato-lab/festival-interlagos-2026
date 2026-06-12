@@ -231,17 +231,22 @@ def sentimento_comentario(txt):
 # reclamacao da seguradora Suhai (patrocinadora, marca diferente do festival) que vaza pelo naming rights
 SEGURO = re.compile(r'seguradora|sinistro|vistoria|ap[óo]lice|indeniza|guincho|oficina|reembolso|cobertura|'
                     r've[íi]culo\s+(parado|segurado)|carro\s+parado|caminh[ãa]o.*parado|me\s+bateram|bateu\s+atr[áa]s|'
-                    r'acidente|aguardando\s+(vistoria|laudo)|prote[çc][ãa]o\s+veicular|conserto', re.I)
-# contexto que confirma que o comentario e sobre o FESTIVAL (e nao sobre o seguro)
+                    r'acidente|aguardando\s+(vistoria|laudo)|prote[çc][ãa]o\s+veicular|conserto|seguro\s+(do|do meu|auto)', re.I)
+# reclamacao generica de SAC/atendimento (tipica da seguradora vazando, nao do festival)
+SAC = re.compile(r'descaso|p[ée]ssim|horr[íi]vel\s+atendimento|atendimento\s+(p[ée]ssim|ruim|horr|nota\s*zero|zero)|'
+                 r'n[ãa]o\s+(me\s+)?respond|sem\s+resposta|falta\s+de\s+resposta|n[ãa]o\s+responde|'
+                 r'\d+\s*dias?\s+(esperando|aguardando|sem\s+resposta)|esperando\s+(um\s+)?atendimento', re.I)
+# contexto que confirma que o comentario e sobre o FESTIVAL (e nao sobre o seguro/SAC)
 FESTIVAL_CTX = re.compile(r'ingresso|festival|interlagos|line.?up|lineup|show|test.?ride|pista|evento|palco|'
                           r'pulseira|portaria|meia.?entrada|estacionamento|grade|atra[çc][ãa]o|camarote|'
-                          r'\bpasse\b|\bmoto\b|\bcarro\b|expo', re.I)
+                          r'\bpasse\b|\bmoto\b|\bcarro\b|expo|organiza|\bfila\b|compr[aeio]|ingressar|desconto', re.I)
 
 def eh_comentario_festival(txt):
-    """False quando o comentario e reclamacao da seguradora Suhai (sinistro, oficina, vistoria) sem
-    relacao com o festival. Esse dashboard e do Festival Interlagos, nao do SAC da seguradora."""
+    """False quando o comentario e reclamacao da seguradora Suhai (sinistro, oficina, vistoria) ou SAC
+    generico (atendimento pessimo, descaso, dias esperando resposta) SEM relacao com o festival.
+    Esse dashboard e do Festival Interlagos, nao do SAC da seguradora."""
     t = txt or ''
-    if SEGURO.search(t) and not FESTIVAL_CTX.search(t):
+    if (SEGURO.search(t) or SAC.search(t)) and not FESTIVAL_CTX.search(t):
         return False
     return True
 
