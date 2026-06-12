@@ -17,6 +17,8 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
 .top{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--line);background:#0B0D10;position:sticky;top:0;z-index:50}
 .brand{display:flex;align-items:center;gap:10px;font-family:'Barlow Condensed',sans-serif}
 .brand .l{font-weight:900;font-size:1.35rem;color:var(--lime);letter-spacing:.08em}
+.brand .logo-lime{height:26px;width:auto;display:block}
+.brand .logo-fest{height:30px;width:auto;display:block}
 .brand .t{font-weight:700;font-size:.95rem;color:var(--tx2);letter-spacing:.05em}
 .live{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--tx2)}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pul 2s infinite}
@@ -118,7 +120,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
 </head>
 <body>
 <div class="top">
-  <div class="brand"><span class="l">LIME</span><span style="color:var(--tx3)">|</span><span class="t">SUHAI FESTIVAL INTERLAGOS · BRAND MONITOR</span></div>
+  <div class="brand"><img src="logo-lime.png.png" class="logo-lime" alt="Lime" onerror="this.style.display='none'"><span style="color:var(--tx3)">|</span><img src="logo-festival.png.png" class="logo-fest" alt="Suhai Festival Interlagos" onerror="this.style.display='none'"><span class="t">BRAND MONITOR</span></div>
   <div class="live"><span class="dot"></span><span id="upd">conectando…</span></div>
 </div>
 <div class="wrap">
