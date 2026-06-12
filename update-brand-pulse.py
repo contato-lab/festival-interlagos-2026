@@ -281,10 +281,12 @@ def claude_classifica(comentarios):
         txt = out['content'][0]['text']
         m = re.search(r'\{.*\}', txt, re.S)
         data = json.loads(m.group(0))
+        resumo = _limpa(data.get('resumo'))  # sempre aproveita o resumo, mesmo se as etiquetas nao baterem
         labs = data.get('sentimentos')
         if labs and len(labs) == len(comentarios):
             labs = [l if l in ('positivo', 'negativo', 'neutro') else 'neutro' for l in labs]
-            return labs, _limpa(data.get('resumo'))
+            return labs, resumo
+        return None, resumo
     except Exception as e:
         print(f'[claude] {e}', file=sys.stderr)
     return None, None
