@@ -240,9 +240,9 @@ const S={};
 
 async function loadAll(){
   const get=async u=>{try{const r=await fetch(u+'?t='+Date.now(),{cache:'no-store'});return r.ok?await r.json():null}catch(e){return null}};
-  [S.ga,S.meta,S.gads,S.tt,S.vd,S.pulse,S.ap]=await Promise.all([
+  [S.ga,S.meta,S.gads,S.tt,S.vd,S.pulse,S.ap,S.tmFile]=await Promise.all([
     get('ga4-data.json'),get('meta-data.json'),get('google-ads-data.json'),
-    get('tiktok-data.json'),get('vendas-data.json'),get('brand-pulse-data.json'),get('adsplay-data.json')]);
+    get('tiktok-data.json'),get('vendas-data.json'),get('brand-pulse-data.json'),get('adsplay-data.json'),get('ticketmaster-data.json')]);
   render();
   const stamp=()=>document.getElementById('upd').textContent='atualizado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   stamp();
@@ -308,8 +308,9 @@ function render(){
   const shareNP=pct(np,tt4);
   const custo=(S.meta?.totals?.cost||0)+(S.gads?.totals?.cost||0)+(S.tt?.totals?.cost||0);
   const conv=(S.meta?.totals?.purchases||0)+(S.gads?.totals?.conversions||0)+(S.tt?.totals?.purchases||0);
-  const rec=(S.vd?.totals?.total_receita||0)+(S.tm?.totals?.total_receita||0);
-  const ing=(S.vd?.totals?.total_ingressos||0)+(S.tm?.totals?.total_ingressos||0);
+  const tmT=S.tm?.totals||S.tmFile?.totals||{}; // worker ao vivo, com fallback no arquivo commitado (sempre presente)
+  const rec=(S.vd?.totals?.total_receita||0)+(tmT.total_receita||0);
+  const ing=(S.vd?.totals?.total_ingressos||0)+(tmT.total_ingressos||0);
   const cpa=conv?custo/conv:0, tkt=ing?rec/ing:0, roas=custo?rec/custo:0;
   const users=S.ga.totals?.users||0, convRate=pct(ing,users);
   const sDem=Math.min(100,Math.round(shareNP/35*100));
@@ -413,15 +414,15 @@ function render(){
     {n:'Meta Ads',v:S.meta?.totals?.purchases||0,c:S.meta?.totals?.cost||0,cor:'var(--purple)'},
     {n:'TikTok Ads',v:S.tt?.totals?.purchases||0,c:S.tt?.totals?.cost||0,cor:'var(--green)'}];
   const totalPago=pagas.reduce((a,f)=>a+f.v,0);
-  const organico=Math.max(0,Math.round(ing)-totalPago);
-  const fontes=pagas.concat([{n:'Direto / Orgânico',v:organico,org:true,cor:'var(--lime)'}]).sort((a,b)=>b.v-a.v);
+  const organico=Math.round(ing)-totalPago;
+  const fontes=pagas.concat(organico>0?[{n:'Direto / Orgânico',v:organico,org:true,cor:'var(--lime)'}]:[]).sort((a,b)=>b.v-a.v);
   const mxv=Math.max(1,...fontes.map(f=>f.v));
   document.getElementById('fontes').innerHTML=fontes.map(f=>
     `<div class="srcrow"><div class="n">${f.n}${f.org?' <span style="color:var(--tx3);font-size:.6rem">sem mídia paga</span>':''}</div><div class="bw"><div class="b" style="width:${Math.max(2,f.v/mxv*100)}%;background:${f.cor}"></div></div>
      <div class="v">${fmt(f.v)}</div><div class="c">${f.org?(ing?Math.round(f.v/ing*100)+'% do total':''):'CPA '+fmtR(f.v?f.c/f.v:0)}</div></div>`).join('')
     +`<div class="srcrow"><div class="n">ADSPLAY <span style="color:var(--tx3);font-size:.6rem">alcance</span></div><div class="bw"><div class="b" style="width:100%;background:rgba(255,255,255,.10)"></div></div>
       <div class="v">${(apT.impressions/1e6).toFixed(1)}M</div><div class="c">${fmtR(apT.cost)}</div></div>`;
-  document.getElementById('fontes-note').textContent='Mídia paga atribuída por pixel (Meta, Google, TikTok). Direto e orgânico é o restante dos '+fmt(Math.round(ing))+' ingressos: quem chega por busca, indicação ou acesso direto, sem anúncio. ADSPLAY é awareness, alimenta o topo e não fecha no clique.';
+  document.getElementById('fontes-note').textContent='Mídia paga atribuída por pixel (Meta, Google, TikTok).'+(organico>0?' Direto e orgânico é o restante dos '+fmt(Math.round(ing))+' ingressos vendidos: quem chega por busca, indicação ou acesso direto, sem anúncio.':'')+' ADSPLAY é awareness, alimenta o topo e não fecha no clique.';
 
   // mix chart
   if(window.__m)window.__m.destroy();
