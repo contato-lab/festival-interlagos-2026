@@ -62,6 +62,13 @@ def eh_2026(titulo, data_pub=''):
     return True
 
 
+def eh_relevante(titulo):
+    """So aceita mencao que seja REALMENTE do Suhai Festival Interlagos. Barra outros festivais
+    (Suzano Music, Primavera Sound, Holi, Nomade, Festival do Cafe, shows avulsos etc.)."""
+    t = re.sub(r'[^a-z0-9]+', ' ', (titulo or '').lower())
+    return 'festival interlagos' in t or ('suhai' in t and 'interlagos' in t)
+
+
 # ---------- fontes sem chave ----------
 
 def google_news(feed, vistos):
@@ -76,7 +83,7 @@ def google_news(feed, vistos):
                 l = (item.findtext('link') or '').strip()
                 src = item.find('{https://news.google.com/rss}source')
                 fonte = src.text.strip() if src is not None and src.text else 'Google News'
-                if t and l and l not in vistos and eh_2026(t, item.findtext('pubDate') or ''):
+                if t and l and l not in vistos and eh_relevante(t) and eh_2026(t, item.findtext('pubDate') or ''):
                     feed.append({'canal': 'Imprensa', 'fonte': fonte, 'titulo': t, 'url': l,
                                  'data': (item.findtext('pubDate') or '')[:16], 'sentimento': sentimento(t)})
                     vistos.add(l)
@@ -96,7 +103,7 @@ def reddit(feed, vistos):
                 p = ch.get('data', {})
                 t = (p.get('title') or '').strip()
                 l = 'https://reddit.com' + (p.get('permalink') or '')
-                if t and l not in vistos and eh_2026(t):
+                if t and l not in vistos and eh_relevante(t) and eh_2026(t):
                     feed.append({'canal': 'Comunidades', 'fonte': 'r/' + (p.get('subreddit') or '?'),
                                  'titulo': t, 'url': l,
                                  'data': datetime.fromtimestamp(p.get('created_utc', 0), tz=timezone.utc).strftime('%Y-%m-%d'),
@@ -177,7 +184,7 @@ def brave(feed, vistos, pulse):
         data = json.loads(fetch(url, headers={'X-Subscription-Token': key, 'Accept': 'application/json'}))
         for r in (data.get('web', {}).get('results') or []):
             l, t = r.get('url', ''), (r.get('title') or '').strip()
-            if t and l and l not in vistos and eh_2026(t):
+            if t and l and l not in vistos and eh_relevante(t) and eh_2026(t):
                 dom = urllib.parse.urlparse(l).netloc.replace('www.', '')
                 feed.append({'canal': 'Web', 'fonte': dom, 'titulo': t, 'url': l,
                              'data': HOJE, 'sentimento': sentimento(t + ' ' + (r.get('description') or ''))})
@@ -667,8 +674,10 @@ def main():
     feed = pulse.get('feed_auto', [])
     vistos = {m.get('url') for m in feed}
     n = google_news(feed, vistos) + reddit(feed, vistos) + brave(feed, vistos, pulse)
-    # recorte duro 2026: expulsa do feed qualquer mencao de edicao passada que ja tenha entrado
-    feed = [m for m in feed if isinstance(m, dict) and eh_2026(m.get('titulo') or '', m.get('data') or '')]
+    # recorte duro: so mencoes do Suhai Festival Interlagos e da edicao 2026; expulsa o que ja entrou fora disso
+    feed = [m for m in feed if isinstance(m, dict)
+            and eh_relevante(m.get('titulo') or '')
+            and eh_2026(m.get('titulo') or '', m.get('data') or '')]
     feed = feed[-300:]
     # sanitiza texto vindo de fontes externas (travessao e tags nunca chegam ao dashboard)
     for m in feed:
