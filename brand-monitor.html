@@ -407,18 +407,21 @@ function render(){
   const custoAll=custo+(apT.cost||0);
   document.getElementById('funil-note').textContent='· mídia total '+fmtR(custoAll)+' · retorno '+(custoAll?(rec/custoAll).toFixed(1):'—')+'x';
 
-  // fontes
-  const fontes=[
+  // fontes: pagas atribuídas por pixel + o restante (direto/orgânico) sobre o total real de ingressos
+  const pagas=[
     {n:'Google Ads',v:Math.round(S.gads?.totals?.conversions||0),c:S.gads?.totals?.cost||0,cor:'var(--blue)'},
     {n:'Meta Ads',v:S.meta?.totals?.purchases||0,c:S.meta?.totals?.cost||0,cor:'var(--purple)'},
-    {n:'TikTok Ads',v:S.tt?.totals?.purchases||0,c:S.tt?.totals?.cost||0,cor:'var(--green)'}].sort((a,b)=>b.v-a.v);
-  const mxv=Math.max(...fontes.map(f=>f.v));
+    {n:'TikTok Ads',v:S.tt?.totals?.purchases||0,c:S.tt?.totals?.cost||0,cor:'var(--green)'}];
+  const totalPago=pagas.reduce((a,f)=>a+f.v,0);
+  const organico=Math.max(0,Math.round(ing)-totalPago);
+  const fontes=pagas.concat([{n:'Direto / Orgânico',v:organico,org:true,cor:'var(--lime)'}]).sort((a,b)=>b.v-a.v);
+  const mxv=Math.max(1,...fontes.map(f=>f.v));
   document.getElementById('fontes').innerHTML=fontes.map(f=>
-    `<div class="srcrow"><div class="n">${f.n}</div><div class="bw"><div class="b" style="width:${f.v/mxv*100}%;background:${f.cor}"></div></div>
-     <div class="v">${fmt(f.v)}</div><div class="c">CPA ${fmtR(f.c/f.v)}</div></div>`).join('')
+    `<div class="srcrow"><div class="n">${f.n}${f.org?' <span style="color:var(--tx3);font-size:.6rem">sem mídia paga</span>':''}</div><div class="bw"><div class="b" style="width:${Math.max(2,f.v/mxv*100)}%;background:${f.cor}"></div></div>
+     <div class="v">${fmt(f.v)}</div><div class="c">${f.org?(ing?Math.round(f.v/ing*100)+'% do total':''):'CPA '+fmtR(f.v?f.c/f.v:0)}</div></div>`).join('')
     +`<div class="srcrow"><div class="n">ADSPLAY <span style="color:var(--tx3);font-size:.6rem">alcance</span></div><div class="bw"><div class="b" style="width:100%;background:rgba(255,255,255,.10)"></div></div>
       <div class="v">${(apT.impressions/1e6).toFixed(1)}M</div><div class="c">${fmtR(apT.cost)}</div></div>`;
-  document.getElementById('fontes-note').textContent='Vendas atribuídas por pixel. A venda nasce no anúncio e fecha no acesso direto ou na Ticketmaster. ADSPLAY é awareness: alimenta o topo, não fecha no clique.';
+  document.getElementById('fontes-note').textContent='Mídia paga atribuída por pixel (Meta, Google, TikTok). Direto e orgânico é o restante dos '+fmt(Math.round(ing))+' ingressos: quem chega por busca, indicação ou acesso direto, sem anúncio. ADSPLAY é awareness, alimenta o topo e não fecha no clique.';
 
   // mix chart
   if(window.__m)window.__m.destroy();
