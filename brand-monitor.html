@@ -490,7 +490,7 @@ function render(){
         ${resumo?`<div style="font-size:.72rem;color:var(--tx2);margin:7px 0;line-height:1.45;border-left:2px solid ${cor};padding-left:8px">${esc(resumo)}</div>`:''}
         ${list.map(c=>`<div style="border-top:1px solid var(--line);padding:7px 0">
           <div style="font-size:.73rem;line-height:1.4">${esc(c.texto)}</div>
-          <div class="meta" style="margin-top:3px">@${esc(c.autor)}${c.likes?' · '+fmt(c.likes)+' curtidas':''} <span class="pill ${c.sentimento==='positivo'?'pos':c.sentimento==='negativo'?'neg':'neu'}">${c.sentimento}</span></div></div>`).join('')}</div>`;
+          <div class="meta" style="margin-top:3px">@${esc(c.autor)}${c.likes?' · '+fmt(c.likes)+' curtidas':''}${c.data?' · '+esc(String(c.data).split('-').reverse().join('/').slice(0,5)):''} <span class="pill ${c.sentimento==='positivo'?'pos':c.sentimento==='negativo'?'neg':'neu'}">${c.sentimento}</span></div></div>`).join('')}</div>`;
     }).join('');
   } else {
     document.getElementById('comentarios').innerHTML='<div style="font-size:.74rem;color:var(--tx3)">Primeira coleta acontece na próxima rodada do robô.</div>';

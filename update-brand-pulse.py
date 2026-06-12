@@ -16,7 +16,7 @@ Fontes COM chave (ativam sozinhas quando o secret existir no repo):
   - APIFY_TOKEN                    -> social_proprio (seguidores IG/TikTok) + historico_social
 """
 import json, os, re, sys, urllib.request, urllib.parse
-from datetime import datetime, timezone, date
+from datetime import datetime, timezone, date, timedelta
 from xml.etree import ElementTree
 
 PULSE_FILE = 'brand-pulse-data.json'
@@ -48,6 +48,20 @@ def hist_append(pulse, key, registro):
     pulse[key] = h[-120:]
 
 
+ANO_ANTIGO = re.compile(r'\b(200\d|201\d|202[0-5])\b')
+
+def eh_2026(titulo, data_pub=''):
+    """Recorte duro do ano: rejeita mencao que cita edicao passada (2025, 2024...) sem citar 2026,
+    ou cuja data de publicacao e anterior a 2026."""
+    t = titulo or ''
+    if ANO_ANTIGO.search(t) and '2026' not in t:
+        return False
+    m = re.search(r'\b(19|20)\d{2}\b', data_pub or '')
+    if m and int(m.group(0)) < 2026:
+        return False
+    return True
+
+
 # ---------- fontes sem chave ----------
 
 def google_news(feed, vistos):
@@ -62,7 +76,7 @@ def google_news(feed, vistos):
                 l = (item.findtext('link') or '').strip()
                 src = item.find('{https://news.google.com/rss}source')
                 fonte = src.text.strip() if src is not None and src.text else 'Google News'
-                if t and l and l not in vistos:
+                if t and l and l not in vistos and eh_2026(t, item.findtext('pubDate') or ''):
                     feed.append({'canal': 'Imprensa', 'fonte': fonte, 'titulo': t, 'url': l,
                                  'data': (item.findtext('pubDate') or '')[:16], 'sentimento': sentimento(t)})
                     vistos.add(l)
@@ -82,7 +96,7 @@ def reddit(feed, vistos):
                 p = ch.get('data', {})
                 t = (p.get('title') or '').strip()
                 l = 'https://reddit.com' + (p.get('permalink') or '')
-                if t and l not in vistos:
+                if t and l not in vistos and eh_2026(t):
                     feed.append({'canal': 'Comunidades', 'fonte': 'r/' + (p.get('subreddit') or '?'),
                                  'titulo': t, 'url': l,
                                  'data': datetime.fromtimestamp(p.get('created_utc', 0), tz=timezone.utc).strftime('%Y-%m-%d'),
@@ -163,7 +177,7 @@ def brave(feed, vistos, pulse):
         data = json.loads(fetch(url, headers={'X-Subscription-Token': key, 'Accept': 'application/json'}))
         for r in (data.get('web', {}).get('results') or []):
             l, t = r.get('url', ''), (r.get('title') or '').strip()
-            if t and l and l not in vistos:
+            if t and l and l not in vistos and eh_2026(t):
                 dom = urllib.parse.urlparse(l).netloc.replace('www.', '')
                 feed.append({'canal': 'Web', 'fonte': dom, 'titulo': t, 'url': l,
                              'data': HOJE, 'sentimento': sentimento(t + ' ' + (r.get('description') or ''))})
@@ -469,6 +483,14 @@ def claude_interpreta_marca(pulse):
         print(f'[claude-interpreta] {e}', file=sys.stderr)
 
 
+def _data_iso(*vals):
+    """Extrai a primeira data ISO (YYYY-MM-DD) valida entre os campos candidatos do scraper."""
+    for v in vals:
+        if isinstance(v, str) and re.match(r'\d{4}-\d{2}-\d{2}', v):
+            return v[:10]
+    return ''
+
+
 def apify_call(actor, payload, token, timeout=300):
     url = f'https://api.apify.com/v2/acts/{actor}/run-sync-get-dataset-items?token={token}'
     req = urllib.request.Request(url, data=json.dumps(payload).encode(),
@@ -490,14 +512,20 @@ def social_comments(pulse):
     plats = sc.setdefault('plataformas', {})
 
     def push(plat, items):
-        old = (plats.get(plat) or {}).get('comentarios', [])
-        seen = {(c.get('autor'), c.get('texto')) for c in old}
-        for it in items:
+        velhos = (plats.get(plat) or {}).get('comentarios', [])
+        merged = {}
+        for it in velhos + items:
             k = (it.get('autor'), it.get('texto'))
-            if k not in seen:
-                old.append(it)
-                seen.add(k)
-        old = old[-30:]
+            if k in merged:
+                if not merged[k].get('data') and it.get('data'):
+                    merged[k]['data'] = it['data']
+            else:
+                merged[k] = dict(it)
+        # descarta comentario com data conhecida ha mais de 30 dias; ordena do mais antigo ao mais novo
+        corte = (datetime.now(timezone.utc) - timedelta(days=30)).strftime('%Y-%m-%d')
+        lst = [c for c in merged.values() if not c.get('data') or c['data'] >= corte]
+        lst.sort(key=lambda c: c.get('data') or '')
+        old = lst[-30:]
         # sentimento fino + resumo automatico via Claude API (quando a chave existir)
         labs, resumo = claude_classifica(old)
         if labs:
@@ -522,7 +550,8 @@ def social_comments(pulse):
             coms = apify_call('apify~instagram-comment-scraper',
                               {'directUrls': urls, 'resultsLimit': 30}, token)
             items = [{'texto': (c.get('text') or '')[:220], 'autor': c.get('ownerUsername') or '?',
-                      'likes': c.get('likesCount') or 0, 'sentimento': sentimento_comentario(c.get('text')),
+                      'likes': c.get('likesCount') or 0, 'data': _data_iso(c.get('timestamp'), c.get('createdAt')),
+                      'sentimento': sentimento_comentario(c.get('text')),
                       'origem': 'post oficial'} for c in coms if c.get('text')]
             push('instagram', items)
             print(f'[coment-ig] {len(items)} comentarios')
@@ -540,7 +569,11 @@ def social_comments(pulse):
             coms = apify_call('clockworks~tiktok-comments-scraper',
                               {'postURLs': vurls, 'commentsPerPost': 10}, token)
             items = [{'texto': (c.get('text') or '')[:220], 'autor': c.get('uniqueId') or '?',
-                      'likes': c.get('diggCount') or 0, 'sentimento': sentimento_comentario(c.get('text')),
+                      'likes': c.get('diggCount') or 0,
+                      'data': _data_iso(c.get('createTimeISO'),
+                                        datetime.fromtimestamp(c['createTime'], tz=timezone.utc).strftime('%Y-%m-%d')
+                                        if isinstance(c.get('createTime'), (int, float)) and c.get('createTime') else None),
+                      'sentimento': sentimento_comentario(c.get('text')),
                       'origem': 'vídeo oficial'} for c in coms if c.get('text')]
             push('tiktok', items)
             print(f'[coment-tt] {len(items)} comentarios')
@@ -556,6 +589,7 @@ def social_comments(pulse):
             items = [{'texto': (c.get('comment') or c.get('text') or '')[:220],
                       'autor': c.get('author') or c.get('authorName') or '?',
                       'likes': c.get('voteCount') or c.get('likes') or 0,
+                      'data': _data_iso(c.get('date'), c.get('publishedAt'), c.get('publishedTimeText')),
                       'sentimento': sentimento_comentario(c.get('comment') or c.get('text')),
                       'origem': 'vídeo de criador'} for c in coms if (c.get('comment') or c.get('text'))]
             push('youtube', items)
@@ -617,6 +651,8 @@ def main():
     feed = pulse.get('feed_auto', [])
     vistos = {m.get('url') for m in feed}
     n = google_news(feed, vistos) + reddit(feed, vistos) + brave(feed, vistos, pulse)
+    # recorte duro 2026: expulsa do feed qualquer mencao de edicao passada que ja tenha entrado
+    feed = [m for m in feed if isinstance(m, dict) and eh_2026(m.get('titulo') or '', m.get('data') or '')]
     feed = feed[-300:]
     # sanitiza texto vindo de fontes externas (travessao e tags nunca chegam ao dashboard)
     for m in feed:

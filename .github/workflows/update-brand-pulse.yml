@@ -25,6 +25,7 @@ jobs:
           BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FORCE_COMMENTS: ${{ github.event_name == 'workflow_dispatch' && '1' || '' }}
         run: python update-brand-pulse.py
 
       - name: Commit
