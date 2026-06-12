@@ -36,7 +36,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
 .gnum .v{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:4rem;line-height:.9}
 .gnum .lab{font-size:.62rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.14em;margin-top:6px}
 .gdelta{margin-top:10px;font-size:.72rem;color:var(--tx3)}
-.pillars{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.pillars{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
 .pillar{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:16px 14px;display:flex;flex-direction:column;gap:8px}
 .pillar .n{font-size:.62rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
 .pillar .v{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:2.2rem;line-height:1}
@@ -267,16 +267,16 @@ function weeklyMix(){const w={};(S.ga.source_medium_daily||[]).forEach(r=>{
 function weekKey(dstr){const d=new Date(dstr+'T12:00:00');const mo=new Date(d);mo.setDate(d.getDate()-((d.getDay()+6)%7));return mo.toISOString().slice(0,10)}
 function weeklySeries(){
   const W={};
-  const add=(dstr,field,val)=>{if(!dstr||!val&&val!==0)return;const k=weekKey(dstr);if(!W[k])W[k]={rec:0,ing:0,custo:0,conv:0,sess:0,np:0};W[k][field]+=val};
+  const add=(dstr,field,val)=>{if(!dstr||!val&&val!==0)return;const k=weekKey(dstr);if(!W[k])W[k]={rec:0,ing:0,custo:0,conv:0,sess:0,np:0,nu:0};W[k][field]+=val};
   (S.vd?.daily||[]).forEach(r=>{add(r.date,'rec',(r.moto_receita||0)+(r.auto_receita||0));add(r.date,'ing',(r.moto_ingressos||0)+(r.auto_ingressos||0))});
   (S.tm?.daily||[]).forEach(r=>{add(r.date,'rec',(r.moto_receita||0)+(r.auto_receita||0));add(r.date,'ing',(r.moto_ingressos||0)+(r.auto_ingressos||0))});
   (S.meta?.daily_series||[]).forEach(r=>{add(r.date,'custo',r.cost||0);add(r.date,'conv',r.purchases||0)});
   (S.gads?.daily_series||[]).forEach(r=>{add(r.date,'custo',r.cost||0);add(r.date,'conv',r.conversions||0)});
   (S.tt?.daily_series||[]).forEach(r=>{add(r.date,'custo',r.cost||0);add(r.date,'conv',r.purchases||0)});
-  (S.ga?.source_medium_daily||[]).forEach(r=>{const cl=classCanal(r.source,r.medium);if(cl==='self')return;add(r.date,'sess',r.sessions||0);if(cl==='direto'||cl==='organico'||cl==='proprio')add(r.date,'np',r.sessions||0)});
+  (S.ga?.source_medium_daily||[]).forEach(r=>{const cl=classCanal(r.source,r.medium);if(cl==='self')return;add(r.date,'sess',r.sessions||0);add(r.date,'nu',r.new_users||0);if(cl==='direto'||cl==='organico'||cl==='proprio')add(r.date,'np',r.sessions||0)});
   const ks=Object.keys(W).sort();
   // descarta semana parcial corrente se tiver menos de 3 dias de dados? mantemos tudo; ultima semana pode estar parcial
-  return ks.map(k=>{const w=W[k];return {wk:k,rec:w.rec,ing:w.ing,custo:w.custo,conv:w.conv,sess:w.sess,
+  return ks.map(k=>{const w=W[k];return {wk:k,rec:w.rec,ing:w.ing,custo:w.custo,conv:w.conv,sess:w.sess,newUsers:w.nu,
     roas:w.custo?w.rec/w.custo:null,cpa:w.conv?w.custo/w.conv:null,convRate:w.sess?w.ing/w.sess*100:null,shareNP:w.sess?w.np/w.sess*100:null,
     vendaPropria:w.ing>0?Math.max(0,(w.ing-w.conv)/w.ing*100):null}})
     .filter(w=>w.sess>500||w.rec>1000);
@@ -324,7 +324,11 @@ function render(){
   const sFu=Math.max(0,Math.min(100,Math.round(convRate/3.5*100)));
   const sRo=Math.max(0,Math.min(100,Math.round(roas/15*100)));
   const sVo=S.pulse?.voz_score??50;
-  const score=Math.round(sDem*.22+sEf*.20+sFu*.18+sRo*.18+sVo*.22);
+  // publico novo: % de usuarios que nunca tinham acessado o site (alcance de gente nova)
+  const novosTot=S.ga.totals?.new_users||0, usersTot=S.ga.totals?.users||0;
+  const shareNovos=usersTot?Math.round(novosTot/usersTot*100):null;
+  const sNovo=shareNovos!==null?shareNovos:50;
+  const score=Math.round(sVo*.20+sDem*.18+sEf*.15+sFu*.15+sRo*.17+sNovo*.15);
 
   // gauge
   document.getElementById('score').textContent=score;
@@ -338,12 +342,17 @@ function render(){
   const ws=weeklySeries();
   const cpaGoal=tkt*0.15;
   const vozHist=(S.pulse?.historico||[]).map(h=>h.voz);
+  // tendencia semanal de novos usuarios (esta crescendo?)
+  const nuFull=ws.filter(w=>w.newUsers>0);
+  const nuLast=nuFull[nuFull.length-2], nuPrev=nuFull[nuFull.length-3]; // ultimas semanas completas
+  const nuDelta=(nuLast&&nuPrev&&nuPrev.newUsers)?((nuLast.newUsers/nuPrev.newUsers-1)*100):null;
   const pil=[
     {n:'Voz da marca',v:sVo,m:'menções, imprensa e reputação',sp:spark(vozHist,'#C8FF00',60),bd:stBadge(sVo,60),ref:'você <b>'+sVo+'</b> · saudável <b>60+</b>',tip:'O que falam da marca na internet: imprensa, redes, comunidades e reclamações. Atualizado pela IA a cada varredura.'+(S.pulse?.voz_why?' Leitura atual: '+esc(S.pulse.voz_why):'')},
     {n:'Demanda própria',v:sDem,m:(vendaPropriaPct??'—')+'% das vendas sem mídia paga',sp:spark(ws.map(w=>w.vendaPropria),'#2BE080',35),bd:stBadge(sDem,35),ref:'você <b>'+(vendaPropriaPct??'—')+'%</b> · saudável <b>35%+</b>',tip:'Fatia das vendas de ingressos que NÃO foi atribuída a anúncio pago (Meta, Google, TikTok). É o restante que chega por acesso direto, busca orgânica e indicação. Mesma base da seção "Quem gera a venda". Quanto maior, mais a marca vende sozinha. Meta: 35%+.'},
     {n:'Eficiência',v:sEf,m:'CPA '+fmtR(cpa)+' por venda',sp:spark(ws.map(w=>w.cpa),'#4DA8FF',cpaGoal,false),bd:stBadge(cpa,cpaGoal,false),ref:'você <b>'+fmtR(cpa)+'</b> · saudável <b>até '+fmtR(cpaGoal)+'</b>',tip:'Custo por venda (CPA) semanal. Saudável: consumir no máximo 15% do ticket médio. Aqui, quanto MENOR a linha, melhor.'},
     {n:'Funil',v:sFu,m:convRate.toFixed(1)+'% dos visitantes compram',sp:spark(ws.map(w=>w.convRate),'#9B6BFF',3),bd:stBadge(convRate,2.5),ref:'você <b>'+convRate.toFixed(1)+'%</b> · saudável <b>2,5%+</b>',tip:'Percentual de visitantes que compram, semana a semana. Linha pontilhada: 3% (excelência).'},
-    {n:'Retorno',v:sRo,m:roas.toFixed(0)+'x sobre performance',sp:spark(ws.map(w=>w.roas),'#2BE080',10),bd:stBadge(roas,10),ref:'você <b>'+roas.toFixed(1)+'x</b> · saudável <b>10x+</b>',tip:'Receita por R$ 1 investido em Meta, Google e TikTok, semana a semana. Linha pontilhada: 10x.'}];
+    {n:'Retorno',v:sRo,m:roas.toFixed(0)+'x sobre performance',sp:spark(ws.map(w=>w.roas),'#2BE080',10),bd:stBadge(roas,10),ref:'você <b>'+roas.toFixed(1)+'x</b> · saudável <b>10x+</b>',tip:'Receita por R$ 1 investido em Meta, Google e TikTok, semana a semana. Linha pontilhada: 10x.'},
+    {n:'Público novo',v:sNovo,m:(novosTot>=1000?Math.round(novosTot/1000)+' mil':novosTot)+' novos no site'+(nuDelta!==null?' · semana '+(nuDelta>=0?'+':'')+nuDelta.toFixed(0)+'%':''),sp:spark(ws.map(w=>w.newUsers),'#C8FF00',null),bd:nuDelta!==null?(nuDelta>=0?'<span class="badge-st bs-bom">SUBINDO</span>':'<span class="badge-st bs-at">CAINDO</span>'):stBadge(sNovo,60),ref:'você <b>'+(shareNovos??'—')+'%</b> · saudável <b>60%+</b>',tip:'Fatia dos visitantes que nunca tinham acessado o site (novos usuários do GA4). Mede o quanto a marca alcança gente nova, não só quem já conhecia. A linha mostra os novos usuários semana a semana: subindo = a marca está conquistando público novo. Saudável: 60%+ do público sendo novo.'}];
   document.getElementById('pillars').innerHTML=pil.map(p=>
     `<div class="pillar"><div class="n">${p.n}<span class="qm" data-tip="${p.tip}">?</span></div>
      <div class="vrow"><div class="v" style="color:${colorOf(p.v)}">${p.v}<span style="font-size:.85rem;color:var(--tx3);font-weight:600"> /100</span></div>${p.bd}</div>
