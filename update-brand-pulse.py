@@ -572,11 +572,9 @@ def social_comments(pulse):
                     merged[k]['data'] = it['data']
             else:
                 merged[k] = dict(it)
-        # descarta: reclamacao da seguradora (nao e do festival) e comentario com mais de 30 dias
-        corte = (datetime.now(timezone.utc) - timedelta(days=30)).strftime('%Y-%m-%d')
-        lst = [c for c in merged.values()
-               if eh_comentario_festival(c.get('texto'))
-               and (not c.get('data') or c['data'] >= corte)]
+        # descarta reclamacao da seguradora; ordena por data e fica com os 30 MAIS RECENTES que existirem
+        # (sem corte por idade absoluta, senao plataforma que posta pouco, ex TikTok, fica sem nada)
+        lst = [c for c in merged.values() if eh_comentario_festival(c.get('texto'))]
         lst.sort(key=lambda c: c.get('data') or '')
         old = lst[-30:]
         # sentimento fino + resumo automatico via Claude API (quando a chave existir)
