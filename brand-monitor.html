@@ -125,6 +125,29 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
 </div>
 <div class="wrap">
 
+  <!-- ══ LEITURA DA MARCA (IA) ══ -->
+  <div class="liai-card" id="liai-marca">
+    <div class="liai-head"><span class="liai-spark">✦ LEITURA DA MARCA · IA</span><span class="liai-upd" id="liai-upd-marca"></span></div>
+    <div class="liai-title" id="liai-title-marca">Lendo os sinais da marca...</div>
+    <div class="liai-body" id="liai-body-marca"></div>
+    <div class="liai-tags" id="liai-tags-marca"></div>
+    <div class="liai-alert" id="liai-alert-marca" style="display:none"></div>
+  </div>
+  <style>
+  .liai-card{background:linear-gradient(135deg,rgba(200,255,0,.06),rgba(20,20,20,.55));border:1px solid rgba(200,255,0,.25);border-radius:14px;padding:16px 20px;margin:0 0 18px 0}
+  .liai-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .liai-spark{font-weight:800;font-size:.78rem;letter-spacing:.1em;color:var(--lime);text-transform:uppercase}
+  .liai-upd{font-size:.62rem;color:var(--tx3)}
+  .liai-title{font-weight:800;font-size:1.3rem;color:#fff;line-height:1.15;margin-bottom:6px}
+  .liai-body{font-size:.88rem;color:var(--tx2);line-height:1.5}
+  .liai-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .liai-tag{font-size:.72rem;color:var(--tx2);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:5px 10px}
+  .liai-alert{margin-top:10px;font-size:.78rem;color:#FFC233;background:rgba(255,194,51,.08);border-left:3px solid #FFC233;border-radius:6px;padding:8px 12px}
+  </style>
+  <script>
+  (function(){function f(){fetch('brand-pulse-data.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{var x=d&&d.leitura_ia;if(!x)return;var g=i=>document.getElementById(i);g('liai-title-marca').textContent=x.titulo||'';g('liai-body-marca').textContent=x.paragrafo||'';g('liai-tags-marca').innerHTML=(x.destaques||[]).map(t=>'<span class="liai-tag">'+String(t).replace(/[<>&]/g,'')+'</span>').join('');var a=g('liai-alert-marca');if(x.alerta){a.textContent='⚠ '+x.alerta;a.style.display='block';}var u=g('liai-upd-marca');if(u&&x.updated_at)u.textContent='atualizado '+x.updated_at.slice(0,10);}).catch(()=>{});}f();setInterval(f,6e5);})();
+  </script>
+
   <!-- HERO -->
   <div class="card hero">
     <div class="gaugebox">

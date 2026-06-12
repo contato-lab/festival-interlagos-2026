@@ -243,6 +243,54 @@ def claude_classifica(comentarios):
     return None, None
 
 
+def claude_leitura_marca(pulse):
+    """Leitura interpretativa da marca via Claude (Haiku). Grava pulse['leitura_ia']."""
+    key = os.environ.get('ANTHROPIC_API_KEY')
+    if not key:
+        return
+    ver = pulse.get('veredito', {})
+    resumo_coment = (pulse.get('social_comentarios', {}) or {}).get('resumo', {})
+    fatos = {
+        'forca_da_marca_0a100': pulse.get('voz_score'),
+        'total_mencoes_periodo': pulse.get('total_mencoes'),
+        'mencoes_negativas': pulse.get('feed_auto_negativas'),
+        'furou_a_bolha': ver.get('furou_bolha'),
+        'justificativa': ver.get('justificativa'),
+        'pontos_fortes': ver.get('pontos_fortes'),
+        'pontos_fracos': ver.get('pontos_fracos'),
+        'riscos': ver.get('riscos'),
+        'frentes': [{'nome': f.get('nome'), 'score': f.get('score')} for f in pulse.get('frentes', [])][:8],
+        'seguidores_instagram': (pulse.get('social_proprio', {}) or {}).get('instagram', {}).get('followers'),
+        'seguidores_tiktok': (pulse.get('social_proprio', {}) or {}).get('tiktok', {}).get('followers'),
+        'resumo_comentarios': resumo_coment,
+    }
+    prompt = (
+        "Voce e analista de marca do Suhai Festival Interlagos 2026 (festival de motos 13-16/08 e carros "
+        "27-30/08). Abaixo, os sinais reais da marca hoje (forca da marca 0 a 100, mencoes, veredito sobre "
+        "furar a bolha, frentes monitoradas e resumo dos comentarios). Escreva uma leitura executiva da "
+        "MARCA: como ela esta hoje, se esta furando a bolha e qual a prioridade numero um para agir. "
+        "Regras: portugues do Brasil, direto, NUNCA use travessao, nao invente numero, baseie-se so nos "
+        'fatos. Responda APENAS JSON valido: {"titulo": "ate 8 palavras", "paragrafo": "no maximo 2 frases", '
+        '"destaques": ["3 bullets curtos"], "alerta": "1 frase de atencao ou string vazia"}.\n\nSINAIS:\n'
+        + json.dumps(fatos, ensure_ascii=False))
+    try:
+        body = json.dumps({'model': 'claude-haiku-4-5-20251001', 'max_tokens': 700,
+                           'messages': [{'role': 'user', 'content': prompt}]}).encode()
+        req = urllib.request.Request('https://api.anthropic.com/v1/messages', data=body,
+                                     headers={'x-api-key': key, 'anthropic-version': '2023-06-01',
+                                              'content-type': 'application/json'})
+        with urllib.request.urlopen(req, timeout=120) as r:
+            out = json.loads(r.read())
+        txt = out['content'][0]['text']
+        m = re.search(r'\{.*\}', txt, re.S)
+        d = json.loads(m.group(0))
+        d['updated_at'] = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+        pulse['leitura_ia'] = d
+        print(f'[claude] leitura da marca: {d.get("titulo")}')
+    except Exception as e:
+        print(f'[claude-leitura] {e}', file=sys.stderr)
+
+
 def apify_call(actor, payload, token, timeout=300):
     url = f'https://api.apify.com/v2/acts/{actor}/run-sync-get-dataset-items?token={token}'
     req = urllib.request.Request(url, data=json.dumps(payload).encode(),
@@ -401,6 +449,7 @@ def main():
     google_pse(pulse)
     apify(pulse)
     social_comments(pulse)
+    claude_leitura_marca(pulse)
 
     pulse['integracoes'] = {
         'google_news': True, 'reddit': True, 'autocomplete': 'busca' in pulse,
