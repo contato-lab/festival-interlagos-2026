@@ -195,6 +195,54 @@ def brave(feed, vistos, pulse):
     return add
 
 
+NEGC = re.compile(r'porcaria|merda|m&\$|m\$|lixo|contram[aã]o|p[ée]ssim|horr[ií]vel|vergonha|descaso|decep|nada a ver|odiei|palha[çc]ada|absurdo|petista', re.I)
+POSC = re.compile(r'\bbora+\b|simbora+|j[áa] comprei|\btop\b|incr[íi]vel|sonho|maravilh|perfeito|amei|ansios|n[ãa]o vejo a hora|da hora|show de bola|parab[ée]ns|🔥|❤|🥰|😍|👏', re.I)
+
+def sentimento_comentario(txt):
+    t = txt or ''
+    if NEGC.search(t):
+        return 'negativo'
+    if POSC.search(t):
+        return 'positivo'
+    return 'neutro'
+
+
+def claude_classifica(comentarios):
+    """Classifica sentimento e gera resumo via Claude API (Haiku). Retorna (labels, resumo) ou (None, None).
+    So roda se ANTHROPIC_API_KEY existir; custo estimado: centavos por dia."""
+    key = os.environ.get('ANTHROPIC_API_KEY')
+    if not key or not comentarios:
+        return None, None
+    try:
+        prompt = ("Comentários públicos em posts/vídeos sobre o Suhai Festival Interlagos "
+                  "(festival de motos e carros com test rides e shows). "
+                  "Tarefa 1: classifique o sentimento de CADA comentário em relação ao festival: "
+                  "'positivo', 'negativo' ou 'neutro'. Regras: ironia, deboche e palavrões censurados "
+                  "(ex: m&$#@) são negativos; críticas ao lineup/shows são negativas; reclamações da "
+                  "seguradora Suhai são negativas; dúvidas são neutras; empolgação (bora, já comprei, "
+                  "emojis de amor/fogo) é positiva. "
+                  "Tarefa 2: um resumo de no máximo 2 frases dos temas dominantes, em português, sem travessão. "
+                  'Responda APENAS JSON válido: {"sentimentos": ["..."], "resumo": "..."}.\n\nComentários:\n'
+                  + json.dumps([c.get('texto', '') for c in comentarios], ensure_ascii=False))
+        body = json.dumps({'model': 'claude-haiku-4-5-20251001', 'max_tokens': 1200,
+                           'messages': [{'role': 'user', 'content': prompt}]}).encode()
+        req = urllib.request.Request('https://api.anthropic.com/v1/messages', data=body,
+                                     headers={'x-api-key': key, 'anthropic-version': '2023-06-01',
+                                              'content-type': 'application/json'})
+        with urllib.request.urlopen(req, timeout=120) as r:
+            out = json.loads(r.read())
+        txt = out['content'][0]['text']
+        m = re.search(r'\{.*\}', txt, re.S)
+        data = json.loads(m.group(0))
+        labs = data.get('sentimentos')
+        if labs and len(labs) == len(comentarios):
+            labs = [l if l in ('positivo', 'negativo', 'neutro') else 'neutro' for l in labs]
+            return labs, data.get('resumo')
+    except Exception as e:
+        print(f'[claude] {e}', file=sys.stderr)
+    return None, None
+
+
 def apify_call(actor, payload, token, timeout=300):
     url = f'https://api.apify.com/v2/acts/{actor}/run-sync-get-dataset-items?token={token}'
     req = urllib.request.Request(url, data=json.dumps(payload).encode(),
@@ -224,6 +272,16 @@ def social_comments(pulse):
                 old.append(it)
                 seen.add(k)
         old = old[-30:]
+        # sentimento fino + resumo automatico via Claude API (quando a chave existir)
+        labs, resumo = claude_classifica(old)
+        if labs:
+            for c, l in zip(old, labs):
+                c['sentimento'] = l
+            print(f'[claude-{plat}] sentimento e resumo via API')
+        if resumo:
+            sc.setdefault('resumo', {})
+            if isinstance(sc['resumo'], dict):
+                sc['resumo'][plat] = resumo
         pos = len([c for c in old if c.get('sentimento') == 'positivo'])
         neg = len([c for c in old if c.get('sentimento') == 'negativo'])
         plats[plat] = {'coletados': len(old), 'positivos': pos, 'negativos': neg,
@@ -238,7 +296,7 @@ def social_comments(pulse):
             coms = apify_call('apify~instagram-comment-scraper',
                               {'directUrls': urls, 'resultsLimit': 30}, token)
             items = [{'texto': (c.get('text') or '')[:220], 'autor': c.get('ownerUsername') or '?',
-                      'likes': c.get('likesCount') or 0, 'sentimento': sentimento(c.get('text')),
+                      'likes': c.get('likesCount') or 0, 'sentimento': sentimento_comentario(c.get('text')),
                       'origem': 'post oficial'} for c in coms if c.get('text')]
             push('instagram', items)
             print(f'[coment-ig] {len(items)} comentarios')
@@ -256,7 +314,7 @@ def social_comments(pulse):
             coms = apify_call('clockworks~tiktok-comments-scraper',
                               {'postURLs': vurls, 'commentsPerPost': 10}, token)
             items = [{'texto': (c.get('text') or '')[:220], 'autor': c.get('uniqueId') or '?',
-                      'likes': c.get('diggCount') or 0, 'sentimento': sentimento(c.get('text')),
+                      'likes': c.get('diggCount') or 0, 'sentimento': sentimento_comentario(c.get('text')),
                       'origem': 'vídeo oficial'} for c in coms if c.get('text')]
             push('tiktok', items)
             print(f'[coment-tt] {len(items)} comentarios')
@@ -272,7 +330,7 @@ def social_comments(pulse):
             items = [{'texto': (c.get('comment') or c.get('text') or '')[:220],
                       'autor': c.get('author') or c.get('authorName') or '?',
                       'likes': c.get('voteCount') or c.get('likes') or 0,
-                      'sentimento': sentimento(c.get('comment') or c.get('text')),
+                      'sentimento': sentimento_comentario(c.get('comment') or c.get('text')),
                       'origem': 'vídeo de criador'} for c in coms if (c.get('comment') or c.get('text'))]
             push('youtube', items)
             print(f'[coment-yt] {len(items)} comentarios')

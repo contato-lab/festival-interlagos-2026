@@ -24,6 +24,7 @@ jobs:
           GOOGLE_PSE_CX: ${{ secrets.GOOGLE_PSE_CX }}
           BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python update-brand-pulse.py
 
       - name: Commit
