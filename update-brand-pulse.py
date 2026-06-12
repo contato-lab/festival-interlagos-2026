@@ -16,7 +16,7 @@ Fontes COM chave (ativam sozinhas quando o secret existir no repo):
   - APIFY_TOKEN                    -> social_proprio (seguidores IG/TikTok) + historico_social
 """
 import json, os, re, sys, urllib.request, urllib.parse
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 from xml.etree import ElementTree
 
 PULSE_FILE = 'brand-pulse-data.json'
@@ -237,58 +237,233 @@ def claude_classifica(comentarios):
         labs = data.get('sentimentos')
         if labs and len(labs) == len(comentarios):
             labs = [l if l in ('positivo', 'negativo', 'neutro') else 'neutro' for l in labs]
-            return labs, data.get('resumo')
+            return labs, _limpa(data.get('resumo'))
     except Exception as e:
         print(f'[claude] {e}', file=sys.stderr)
     return None, None
 
 
-def claude_leitura_marca(pulse):
-    """Leitura interpretativa da marca via Claude (Haiku). Grava pulse['leitura_ia']."""
+def _limpa(x):
+    """Remove travessao e tags de textos gerados (regra da casa: nunca travessao)."""
+    if isinstance(x, str):
+        x = re.sub(r'(?<=\d)\s*[–—]\s*(?=\d)', ' a ', x)   # intervalos: 13–16 vira 13 a 16
+        x = re.sub(r'\s*[–—]\s*', ', ', x).replace('<', '').replace('>', '')
+        return re.sub(r'^[,\s]+', '', x).strip()
+    if isinstance(x, list):
+        return [_limpa(i) for i in x]
+    if isinstance(x, dict):
+        return {k: _limpa(v) for k, v in x.items()}
+    return x
+
+
+def _ga4_share_proprio():
+    """Share de trafego proprio (organico + direto) em duas janelas: lancamento e ultimos 14 dias."""
+    try:
+        with open('ga4-data.json', encoding='utf-8') as f:
+            rows = [r for r in (json.load(f).get('source_medium_daily') or []) if isinstance(r, dict)]
+        datas = sorted({r.get('date') for r in rows if r.get('date')})
+        if len(datas) < 7:
+            return None
+
+        def proprio(r):
+            s, m = (r.get('source') or '').lower(), (r.get('medium') or '').lower()
+            return (s == '(direct)' and m == '(none)') or 'organic' in m
+
+        def share(dset):
+            tot = own = 0
+            for r in rows:
+                if r.get('date') in dset:
+                    try:
+                        sess = int(r.get('sessions') or 0)
+                    except (TypeError, ValueError):
+                        continue
+                    tot += sess
+                    own += sess if proprio(r) else 0
+            return round(own / tot * 100) if tot else None
+
+        return {'lancamento_pct': share(set(datas[:14])), 'ultimos_14_dias_pct': share(set(datas[-14:]))}
+    except Exception as e:
+        print(f'[ga4-share] {e}', file=sys.stderr)
+        return None
+
+
+def _conta_sentimentos(pulse):
+    cont = {'positivo': 0, 'negativo': 0, 'neutro': 0}
+    for m in (pulse.get('mencoes_destaque') or []) + (pulse.get('feed_auto') or []):
+        if isinstance(m, dict) and m.get('sentimento') in cont:
+            cont[m['sentimento']] += 1
+    for p in ((pulse.get('social_comentarios') or {}).get('plataformas') or {}).values():
+        if not isinstance(p, dict):
+            continue
+        for c in p.get('comentarios') or []:
+            if isinstance(c, dict) and c.get('sentimento') in cont:
+                cont[c['sentimento']] += 1
+    return cont
+
+
+def _lista_str(v, vazio_ok=False):
+    return isinstance(v, list) and (vazio_ok or v) and all(isinstance(i, str) and i.strip() for i in v)
+
+
+def _interpreta_valida(d):
+    ver = d.get('veredito') or {}
+    if ver.get('furou_bolha') not in ('sim', 'parcialmente', 'nao'):
+        return False
+    if not isinstance(ver.get('resumo_selo'), str) or not ver['resumo_selo'].strip():
+        return False
+    if 'justificativa' in ver and not isinstance(ver['justificativa'], str):
+        return False
+    chips = d.get('chips') or {}
+    if not all(_lista_str(chips.get(k)) for k in ('fortes', 'fracos', 'riscos')):
+        return False
+    acoes = d.get('acoes')
+    if not isinstance(acoes, list) or not acoes or not all(
+            isinstance(a, dict) and all(isinstance(a.get(k), str) and a[k].strip() for k in ('t', 'd', 'prazo'))
+            for a in acoes):
+        return False
+    fr = d.get('frentes')
+    if not isinstance(fr, list) or not fr or not all(
+            isinstance(f, dict) and f.get('nome') and isinstance(f.get('conclusao'), str) for f in fr):
+        return False
+    lei = d.get('leitura') or {}
+    if not lei.get('titulo') or not lei.get('paragrafo') or not _lista_str(lei.get('destaques')):
+        return False
+    return True
+
+
+def claude_interpreta_marca(pulse):
+    """Interpretacao completa do Brand Monitor via Claude: voz_score/voz_why, veredito da bolha,
+    chips, proximas acoes, conclusao por frente e leitura da marca. Uma unica chamada por varredura
+    para manter o custo baixo. Em qualquer falha, os textos anteriores permanecem intactos."""
     key = os.environ.get('ANTHROPIC_API_KEY')
     if not key:
         return
-    ver = pulse.get('veredito', {})
-    resumo_coment = (pulse.get('social_comentarios', {}) or {}).get('resumo', {})
-    fatos = {
-        'forca_da_marca_0a100': pulse.get('voz_score'),
-        'total_mencoes_periodo': pulse.get('total_mencoes'),
-        'mencoes_negativas': pulse.get('feed_auto_negativas'),
-        'furou_a_bolha': ver.get('furou_bolha'),
-        'justificativa': ver.get('justificativa'),
-        'pontos_fortes': ver.get('pontos_fortes'),
-        'pontos_fracos': ver.get('pontos_fracos'),
-        'riscos': ver.get('riscos'),
-        'frentes': [{'nome': f.get('nome'), 'score': f.get('score')} for f in pulse.get('frentes', [])][:8],
-        'seguidores_instagram': (pulse.get('social_proprio', {}) or {}).get('instagram', {}).get('followers'),
-        'seguidores_tiktok': (pulse.get('social_proprio', {}) or {}).get('tiktok', {}).get('followers'),
-        'resumo_comentarios': resumo_coment,
-    }
-    prompt = (
-        "Voce e analista de marca do Suhai Festival Interlagos 2026 (festival de motos 13-16/08 e carros "
-        "27-30/08). Abaixo, os sinais reais da marca hoje (forca da marca 0 a 100, mencoes, veredito sobre "
-        "furar a bolha, frentes monitoradas e resumo dos comentarios). Escreva uma leitura executiva da "
-        "MARCA: como ela esta hoje, se esta furando a bolha e qual a prioridade numero um para agir. "
-        "Regras: portugues do Brasil, direto, NUNCA use travessao, nao invente numero, baseie-se so nos "
-        'fatos. Responda APENAS JSON valido: {"titulo": "ate 8 palavras", "paragrafo": "no maximo 2 frases", '
-        '"destaques": ["3 bullets curtos"], "alerta": "1 frase de atencao ou string vazia"}.\n\nSINAIS:\n'
-        + json.dumps(fatos, ensure_ascii=False))
     try:
-        body = json.dumps({'model': 'claude-haiku-4-5-20251001', 'max_tokens': 700,
+        hoje = datetime.now(timezone.utc).date()
+        sent = _conta_sentimentos(pulse)
+        ig = (pulse.get('social_proprio') or {}).get('instagram') or {}
+        tk = (pulse.get('social_proprio') or {}).get('tiktok') or {}
+        hist_soc = [h for h in pulse.get('historico_social') or [] if isinstance(h, dict)]
+        plats = (pulse.get('social_comentarios') or {}).get('plataformas') or {}
+        sinais = {
+            'data_de_hoje': hoje.isoformat(),
+            'dias_para_festival_motos_13_08': (date(2026, 8, 13) - hoje).days,
+            'dias_para_festival_carros_27_08': (date(2026, 8, 27) - hoje).days,
+            'mencoes_catalogadas_varredura_profunda': pulse.get('total_mencoes'),
+            'feed_automatico_total': pulse.get('feed_auto_total'),
+            'feed_automatico_negativas': pulse.get('feed_auto_negativas'),
+            'contagem_sentimento_mencoes_e_comentarios': sent,
+            'mencoes_recentes_feed': [
+                {'fonte': m.get('fonte'), 'titulo': m.get('titulo'), 'sentimento': m.get('sentimento')}
+                for m in (pulse.get('feed_auto') or [])[-25:] if isinstance(m, dict)],
+            'busca_share_transacional_pct': (pulse.get('busca') or {}).get('share_transacional'),
+            'serp_saude_pct': (pulse.get('serp') or {}).get('health'),
+            'instagram_oficial': {'seguidores': ig.get('followers'), 'posts': ig.get('posts')},
+            'tiktok_oficial': {'seguidores': tk.get('followers')},
+            'evolucao_seguidores': {'inicio': hist_soc[0] if hist_soc else None,
+                                    'agora': hist_soc[-1] if hist_soc else None},
+            'comentarios_por_plataforma': {
+                k: {kk: v.get(kk) for kk in ('coletados', 'positivos', 'negativos')}
+                for k, v in plats.items() if isinstance(v, dict)},
+            'resumo_comentarios': (pulse.get('social_comentarios') or {}).get('resumo'),
+            'share_trafego_proprio_site': _ga4_share_proprio(),
+            'analise_anterior': {
+                'voz_score': pulse.get('voz_score'),
+                'voz_why': pulse.get('voz_why'),
+                'veredito': pulse.get('veredito'),
+                'chips': pulse.get('chips'),
+                'acoes': pulse.get('acoes'),
+                'frentes': [{'nome': f.get('nome'), 'score': f.get('score'), 'conclusao': f.get('conclusao')}
+                            for f in pulse.get('frentes') or [] if isinstance(f, dict)],
+            },
+        }
+        prompt = (
+            "Voce e o analista de marca do Suhai Festival Interlagos 2026 (festival de motos 13 a 16/08 e de "
+            "carros 27 a 30/08, no Autodromo de Interlagos). Abaixo estao os SINAIS reais coletados hoje pela "
+            "varredura automatica (mencoes, busca, redes, comentarios, trafego do site) e a ANALISE ANTERIOR. "
+            "Sua tarefa: ATUALIZAR a analise completa do Brand Monitor. Mantenha o que segue valido da analise "
+            "anterior, atualize o que os sinais novos mudaram e corrija numeros citados nos textos para os "
+            "valores atuais. Traga informacao pertinente e acionavel, nada generico.\n"
+            "REGRAS OBRIGATORIAS: portugues do Brasil; NUNCA use travessao em nenhum texto; nao use emojis; "
+            "nao invente numero nenhum, use somente os numeros presentes nos SINAIS; nunca cite estimativa de "
+            "publico do evento; tom direto de analista, sem encher linguica.\n"
+            "FORMATO: responda APENAS um JSON valido com exatamente esta estrutura:\n"
+            '{"voz_score": inteiro 0 a 100 (forca da voz da marca hoje),\n'
+            '"voz_why": "1 a 2 frases justificando o voz_score",\n'
+            '"veredito": {"furou_bolha": "sim" ou "parcialmente" ou "nao" (sem acento),\n'
+            ' "resumo_selo": "frase de ate 28 palavras explicando o veredito, vai ao lado do selo",\n'
+            ' "justificativa": "paragrafo de ate 150 palavras com A favor: e Contra:"},\n'
+            '"chips": {"fortes": ["4 a 5 chips de 4 a 8 palavras"], "fracos": ["4 a 5 chips"], "riscos": ["3 a 4 chips"]},\n'
+            '"acoes": [3 a 4 itens {"t": "titulo de ate 7 palavras", "d": "justificativa de ate 25 palavras '
+            'baseada nos sinais", "prazo": "Esta semana" ou "Antes de julho" ou "Preparar agora" ou similar}],\n'
+            '"frentes": [para cada frente da analise anterior, manter o MESMO nome exato com acentos: '
+            '{"nome": "...", "score": inteiro 0 a 100, "conclusao": "1 a 2 frases atualizadas"}],\n'
+            '"leitura": {"titulo": "ate 8 palavras", "paragrafo": "no maximo 2 frases", '
+            '"destaques": ["3 bullets de ate 18 palavras"], "alerta": "1 frase com a prioridade numero 1"}}\n\n'
+            'SINAIS:\n' + json.dumps(sinais, ensure_ascii=False))
+        body = json.dumps({'model': 'claude-haiku-4-5-20251001', 'max_tokens': 6000,
                            'messages': [{'role': 'user', 'content': prompt}]}).encode()
         req = urllib.request.Request('https://api.anthropic.com/v1/messages', data=body,
                                      headers={'x-api-key': key, 'anthropic-version': '2023-06-01',
                                               'content-type': 'application/json'})
-        with urllib.request.urlopen(req, timeout=120) as r:
+        with urllib.request.urlopen(req, timeout=180) as r:
             out = json.loads(r.read())
+        if out.get('stop_reason') == 'max_tokens':
+            print('[claude-interpreta] resposta truncada (max_tokens), mantendo textos anteriores', file=sys.stderr)
+            return
         txt = out['content'][0]['text']
         m = re.search(r'\{.*\}', txt, re.S)
-        d = json.loads(m.group(0))
-        d['updated_at'] = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-        pulse['leitura_ia'] = d
-        print(f'[claude] leitura da marca: {d.get("titulo")}')
+        if not m:
+            print('[claude-interpreta] sem JSON na resposta, mantendo textos anteriores', file=sys.stderr)
+            return
+        d = _limpa(json.loads(m.group(0)))
+        ver_novo = d.get('veredito') or {}
+        fb = (ver_novo.get('furou_bolha') or '').strip().lower().replace('não', 'nao')
+        if fb in ('sim', 'parcialmente', 'nao'):
+            ver_novo['furou_bolha'] = fb
+        if not _interpreta_valida(d):
+            print('[claude-interpreta] resposta invalida, mantendo textos anteriores', file=sys.stderr)
+            return
+
+        # tudo validado: monta as mudancas e aplica de uma vez (atomico)
+        agora = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+        ver_atual = pulse.get('veredito')
+        ver_atual = dict(ver_atual) if isinstance(ver_atual, dict) else {}
+        ver_atual.update({k: v for k, v in ver_novo.items() if v})
+        frentes_atuais = [dict(f) for f in pulse.get('frentes') or [] if isinstance(f, dict)]
+        por_nome = {f.get('nome'): f for f in d.get('frentes') or [] if isinstance(f, dict)}
+        for f in frentes_atuais:
+            novo = por_nome.pop(f.get('nome'), None)
+            if novo:
+                try:
+                    f['score'] = max(0, min(100, int(novo.get('score', f.get('score')))))
+                except (TypeError, ValueError):
+                    pass
+                if novo.get('conclusao'):
+                    f['conclusao'] = novo['conclusao']
+        if por_nome:
+            print(f'[claude-interpreta] frentes sem par (nome divergente): {list(por_nome)}', file=sys.stderr)
+        lei = d['leitura']
+        lei['updated_at'] = agora
+        updates = {'veredito': ver_atual, 'chips': d['chips'], 'acoes': d['acoes'][:4],
+                   'frentes': frentes_atuais, 'leitura_ia': lei, 'interpretacao_updated_at': agora}
+        try:
+            updates['voz_score'] = max(0, min(100, int(d['voz_score'])))
+        except (TypeError, ValueError):
+            pass
+        if isinstance(d.get('voz_why'), str) and d['voz_why'].strip():
+            updates['voz_why'] = d['voz_why']
+        pulse.update(updates)
+        s = _conta_sentimentos(pulse)
+        nao_neutros = s['positivo'] + s['negativo']
+        hist_append(pulse, 'historico', {
+            'voz': pulse.get('voz_score'),
+            'mencoes': pulse.get('total_mencoes'),
+            'sent_pos': round(s['positivo'] / nao_neutros * 100) if nao_neutros else None})
+        print(f'[claude] interpretacao completa: {lei.get("titulo")} | voz {pulse.get("voz_score")} | '
+              f'bolha {ver_atual.get("furou_bolha")}')
     except Exception as e:
-        print(f'[claude-leitura] {e}', file=sys.stderr)
+        print(f'[claude-interpreta] {e}', file=sys.stderr)
 
 
 def apify_call(actor, payload, token, timeout=300):
@@ -440,6 +615,12 @@ def main():
     vistos = {m.get('url') for m in feed}
     n = google_news(feed, vistos) + reddit(feed, vistos) + brave(feed, vistos, pulse)
     feed = feed[-300:]
+    # sanitiza texto vindo de fontes externas (travessao e tags nunca chegam ao dashboard)
+    for m in feed:
+        if isinstance(m, dict):
+            for k in ('titulo', 'fonte'):
+                if isinstance(m.get(k), str):
+                    m[k] = _limpa(m[k])
     pulse['feed_auto'] = feed
     pulse['feed_auto_updated_at'] = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     pulse['feed_auto_total'] = len(feed)
@@ -449,7 +630,7 @@ def main():
     google_pse(pulse)
     apify(pulse)
     social_comments(pulse)
-    claude_leitura_marca(pulse)
+    claude_interpreta_marca(pulse)
 
     pulse['integracoes'] = {
         'google_news': True, 'reddit': True, 'autocomplete': 'busca' in pulse,
@@ -458,8 +639,18 @@ def main():
         'apify_social': bool(os.environ.get('APIFY_TOKEN')),
     }
 
-    with open(PULSE_FILE, 'w', encoding='utf-8') as f:
+    # serp pode ter sido reescrito por google_pse/brave depois do feed: sanitiza por ultimo
+    for t in (pulse.get('serp') or {}).get('top') or []:
+        if isinstance(t, dict):
+            for k in ('titulo', 'q'):
+                if isinstance(t.get(k), str):
+                    t[k] = _limpa(t[k])
+
+    # escrita atomica: nunca deixa o JSON truncado se o processo morrer no meio
+    tmp = PULSE_FILE + '.tmp'
+    with open(tmp, 'w', encoding='utf-8') as f:
         json.dump(pulse, f, ensure_ascii=False, indent=1)
+    os.replace(tmp, PULSE_FILE)
     print(f'ok: +{n} mencoes novas, {len(feed)} no feed, {pulse["feed_auto_negativas"]} negativas')
 
 

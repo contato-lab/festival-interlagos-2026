@@ -145,7 +145,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
   .liai-alert{margin-top:10px;font-size:.78rem;color:#FFC233;background:rgba(255,194,51,.08);border-left:3px solid #FFC233;border-radius:6px;padding:8px 12px}
   </style>
   <script>
-  (function(){function f(){fetch('brand-pulse-data.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{var x=d&&d.leitura_ia;if(!x)return;var g=i=>document.getElementById(i);g('liai-title-marca').textContent=x.titulo||'';g('liai-body-marca').textContent=x.paragrafo||'';g('liai-tags-marca').innerHTML=(x.destaques||[]).map(t=>'<span class="liai-tag">'+String(t).replace(/[<>&]/g,'')+'</span>').join('');var a=g('liai-alert-marca');if(x.alerta){a.textContent='⚠ '+x.alerta;a.style.display='block';}var u=g('liai-upd-marca');if(u&&x.updated_at)u.textContent='atualizado '+x.updated_at.slice(0,10);}).catch(()=>{});}f();setInterval(f,6e5);})();
+  (function(){function f(){fetch('brand-pulse-data.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{var x=d&&d.leitura_ia;if(!x)return;var g=i=>document.getElementById(i);g('liai-title-marca').textContent=x.titulo||'';g('liai-body-marca').textContent=x.paragrafo||'';g('liai-tags-marca').innerHTML=(x.destaques||[]).map(t=>'<span class="liai-tag">'+String(t).replace(/[<>&]/g,'')+'</span>').join('');var a=g('liai-alert-marca');if(x.alerta){a.textContent='⚠ '+x.alerta;a.style.display='block';}else{a.textContent='';a.style.display='none';}var u=g('liai-upd-marca');if(u&&x.updated_at)u.textContent='atualizado '+x.updated_at.slice(0,10);}).catch(()=>{});}f();setInterval(f,6e5);})();
   </script>
 
   <!-- HERO -->
@@ -299,6 +299,7 @@ function stBadge(val,goal,maxBetter=true,labels=['BOM','OK','ATENÇÃO','CRÍTIC
 
 function render(){
   if(!S.ga)return;
+  const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const mix=weeklyMix(), last4=mix.slice(-4);
   const np=last4.reduce((a,w)=>a+w.direto+w.organico,0), tt4=last4.reduce((a,w)=>a+w.pago+w.direto+w.organico+w.outros,0);
   const shareNP=pct(np,tt4);
@@ -328,7 +329,7 @@ function render(){
   const cpaGoal=tkt*0.15;
   const vozHist=(S.pulse?.historico||[]).map(h=>h.voz);
   const pil=[
-    {n:'Voz da marca',v:sVo,m:'menções, imprensa e reputação',sp:spark(vozHist,'#C8FF00',60),bd:stBadge(sVo,60),ref:'você <b>'+sVo+'</b> · saudável <b>60+</b>',tip:'O que falam da marca na internet: imprensa, redes, comunidades e reclamações. Vem da varredura profunda. A linha do tempo cresce a cada nova varredura.'},
+    {n:'Voz da marca',v:sVo,m:'menções, imprensa e reputação',sp:spark(vozHist,'#C8FF00',60),bd:stBadge(sVo,60),ref:'você <b>'+sVo+'</b> · saudável <b>60+</b>',tip:'O que falam da marca na internet: imprensa, redes, comunidades e reclamações. Atualizado pela IA a cada varredura.'+(S.pulse?.voz_why?' Leitura atual: '+esc(S.pulse.voz_why):'')},
     {n:'Demanda própria',v:sDem,m:shareNP.toFixed(0)+'% do tráfego vem sozinho',sp:spark(ws.map(w=>w.shareNP),'#2BE080',35),bd:stBadge(shareNP,35),ref:'você <b>'+shareNP.toFixed(0)+'%</b> · saudável <b>35%+</b>',tip:'Quanto do tráfego chega sem anúncio (busca + direto), semana a semana desde o lançamento. A linha pontilhada é a meta de 35%.'},
     {n:'Eficiência',v:sEf,m:'CPA '+fmtR(cpa)+' por venda',sp:spark(ws.map(w=>w.cpa),'#4DA8FF',cpaGoal,false),bd:stBadge(cpa,cpaGoal,false),ref:'você <b>'+fmtR(cpa)+'</b> · saudável <b>até '+fmtR(cpaGoal)+'</b>',tip:'Custo por venda (CPA) semanal. Saudável: consumir no máximo 15% do ticket médio. Aqui, quanto MENOR a linha, melhor.'},
     {n:'Funil',v:sFu,m:convRate.toFixed(1)+'% dos visitantes compram',sp:spark(ws.map(w=>w.convRate),'#9B6BFF',3),bd:stBadge(convRate,2.5),ref:'você <b>'+convRate.toFixed(1)+'%</b> · saudável <b>2,5%+</b>',tip:'Percentual de visitantes que compram, semana a semana. Linha pontilhada: 3% (excelência).'},
@@ -341,8 +342,15 @@ function render(){
      <div class="ref">${p.ref}</div>
      <div class="m">${p.m}</div></div>`).join('');
 
-  // kpis
-  const sent=S.pulse?`${Math.round(43/55*100)}%`:'—';
+  // kpis: sentimento real = positivas vs negativas (exclui neutras), de menções + comentários
+  let sentPos=0,sentNeg=0;
+  if(S.pulse){
+    const conta=x=>{if(x&&x.sentimento==='positivo')sentPos++;else if(x&&x.sentimento==='negativo')sentNeg++;};
+    [...(S.pulse.mencoes_destaque||[]),...(S.pulse.feed_auto||[])].filter(Boolean).forEach(conta);
+    Object.values((S.pulse.social_comentarios||{}).plataformas||{}).forEach(p=>((p&&p.comentarios)||[]).filter(Boolean).forEach(conta));
+  }
+  const sentPct=(sentPos+sentNeg)?Math.round(sentPos/(sentPos+sentNeg)*100):null;
+  const sent=sentPct!==null?sentPct+'%':'—';
   const wsFull=ws.filter(w=>w.rec>0);
   const lastW=wsFull[wsFull.length-2], prevW=wsFull[wsFull.length-3]; // ultimas semanas completas
   const recDelta=(lastW&&prevW&&prevW.rec)?((lastW.rec/prevW.rec-1)*100):null;
@@ -354,7 +362,7 @@ function render(){
     {n:'CPA médio',v:fmtR2(cpa),s:'saudável: até '+fmtR(cpaGoal)+' (15% do ticket)',sp:spark(ws.map(w=>w.cpa),'#4DA8FF',cpaGoal,false),bd:stBadge(cpa,cpaGoal,false),tip:'Custo por venda nas plataformas de performance. Quanto menor, melhor. Linha pontilhada: teto saudável de 15% do ticket médio.'},
     {n:'Demanda própria',v:shareNP.toFixed(0)+'%',s:'saudável: 35% ou mais',sp:spark(ws.map(w=>w.shareNP),'#2BE080',35),bd:stBadge(shareNP,35),tip:'Fatia das sessões que chega sem anúncio (busca + direto). Termômetro de força própria da marca. Linha pontilhada: 35%.'},
     {n:'Menções 2026',v:S.pulse?.total_mencoes??'—',s:'saudável: crescente a cada varredura',sp:spark(menHist,'#C8FF00',null),bd:'',tip:'Menções catalogadas pela varredura. A linha cresce a cada nova varredura profunda; o robô diário soma menções novas entre varreduras.'},
-    {n:'Sentimento positivo',v:sent,s:'saudável: 70% ou mais',sp:spark(sentHist,'#2BE080',70),bd:stBadge(43/55*100,70),tip:'Percentual das menções do ano com tom positivo. Linha pontilhada: 70%. Em 2026 não há nenhuma menção negativa de consumidor.'}];
+    {n:'Sentimento positivo',v:sent,s:(sentPos+sentNeg)?sentPos+' positivas vs '+sentNeg+' negativas · saudável: 70%+':'saudável: 70% ou mais',sp:spark(sentHist,'#2BE080',70),bd:sentPct!==null?stBadge(sentPct,70):'',tip:'Entre menções e comentários com opinião (positivos ou negativos), quantos % são positivos. Neutros ficam de fora da conta. Linha pontilhada: 70%.'}];
   document.getElementById('kpis').innerHTML=kp.map(k=>
     `<div class="kpi"><div class="n">${k.n}<span class="qm" data-tip="${k.tip}">?</span></div><div class="vrow"><div class="v">${k.v}</div>${k.bd}</div>${k.sp}<div class="s">${k.s}</div></div>`).join('');
 
@@ -363,15 +371,17 @@ function render(){
     const v=S.pulse.veredito||{};
     const map={sim:['SIM','var(--green)','rgba(43,224,128,.12)'],parcialmente:['PARCIAL','var(--amber)','rgba(255,194,51,.12)'],nao:['NÃO','var(--red)','rgba(255,92,92,.12)'],inconclusivo:['?','var(--tx3)','rgba(255,255,255,.06)']};
     const m=map[v.furou_bolha]||map.inconclusivo;
+    const seloW=v.resumo_selo?esc(v.resumo_selo).split(' '):null;
+    const seloTxt=seloW?(seloW.slice(0,45).join(' ')+(seloW.length>45?'…':'')):'A marca já circula fora do nicho automotivo (música, negócios, trade). Falta o público geral: conversa espontânea e grande imprensa.';
     document.getElementById('selo').innerHTML=
       `<div class="badge" style="color:${m[1]};background:${m[2]}">${m[0]}</div>
-       <div class="q">A marca já circula fora do nicho automotivo (música, negócios, trade). Falta o público geral: conversa espontânea e grande imprensa.</div>`;
+       <div class="q">${seloTxt}</div>`;
     const c=S.pulse.chips||{};
-    const col=(t,cor,items)=>`<div class="chipcol"><div class="t" style="color:${cor}">${t}</div>${(items||[]).map(x=>`<div class="chip" style="border-left-color:${cor}">${x}</div>`).join('')}</div>`;
+    const col=(t,cor,items)=>`<div class="chipcol"><div class="t" style="color:${cor}">${t}</div>${(items||[]).filter(Boolean).map(x=>`<div class="chip" style="border-left-color:${cor}">${esc(x)}</div>`).join('')}</div>`;
     document.getElementById('chipcols').innerHTML=
       col('Forças',  'var(--green)', c.fortes)+col('Lacunas','var(--amber)', c.fracos)+col('Riscos','var(--red)', c.riscos);
-    document.getElementById('acoes').innerHTML=(S.pulse.acoes||[]).map((a,i)=>
-      `<div class="acao"><div class="num">${i+1}</div><div><div class="tt">${a.t}</div><div class="dd">${a.d}</div></div><div class="pz">${a.prazo}</div></div>`).join('');
+    document.getElementById('acoes').innerHTML=(S.pulse.acoes||[]).filter(Boolean).map((a,i)=>
+      `<div class="acao"><div class="num">${i+1}</div><div><div class="tt">${esc(a.t)}</div><div class="dd">${esc(a.d)}</div></div><div class="pz">${esc(a.prazo)}</div></div>`).join('');
   }
 
   // funil
@@ -418,18 +428,20 @@ function render(){
 
   // voz
   if(S.pulse){
-    document.getElementById('voz-note').textContent='· '+(S.pulse.updated_at||'').slice(0,10);
-    document.getElementById('voz').innerHTML=(S.pulse.frentes||[]).slice().sort((a,b)=>(b.score||0)-(a.score||0)).map(f=>
-      `<div class="vozrow"><div class="n">${f.nome}</div><div class="bw"><div class="b" style="width:${f.score||0}%;background:${colorOf(f.score||0)}"></div></div>
-       <div class="v" style="color:${colorOf(f.score||0)}">${f.score||0}</div></div>`).join('');
-    const feed=(S.pulse.feed_auto||[]).slice(-6).reverse().map(m=>({frente:m.canal+' · novo',fonte:m.fonte,titulo:m.titulo,url:m.url,sentimento:m.sentimento}));
+    document.getElementById('voz-note').textContent='· '+((S.pulse.interpretacao_updated_at||S.pulse.updated_at||'')).slice(0,10);
+    document.getElementById('voz').innerHTML=(S.pulse.frentes||[]).filter(Boolean).slice().sort((a,b)=>(b.score||0)-(a.score||0)).map(f=>{
+      const q=f.conclusao?'<span class="qm" data-tip="'+esc(f.conclusao)+'">?</span>':'';
+      return `<div class="vozrow"><div class="n">${esc(f.nome)}${q}</div><div class="bw"><div class="b" style="width:${f.score||0}%;background:${colorOf(f.score||0)}"></div></div>
+       <div class="v" style="color:${colorOf(f.score||0)}">${f.score||0}</div></div>`}).join('');
+    const feed=(S.pulse.feed_auto||[]).filter(Boolean).slice(-6).reverse().map(m=>({frente:(m.canal||'')+' · novo',fonte:m.fonte,titulo:m.titulo,url:m.url,sentimento:m.sentimento}));
     const negAuto=S.pulse.feed_auto_negativas||0;
     document.getElementById('men-note').textContent='· recorte 2026 · '+(S.pulse.total_mencoes||0)+' catalogadas'
       +(S.pulse.feed_auto_total?(' · feed automático: '+S.pulse.feed_auto_total+(negAuto?' ('+negAuto+' com sinal negativo ⚠)':'')):'');
-    document.getElementById('mencoes').innerHTML=feed.concat((S.pulse.mencoes_destaque||[])).slice(0,12).map(m=>
-      `<div class="men"><div class="f">${m.frente}</div>
-       <div class="t">${m.url?`<a href="${m.url}" target="_blank">${m.titulo}</a>`:m.titulo}</div>
-       <div class="meta">${m.fonte} <span class="pill ${m.sentimento==='positivo'?'pos':m.sentimento==='negativo'?'neg':'neu'}">${m.sentimento}</span></div></div>`).join('');
+    document.getElementById('mencoes').innerHTML=feed.concat((S.pulse.mencoes_destaque||[])).filter(Boolean).slice(0,12).map(m=>{
+      const u=/^https?:\/\//.test(m.url||'')?esc(m.url):'';
+      return `<div class="men"><div class="f">${esc(m.frente)}</div>
+       <div class="t">${u?`<a href="${u}" target="_blank" rel="noopener noreferrer">${esc(m.titulo)}</a>`:esc(m.titulo)}</div>
+       <div class="meta">${esc(m.fonte)} <span class="pill ${m.sentimento==='positivo'?'pos':m.sentimento==='negativo'?'neg':'neu'}">${esc(m.sentimento)}</span></div></div>`}).join('');
   }
 
   // Presença própria + saúde da busca
@@ -457,7 +469,6 @@ function render(){
   document.getElementById('presenca').innerHTML=pres;
 
   // Comentários sociais
-  const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const SC=P.social_comentarios;
   const platDefs=[['instagram','Instagram','#9B6BFF'],['tiktok','TikTok','#4DA8FF'],['youtube','YouTube','#FF5C5C']];
   if(SC&&SC.plataformas){
