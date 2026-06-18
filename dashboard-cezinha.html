@@ -87,6 +87,12 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .ia-comp-seg{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:19px;color:var(--lime);margin-bottom:8px}
 .ia-comp-line{font-size:12px;color:var(--text2);line-height:1.4;margin-top:6px}
 .ia-comp-line b{color:var(--text3);font-weight:700;text-transform:uppercase;font-size:9.5px;letter-spacing:.5px;display:block;margin-bottom:1px}
+.ia-trab{margin-top:20px;padding-top:18px;border-top:1px solid var(--border)}
+.ia-trab-list{display:grid;grid-template-columns:1fr 1fr;gap:11px 20px;margin-top:4px}
+.ia-trab-item{font-size:13px;color:var(--text2);line-height:1.45;padding-left:15px;position:relative}
+.ia-trab-item::before{content:'';position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%;background:var(--lime)}
+.ia-trab-item b{color:var(--text);font-weight:700}
+.ia-trab-tag{display:inline-block;font-size:9px;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);border:1px solid var(--border);border-radius:10px;padding:1px 7px;margin-left:6px;vertical-align:middle}
 
 /* CAMPAIGN CARDS */
 .camp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
@@ -156,6 +162,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   .camp-grid{grid-template-columns:1fr}
   .ia-cols{grid-template-columns:1fr;gap:16px}
   .ia-comp-list{grid-template-columns:1fr}
+  .ia-trab-list{grid-template-columns:1fr}
   .ia-title{font-size:19px}
   .foll-grid{grid-template-columns:1fr}
   .foll-val{font-size:40px}
@@ -210,6 +217,11 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
       <div class="ia-col good"><div class="ia-col-h good">Indo bem</div><ul id="iaDestaques"></ul></div>
       <div class="ia-col warn"><div class="ia-col-h warn">Onde melhorar</div><ul id="iaAtencao"></ul></div>
       <div class="ia-col next"><div class="ia-col-h next">Próximos passos</div><ul id="iaPassos"></ul></div>
+    </div>
+    <div class="ia-trab" id="iaTrab" style="display:none">
+      <div class="ia-comp-h" style="color:var(--lime)">Trabalho parlamentar pra divulgar</div>
+      <div class="ia-comp-resumo" id="iaTrabResumo"></div>
+      <div class="ia-trab-list" id="iaTrabList"></div>
     </div>
     <div class="ia-comp" id="iaComp" style="display:none">
       <div class="ia-comp-h">Comparativo com concorrentes</div>
@@ -534,6 +546,12 @@ function renderIA(){
     document.getElementById('iaCompResumo').textContent = comp.resumo||'';
     document.getElementById('iaCompList').innerHTML = comp.linhas.map(l=>`<div class="ia-comp-card"><div class="ia-comp-nome">${esc(l.nome||'')}</div><div class="ia-comp-arroba">${esc(l.arroba||'')}</div><div class="ia-comp-seg">${esc(l.seguidores||'')}</div><div class="ia-comp-line"><b>Forte em</b>${esc(l.destaque||'')}</div>${l.o_que_aprender?`<div class="ia-comp-line"><b>O que puxar dele</b>${esc(l.o_que_aprender)}</div>`:''}</div>`).join('');
   } else if(cwrap){ cwrap.style.display='none'; }
+  const trab = d.trabalho_parlamentar, twrap=document.getElementById('iaTrab');
+  if(trab && trab.itens && trab.itens.length){
+    twrap.style.display='';
+    document.getElementById('iaTrabResumo').textContent = trab.resumo||'';
+    document.getElementById('iaTrabList').innerHTML = trab.itens.map(it=>`<div class="ia-trab-item"><b>${esc(it.titulo||'')}</b>${it.tipo?`<span class="ia-trab-tag">${esc(it.tipo)}</span>`:''}<br>${esc(it.descricao||'')}</div>`).join('');
+  } else if(twrap){ twrap.style.display='none'; }
   const dt = IA.gerado_em ? new Date(IA.gerado_em) : null;
   const de=document.getElementById('iaDate'); if(de) de.textContent = dt ? 'Atualizado '+dt.toLocaleDateString('pt-BR') : '';
 }
