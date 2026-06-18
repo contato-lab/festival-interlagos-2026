@@ -398,28 +398,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
 
 <div class="main">
 
-<!-- ══ LEITURA DO DIA (IA) ══ -->
-<div class="liai-card" id="liai-geral">
-  <div class="liai-head"><span class="liai-spark">✦ LEITURA DO DIA · IA</span><span class="liai-upd" id="liai-upd-geral"></span></div>
-  <div class="liai-title" id="liai-title-geral">Gerando leitura do dia...</div>
-  <div class="liai-body" id="liai-body-geral"></div>
-  <div class="liai-tags" id="liai-tags-geral"></div>
-  <div class="liai-alert" id="liai-alert-geral" style="display:none"></div>
-</div>
-<style>
-.liai-card{background:linear-gradient(135deg,rgba(200,255,0,.06),rgba(20,20,20,.55));border:1px solid rgba(200,255,0,.25);border-radius:14px;padding:16px 20px;margin:0 0 18px 0;font-family:'Inter',sans-serif}
-.liai-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.liai-spark{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.78rem;letter-spacing:.1em;color:#C8FF00;text-transform:uppercase}
-.liai-upd{font-size:.62rem;color:#777}
-.liai-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.3rem;color:#fff;line-height:1.15;margin-bottom:6px}
-.liai-body{font-size:.88rem;color:#d2d2d2;line-height:1.5}
-.liai-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.liai-tag{font-size:.72rem;color:#d2d2d2;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:5px 10px}
-.liai-alert{margin-top:10px;font-size:.78rem;color:#FFC233;background:rgba(255,194,51,.08);border-left:3px solid #FFC233;border-radius:6px;padding:8px 12px}
-</style>
-<script>
-(function(){var K='geral';function f(){fetch('leitura-ia.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{if(!d||!d[K])return;var x=d[K],g=i=>document.getElementById(i);g('liai-title-'+K).textContent=x.titulo||'';g('liai-body-'+K).textContent=x.paragrafo||'';g('liai-tags-'+K).innerHTML=(x.destaques||[]).map(t=>'<span class="liai-tag">'+String(t).replace(/[<>&]/g,'')+'</span>').join('');var a=g('liai-alert-'+K);if(x.alerta){a.textContent='⚠ '+x.alerta;a.style.display='block';}var u=g('liai-upd-'+K);if(u&&x.updated_at)u.textContent='atualizado '+x.updated_at.slice(0,10);}).catch(()=>{});}f();setInterval(f,6e5);})();
-</script>
+<!-- Leitura do Dia (IA) removida do dashboard geral -->
 
 <!-- ══ KPIs ══ -->
 <div class="kpi-strip">
