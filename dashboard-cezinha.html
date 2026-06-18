@@ -101,6 +101,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .foll-val{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:46px;line-height:1;letter-spacing:-1px;color:var(--text)}
 .foll-delta{font-size:12px;margin-top:8px;font-weight:600}
 .foll-delta.up{color:var(--green)} .foll-delta.down{color:var(--red)} .foll-delta.neu{color:var(--text3)}
+.foll-sub{font-size:11px;color:var(--text3);margin-top:8px}
 
 /* FOOTER */
 .footer{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;padding:28px 24px;margin-top:8px;border-top:1px solid var(--border);color:var(--text3);font-size:12px}
@@ -215,6 +216,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
         <div class="foll-net"><span class="foll-ic ig">◉ Instagram</span></div>
         <div class="foll-val" id="igVal">—</div>
         <div class="foll-delta neu" id="igDelta">no período</div>
+        <div class="foll-sub" id="igSub"></div>
       </div>
       <div class="chart-card"><div class="ct">Evolução de seguidores (dia a dia)</div><div class="chart-wrap"><canvas id="chFollow"></canvas></div></div>
     </div>
@@ -244,7 +246,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 // ── fallback embutido (renderiza mesmo offline; fetch sobrescreve com dado vivo) ──
 const DATA_FALLBACK = {
   "cliente":"Cezinha de Madureira","atualizado_em":"2026-06-17T17:15:00-03:00",
-  "seguidores":{"fb_atual":106722,"ig_atual":191464,"ig_posts":420,"serie":[{"data":"2026-06-17","fb":106722,"ig":191464}]},
+  "seguidores":{"fb_atual":106722,"ig_atual":191464,"ig_posts":420,"ig_follows":4143,"serie":[{"data":"2026-06-17","fb":106722,"ig":191464}]},
   "campanhas":[
     {"id":"52562360720227","nome":"Engajamento","objetivo":"OUTCOME_ENGAGEMENT","objetivo_label":"Engajamento","totais":{"impressions":8314,"reach":8204,"frequency":1.0134,"spend":52.14,"cpm":6.27,"cpc":0.4655,"ctr":1.347,"clicks":112,"engajamentos":5465,"reacoes":35,"comentarios":0,"salvamentos":1,"compartilhamentos":0,"link_clicks":0,"video_plays":7744,"video_views":5429,"thruplays":1194,"custo_engajamento":0.0095},"serie":[{"data":"2026-06-17","impressions":8314,"reach":8204,"spend":52.14,"engajamentos":5465,"clicks":112,"link_clicks":0}]},
     {"id":"52562338465227","nome":"Reconhecimento","objetivo":"OUTCOME_AWARENESS","objetivo_label":"Reconhecimento de marca","totais":{"impressions":60658,"reach":58677,"frequency":1.0338,"spend":93.59,"cpm":1.5429,"cpc":7.7992,"ctr":0.0198,"clicks":12,"engajamentos":1336,"reacoes":3,"comentarios":0,"salvamentos":0,"compartilhamentos":0,"link_clicks":0,"video_plays":57767,"video_views":1333,"thruplays":168,"custo_engajamento":0.0701,"ad_recall_rate":0.032528,"ad_recallers":20},"serie":[{"data":"2026-06-17","impressions":60658,"reach":58677,"spend":93.59,"engajamentos":1336,"clicks":12,"link_clicks":0}]},
@@ -357,22 +359,9 @@ function metricsFor(camp){
     ]};
   }
   // OUTCOME_TRAFFIC (tráfego para Instagram e Facebook)
-  const a = ATRIB && ATRIB.traffic;
-  if(a){
-    return {hero:{v:fmtN(a.visitas_perfil), l:'visitas ao perfil'}, items:[
-      ['Custo / visita', fmtCusto(a.custo_visita)],
-      ['Seguidores no Instagram', fmtN(a.seguidores_ig)],
-      ['Custo / seguidor', fmtCusto(a.custo_seguidor)],
-      ['Alcance', fmtN(t.reach)],
-      ['CPM', fmtBRL(t.cpm)]
-    ], note:'Visitas e seguidores: Gerenciador de Anúncios (total desde o início · atualizado '+(ATRIB.atualizado_em||'')+')'};
-  }
-  const g = growthInPeriod();
-  const novosSeg = (g.total!=null) ? ((g.total>0?'+':'')+fmtN(g.total)) : '—';
-  return {hero:{v:fmtN(t.link_clicks||t.clicks),l:'acessos ao perfil (cliques)'}, items:[
-    ['Custo / acesso', fmtCusto(t.custo_link_click||t.cpc)],
+  return {hero:{v:fmtN(t.link_clicks||t.clicks),l:'cliques no link (acessos ao perfil)'}, items:[
+    ['Custo / clique', fmtCusto(t.custo_link_click||t.cpc)],
     ['CTR', fmtPct(t.ctr)],
-    ['Novos seguidores (FB+IG)', novosSeg],
     ['Alcance', fmtN(t.reach)],
     ['CPM', fmtBRL(t.cpm)]
   ]};
@@ -427,6 +416,8 @@ function renderFollowers(){
   const seg = DATA.seguidores||{};
   document.getElementById('fbVal').textContent = fmtN(seg.fb_atual);
   document.getElementById('igVal').textContent = fmtN(seg.ig_atual);
+  const igSub=document.getElementById('igSub');
+  if(igSub){ const p=[]; if(seg.ig_follows!=null)p.push('Seguindo '+fmtN(seg.ig_follows)); if(seg.ig_posts!=null)p.push(fmtN(seg.ig_posts)+' posts'); igSub.textContent=p.join(' · '); }
   // delta no período (último - primeiro da série filtrada)
   function setDelta(id, arr){
     const el=document.getElementById(id);

@@ -110,19 +110,20 @@ def fetch_serie(camp_id, desde):
 
 
 def fetch_followers():
-    fb = ig = ig_posts = None
+    fb = ig = ig_posts = ig_follows = None
     try:
         d = api_get(FB_PAGE_ID, {'fields': 'fan_count,followers_count'})
         fb = int(d.get('followers_count') or d.get('fan_count') or 0)
     except Exception as e:
         print(f'[warn] FB followers: {e}', file=sys.stderr)
     try:
-        d = api_get(IG_ID, {'fields': 'followers_count,media_count'})
+        d = api_get(IG_ID, {'fields': 'followers_count,follows_count,media_count'})
         ig = int(d.get('followers_count') or 0)
         ig_posts = int(d.get('media_count') or 0)
+        ig_follows = int(d.get('follows_count') or 0)
     except Exception as e:
         print(f'[warn] IG followers: {e}', file=sys.stderr)
-    return fb, ig, ig_posts
+    return fb, ig, ig_posts, ig_follows
 
 
 def upsert_by_date(serie, ponto, campo='data'):
@@ -150,7 +151,7 @@ def main():
                 'seguidores': {'serie': []}, 'campanhas': []}
 
     # ── seguidores ──
-    fb, ig, ig_posts = fetch_followers()
+    fb, ig, ig_posts, ig_follows = fetch_followers()
     seg = data.setdefault('seguidores', {'serie': []})
     if fb is not None:
         seg['fb_atual'] = fb
@@ -158,6 +159,8 @@ def main():
         seg['ig_atual'] = ig
     if ig_posts is not None:
         seg['ig_posts'] = ig_posts
+    if ig_follows is not None:
+        seg['ig_follows'] = ig_follows
     if fb is not None or ig is not None:
         ponto = {'data': HOJE,
                  'fb': fb if fb is not None else seg.get('fb_atual'),
