@@ -63,6 +63,21 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .kpi-value.lime{color:var(--lime)}
 .kpi-sub{font-size:11px;color:var(--text3);margin-top:6px}
 
+/* DIAGNÓSTICO IA */
+.ia-card{background:linear-gradient(135deg,rgba(200,255,0,0.07) 0%,var(--card) 55%);border:1px solid var(--lime-border);border-radius:var(--radius);box-shadow:0 0 0 1px rgba(200,255,0,0.08);padding:22px 24px;animation:rise .5s ease both}
+.ia-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.ia-badge{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--lime);display:flex;align-items:center;gap:7px}
+.ia-date{font-size:11px;color:var(--text3)}
+.ia-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:23px;color:var(--text);line-height:1.1;margin-bottom:8px}
+.ia-panorama{font-size:14px;color:var(--text2);line-height:1.55;margin-bottom:18px;max-width:1050px}
+.ia-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.ia-col-h{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.8px;text-transform:uppercase;margin-bottom:9px}
+.ia-col-h.good{color:var(--green)} .ia-col-h.warn{color:var(--warn)} .ia-col-h.next{color:var(--lime)}
+.ia-col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ia-col li{font-size:13px;color:var(--text2);line-height:1.45;padding-left:15px;position:relative}
+.ia-col li::before{content:'';position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%}
+.ia-col.good li::before{background:var(--green)} .ia-col.warn li::before{background:var(--warn)} .ia-col.next li::before{background:var(--lime)}
+
 /* CAMPAIGN CARDS */
 .camp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
 .camp-card{background:var(--card);border:1px solid var(--lime-border);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 0 0 1px rgba(200,255,0,0.05);transition:all .2s;animation:rise .5s ease both}
@@ -129,6 +144,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   .kpi-card{padding:14px}
   .kpi-value{font-size:27px}
   .camp-grid{grid-template-columns:1fr}
+  .ia-cols{grid-template-columns:1fr;gap:16px}
+  .ia-title{font-size:19px}
   .foll-grid{grid-template-columns:1fr}
   .foll-val{font-size:40px}
   .section-title{font-size:15px}
@@ -169,6 +186,21 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 </div>
 
 <main class="main">
+
+  <!-- DIAGNÓSTICO IA -->
+  <section class="ia-card" id="iaCard" style="display:none">
+    <div class="ia-head">
+      <span class="ia-badge">✱ Diagnóstico das Redes · IA</span>
+      <span class="ia-date" id="iaDate"></span>
+    </div>
+    <div class="ia-title" id="iaTitulo"></div>
+    <div class="ia-panorama" id="iaPanorama"></div>
+    <div class="ia-cols">
+      <div class="ia-col good"><div class="ia-col-h good">Indo bem</div><ul id="iaDestaques"></ul></div>
+      <div class="ia-col warn"><div class="ia-col-h warn">Onde melhorar</div><ul id="iaAtencao"></ul></div>
+      <div class="ia-col next"><div class="ia-col-h next">Próximos passos</div><ul id="iaPassos"></ul></div>
+    </div>
+  </section>
 
   <!-- KPI CONSOLIDADO -->
   <section>
@@ -256,6 +288,7 @@ const DATA_FALLBACK = {
 };
 
 let DATA = DATA_FALLBACK;
+let IA = null;
 let RANGE = {mode:'all', from:null, to:null};
 const charts = {};
 
@@ -470,8 +503,20 @@ function renderDaily(){
   });
 }
 
+function renderIA(){
+  const card=document.getElementById('iaCard');
+  const d = IA && IA.diagnostico;
+  if(!d){ if(card) card.style.display='none'; return; }
+  card.style.display='';
+  document.getElementById('iaTitulo').textContent = d.titulo||'';
+  document.getElementById('iaPanorama').textContent = d.panorama||'';
+  const fill=(id,arr)=>{ const el=document.getElementById(id); if(el) el.innerHTML=(arr||[]).map(x=>`<li>${esc(x)}</li>`).join(''); };
+  fill('iaDestaques', d.destaques); fill('iaAtencao', d.atencao); fill('iaPassos', d.proximos_passos);
+  const dt = IA.gerado_em ? new Date(IA.gerado_em) : null;
+  const de=document.getElementById('iaDate'); if(de) de.textContent = dt ? 'Atualizado '+dt.toLocaleDateString('pt-BR') : '';
+}
 function renderAll(){
-  renderKPIs(); renderCampaigns(); renderCompare(); renderFollowers(); renderDaily();
+  renderIA(); renderKPIs(); renderCampaigns(); renderCompare(); renderFollowers(); renderDaily();
   const dt = DATA.atualizado_em ? new Date(DATA.atualizado_em) : null;
   document.getElementById('genDate').textContent = dt ? 'Atualizado '+dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '';
 }
@@ -507,8 +552,10 @@ document.getElementById('applyDate').addEventListener('click',()=>{
 });
 
 // ── load ──
-fetch('cezinha-data.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)
-  .then(d=>{ if(d) DATA=d; renderAll(); });
+Promise.all([
+  fetch('cezinha-data.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),
+  fetch('cezinha-ia.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)
+]).then(([d,i])=>{ if(d) DATA=d; if(i) IA=i; renderAll(); });
 renderAll();
 </script>
 </body>
