@@ -31,13 +31,14 @@ DATA_FILE = os.path.join(HERE, 'cezinha-data.json')
 CAMPAIGNS = [
     {'id': '52562360720227', 'nome': 'Engajamento',    'objetivo': 'OUTCOME_ENGAGEMENT', 'objetivo_label': 'Engajamento',                  'desde': '2026-06-17'},
     {'id': '52562338465227', 'nome': 'Reconhecimento', 'objetivo': 'OUTCOME_AWARENESS',  'objetivo_label': 'Reconhecimento de marca',     'desde': '2026-06-17'},
-    {'id': '52562318873627', 'nome': 'Seguidores',     'objetivo': 'OUTCOME_TRAFFIC',    'objetivo_label': 'Tráfego (ganho de seguidores)', 'desde': '2026-06-17'},
+    {'id': '52562318873627', 'nome': 'Tráfego para o Instagram', 'objetivo': 'OUTCOME_TRAFFIC', 'objetivo_label': 'Tráfego (Instagram)', 'desde': '2026-06-17'},
 ]
 
 INSIGHT_FIELDS = ','.join([
     'impressions', 'reach', 'frequency', 'spend', 'cpm', 'cpc', 'ctr',
     'clicks', 'inline_link_clicks', 'actions', 'cost_per_action_type',
     'video_play_actions', 'video_thruplay_watched_actions',
+    'estimated_ad_recallers', 'estimated_ad_recall_rate',
 ])
 
 
@@ -81,6 +82,8 @@ def parse_row(row):
         'thruplays':     int(_action(row.get('video_thruplay_watched_actions'), 'video_view')),
         'custo_engajamento': round(_action(cpa, 'post_engagement'), 4),
         'custo_link_click':  round(_action(cpa, 'link_click'), 4),
+        'ad_recallers':      int(float(row.get('estimated_ad_recallers', 0) or 0)),
+        'ad_recall_rate':    round(float(row.get('estimated_ad_recall_rate', 0) or 0), 6),
     }
 
 

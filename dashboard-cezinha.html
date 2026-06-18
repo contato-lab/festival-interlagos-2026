@@ -52,7 +52,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .section-sub{font-size:12px;color:var(--text3);margin-top:3px}
 
 /* KPI STRIP */
-.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
 .kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;transition:border-color .2s;animation:rise .5s ease both}
 .kpi-card:hover{border-color:rgba(200,255,0,0.15)}
 .kpi-card.accent{border-color:var(--lime-border);background:linear-gradient(135deg,rgba(200,255,0,0.07) 0%,var(--card) 70%)}
@@ -135,12 +135,16 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 
 <div class="filter-bar">
   <span class="filter-label">Período</span>
-  <button class="fpill active" data-range="all">Tudo</button>
+  <button class="fpill" data-range="hoje">Hoje</button>
+  <button class="fpill" data-range="ontem">Ontem</button>
   <button class="fpill" data-range="7">7 dias</button>
+  <button class="fpill" data-range="14">14 dias</button>
   <button class="fpill" data-range="30">30 dias</button>
+  <button class="fpill active" data-range="all">Todo o período</button>
   <span class="filter-sep">|</span>
+  <span class="filter-label">De</span>
   <input type="date" class="filter-date" id="dFrom">
-  <span class="filter-sep">até</span>
+  <span class="filter-label">Até</span>
   <input type="date" class="filter-date" id="dTo">
   <button class="filter-apply" id="applyDate">Aplicar</button>
   <span class="filter-sep" id="filterNote" style="margin-left:auto"></span>
@@ -226,8 +230,8 @@ const DATA_FALLBACK = {
   "seguidores":{"fb_atual":106722,"ig_atual":191464,"ig_posts":420,"serie":[{"data":"2026-06-17","fb":106722,"ig":191464}]},
   "campanhas":[
     {"id":"52562360720227","nome":"Engajamento","objetivo":"OUTCOME_ENGAGEMENT","objetivo_label":"Engajamento","totais":{"impressions":8314,"reach":8204,"frequency":1.0134,"spend":52.14,"cpm":6.27,"cpc":0.4655,"ctr":1.347,"clicks":112,"engajamentos":5465,"reacoes":35,"comentarios":0,"salvamentos":1,"compartilhamentos":0,"link_clicks":0,"video_plays":7744,"video_views":5429,"thruplays":1194,"custo_engajamento":0.0095},"serie":[{"data":"2026-06-17","impressions":8314,"reach":8204,"spend":52.14,"engajamentos":5465,"clicks":112,"link_clicks":0}]},
-    {"id":"52562338465227","nome":"Reconhecimento","objetivo":"OUTCOME_AWARENESS","objetivo_label":"Reconhecimento de marca","totais":{"impressions":60658,"reach":58677,"frequency":1.0338,"spend":93.59,"cpm":1.5429,"cpc":7.7992,"ctr":0.0198,"clicks":12,"engajamentos":1336,"reacoes":3,"comentarios":0,"salvamentos":0,"compartilhamentos":0,"link_clicks":0,"video_plays":57767,"video_views":1333,"thruplays":168,"custo_engajamento":0.0701},"serie":[{"data":"2026-06-17","impressions":60658,"reach":58677,"spend":93.59,"engajamentos":1336,"clicks":12,"link_clicks":0}]},
-    {"id":"52562318873627","nome":"Seguidores","objetivo":"OUTCOME_TRAFFIC","objetivo_label":"Tráfego (ganho de seguidores)","totais":{"impressions":9195,"reach":8270,"frequency":1.1119,"spend":95.64,"cpm":10.4013,"cpc":0.3721,"ctr":2.795,"clicks":257,"engajamentos":1777,"reacoes":37,"comentarios":1,"salvamentos":0,"compartilhamentos":0,"link_clicks":243,"video_plays":8587,"video_views":1494,"thruplays":292,"custo_link_click":0.3936},"serie":[{"data":"2026-06-17","impressions":9195,"reach":8270,"spend":95.64,"engajamentos":1777,"clicks":257,"link_clicks":243}]}
+    {"id":"52562338465227","nome":"Reconhecimento","objetivo":"OUTCOME_AWARENESS","objetivo_label":"Reconhecimento de marca","totais":{"impressions":60658,"reach":58677,"frequency":1.0338,"spend":93.59,"cpm":1.5429,"cpc":7.7992,"ctr":0.0198,"clicks":12,"engajamentos":1336,"reacoes":3,"comentarios":0,"salvamentos":0,"compartilhamentos":0,"link_clicks":0,"video_plays":57767,"video_views":1333,"thruplays":168,"custo_engajamento":0.0701,"ad_recall_rate":0.032528,"ad_recallers":20},"serie":[{"data":"2026-06-17","impressions":60658,"reach":58677,"spend":93.59,"engajamentos":1336,"clicks":12,"link_clicks":0}]},
+    {"id":"52562318873627","nome":"Tráfego para o Instagram","objetivo":"OUTCOME_TRAFFIC","objetivo_label":"Tráfego (Instagram)","totais":{"impressions":9195,"reach":8270,"frequency":1.1119,"spend":95.64,"cpm":10.4013,"cpc":0.3721,"ctr":2.795,"clicks":257,"engajamentos":1777,"reacoes":37,"comentarios":1,"salvamentos":0,"compartilhamentos":0,"link_clicks":243,"video_plays":8587,"video_views":1494,"thruplays":292,"custo_link_click":0.3936},"serie":[{"data":"2026-06-17","impressions":9195,"reach":8270,"spend":95.64,"engajamentos":1777,"clicks":257,"link_clicks":243}]}
   ]
 };
 
@@ -252,14 +256,26 @@ function inRange(d){
   return true;
 }
 function filterSerie(serie){ return (serie||[]).filter(p=>inRange(p.data)); }
+function growthInPeriod(){
+  const s = filterSerie((DATA.seguidores||{}).serie);
+  if(s.length<2) return {fb:null, ig:null, total:null};
+  const a=s[0], b=s[s.length-1];
+  const fb=(+b.fb||0)-(+a.fb||0), ig=(+b.ig||0)-(+a.ig||0);
+  return {fb, ig, total:fb+ig};
+}
 
 // ── KPI consolidado (acumulado) ──
 function renderKPIs(){
   const c = DATA.campanhas||[];
   const sum = k => c.reduce((a,x)=>a+(+((x.totais||{})[k])||0),0);
   const spend=sum('spend'), impr=sum('impressions'), reach=sum('reach'), eng=sum('engajamentos');
+  const seg = DATA.seguidores||{};
+  const totalSeg = (+seg.fb_atual||0)+(+seg.ig_atual||0);
+  const g = growthInPeriod();
+  const segSub = (g.total!=null) ? ((g.total>0?'+':'')+fmtN(g.total)+' no período') : 'Facebook + Instagram';
   const kpis=[
     {l:'Investimento total', v:fmtBRL(spend), sub:'soma das 3 campanhas', accent:true},
+    {l:'Seguidores (FB + IG)', v:fmtN(totalSeg), sub:segSub},
     {l:'Pessoas alcançadas', v:fmtN(reach), sub:'soma das campanhas'},
     {l:'Impressões', v:fmtN(impr), sub:'total de exibições'},
     {l:'Engajamentos', v:fmtN(eng), sub:'interações com as publicações'}
@@ -289,13 +305,17 @@ function metricsFor(camp){
       ['Impressões', fmtN(t.impressions)],
       ['CPM', fmtBRL(t.cpm)],
       ['Frequência', (t.frequency||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})],
+      ['Lembrança do anúncio (est.)', t.ad_recall_rate!=null ? fmtPct(t.ad_recall_rate*100) : '—'],
       ['Reproduções de vídeo', fmtN(t.video_plays)]
     ]};
   }
-  // OUTCOME_TRAFFIC
-  return {hero:{v:fmtN(t.link_clicks||t.clicks),l:'cliques no link'}, items:[
+  // OUTCOME_TRAFFIC (tráfego para o Instagram)
+  const g = growthInPeriod();
+  const novosIG = (g.ig!=null) ? ((g.ig>0?'+':'')+fmtN(g.ig)) : '—';
+  return {hero:{v:fmtN(t.link_clicks||t.clicks),l:'acessos ao perfil (cliques)'}, items:[
+    ['Custo / acesso', fmtCusto(t.custo_link_click||t.cpc)],
     ['CTR', fmtPct(t.ctr)],
-    ['Custo / clique', fmtCusto(t.custo_link_click||t.cpc)],
+    ['Novos seguidores IG · período', novosIG],
     ['Alcance', fmtN(t.reach)],
     ['CPM', fmtBRL(t.cpm)]
   ]};
@@ -358,6 +378,9 @@ function renderFollowers(){
   }
   setDelta('fbDelta', fb); setDelta('igDelta', ig);
   destroy('follow');
+  const wrapF=document.getElementById('chFollow').parentElement;
+  if(!labels.length){ wrapF.classList.add('empty'); return; }
+  wrapF.classList.remove('empty');
   charts.follow = new Chart(document.getElementById('chFollow'),{
     type:'line',
     data:{labels,datasets:[
@@ -381,6 +404,9 @@ function renderDaily(){
   const dates = Object.keys(map).sort();
   const labels = dates.map(brDate);
   destroy('daily');
+  const wrapD=document.getElementById('chDaily').parentElement;
+  if(!labels.length){ wrapD.classList.add('empty'); return; }
+  wrapD.classList.remove('empty');
   charts.daily = new Chart(document.getElementById('chDaily'),{
     data:{labels,datasets:[
       {type:'line',label:'Impressões',data:dates.map(d=>map[d].impr),borderColor:'#C8FF00',backgroundColor:'rgba(200,255,0,.10)',tension:.3,fill:true,yAxisID:'y',pointRadius:3,borderWidth:2},
@@ -405,22 +431,27 @@ function renderAll(){
 function applyRange(mode){
   RANGE.mode = mode;
   const note=document.getElementById('filterNote');
+  const dF=document.getElementById('dFrom'), dT=document.getElementById('dTo');
+  const fmt=d=>d.toISOString().slice(0,10);
   if(mode==='all'){ RANGE.from=RANGE.to=null; note.textContent=''; }
   else if(mode==='custom'){ note.textContent = (RANGE.from||'?')+' a '+(RANGE.to||'?'); }
   else {
-    const to = new Date(); const from = new Date(); from.setDate(from.getDate()-(+mode)+1);
-    RANGE.from = from.toISOString().slice(0,10); RANGE.to = to.toISOString().slice(0,10);
-    note.textContent = 'últimos '+mode+' dias';
+    const to=new Date(), from=new Date();
+    if(mode==='ontem'){ from.setDate(from.getDate()-1); to.setDate(to.getDate()-1); }
+    else if(mode!=='hoje'){ from.setDate(from.getDate()-(+mode)+1); }
+    RANGE.from=fmt(from); RANGE.to=fmt(to);
+    dF.value=RANGE.from; dT.value=RANGE.to; note.textContent='';
   }
-  renderFollowers(); renderDaily();
+  renderKPIs(); renderCampaigns(); renderFollowers(); renderDaily();
 }
 document.querySelectorAll('.fpill').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.fpill').forEach(x=>x.classList.remove('active'));
   b.classList.add('active'); applyRange(b.dataset.range);
 }));
 document.getElementById('applyDate').addEventListener('click',()=>{
-  const f=document.getElementById('dFrom').value, t=document.getElementById('dTo').value;
+  let f=document.getElementById('dFrom').value, t=document.getElementById('dTo').value;
   if(!f && !t) return;
+  if(f && t && f>t){ const tmp=f; f=t; t=tmp; document.getElementById('dFrom').value=f; document.getElementById('dTo').value=t; }
   RANGE.from=f||null; RANGE.to=t||null;
   document.querySelectorAll('.fpill').forEach(x=>x.classList.remove('active'));
   applyRange('custom');
