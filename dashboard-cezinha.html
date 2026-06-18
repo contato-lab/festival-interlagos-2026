@@ -47,28 +47,32 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 /* MAIN */
 .main{padding:20px 24px;max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
 .section-header{margin-bottom:14px}
-.section-title{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--text);display:flex;align-items:center;gap:8px}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--text);display:flex;align-items:center;gap:8px;border-left:3px solid var(--lime);padding-left:11px}
 .section-title .splat{color:var(--lime)}
-.section-sub{font-size:12px;color:var(--text3);margin-top:3px}
+.section-sub{font-size:12px;color:var(--text3);margin-top:5px;padding-left:14px}
 
 /* KPI STRIP */
 .kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
-.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;transition:border-color .2s;animation:rise .5s ease both}
-.kpi-card:hover{border-color:rgba(200,255,0,0.15)}
-.kpi-card.accent{border-color:var(--lime-border);background:linear-gradient(135deg,rgba(200,255,0,0.07) 0%,var(--card) 70%)}
-.kpi-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.kpi-card{background:var(--card);border:1px solid var(--lime-border);border-radius:var(--radius);padding:16px 18px;box-shadow:0 0 0 1px rgba(200,255,0,0.06);transition:all .2s;animation:rise .5s ease both}
+.kpi-card:hover{border-color:var(--lime);box-shadow:0 6px 18px rgba(0,0,0,0.4),0 0 0 1px rgba(200,255,0,0.22);transform:translateY(-2px)}
+.kpi-card.accent{background:linear-gradient(135deg,rgba(200,255,0,0.10) 0%,var(--card) 70%)}
+.kpi-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .kpi-value{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:32px;color:var(--text);letter-spacing:-.5px;line-height:1}
 .kpi-value.lime{color:var(--lime)}
 .kpi-sub{font-size:11px;color:var(--text3);margin-top:6px}
 
 /* CAMPAIGN CARDS */
 .camp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
-.camp-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;gap:14px;animation:rise .5s ease both}
-.camp-card:hover{border-color:rgba(200,255,0,0.18)}
+.camp-card{background:var(--card);border:1px solid var(--lime-border);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 0 0 1px rgba(200,255,0,0.05);transition:all .2s;animation:rise .5s ease both}
+.camp-card:hover{border-color:var(--lime);box-shadow:0 6px 18px rgba(0,0,0,0.4),0 0 0 1px rgba(200,255,0,0.2);transform:translateY(-2px)}
+.camp-obj.blue{background:rgba(46,168,255,.12);border-color:rgba(46,168,255,.4);color:#2EA8FF}
+.camp-obj.orange{background:rgba(255,138,61,.12);border-color:rgba(255,138,61,.4);color:#FF8A3D}
 .camp-obj{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:4px 11px;border-radius:20px;background:var(--lime-dim);border:1px solid var(--lime-border);color:var(--lime)}
 .camp-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:var(--text);line-height:1.05}
 .camp-hero{margin-top:2px}
 .camp-hero-val{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:40px;color:var(--lime);line-height:1;letter-spacing:-1px}
+.camp-hero-val.blue{color:#2EA8FF}
+.camp-hero-val.orange{color:#FF8A3D}
 .camp-hero-lbl{font-size:12px;color:var(--text3);margin-top:3px}
 .camp-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-top:4px}
 .cm{background:var(--card2);border-radius:var(--rad-sm);padding:9px 11px}
@@ -101,17 +105,28 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 
 @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-@media(max-width:900px){
-  .kpi-strip{grid-template-columns:1fr 1fr}
-  .camp-grid{grid-template-columns:1fr}
+@media(max-width:1024px){
+  .kpi-strip{grid-template-columns:repeat(3,1fr)}
   .charts-grid{grid-template-columns:1fr}
   .foll-grid{grid-template-columns:1fr 1fr}
   .header-center{order:3;flex-basis:100%}
 }
-@media(max-width:560px){
-  .kpi-strip{grid-template-columns:1fr 1fr}
+@media(max-width:768px){
+  .header{position:relative;flex-direction:column;gap:6px;text-align:center;padding:10px 14px}
+  .header-brand{justify-content:center}
+  .header-center{order:2;flex-basis:auto}
+  .header-right{order:3;flex-wrap:wrap;justify-content:center}
+  .filter-bar{padding:10px 12px;gap:6px}
+  .fpill{padding:4px 11px}
+  .main{padding:14px 12px;gap:22px}
+  .kpi-strip{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi-card{padding:14px}
+  .kpi-value{font-size:27px}
+  .camp-grid{grid-template-columns:1fr}
   .foll-grid{grid-template-columns:1fr}
-  .main{padding:16px 14px}
+  .foll-val{font-size:40px}
+  .section-title{font-size:15px}
+  .footer{flex-direction:column;text-align:center;padding:22px 14px}
 }
 </style>
 </head>
@@ -155,7 +170,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   <!-- KPI CONSOLIDADO -->
   <section>
     <div class="section-header">
-      <div class="section-title"><span class="splat">✱</span> Resumo das campanhas</div>
+      <div class="section-title">📊 Resumo das campanhas</div>
       <div class="section-sub" id="resumoSub">3 campanhas ativas · acumulado desde o início</div>
     </div>
     <div class="kpi-strip" id="kpiStrip"></div>
@@ -164,7 +179,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   <!-- CAMPANHAS -->
   <section>
     <div class="section-header">
-      <div class="section-title">Campanhas por objetivo</div>
+      <div class="section-title">🎯 Campanhas por objetivo</div>
       <div class="section-sub">Cada campanha mostra a métrica principal do seu objetivo. Nenhuma é de venda.</div>
     </div>
     <div class="camp-grid" id="campGrid"></div>
@@ -173,7 +188,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   <!-- COMPARATIVO -->
   <section>
     <div class="section-header">
-      <div class="section-title">Comparativo entre campanhas</div>
+      <div class="section-title">⚖️ Comparativo entre campanhas</div>
       <div class="section-sub">Por campanha · segue o filtro de período</div>
     </div>
     <div class="charts-grid">
@@ -185,7 +200,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   <!-- CRESCIMENTO SEGUIDORES -->
   <section>
     <div class="section-header">
-      <div class="section-title"><span class="splat">✱</span> Crescimento de seguidores</div>
+      <div class="section-title">📈 Crescimento de seguidores</div>
       <div class="section-sub" id="growthSub">Medição diária iniciada em 17/06/2026 · cresce a cada dia</div>
     </div>
     <div class="foll-grid">
@@ -206,7 +221,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   <!-- EVOLUCAO DIARIA CAMPANHAS -->
   <section>
     <div class="section-header">
-      <div class="section-title">Evolução diária das campanhas</div>
+      <div class="section-title">🗓️ Evolução diária das campanhas</div>
       <div class="section-sub">Impressões e investimento somados por dia (responde ao filtro de período)</div>
     </div>
     <div class="chart-card"><div class="chart-wrap" style="height:300px"><canvas id="chDaily"></canvas></div></div>
@@ -302,15 +317,15 @@ function renderKPIs(){
   const g = growthInPeriod();
   const segSub = (g.total!=null) ? ((g.total>0?'+':'')+fmtN(g.total)+' no período') : 'Facebook + Instagram';
   const kpis=[
-    {l:'Investimento total', v:fmtBRL(spend), sub:'soma das 3 campanhas', accent:true},
-    {l:'Seguidores (FB + IG)', v:fmtN(totalSeg), sub:segSub},
-    {l:'Pessoas alcançadas', v:fmtN(reach), sub:'soma das campanhas'},
-    {l:'Impressões', v:fmtN(impr), sub:'total de exibições'},
-    {l:'Engajamentos', v:fmtN(eng), sub:'interações com as publicações'}
+    {ic:'💰', l:'Investimento total', v:fmtBRL(spend), sub:'soma das campanhas', accent:true},
+    {ic:'👥', l:'Seguidores (FB + IG)', v:fmtN(totalSeg), sub:segSub},
+    {ic:'📣', l:'Pessoas alcançadas', v:fmtN(reach), sub:'soma das campanhas'},
+    {ic:'👁️', l:'Impressões', v:fmtN(impr), sub:'total de exibições'},
+    {ic:'💬', l:'Engajamentos', v:fmtN(eng), sub:'interações com as publicações'}
   ];
   document.getElementById('kpiStrip').innerHTML = kpis.map((k,i)=>
     `<div class="kpi-card${k.accent?' accent':''}" style="animation-delay:${i*60}ms">
-      <div class="kpi-label">${esc(k.l)}</div>
+      <div class="kpi-label"><span>${esc(k.ic||'')}</span>${esc(k.l)}</div>
       <div class="kpi-value${k.accent?' lime':''}">${esc(k.v)}</div>
       <div class="kpi-sub">${esc(k.sub)}</div>
     </div>`).join('');
@@ -349,12 +364,14 @@ function metricsFor(camp){
   ]};
 }
 function renderCampaigns(){
+  const OBJ_STYLE={'OUTCOME_ENGAGEMENT':{cls:'',ic:'💬'},'OUTCOME_AWARENESS':{cls:'blue',ic:'📣'},'OUTCOME_TRAFFIC':{cls:'orange',ic:'🔗'}};
   const html = (DATA.campanhas||[]).map((c,i)=>{
     const m = metricsFor(c); const t=campPeriod(c);
+    const st = OBJ_STYLE[c.objetivo]||{cls:'',ic:''};
     return `<div class="camp-card" style="animation-delay:${i*70}ms">
-      <span class="camp-obj">${esc(c.objetivo_label||c.nome)}</span>
+      <span class="camp-obj ${st.cls}">${esc(st.ic)} ${esc(c.objetivo_label||c.nome)}</span>
       <div class="camp-name">${esc(c.nome)}</div>
-      <div class="camp-hero"><div class="camp-hero-val">${m.hero.v}</div><div class="camp-hero-lbl">${esc(m.hero.l)}</div></div>
+      <div class="camp-hero"><div class="camp-hero-val ${st.cls}">${m.hero.v}</div><div class="camp-hero-lbl">${esc(m.hero.l)}</div></div>
       <div class="camp-metrics">${m.items.map(it=>`<div class="cm"><div class="cm-lbl">${esc(it[0])}</div><div class="cm-val">${it[1]}</div></div>`).join('')}</div>
       <div class="camp-foot"><span>Investido</span><b>${fmtBRL(t.spend)}</b></div>
     </div>`;
