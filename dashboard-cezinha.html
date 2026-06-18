@@ -334,7 +334,6 @@ function metricsFor(camp){
       ['Impressões', fmtN(t.impressions)],
       ['CPM', fmtBRL(t.cpm)],
       ['Frequência', (t.frequency||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})],
-      ['Lembrança do anúncio (est.)', t.ad_recall_rate!=null ? fmtPct(t.ad_recall_rate*100) : '—'],
       ['Reproduções de vídeo', fmtN(t.video_plays)]
     ]};
   }
