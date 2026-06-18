@@ -80,6 +80,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .cm-val{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:800;color:var(--text);margin-top:2px}
 .camp-foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--text3)}
 .camp-foot b{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:var(--text2)}
+.camp-note{font-size:10.5px;color:var(--text3);font-style:italic;line-height:1.4;border-top:1px dashed var(--border);padding-top:8px}
 
 /* CHARTS */
 .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -251,7 +252,9 @@ const DATA_FALLBACK = {
   ]
 };
 
+const ATRIB_FALLBACK = {"atualizado_em":"18/06/2026","traffic":{"visitas_perfil":378,"seguidores_ig":17,"custo_visita":0.37,"custo_seguidor":8.24}};
 let DATA = DATA_FALLBACK;
+let ATRIB = ATRIB_FALLBACK;
 let RANGE = {mode:'all', from:null, to:null};
 const charts = {};
 
@@ -353,6 +356,16 @@ function metricsFor(camp){
     ]};
   }
   // OUTCOME_TRAFFIC (tráfego para Instagram e Facebook)
+  const a = ATRIB && ATRIB.traffic;
+  if(a){
+    return {hero:{v:fmtN(a.visitas_perfil), l:'visitas ao perfil'}, items:[
+      ['Custo / visita', fmtCusto(a.custo_visita)],
+      ['Seguidores no Instagram', fmtN(a.seguidores_ig)],
+      ['Custo / seguidor', fmtCusto(a.custo_seguidor)],
+      ['Alcance', fmtN(t.reach)],
+      ['CPM', fmtBRL(t.cpm)]
+    ], note:'Visitas e seguidores: Gerenciador de Anúncios (total desde o início · atualizado '+(ATRIB.atualizado_em||'')+')'};
+  }
   const g = growthInPeriod();
   const novosSeg = (g.total!=null) ? ((g.total>0?'+':'')+fmtN(g.total)) : '—';
   return {hero:{v:fmtN(t.link_clicks||t.clicks),l:'acessos ao perfil (cliques)'}, items:[
@@ -373,6 +386,7 @@ function renderCampaigns(){
       <div class="camp-name">${esc(c.nome)}</div>
       <div class="camp-hero"><div class="camp-hero-val ${st.cls}">${m.hero.v}</div><div class="camp-hero-lbl">${esc(m.hero.l)}</div></div>
       <div class="camp-metrics">${m.items.map(it=>`<div class="cm"><div class="cm-lbl">${esc(it[0])}</div><div class="cm-val">${it[1]}</div></div>`).join('')}</div>
+      ${m.note?`<div class="camp-note">${esc(m.note)}</div>`:''}
       <div class="camp-foot"><span>Investido</span><b>${fmtBRL(t.spend)}</b></div>
     </div>`;
   }).join('');
@@ -503,10 +517,10 @@ document.getElementById('applyDate').addEventListener('click',()=>{
 });
 
 // ── load ──
-fetch('cezinha-data.json',{cache:'no-store'})
-  .then(r=>r.ok?r.json():Promise.reject())
-  .then(j=>{ DATA=j; renderAll(); })
-  .catch(()=>{ renderAll(); }); // usa fallback embutido
+Promise.all([
+  fetch('cezinha-data.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),
+  fetch('cezinha-atribuido.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)
+]).then(([d,a])=>{ if(d) DATA=d; if(a) ATRIB=a; renderAll(); });
 renderAll();
 </script>
 </body>
