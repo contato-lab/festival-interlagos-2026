@@ -359,6 +359,15 @@ function metricsFor(camp){
     ]};
   }
   // OUTCOME_TRAFFIC (tráfego para Instagram e Facebook)
+  const a = ATRIB && ATRIB.traffic;
+  if(a){
+    return {hero:{v:fmtN(a.visitas_perfil), l:'visitas ao perfil'}, items:[
+      ['Custo / visita', fmtCusto(a.custo_visita)],
+      ['CTR', fmtPct(t.ctr)],
+      ['Alcance', fmtN(t.reach)],
+      ['CPM', fmtBRL(t.cpm)]
+    ], note:'Visitas ao perfil: Gerenciador de Anúncios (atualizado '+(ATRIB.atualizado_em||'')+')'};
+  }
   return {hero:{v:fmtN(t.link_clicks||t.clicks),l:'cliques no link (acessos ao perfil)'}, items:[
     ['Custo / clique', fmtCusto(t.custo_link_click||t.cpc)],
     ['CTR', fmtPct(t.ctr)],
