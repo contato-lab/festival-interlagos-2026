@@ -1,9 +1,7 @@
 name: Update Cezinha IA (diagnóstico das redes)
 
 on:
-  schedule:
-    # 1x por dia, 06:42 BRT (09:42 UTC)
-    - cron: '42 9 * * *'
+  # diagnostico antigo (de campanha) desligado; o diagnostico das redes e gerado por pesquisa e gravado em cezinha-ia.json
   workflow_dispatch:
 
 jobs:

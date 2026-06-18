@@ -77,6 +77,16 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .ia-col li{font-size:13px;color:var(--text2);line-height:1.45;padding-left:15px;position:relative}
 .ia-col li::before{content:'';position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%}
 .ia-col.good li::before{background:var(--green)} .ia-col.warn li::before{background:var(--warn)} .ia-col.next li::before{background:var(--lime)}
+.ia-comp{margin-top:20px;padding-top:18px;border-top:1px solid var(--border)}
+.ia-comp-h{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:13px;letter-spacing:.8px;text-transform:uppercase;color:var(--purple);margin-bottom:8px}
+.ia-comp-resumo{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:14px;max-width:1050px}
+.ia-comp-list{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ia-comp-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--rad-sm);padding:13px 15px}
+.ia-comp-nome{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;color:var(--text);line-height:1.1}
+.ia-comp-arroba{font-size:11px;color:var(--text3);margin-bottom:6px}
+.ia-comp-seg{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:19px;color:var(--lime);margin-bottom:8px}
+.ia-comp-line{font-size:12px;color:var(--text2);line-height:1.4;margin-top:6px}
+.ia-comp-line b{color:var(--text3);font-weight:700;text-transform:uppercase;font-size:9.5px;letter-spacing:.5px;display:block;margin-bottom:1px}
 
 /* CAMPAIGN CARDS */
 .camp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
@@ -145,6 +155,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   .kpi-value{font-size:27px}
   .camp-grid{grid-template-columns:1fr}
   .ia-cols{grid-template-columns:1fr;gap:16px}
+  .ia-comp-list{grid-template-columns:1fr}
   .ia-title{font-size:19px}
   .foll-grid{grid-template-columns:1fr}
   .foll-val{font-size:40px}
@@ -199,6 +210,11 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
       <div class="ia-col good"><div class="ia-col-h good">Indo bem</div><ul id="iaDestaques"></ul></div>
       <div class="ia-col warn"><div class="ia-col-h warn">Onde melhorar</div><ul id="iaAtencao"></ul></div>
       <div class="ia-col next"><div class="ia-col-h next">Próximos passos</div><ul id="iaPassos"></ul></div>
+    </div>
+    <div class="ia-comp" id="iaComp" style="display:none">
+      <div class="ia-comp-h">Comparativo com concorrentes</div>
+      <div class="ia-comp-resumo" id="iaCompResumo"></div>
+      <div class="ia-comp-list" id="iaCompList"></div>
     </div>
   </section>
 
@@ -512,6 +528,12 @@ function renderIA(){
   document.getElementById('iaPanorama').textContent = d.panorama||'';
   const fill=(id,arr)=>{ const el=document.getElementById(id); if(el) el.innerHTML=(arr||[]).map(x=>`<li>${esc(x)}</li>`).join(''); };
   fill('iaDestaques', d.destaques); fill('iaAtencao', d.atencao); fill('iaPassos', d.proximos_passos);
+  const comp = d.comparativo, cwrap=document.getElementById('iaComp');
+  if(comp && comp.linhas && comp.linhas.length){
+    cwrap.style.display='';
+    document.getElementById('iaCompResumo').textContent = comp.resumo||'';
+    document.getElementById('iaCompList').innerHTML = comp.linhas.map(l=>`<div class="ia-comp-card"><div class="ia-comp-nome">${esc(l.nome||'')}</div><div class="ia-comp-arroba">${esc(l.arroba||'')}</div><div class="ia-comp-seg">${esc(l.seguidores||'')}</div><div class="ia-comp-line"><b>Forte em</b>${esc(l.destaque||'')}</div>${l.o_que_aprender?`<div class="ia-comp-line"><b>O que puxar dele</b>${esc(l.o_que_aprender)}</div>`:''}</div>`).join('');
+  } else if(cwrap){ cwrap.style.display='none'; }
   const dt = IA.gerado_em ? new Date(IA.gerado_em) : null;
   const de=document.getElementById('iaDate'); if(de) de.textContent = dt ? 'Atualizado '+dt.toLocaleDateString('pt-BR') : '';
 }
