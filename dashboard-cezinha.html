@@ -255,9 +255,7 @@ const DATA_FALLBACK = {
   ]
 };
 
-const ATRIB_FALLBACK = {"atualizado_em":"18/06/2026","traffic":{"visitas_perfil":389,"seguidores_ig":18,"custo_visita":0.36,"custo_seguidor":7.78}};
 let DATA = DATA_FALLBACK;
-let ATRIB = ATRIB_FALLBACK;
 let RANGE = {mode:'all', from:null, to:null};
 const charts = {};
 
@@ -358,16 +356,7 @@ function metricsFor(camp){
       ['Reproduções de vídeo', fmtN(t.video_plays)]
     ]};
   }
-  // OUTCOME_TRAFFIC (tráfego para Instagram e Facebook)
-  const a = ATRIB && ATRIB.traffic;
-  if(a){
-    return {hero:{v:fmtN(a.visitas_perfil), l:'visitas ao perfil'}, items:[
-      ['Custo / visita', fmtCusto(a.custo_visita)],
-      ['CTR', fmtPct(t.ctr)],
-      ['Alcance', fmtN(t.reach)],
-      ['CPM', fmtBRL(t.cpm)]
-    ], note:'Visitas ao perfil: Gerenciador de Anúncios (atualizado '+(ATRIB.atualizado_em||'')+')'};
-  }
+  // OUTCOME_TRAFFIC (tráfego para Instagram e Facebook) — só métricas automáticas da API
   return {hero:{v:fmtN(t.link_clicks||t.clicks),l:'cliques no link (acessos ao perfil)'}, items:[
     ['Custo / clique', fmtCusto(t.custo_link_click||t.cpc)],
     ['CTR', fmtPct(t.ctr)],
@@ -518,10 +507,8 @@ document.getElementById('applyDate').addEventListener('click',()=>{
 });
 
 // ── load ──
-Promise.all([
-  fetch('cezinha-data.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),
-  fetch('cezinha-atribuido.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)
-]).then(([d,a])=>{ if(d) DATA=d; if(a) ATRIB=a; renderAll(); });
+fetch('cezinha-data.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)
+  .then(d=>{ if(d) DATA=d; renderAll(); });
 renderAll();
 </script>
 </body>
