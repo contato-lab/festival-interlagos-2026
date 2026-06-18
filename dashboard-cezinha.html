@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Cezinha de Madureira — Dashboard Lime</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --lime:#C8FF00; --lime-dim:rgba(200,255,0,0.10); --lime-border:rgba(200,255,0,0.25);
+  --purple:#7B2D8B; --blue:#5B9BD5;
+  --bg:#0A0A0A; --card:#141414; --card2:#1A1A1A;
+  --text:#FFFFFF; --text2:#CCCCCC; --text3:#888888;
+  --green:#00FF88; --red:#FF4444; --warn:#FFB800;
+  --border:rgba(255,255,255,0.07); --radius:14px; --rad-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+
+/* HEADER */
+.header{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:12px 24px;background:rgba(10,10,10,0.97);border-bottom:1px solid var(--border);backdrop-filter:blur(12px)}
+.header-brand{display:flex;align-items:center;gap:12px}
+.header-logo{height:28px}
+.header-sep{color:var(--border);font-size:20px}
+.header-client{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:.5px;color:var(--text2)}
+.header-center{flex:1;text-align:center;min-width:180px}
+.header-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;letter-spacing:.5px;color:var(--lime)}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.badge{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.8px;padding:3px 10px;border-radius:20px;border:1px solid var(--border);color:var(--text3);text-transform:uppercase}
+.badge-live{border-color:rgba(0,255,136,0.4);color:var(--green);background:rgba(0,255,136,0.08)}
+.badge-live::before{content:'● ';font-size:9px}
+.gen-date{font-size:11px;color:var(--text3)}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 24px;background:#0D0D0D;border-bottom:1px solid var(--border)}
+.filter-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.8px;color:var(--text3);text-transform:uppercase}
+.fpill{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;padding:4px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;text-transform:uppercase}
+.fpill:hover{border-color:rgba(200,255,0,0.3);color:var(--lime)}
+.fpill.active{background:var(--lime-dim);border-color:var(--lime-border);color:var(--lime)}
+.filter-sep{font-size:12px;color:var(--text3)}
+.filter-date{background:#1A1A1A;border:1px solid var(--border);color:var(--text2);font-size:12px;padding:4px 8px;border-radius:var(--rad-sm);outline:none}
+.filter-date:focus{border-color:var(--lime-border)}
+.filter-apply{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;padding:4px 14px;border-radius:20px;border:1px solid var(--lime-border);background:var(--lime-dim);color:var(--lime);cursor:pointer;text-transform:uppercase}
+.filter-apply:hover{background:rgba(200,255,0,0.18)}
+
+/* MAIN */
+.main{padding:20px 24px;max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+.section-header{margin-bottom:14px}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--text);display:flex;align-items:center;gap:8px}
+.section-title .splat{color:var(--lime)}
+.section-sub{font-size:12px;color:var(--text3);margin-top:3px}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;transition:border-color .2s;animation:rise .5s ease both}
+.kpi-card:hover{border-color:rgba(200,255,0,0.15)}
+.kpi-card.accent{border-color:var(--lime-border);background:linear-gradient(135deg,rgba(200,255,0,0.07) 0%,var(--card) 70%)}
+.kpi-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.kpi-value{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:32px;color:var(--text);letter-spacing:-.5px;line-height:1}
+.kpi-value.lime{color:var(--lime)}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:6px}
+
+/* CAMPAIGN CARDS */
+.camp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.camp-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;gap:14px;animation:rise .5s ease both}
+.camp-card:hover{border-color:rgba(200,255,0,0.18)}
+.camp-obj{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:4px 11px;border-radius:20px;background:var(--lime-dim);border:1px solid var(--lime-border);color:var(--lime)}
+.camp-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:var(--text);line-height:1.05}
+.camp-hero{margin-top:2px}
+.camp-hero-val{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:40px;color:var(--lime);line-height:1;letter-spacing:-1px}
+.camp-hero-lbl{font-size:12px;color:var(--text3);margin-top:3px}
+.camp-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-top:4px}
+.cm{background:var(--card2);border-radius:var(--rad-sm);padding:9px 11px}
+.cm-lbl{font-size:10.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.cm-val{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:800;color:var(--text);margin-top:2px}
+.camp-foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--text3)}
+.camp-foot b{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:var(--text2)}
+
+/* CHARTS */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.chart-card .ct{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--text2);margin-bottom:14px}
+.chart-wrap{position:relative;height:280px}
+.chart-wrap.empty::after{content:'Sem dados no período';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px}
+
+/* FOLLOWERS */
+.foll-grid{display:grid;grid-template-columns:1fr 1fr 2fr;gap:16px}
+.foll-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;justify-content:center}
+.foll-net{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.foll-ic{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;letter-spacing:1px;text-transform:uppercase}
+.foll-ic.fb{color:var(--blue)}
+.foll-ic.ig{color:var(--lime)}
+.foll-val{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:46px;line-height:1;letter-spacing:-1px;color:var(--text)}
+.foll-delta{font-size:12px;margin-top:8px;font-weight:600}
+.foll-delta.up{color:var(--green)} .foll-delta.down{color:var(--red)} .foll-delta.neu{color:var(--text3)}
+
+/* FOOTER */
+.footer{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;padding:28px 24px;margin-top:8px;border-top:1px solid var(--border);color:var(--text3);font-size:12px}
+.footer-sep{color:var(--border)}
+
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+@media(max-width:900px){
+  .kpi-strip{grid-template-columns:1fr 1fr}
+  .camp-grid{grid-template-columns:1fr}
+  .charts-grid{grid-template-columns:1fr}
+  .foll-grid{grid-template-columns:1fr 1fr}
+  .header-center{order:3;flex-basis:100%}
+}
+@media(max-width:560px){
+  .kpi-strip{grid-template-columns:1fr 1fr}
+  .foll-grid{grid-template-columns:1fr}
+  .main{padding:16px 14px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-brand">
+    <svg class="header-logo" viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="110" height="44" rx="10" ry="10" fill="#0A0A0A"/>
+      <text x="55" y="32" font-family="'Barlow Condensed',Arial Black,sans-serif" font-weight="900" font-size="28" fill="#C8FF00" text-anchor="middle" letter-spacing="3">LIME</text>
+    </svg>
+    <span class="header-sep">|</span>
+    <span class="header-client">Cezinha de Madureira</span>
+  </div>
+  <div class="header-center"><span class="header-title">Performance &amp; Crescimento</span></div>
+  <div class="header-right">
+    <span class="badge badge-live">Ao vivo</span>
+    <span class="gen-date" id="genDate"></span>
+  </div>
+</header>
+
+<div class="filter-bar">
+  <span class="filter-label">Período</span>
+  <button class="fpill active" data-range="all">Tudo</button>
+  <button class="fpill" data-range="7">7 dias</button>
+  <button class="fpill" data-range="30">30 dias</button>
+  <span class="filter-sep">|</span>
+  <input type="date" class="filter-date" id="dFrom">
+  <span class="filter-sep">até</span>
+  <input type="date" class="filter-date" id="dTo">
+  <button class="filter-apply" id="applyDate">Aplicar</button>
+  <span class="filter-sep" id="filterNote" style="margin-left:auto"></span>
+</div>
+
+<main class="main">
+
+  <!-- KPI CONSOLIDADO -->
+  <section>
+    <div class="section-header">
+      <div class="section-title"><span class="splat">✱</span> Resumo das campanhas</div>
+      <div class="section-sub" id="resumoSub">3 campanhas ativas · acumulado desde o início</div>
+    </div>
+    <div class="kpi-strip" id="kpiStrip"></div>
+  </section>
+
+  <!-- CAMPANHAS -->
+  <section>
+    <div class="section-header">
+      <div class="section-title">Campanhas por objetivo</div>
+      <div class="section-sub">Cada campanha mostra a métrica principal do seu objetivo. Nenhuma é de venda.</div>
+    </div>
+    <div class="camp-grid" id="campGrid"></div>
+  </section>
+
+  <!-- COMPARATIVO -->
+  <section>
+    <div class="section-header">
+      <div class="section-title">Comparativo entre campanhas</div>
+      <div class="section-sub">Acumulado desde o início</div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card"><div class="ct">Alcance por campanha</div><div class="chart-wrap"><canvas id="chReach"></canvas></div></div>
+      <div class="chart-card"><div class="ct">Investimento por campanha</div><div class="chart-wrap"><canvas id="chSpend"></canvas></div></div>
+    </div>
+  </section>
+
+  <!-- CRESCIMENTO SEGUIDORES -->
+  <section>
+    <div class="section-header">
+      <div class="section-title"><span class="splat">✱</span> Crescimento de seguidores</div>
+      <div class="section-sub" id="growthSub">Medição diária iniciada em 17/06/2026 · cresce a cada dia</div>
+    </div>
+    <div class="foll-grid">
+      <div class="foll-card">
+        <div class="foll-net"><span class="foll-ic fb">▸ Facebook</span></div>
+        <div class="foll-val" id="fbVal">—</div>
+        <div class="foll-delta neu" id="fbDelta">no período</div>
+      </div>
+      <div class="foll-card">
+        <div class="foll-net"><span class="foll-ic ig">◉ Instagram</span></div>
+        <div class="foll-val" id="igVal">—</div>
+        <div class="foll-delta neu" id="igDelta">no período</div>
+      </div>
+      <div class="chart-card"><div class="ct">Evolução de seguidores (dia a dia)</div><div class="chart-wrap"><canvas id="chFollow"></canvas></div></div>
+    </div>
+  </section>
+
+  <!-- EVOLUCAO DIARIA CAMPANHAS -->
+  <section>
+    <div class="section-header">
+      <div class="section-title">Evolução diária das campanhas</div>
+      <div class="section-sub">Impressões e investimento somados por dia (responde ao filtro de período)</div>
+    </div>
+    <div class="chart-card"><div class="chart-wrap" style="height:300px"><canvas id="chDaily"></canvas></div></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg" style="height:22px">
+    <rect x="0" y="0" width="110" height="44" rx="10" fill="#0A0A0A"/>
+    <text x="55" y="32" font-family="'Barlow Condensed',sans-serif" font-weight="900" font-size="28" fill="#C8FF00" text-anchor="middle" letter-spacing="3">LIME</text>
+  </svg>
+  <span class="footer-sep">|</span>
+  <span>Agência Lime · Cezinha de Madureira · dados Meta atualizados automaticamente</span>
+</footer>
+
+<script>
+// ── fallback embutido (renderiza mesmo offline; fetch sobrescreve com dado vivo) ──
+const DATA_FALLBACK = {
+  "cliente":"Cezinha de Madureira","atualizado_em":"2026-06-17T17:15:00-03:00",
+  "seguidores":{"fb_atual":106722,"ig_atual":191464,"ig_posts":420,"serie":[{"data":"2026-06-17","fb":106722,"ig":191464}]},
+  "campanhas":[
+    {"id":"52562360720227","nome":"Engajamento","objetivo":"OUTCOME_ENGAGEMENT","objetivo_label":"Engajamento","totais":{"impressions":8314,"reach":8204,"frequency":1.0134,"spend":52.14,"cpm":6.27,"cpc":0.4655,"ctr":1.347,"clicks":112,"engajamentos":5465,"reacoes":35,"comentarios":0,"salvamentos":1,"compartilhamentos":0,"link_clicks":0,"video_plays":7744,"video_views":5429,"thruplays":1194,"custo_engajamento":0.0095},"serie":[{"data":"2026-06-17","impressions":8314,"reach":8204,"spend":52.14,"engajamentos":5465,"clicks":112,"link_clicks":0}]},
+    {"id":"52562338465227","nome":"Reconhecimento","objetivo":"OUTCOME_AWARENESS","objetivo_label":"Reconhecimento de marca","totais":{"impressions":60658,"reach":58677,"frequency":1.0338,"spend":93.59,"cpm":1.5429,"cpc":7.7992,"ctr":0.0198,"clicks":12,"engajamentos":1336,"reacoes":3,"comentarios":0,"salvamentos":0,"compartilhamentos":0,"link_clicks":0,"video_plays":57767,"video_views":1333,"thruplays":168,"custo_engajamento":0.0701},"serie":[{"data":"2026-06-17","impressions":60658,"reach":58677,"spend":93.59,"engajamentos":1336,"clicks":12,"link_clicks":0}]},
+    {"id":"52562318873627","nome":"Seguidores","objetivo":"OUTCOME_TRAFFIC","objetivo_label":"Tráfego (ganho de seguidores)","totais":{"impressions":9195,"reach":8270,"frequency":1.1119,"spend":95.64,"cpm":10.4013,"cpc":0.3721,"ctr":2.795,"clicks":257,"engajamentos":1777,"reacoes":37,"comentarios":1,"salvamentos":0,"compartilhamentos":0,"link_clicks":243,"video_plays":8587,"video_views":1494,"thruplays":292,"custo_link_click":0.3936},"serie":[{"data":"2026-06-17","impressions":9195,"reach":8270,"spend":95.64,"engajamentos":1777,"clicks":257,"link_clicks":243}]}
+  ]
+};
+
+let DATA = DATA_FALLBACK;
+let RANGE = {mode:'all', from:null, to:null};
+const charts = {};
+
+// ── helpers ──
+const nf = new Intl.NumberFormat('pt-BR');
+const fmtN = v => nf.format(Math.round(v||0));
+const fmtBRL = v => 'R$ '+ (v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtCusto = v => (v>0 && v<0.01) ? 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:4,maximumFractionDigits:4}) : fmtBRL(v);
+const fmtPct = v => (v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function brDate(iso){ if(!iso) return ''; const p=String(iso).slice(0,10).split('-'); return p.length===3?`${p[2]}/${p[1]}`:iso; }
+
+function inRange(d){
+  if(RANGE.mode==='all'){ return true; }
+  const day = String(d).slice(0,10);
+  if(RANGE.from && day < RANGE.from) return false;
+  if(RANGE.to && day > RANGE.to) return false;
+  return true;
+}
+function filterSerie(serie){ return (serie||[]).filter(p=>inRange(p.data)); }
+
+// ── KPI consolidado (acumulado) ──
+function renderKPIs(){
+  const c = DATA.campanhas||[];
+  const sum = k => c.reduce((a,x)=>a+(+((x.totais||{})[k])||0),0);
+  const spend=sum('spend'), impr=sum('impressions'), reach=sum('reach'), eng=sum('engajamentos');
+  const kpis=[
+    {l:'Investimento total', v:fmtBRL(spend), sub:'soma das 3 campanhas', accent:true},
+    {l:'Pessoas alcançadas', v:fmtN(reach), sub:'soma das campanhas'},
+    {l:'Impressões', v:fmtN(impr), sub:'total de exibições'},
+    {l:'Engajamentos', v:fmtN(eng), sub:'interações com as publicações'}
+  ];
+  document.getElementById('kpiStrip').innerHTML = kpis.map((k,i)=>
+    `<div class="kpi-card${k.accent?' accent':''}" style="animation-delay:${i*60}ms">
+      <div class="kpi-label">${esc(k.l)}</div>
+      <div class="kpi-value${k.accent?' lime':''}">${esc(k.v)}</div>
+      <div class="kpi-sub">${esc(k.sub)}</div>
+    </div>`).join('');
+}
+
+// ── cards de campanha (por objetivo) ──
+function metricsFor(camp){
+  const t = camp.totais||{};
+  const obj = camp.objetivo;
+  if(obj==='OUTCOME_ENGAGEMENT'){
+    return {hero:{v:fmtN(t.engajamentos),l:'engajamentos'}, items:[
+      ['Custo / engajamento', fmtCusto(t.custo_engajamento)],
+      ['Alcance', fmtN(t.reach)],
+      ['Reações', fmtN(t.reacoes)],
+      ['Views de vídeo', fmtN(t.video_views)]
+    ]};
+  }
+  if(obj==='OUTCOME_AWARENESS'){
+    return {hero:{v:fmtN(t.reach),l:'pessoas alcançadas'}, items:[
+      ['Impressões', fmtN(t.impressions)],
+      ['CPM', fmtBRL(t.cpm)],
+      ['Frequência', (t.frequency||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})],
+      ['Reproduções de vídeo', fmtN(t.video_plays)]
+    ]};
+  }
+  // OUTCOME_TRAFFIC
+  return {hero:{v:fmtN(t.link_clicks||t.clicks),l:'cliques no link'}, items:[
+    ['CTR', fmtPct(t.ctr)],
+    ['Custo / clique', fmtCusto(t.custo_link_click||t.cpc)],
+    ['Alcance', fmtN(t.reach)],
+    ['CPM', fmtBRL(t.cpm)]
+  ]};
+}
+function renderCampaigns(){
+  const html = (DATA.campanhas||[]).map((c,i)=>{
+    const m = metricsFor(c); const t=c.totais||{};
+    return `<div class="camp-card" style="animation-delay:${i*70}ms">
+      <span class="camp-obj">${esc(c.objetivo_label||c.nome)}</span>
+      <div class="camp-name">${esc(c.nome)}</div>
+      <div class="camp-hero"><div class="camp-hero-val">${m.hero.v}</div><div class="camp-hero-lbl">${esc(m.hero.l)}</div></div>
+      <div class="camp-metrics">${m.items.map(it=>`<div class="cm"><div class="cm-lbl">${esc(it[0])}</div><div class="cm-val">${it[1]}</div></div>`).join('')}</div>
+      <div class="camp-foot"><span>Investido</span><b>${fmtBRL(t.spend)}</b></div>
+    </div>`;
+  }).join('');
+  document.getElementById('campGrid').innerHTML = html;
+}
+
+// ── charts ──
+const GRID={color:'rgba(255,255,255,0.06)'}, TICK={color:'#888',font:{family:'Inter',size:11}};
+function destroy(k){ if(charts[k]){ charts[k].destroy(); charts[k]=null; } }
+
+function renderCompare(){
+  const c = DATA.campanhas||[];
+  const labels = c.map(x=>x.nome);
+  destroy('reach');
+  charts.reach = new Chart(document.getElementById('chReach'),{
+    type:'bar',
+    data:{labels,datasets:[{label:'Alcance',data:c.map(x=>(x.totais||{}).reach||0),backgroundColor:'#C8FF00',borderRadius:6,maxBarThickness:46}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>' '+fmtN(ctx.raw)+' pessoas'}}},
+      scales:{x:{grid:GRID,ticks:{...TICK,callback:v=>fmtN(v)}},y:{grid:{display:false},ticks:TICK}}}
+  });
+  destroy('spend');
+  const cols=['#C8FF00','#7B2D8B','#5B9BD5'];
+  charts.spend = new Chart(document.getElementById('chSpend'),{
+    type:'doughnut',
+    data:{labels,datasets:[{data:c.map(x=>(x.totais||{}).spend||0),backgroundColor:cols,borderColor:'#141414',borderWidth:3}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{
+      legend:{position:'bottom',labels:{color:'#CCC',font:{family:'Inter',size:12},padding:14,boxWidth:12}},
+      tooltip:{callbacks:{label:ctx=>' '+ctx.label+': '+fmtBRL(ctx.raw)}}}}
+  });
+}
+
+function renderFollowers(){
+  const s = filterSerie((DATA.seguidores||{}).serie);
+  const labels = s.map(p=>brDate(p.data));
+  const fb = s.map(p=>p.fb), ig = s.map(p=>p.ig);
+  const seg = DATA.seguidores||{};
+  document.getElementById('fbVal').textContent = fmtN(seg.fb_atual);
+  document.getElementById('igVal').textContent = fmtN(seg.ig_atual);
+  // delta no período (último - primeiro da série filtrada)
+  function setDelta(id, arr){
+    const el=document.getElementById(id);
+    if(arr.length>=2){
+      const d = arr[arr.length-1]-arr[0];
+      el.className='foll-delta '+(d>0?'up':d<0?'down':'neu');
+      el.textContent=(d>0?'+':'')+fmtN(d)+' no período';
+    } else { el.className='foll-delta neu'; el.textContent='aguardando 2º dia de medição'; }
+  }
+  setDelta('fbDelta', fb); setDelta('igDelta', ig);
+  destroy('follow');
+  charts.follow = new Chart(document.getElementById('chFollow'),{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Facebook',data:fb,borderColor:'#5B9BD5',backgroundColor:'rgba(91,155,213,.12)',tension:.3,fill:true,pointRadius:3,borderWidth:2},
+      {label:'Instagram',data:ig,borderColor:'#C8FF00',backgroundColor:'rgba(200,255,0,.10)',tension:.3,fill:true,pointRadius:3,borderWidth:2}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'top',labels:{color:'#CCC',font:{family:'Inter',size:12},boxWidth:12}},
+        tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmtN(ctx.raw)}}},
+      scales:{x:{grid:GRID,ticks:TICK},y:{grid:GRID,ticks:{...TICK,callback:v=>fmtN(v)}}}}
+  });
+}
+
+function renderDaily(){
+  // une as datas de todas as campanhas; soma impressões e investimento por dia
+  const map = {};
+  (DATA.campanhas||[]).forEach(c=>filterSerie(c.serie).forEach(p=>{
+    const d=String(p.data).slice(0,10); map[d]=map[d]||{impr:0,spend:0};
+    map[d].impr+=(+p.impressions||0); map[d].spend+=(+p.spend||0);
+  }));
+  const dates = Object.keys(map).sort();
+  const labels = dates.map(brDate);
+  destroy('daily');
+  charts.daily = new Chart(document.getElementById('chDaily'),{
+    data:{labels,datasets:[
+      {type:'line',label:'Impressões',data:dates.map(d=>map[d].impr),borderColor:'#C8FF00',backgroundColor:'rgba(200,255,0,.10)',tension:.3,fill:true,yAxisID:'y',pointRadius:3,borderWidth:2},
+      {type:'bar',label:'Investimento (R$)',data:dates.map(d=>map[d].spend),backgroundColor:'rgba(123,45,139,.55)',borderColor:'#7B2D8B',borderWidth:1,yAxisID:'y1',maxBarThickness:38}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'top',labels:{color:'#CCC',font:{family:'Inter',size:12},boxWidth:12}},
+        tooltip:{callbacks:{label:ctx=>ctx.dataset.yAxisID==='y1'?' '+fmtBRL(ctx.raw):' '+fmtN(ctx.raw)+' impressões'}}},
+      scales:{x:{grid:GRID,ticks:TICK},
+        y:{position:'left',grid:GRID,ticks:{...TICK,callback:v=>fmtN(v)}},
+        y1:{position:'right',grid:{display:false},ticks:{...TICK,callback:v=>'R$'+fmtN(v)}}}}
+  });
+}
+
+function renderAll(){
+  renderKPIs(); renderCampaigns(); renderCompare(); renderFollowers(); renderDaily();
+  const dt = DATA.atualizado_em ? new Date(DATA.atualizado_em) : null;
+  document.getElementById('genDate').textContent = dt ? 'Atualizado '+dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '';
+}
+
+// ── filtro de data ──
+function applyRange(mode){
+  RANGE.mode = mode;
+  const note=document.getElementById('filterNote');
+  if(mode==='all'){ RANGE.from=RANGE.to=null; note.textContent=''; }
+  else if(mode==='custom'){ note.textContent = (RANGE.from||'?')+' a '+(RANGE.to||'?'); }
+  else {
+    const to = new Date(); const from = new Date(); from.setDate(from.getDate()-(+mode)+1);
+    RANGE.from = from.toISOString().slice(0,10); RANGE.to = to.toISOString().slice(0,10);
+    note.textContent = 'últimos '+mode+' dias';
+  }
+  renderFollowers(); renderDaily();
+}
+document.querySelectorAll('.fpill').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.fpill').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); applyRange(b.dataset.range);
+}));
+document.getElementById('applyDate').addEventListener('click',()=>{
+  const f=document.getElementById('dFrom').value, t=document.getElementById('dTo').value;
+  if(!f && !t) return;
+  RANGE.from=f||null; RANGE.to=t||null;
+  document.querySelectorAll('.fpill').forEach(x=>x.classList.remove('active'));
+  applyRange('custom');
+});
+
+// ── load ──
+fetch('cezinha-data.json',{cache:'no-store'})
+  .then(r=>r.ok?r.json():Promise.reject())
+  .then(j=>{ DATA=j; renderAll(); })
+  .catch(()=>{ renderAll(); }); // usa fallback embutido
+renderAll();
+</script>
+</body>
+</html>
