@@ -29,9 +29,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(HERE, 'cezinha-data.json')
 
 CAMPAIGNS = [
-    {'id': '52562360720227', 'nome': 'Engajamento',    'objetivo': 'OUTCOME_ENGAGEMENT', 'objetivo_label': 'Engajamento',                  'desde': '2026-06-17'},
-    {'id': '52562338465227', 'nome': 'Reconhecimento', 'objetivo': 'OUTCOME_AWARENESS',  'objetivo_label': 'Reconhecimento de marca',     'desde': '2026-06-17'},
-    {'id': '52562318873627', 'nome': 'Tráfego para o Instagram', 'objetivo': 'OUTCOME_TRAFFIC', 'objetivo_label': 'Tráfego (Instagram)', 'desde': '2026-06-17'},
+    {'id': '52562360720227', 'nome': 'Engajamento',             'objetivo': 'OUTCOME_ENGAGEMENT', 'objetivo_label': 'Engajamento',              'desde': '2026-06-17'},
+    {'id': '52562338465227', 'nome': 'Reconhecimento',          'objetivo': 'OUTCOME_AWARENESS',  'objetivo_label': 'Reconhecimento de marca', 'desde': '2026-06-17'},
+    {'id': '52562600820027', 'nome': 'Reconhecimento Bragança', 'objetivo': 'OUTCOME_AWARENESS',  'objetivo_label': 'Reconhecimento de marca', 'desde': '2026-06-18'},
+    {'id': '52562318873627', 'nome': 'Tráfego para o Instagram e Facebook', 'objetivo': 'OUTCOME_TRAFFIC', 'objetivo_label': 'Tráfego (Instagram e Facebook)', 'desde': '2026-06-17'},
 ]
 
 INSIGHT_FIELDS = ','.join([
@@ -94,23 +95,17 @@ def fetch_totais(camp_id):
 
 
 def fetch_serie(camp_id, desde):
+    # série diária COMPLETA (todos os campos por dia), pra tela poder somar qualquer período
     data = api_get(f'{camp_id}/insights', {
-        'fields': 'impressions,reach,spend,clicks,actions,inline_link_clicks',
+        'fields': INSIGHT_FIELDS,
         'time_range': json.dumps({'since': desde, 'until': HOJE}),
         'time_increment': '1', 'limit': '500',
     })
     serie = []
     for row in (data.get('data') or []):
-        actions = row.get('actions') or []
-        serie.append({
-            'data':         row.get('date_start'),
-            'impressions':  int(float(row.get('impressions', 0) or 0)),
-            'reach':        int(float(row.get('reach', 0) or 0)),
-            'spend':        round(float(row.get('spend', 0) or 0), 2),
-            'engajamentos': int(_action(actions, 'post_engagement')),
-            'clicks':       int(float(row.get('clicks', 0) or 0)),
-            'link_clicks':  int(_action(actions, 'link_click') or float(row.get('inline_link_clicks', 0) or 0)),
-        })
+        rec = parse_row(row)
+        rec['data'] = row.get('date_start')
+        serie.append(rec)
     return serie
 
 

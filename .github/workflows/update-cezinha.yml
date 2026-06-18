@@ -2,8 +2,8 @@ name: Update Cezinha (Meta)
 
 on:
   schedule:
-    # 1x por dia, 06:13 BRT (09:13 UTC) — 1 ponto/dia pra série de crescimento
-    - cron: '13 9 * * *'
+    # a cada 15 min (minutos 8/23/38/53 pra nao colidir com os workflows do festival)
+    - cron: '8,23,38,53 * * * *'
   workflow_dispatch:
 
 jobs:
