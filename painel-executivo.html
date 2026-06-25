@@ -659,6 +659,37 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     </div>
   </div>
 
+  <!-- ══ TEST RIDE — DISPONIBILIDADE ══ -->
+  <style>
+    #estoqueCard .estq-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    #estoqueCard .estq-ed{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px}
+    #estoqueCard .estq-edh{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.95rem;color:var(--text);letter-spacing:.02em}
+    #estoqueCard .estq-big{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.9rem;color:var(--lime);line-height:1.05;margin:6px 0}
+    #estoqueCard .estq-big span{font-family:'Inter',sans-serif;font-weight:600;font-size:.6rem;color:#888;text-transform:uppercase;letter-spacing:.08em}
+    #estoqueCard .estq-chip{display:block;font-size:.72rem;line-height:1.5;margin-top:6px;padding:5px 10px;border-radius:6px}
+    #estoqueCard .estq-chip.red{background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.25);color:#ff8a8a}
+    #estoqueCard .estq-chip.green{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);color:#7dffb2}
+    #estoqueCard .estq-more{margin-top:10px}
+    #estoqueCard .estq-more summary{cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.8rem;color:var(--lime);letter-spacing:.03em;padding:4px 0}
+    #estoqueCard .estq-passttl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.74rem;color:#aaa;text-transform:uppercase;letter-spacing:.06em;margin:12px 0 4px}
+    #estoqueCard .estq-tbl{width:100%;border-collapse:collapse;font-size:.74rem}
+    #estoqueCard .estq-tbl th{color:#888;font-weight:600;text-align:right;padding:4px 6px;font-size:.62rem;text-transform:uppercase}
+    #estoqueCard .estq-tbl th:first-child{text-align:left}
+    #estoqueCard .estq-tbl td{text-align:right;padding:4px 6px;border-top:1px solid rgba(255,255,255,.05)}
+    #estoqueCard .estq-tbl td:first-child{text-align:left;color:var(--text)}
+    @media(max-width:760px){#estoqueCard .estq-grid{grid-template-columns:1fr}}
+  </style>
+  <div class="exec-chart-card" id="estoqueCard" style="margin-top:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px">
+      <div class="section-title">🏍️🚗 Test Ride — Disponibilidade</div>
+      <span class="badge" id="estoqueStatus">—</span>
+    </div>
+    <div id="estoqueWrap"><div style="color:#666;padding:20px;text-align:center">Carregando disponibilidade…</div></div>
+    <div style="margin-top:14px;font-size:.78rem;color:var(--text3);line-height:1.5">
+      <strong style="color:var(--lime)">Fonte:</strong> base da planilha de estoque (24/06) menos as vendas ao vivo da API do sistema próprio · atualizado em <span id="estoqueDate">—</span>. Mostra só horários ainda disponíveis; o que não aparece está esgotado.
+    </div>
+  </div>
+
 </div><!-- /exec-main -->
 
 <footer class="footer">
@@ -2382,11 +2413,63 @@ function setExecDayPreset(d, iso) {
 Chart.defaults.color='#555';
 Chart.defaults.font.family="'Inter',sans-serif";
 
+/* ═══ TEST RIDE — Disponibilidade (estoque-data.json) ═══ */
+let ESTOQUE_DATA = null;
+async function fetchEstoque(){
+  try{
+    const res = await fetch('estoque-data.json?t='+Date.now(), {cache:'no-store'});
+    if(!res.ok) throw new Error('nf');
+    ESTOQUE_DATA = await res.json();
+    const b=document.getElementById('estoqueStatus'); if(b) b.textContent='✓ atualizado';
+    const d=document.getElementById('estoqueDate'); if(d) d.textContent=ESTOQUE_DATA.updated_at||'—';
+    renderEstoque();
+  }catch(e){
+    const w=document.getElementById('estoqueWrap'); if(w) w.innerHTML='<div style="color:#666;padding:20px;text-align:center">Sem dados de estoque ainda.</div>';
+  }
+}
+function renderEstoque(){
+  if(!ESTOQUE_DATA) return;
+  const eds=ESTOQUE_DATA.edicoes||{};
+  const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const nf=v=>(+v||0).toLocaleString('pt-BR');
+  const arr=x=>Array.isArray(x)?x:(x==null?[]:[x]);
+  let html='<div class="estq-grid">';
+  for(const key of ['moto','auto']){
+    const ed=eds[key]; if(!ed) continue;
+    const ic = key==='moto' ? '🏍️' : '🚗';
+    const low=arr(ed.quase_esgotando).map(x=>esc(x.marca)+' '+nf(x.total)).join(' · ');
+    const hi=arr(ed.mais_folga).map(x=>esc(x.marca)).join(' · ');
+    let tables='';
+    for(const p of arr(ed.passes)){
+      const max=Math.max.apply(null,arr(p.marcas).map(m=>m.total).concat([1]));
+      const dh=arr(ed.dias).map(d=>'<th>'+esc(d)+'</th>').join('');
+      const rows=arr(p.marcas).map(m=>{
+        const dcells=arr(m.dias).map(v=>'<td>'+(v===0?'<span style="color:#FF4444;font-weight:700">0</span>':nf(v))+'</td>').join('');
+        const w=Math.max(3,Math.round((m.total/max)*100));
+        const lowB=m.total < max*0.12;
+        return '<tr><td>'+esc(m.marca)+'</td>'+dcells
+          +'<td style="font-weight:800;color:'+(lowB?'#FF4444':'var(--text)')+'">'+nf(m.total)+'</td>'
+          +'<td style="width:64px"><div style="height:6px;background:rgba(255,255,255,.08);border-radius:4px"><div style="height:100%;width:'+w+'%;background:var(--lime);border-radius:4px"></div></div></td></tr>';
+      }).join('');
+      tables+='<div class="estq-passttl">'+esc(p.nome)+' · '+nf(p.total)+' disp.</div>'
+        +'<table class="estq-tbl"><thead><tr><th>Marca</th>'+dh+'<th>Total</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+    }
+    html+='<div class="estq-ed"><div class="estq-edh">'+ic+' '+esc(ed.label)+' · '+esc(ed.periodo)+'</div>'
+      +'<div class="estq-big">'+nf(ed.total_disponivel)+' <span>horários disponíveis · '+esc(ed.marcas_com_vaga)+' marcas</span></div>'
+      +(low?'<span class="estq-chip red">Quase esgotando: '+low+'</span>':'')
+      +(hi?'<span class="estq-chip green">Mais folga: '+hi+'</span>':'')
+      +'<details class="estq-more"><summary>Ver todas as marcas</summary>'+tables+'</details></div>';
+  }
+  html+='</div>';
+  const w=document.getElementById('estoqueWrap'); if(w) w.innerHTML=html;
+}
+
 function initDashboard(){
   updateLastRefreshTime();
   // Carrega TUDO em paralelo e so renderiza quando ambos (vendas + TM) chegam
   // -> evita flicker na abertura (showing only sistema proprio sem TM)
   Promise.allSettled([
+    fetchEstoque(),
     fetchVendasProprio(),
     fetchTicketmaster(),
     fetchGAdsData(),
