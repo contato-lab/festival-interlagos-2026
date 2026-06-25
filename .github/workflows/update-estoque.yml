@@ -1,0 +1,36 @@
+name: Update Estoque Test Ride
+
+on:
+  schedule:
+    - cron: '9,39 * * * *'   # 2x por hora (offset pra nao colidir com os outros)
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Rodar update-estoque
+        run: python update-estoque.py
+
+      - name: Commit estoque-data.json
+        run: |
+          git config user.name  "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add estoque-data.json
+          if git diff --staged --quiet; then
+            echo "sem mudancas"; exit 0
+          fi
+          git commit -m "chore: update estoque test ride (vendas ao vivo) [skip ci]"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main 2>&1 || { git rebase --abort 2>/dev/null || true; git add estoque-data.json; git diff --staged --quiet || git commit -m "chore: update estoque test ride [skip ci]" --allow-empty; }
+            git push 2>&1 && { echo "push ok ($i)"; exit 0; }
+            sleep $((RANDOM % 10 + 3))
+          done
+          echo "push falhou"; exit 1
