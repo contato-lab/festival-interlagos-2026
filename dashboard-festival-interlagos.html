@@ -901,72 +901,34 @@ Google Ads
   </div>
 </div>
 
-<!-- ══ ANÁLISE DE CRIATIVOS — META ADS ══ -->
-<div class="chart-card" id="creativesCard">
+<!-- ══ TEST RIDE — DISPONIBILIDADE ══ -->
+<style>
+  #estoqueCard .estq-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  #estoqueCard .estq-ed{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px}
+  #estoqueCard .estq-edh{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.95rem;color:var(--text);letter-spacing:.02em}
+  #estoqueCard .estq-big{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.9rem;color:var(--lime);line-height:1.05;margin:6px 0}
+  #estoqueCard .estq-big span{font-family:'Inter',sans-serif;font-weight:600;font-size:.6rem;color:#888;text-transform:uppercase;letter-spacing:.08em}
+  #estoqueCard .estq-chip{display:block;font-size:.72rem;line-height:1.5;margin-top:6px;padding:5px 10px;border-radius:6px}
+  #estoqueCard .estq-chip.red{background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.25);color:#ff8a8a}
+  #estoqueCard .estq-chip.green{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);color:#7dffb2}
+  #estoqueCard .estq-more{margin-top:10px}
+  #estoqueCard .estq-more summary{cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.8rem;color:var(--lime);letter-spacing:.03em;padding:4px 0}
+  #estoqueCard .estq-passttl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.74rem;color:#aaa;text-transform:uppercase;letter-spacing:.06em;margin:12px 0 4px}
+  #estoqueCard .estq-tbl{width:100%;border-collapse:collapse;font-size:.74rem}
+  #estoqueCard .estq-tbl th{color:#888;font-weight:600;text-align:right;padding:4px 6px;font-size:.62rem;text-transform:uppercase}
+  #estoqueCard .estq-tbl th:first-child{text-align:left}
+  #estoqueCard .estq-tbl td{text-align:right;padding:4px 6px;border-top:1px solid rgba(255,255,255,.05)}
+  #estoqueCard .estq-tbl td:first-child{text-align:left;color:var(--text)}
+  @media(max-width:760px){#estoqueCard .estq-grid{grid-template-columns:1fr}}
+</style>
+<div class="chart-card" id="estoqueCard">
   <div class="section-header">
-    <div class="section-title">🎨 Análise de Criativos — Meta Ads</div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <span class="badge badge-ok" id="creativesStatus" style="font-size:.68rem">Conectando…</span>
-      <select id="creativesSortSel" onchange="renderCreatives()" style="
-        background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);
-        color:var(--text);font-family:'Barlow Condensed',sans-serif;font-weight:700;
-        font-size:.78rem;letter-spacing:.03em;padding:4px 10px;border-radius:6px;cursor:pointer">
-        <option value="spend" style="color:#000;background:#fff">Ordenar: Maior Gasto</option>
-        <option value="purchases" style="color:#000;background:#fff">Ordenar: Mais Vendas</option>
-        <option value="cpp" style="color:#000;background:#fff">Ordenar: Menor Custo/Venda</option>
-        <option value="ctr" style="color:#000;background:#fff">Ordenar: Maior CTR</option>
-        <option value="clicks" style="color:#000;background:#fff">Ordenar: Mais Cliques</option>
-      </select>
-    </div>
+    <div class="section-title">🏍️🚗 Test Ride — Disponibilidade</div>
+    <span class="badge badge-ok" id="estoqueStatus" style="font-size:.68rem">—</span>
   </div>
-
-  <!-- KPI strip criativos -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:18px">
-    <div style="padding:12px 14px;background:rgba(24,119,242,.06);border:1px solid rgba(24,119,242,.18);border-radius:8px">
-      <div style="font-family:'Inter',sans-serif;font-size:.58rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.1em">Criativos Ativos</div>
-      <div id="crvActive" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:#1877F2;margin-top:2px">—</div>
-    </div>
-    <div style="padding:12px 14px;background:rgba(200,255,0,.06);border:1px solid rgba(200,255,0,.18);border-radius:8px">
-      <div style="font-family:'Inter',sans-serif;font-size:.58rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.1em">CTR Médio</div>
-      <div id="crvCtr" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:var(--lime);margin-top:2px">—</div>
-    </div>
-    <div style="padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px">
-      <div style="font-family:'Inter',sans-serif;font-size:.58rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.1em">Cliques</div>
-      <div id="crvClicks" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:var(--text);margin-top:2px">—</div>
-    </div>
-    <div style="padding:12px 14px;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.18);border-radius:8px">
-      <div style="font-family:'Inter',sans-serif;font-size:.58rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.1em">Vendas</div>
-      <div id="crvPurch" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:#00FF88;margin-top:2px">—</div>
-    </div>
-    <div style="padding:12px 14px;background:rgba(255,184,0,.06);border:1px solid rgba(255,184,0,.18);border-radius:8px">
-      <div style="font-family:'Inter',sans-serif;font-size:.58rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.1em">Custo / Venda</div>
-      <div id="crvCpp" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;color:#FFB800;margin-top:2px">—</div>
-    </div>
-  </div>
-
-  <!-- Tabela de criativos -->
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="min-width:280px">Criativo</th>
-          <th>Impressões</th>
-          <th>Cliques</th>
-          <th>CTR</th>
-          <th>Gasto</th>
-          <th>Vendas</th>
-          <th>Custo / Venda</th>
-        </tr>
-      </thead>
-      <tbody id="creativesBody">
-        <tr><td colspan="7" style="text-align:center;color:#666;padding:30px">Carregando criativos…</td></tr>
-      </tbody>
-    </table>
-  </div>
-
+  <div id="estoqueWrap"><div style="color:#666;padding:20px;text-align:center">Carregando disponibilidade…</div></div>
   <div class="note" style="margin-top:14px">
-    <strong style="color:var(--lime)">Fonte:</strong> Meta Ads API (nível <code>ad</code>) — atualizado a cada 5 min via GitHub Actions.
-    Top 20 criativos exibidos. <span id="creativesCount" style="color:#888"></span>
+    <strong style="color:var(--lime)">Fonte:</strong> estoque do sistema próprio (test ride), snapshot de <span id="estoqueDate">—</span>. Mostra só horários ainda disponíveis; o que não aparece está esgotado.
   </div>
 </div>
 
@@ -1255,8 +1217,7 @@ function applyFiltro(){
   updateMediaTotals(deStr, ateStr);
   // Atualiza GA4 com o mesmo range
   if(GA4_DATA) { buildGA4Growth(deStr, ateStr); buildGA4Sources(deStr, ateStr); buildGA4Funnel(deStr, ateStr); }
-  // Atualiza Análise de Criativos com o mesmo range (escala proporcional)
-  if(META_CREATIVES_DATA) renderCreatives();
+  // Test Ride é snapshot do estoque, não depende do filtro de data
   // Atualiza Tipos de Ingresso com o mesmo range
   if(TIPOS_DATA) renderTipos();
 }
@@ -3229,7 +3190,7 @@ function initDashboard(){
     fetchGA4Data(),
     fetchGAdsData(),
     fetchMetaData(),
-    fetchMetaCreatives(),
+    fetchEstoque(),
     fetchTipos(),
     fetchInvestimento2025()
   ]).then(() => applyFiltro());
@@ -3250,7 +3211,7 @@ function initDashboard(){
 
   // Mídia (Google Ads, Meta, GA4, TikTok): a cada 30s (esses APIs têm latência grande mesmo)
   setInterval(() => {
-    fetchGAdsData(); fetchMetaData(); fetchMetaCreatives(); fetchGA4Data(); fetchTikTokData(); updateLastRefreshTime();
+    fetchGAdsData(); fetchMetaData(); fetchGA4Data(); fetchTikTokData(); updateLastRefreshTime();
   }, 30000);
 }
 
@@ -3543,6 +3504,59 @@ function renderTipos() {
 /* ═══════════════════════════════════════════════
    META CRIATIVOS — API (meta-creatives-data.json via GitHub Actions)
 ═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   TEST RIDE — Disponibilidade (estoque-data.json, snapshot manual)
+═══════════════════════════════════════════════ */
+let ESTOQUE_DATA = null;
+async function fetchEstoque(){
+  try{
+    const res = await fetch('estoque-data.json?t='+Date.now(), {cache:'no-store'});
+    if(!res.ok) throw new Error('nf');
+    ESTOQUE_DATA = await res.json();
+    const b=document.getElementById('estoqueStatus'); if(b) b.textContent='✓ atualizado';
+    const d=document.getElementById('estoqueDate'); if(d) d.textContent=ESTOQUE_DATA.updated_at||'—';
+    renderEstoque();
+  }catch(e){
+    const w=document.getElementById('estoqueWrap'); if(w) w.innerHTML='<div style="color:#666;padding:20px;text-align:center">Sem dados de estoque ainda.</div>';
+  }
+}
+function renderEstoque(){
+  if(!ESTOQUE_DATA) return;
+  const eds=ESTOQUE_DATA.edicoes||{};
+  const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const nf=v=>(+v||0).toLocaleString('pt-BR');
+  const arr=x=>Array.isArray(x)?x:(x==null?[]:[x]);
+  let html='<div class="estq-grid">';
+  for(const key of ['moto','auto']){
+    const ed=eds[key]; if(!ed) continue;
+    const ic = key==='moto' ? '🏍️' : '🚗';
+    const low=arr(ed.quase_esgotando).map(x=>esc(x.marca)+' '+nf(x.total)).join(' · ');
+    const hi=arr(ed.mais_folga).map(x=>esc(x.marca)).join(' · ');
+    let tables='';
+    for(const p of arr(ed.passes)){
+      const max=Math.max.apply(null,arr(p.marcas).map(m=>m.total).concat([1]));
+      const dh=arr(ed.dias).map(d=>'<th>'+esc(d)+'</th>').join('');
+      const rows=arr(p.marcas).map(m=>{
+        const dcells=arr(m.dias).map(v=>'<td>'+(v===0?'<span style="color:#FF4444;font-weight:700">0</span>':nf(v))+'</td>').join('');
+        const w=Math.max(3,Math.round((m.total/max)*100));
+        const lowB=m.total < max*0.12;
+        return '<tr><td>'+esc(m.marca)+'</td>'+dcells
+          +'<td style="font-weight:800;color:'+(lowB?'#FF4444':'var(--text)')+'">'+nf(m.total)+'</td>'
+          +'<td style="width:64px"><div style="height:6px;background:rgba(255,255,255,.08);border-radius:4px"><div style="height:100%;width:'+w+'%;background:var(--lime);border-radius:4px"></div></div></td></tr>';
+      }).join('');
+      tables+='<div class="estq-passttl">'+esc(p.nome)+' · '+nf(p.total)+' disp.</div>'
+        +'<table class="estq-tbl"><thead><tr><th>Marca</th>'+dh+'<th>Total</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+    }
+    html+='<div class="estq-ed"><div class="estq-edh">'+ic+' '+esc(ed.label)+' · '+esc(ed.periodo)+'</div>'
+      +'<div class="estq-big">'+nf(ed.total_disponivel)+' <span>horários disponíveis · '+esc(ed.marcas_com_vaga)+' marcas</span></div>'
+      +(low?'<span class="estq-chip red">Quase esgotando: '+low+'</span>':'')
+      +(hi?'<span class="estq-chip green">Mais folga: '+hi+'</span>':'')
+      +'<details class="estq-more"><summary>Ver todas as marcas</summary>'+tables+'</details></div>';
+  }
+  html+='</div>';
+  const w=document.getElementById('estoqueWrap'); if(w) w.innerHTML=html;
+}
+
 let META_CREATIVES_DATA = null;
 
 async function fetchMetaCreatives() {
