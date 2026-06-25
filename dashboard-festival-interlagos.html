@@ -1513,30 +1513,21 @@ function buildEdicao() {
     const ex=Chart.getChart(id);if(ex)ex.destroy();
     const isMotos=id==='chartMotos';
     const isReceita=metric==='receita';
+    // barra UNICA empilhada (Próprio + TM somados no período), igual ao painel executivo — mais limpo de ver
+    const sP=D26.reduce((a,r)=>a+(isMotos?(r.mp||0):(r.ap||0)),0);
+    const sT=D26.reduce((a,r)=>a+(isMotos?(r.mt||0):(r.at||0)),0);
+    const qP=D26.reduce((a,r)=>a+(isMotos?(r.mpQ||0):(r.apQ||0)),0);
+    const qT=D26.reduce((a,r)=>a+(isMotos?(r.mtQ||0):(r.atQ||0)),0);
     const datasets=[];
-    if(vis.prop){
-      const data=isReceita ? D26.map(r=>isMotos?r.mp:r.ap) : D26.map(r=>isMotos?(r.mpQ||0):(r.apQ||0));
-      datasets.push({label:'Sistema Próprio',data,backgroundColor:'rgba(200,255,0,0.78)',borderRadius:3,stack:'s'});
-    }
-    if(vis.tm){
-      const data=isReceita ? D26.map(r=>isMotos?r.mt:r.at) : D26.map(r=>isMotos?(r.mtQ||0):(r.atQ||0));
-      datasets.push({label:'Ticket Master',data,backgroundColor:'rgba(2,77,223,0.85)',borderRadius:3,stack:'s'});
-    }
+    if(vis.prop) datasets.push({label:'Sistema Próprio',data:[isReceita?sP:qP],_rec:sP,_qty:qP,backgroundColor:'#C8FF00',borderRadius:4,stack:'s',maxBarThickness:150});
+    if(vis.tm)   datasets.push({label:'Ticket Master',data:[isReceita?sT:qT],_rec:sT,_qty:qT,backgroundColor:'#2196F3',borderRadius:4,stack:'s',maxBarThickness:150});
     return new Chart(document.getElementById(id),{
       type:'bar',
-      data:{labels,datasets},
+      data:{labels:[isReceita?'Faturamento total':'Ingressos totais'],datasets},
       options:{responsive:true,maintainAspectRatio:false,
         plugins:{legend:{display:false},tooltip:{backgroundColor:'#1A1A1A',borderColor:'rgba(255,255,255,0.07)',borderWidth:1,titleColor:'#888',bodyColor:'#FFF',padding:9,
-          callbacks:{label:ctx=>{
-            const isMot=id==='chartMotos';
-            const idx=ctx.dataIndex;
-            const r=D26[idx];
-            const isProp=ctx.dataset.label==='Sistema Próprio';
-            const rec=isReceita?ctx.raw:(isMot?(isProp?r.mp:r.mt):(isProp?r.ap:r.at));
-            const qty=isReceita?(isMot?(isProp?(r.mpQ||0):(r.mtQ||0)):(isProp?(r.apQ||0):(r.atQ||0))):ctx.raw;
-            return `${ctx.dataset.label}: ${fmtR(rec)}  |  ${qty} ing.`;
-          }}}},
-        scales:{x:{grid:{display:false},ticks:{color:'#AAA',font:{size:10}},stacked:true},
+          callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmtR(ctx.dataset._rec)}  |  ${ctx.dataset._qty} ing.`}}},
+        scales:{x:{grid:{display:false},ticks:{color:'#AAA',font:{size:11}},stacked:true},
                 y:{grid:{color:'rgba(255,255,255,0.07)',drawBorder:false},ticks:{color:'#AAA',font:{size:10},callback:v=>isReceita?fmtK(v):v},stacked:true}}
       }
     });
