@@ -81,7 +81,10 @@ def vendas_pos_snapshot(ed_key):
     token = _get(base + '/apis/token', base)['token']
     sales = {}
     total_q = 0
-    for v in fetch_vendas(base, token):
+    _vendas = fetch_vendas(base, token)
+    _amostra = next((v.get('created_at') for v in _vendas if v.get('created_at')), '-')
+    print(f'[dbg] {ed_key}: {len(_vendas)} vendas brutas, 1a created_at={_amostra}, ts={SNAPSHOT_TS[ed_key]}', file=sys.stderr)
+    for v in _vendas:
         if str(v.get('venda_status')) != '3':
             continue
         if (v.get('created_at') or '') <= ts:   # ja contabilizado na base
