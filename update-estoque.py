@@ -82,23 +82,25 @@ def vendas_pos_snapshot(ed_key):
     sales = {}
     total_q = 0
     _vendas = fetch_vendas(base, token)
-    _amostra = next((v.get('created_at') for v in _vendas if v.get('created_at')), '-')
-    print(f'[dbg] {ed_key}: {len(_vendas)} vendas brutas, 1a created_at={_amostra}, ts={SNAPSHOT_TS[ed_key]}', file=sys.stderr)
+    n_s3 = n_post = 0
     for v in _vendas:
         if str(v.get('venda_status')) != '3':
             continue
+        n_s3 += 1
         if (v.get('created_at') or '') <= ts:   # ja contabilizado na base
             continue
+        n_post += 1
         for q in (v.get('qrcodes') or []):
             if q.get('ingresso_tipo') != 'testRide':
                 continue
             ip = norm_pass(q.get('ingresso_nome'))
+            day = (q.get('data') or '')[:2]   # o dia (data) fica no QRCODE, nao no modelo
             for m in (q.get('modelos') or []):
                 marca = norm(m.get('modelo_marca'))
-                day = (m.get('data') or '')[:2]
                 if ip and marca and day:
                     sales[(ip, marca, day)] = sales.get((ip, marca, day), 0) + 1
                     total_q += 1
+    print(f'[dbg] {ed_key}: brutas={len(_vendas)} status3={n_s3} pos_snap={n_post} slots_descontados={total_q}', file=sys.stderr)
     return sales, total_q
 
 
