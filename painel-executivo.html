@@ -2860,10 +2860,13 @@ function buildExecTMCharts() {
     hide(toast);
     target.scrollIntoView({ behavior:'smooth', block:'center' });
     setTimeout(function(){
+      // fallback: o Chrome as vezes nao completa scroll suave longo -> garante o destino
+      var r = target.getBoundingClientRect();
+      if (r.top < 60 || r.bottom > window.innerHeight - 60) target.scrollIntoView({ block:'center' });
       show(ring); show(pop); place();
       window.addEventListener('scroll', place, { passive:true });
       window.addEventListener('resize', place);
-    }, 560);
+    }, 580);
   }
   function endTour(){
     hide(ring); hide(pop);
