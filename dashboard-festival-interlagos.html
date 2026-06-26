@@ -156,6 +156,14 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .org-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card2);border-radius:var(--rad-sm)}
 .org-label{display:flex;align-items:center;gap:8px;font-size:.8rem}
 .org-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem}
+.org-cpa-wrap{margin-top:18px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px}
+.org-cpa-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;color:#aaa;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.org-cpa-tbl{width:100%;border-collapse:collapse;font-size:.8rem}
+.org-cpa-tbl th{color:#888;font-weight:600;text-align:right;padding:6px 8px;font-size:.64rem;text-transform:uppercase;letter-spacing:.04em}
+.org-cpa-tbl th:first-child{text-align:left}
+.org-cpa-tbl td{text-align:right;padding:7px 8px;border-top:1px solid rgba(255,255,255,.05);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.98rem;color:var(--text)}
+.org-cpa-tbl td:first-child{text-align:left;font-family:'Inter',sans-serif;font-weight:500;font-size:.8rem;color:var(--text2)}
+.org-cpa-tbl tr.tot td{border-top:1px solid rgba(200,255,0,.22);color:var(--lime)}
 .note{font-size:.7rem;color:var(--text3);line-height:1.5;padding:10px 14px;background:var(--lime-dim);border:1px solid var(--lime-border);border-radius:var(--rad-sm)}
 
 /* FILTRO DE DATA */
@@ -898,6 +906,15 @@ Google Ads
         TikTok via API automática (atualiza a cada 15 min via GitHub Actions).
       </div>
     </div>
+  </div>
+  <!-- Investimento + Conversoes + CPA por canal -->
+  <div class="org-cpa-wrap">
+    <div class="org-cpa-title">Investimento e CPA por canal</div>
+    <table class="org-cpa-tbl">
+      <thead><tr><th>Canal</th><th>Investido</th><th>Conversões</th><th>CPA</th></tr></thead>
+      <tbody id="orgCpaBody"><tr><td colspan="4" style="color:#666;text-align:center">Carregando…</td></tr></tbody>
+    </table>
+    <div class="note" style="margin-top:8px">Conversões = compras rastreadas por cada plataforma · CPA = investido ÷ conversões da própria plataforma · Respeita o filtro de data ativo.</div>
   </div>
 </div>
 
@@ -2802,6 +2819,24 @@ function buildOrg() {
   const metaCompras   = metaArr.reduce((s,d)=>s+(d.purchases||d.compras||0),0);
   const gadsConv      = gadsArr.reduce((s,d)=>s+(d.conversions||0),0);
   const tiktokCompras = tiktokArr.reduce((s,d)=>s+(d.purchases||0),0);
+
+  // Investido + CPA por canal (mesma base de conversoes do donut acima)
+  const metaSpend   = metaArr.reduce((s,d)=>s+(d.cost||0),0);
+  const gadsSpend   = gadsArr.reduce((s,d)=>s+(d.cost||0),0);
+  const tiktokSpend = tiktokArr.reduce((s,d)=>s+(d.cost||0),0);
+  const _cpaBody = document.getElementById('orgCpaBody');
+  if (_cpaBody) {
+    const _brl = n => 'R$ ' + Math.round(n||0).toLocaleString('pt-BR');
+    const _num = n => Math.round(n||0).toLocaleString('pt-BR');
+    const _cpa = (sp,cv) => (cv>0 && sp>0) ? 'R$ ' + (sp/cv).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+    const _ts = metaSpend+gadsSpend+tiktokSpend, _tc = metaCompras+gadsConv+tiktokCompras;
+    const _row = (color,nome,sp,cv) => `<tr><td><span class="dot" style="display:inline-block;vertical-align:middle;margin-right:7px;background:${color}"></span>${nome}</td><td>${_brl(sp)}</td><td>${_num(cv)}</td><td>${_cpa(sp,cv)}</td></tr>`;
+    _cpaBody.innerHTML =
+      _row('#1877F2','Meta Ads',metaSpend,metaCompras) +
+      _row('#4285F4','Google Ads',gadsSpend,gadsConv) +
+      _row('#00BCD4','TikTok Ads',tiktokSpend,tiktokCompras) +
+      `<tr class="tot"><td>Total ADS</td><td>${_brl(_ts)}</td><td>${_num(_tc)}</td><td>${_cpa(_ts,_tc)}</td></tr>`;
+  }
 
   let metaPct = 0, gadsPct = 0, tiktokPct = 0, orgPct = 100;
   if (totalReceita > 0 && tktMedio > 0) {
