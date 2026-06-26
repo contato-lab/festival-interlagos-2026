@@ -2856,6 +2856,7 @@ function buildExecTMCharts() {
     pop.style.top = top + 'px';
     pop.style.left = left + 'px';
   }
+  var _ro = (typeof ResizeObserver !== 'undefined') ? new ResizeObserver(function(){ place(); }) : null;
   function startTour(){
     hide(toast);
     target.scrollIntoView({ behavior:'smooth', block:'center' });
@@ -2866,12 +2867,15 @@ function buildExecTMCharts() {
       show(ring); show(pop); place();
       window.addEventListener('scroll', place, { passive:true });
       window.addEventListener('resize', place);
+      if (_ro) _ro.observe(target);            // re-gruda se o card crescer (dados async)
+      setTimeout(place, 350); setTimeout(place, 900);  // belt-and-suspenders
     }, 580);
   }
   function endTour(){
     hide(ring); hide(pop);
     window.removeEventListener('scroll', place);
     window.removeEventListener('resize', place);
+    if (_ro) _ro.disconnect();
   }
   document.getElementById('wn-see').addEventListener('click', startTour);
   document.getElementById('wn-done').addEventListener('click', endTour);
