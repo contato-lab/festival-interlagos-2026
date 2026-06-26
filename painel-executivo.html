@@ -80,6 +80,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .exec-conv-row:last-child{border-bottom:none}
 .exec-conv-label{font-size:.78rem;color:#CCC}
 .exec-conv-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;color:var(--lime)}
+.exec-conv-row{align-items:flex-start}
+.exec-conv-valwrap{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
+.exec-conv-sub{display:block;font-family:'Inter',sans-serif;font-weight:500;font-size:.62rem;color:#7a7a7a;margin-top:3px;letter-spacing:.01em}
+.exec-conv-sub.cpa{color:#9a9a9a}
 /* Exec filter bar */
 .exec-filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px}
 .exec-filter-label{font-size:.65rem;color:#666;text-transform:uppercase;letter-spacing:.08em;margin-right:4px}
@@ -1894,6 +1898,8 @@ function renderExecConversoes() {
   const invest    = buildExecD26Invest(execFiltFrom, execFiltTo);
   const metaConv  = invest.reduce((s,r)=>s+r.metaConv, 0);
   const gadsConv  = invest.reduce((s,r)=>s+r.gadsConv, 0);
+  const metaSpend = invest.reduce((s,r)=>s+r.meta, 0);
+  const gadsSpend = invest.reduce((s,r)=>s+r.gads, 0);
   // TikTok: filtra pelo periodo
   const ttSeries  = TIKTOK_DATA?.daily_series || [];
   const ttFiltered = execFiltFrom
@@ -1925,35 +1931,41 @@ function renderExecConversoes() {
   const cpaAds   = adsConv > 0 ? totalInv / adsConv : null;
   const cpaTot   = ingTot  > 0 ? totalInv / ingTot  : null;
 
+  // Linha de canal: conversoes + investido (esq) + CPA do canal (dir)
+  const convRow = (labelHtml, conv, spend, color) => {
+    const cpa = (conv > 0 && spend > 0) ? spend / conv : null;
+    const convTxt = conv > 0 ? Math.round(conv).toLocaleString('pt-BR') : (spend > 0 ? '0' : '—');
+    const cs = color ? ` style="color:${color}"` : '';
+    return `
+    <div class="exec-conv-row">
+      <span class="exec-conv-label"${cs}>${labelHtml}
+        <span class="exec-conv-sub">${spend > 0 ? execFmtK(spend) + ' investido' : 'sem investimento'}</span>
+      </span>
+      <span class="exec-conv-valwrap">
+        <span class="exec-conv-val"${cs}>${convTxt}</span>
+        <span class="exec-conv-sub cpa">${cpa ? 'CPA ' + execFmtFull(cpa) : 'CPA —'}</span>
+      </span>
+    </div>`;
+  };
+
   document.getElementById('exec-conv-digital').innerHTML = `
-    <div class="section-title" style="margin-bottom:14px">Convers\u00f5es por Origem</div>
-    <div class="exec-conv-row">
-      <span class="exec-conv-label">Meta Ads</span>
-      <span class="exec-conv-val">${Math.round(metaConv).toLocaleString('pt-BR')}</span>
-    </div>
-    <div class="exec-conv-row">
-      <span class="exec-conv-label" style="color:rgba(200,255,0,.85)">Meta ads &middot; Nova conta Motos <span style="font-size:.6rem;color:#666">novo</span></span>
-      <span class="exec-conv-val" style="color:rgba(200,255,0,.9)">${metaMotosConv > 0 ? Math.round(metaMotosConv).toLocaleString('pt-BR') : '—'}</span>
-    </div>
-    <div class="exec-conv-row">
-      <span class="exec-conv-label">Google Ads</span>
-      <span class="exec-conv-val">${Math.round(gadsConv).toLocaleString('pt-BR')}</span>
-    </div>
-    <div class="exec-conv-row">
-      <span class="exec-conv-label" style="color:rgba(0,191,255,.8)">TikTok Ads <span style="font-size:.6rem;color:#555">manual</span></span>
-      <span class="exec-conv-val" style="color:rgba(0,191,255,.9)">${tiktokConv > 0 ? tiktokConv.toLocaleString('pt-BR') : '\u2014'}</span>
-    </div>
-    <div class="exec-conv-row">
-      <span class="exec-conv-label">Org\u00e2nico / Direto / Outros <span style="font-size:.6rem;color:#666">(ingressos \u2212 ADS)</span></span>
-      <span class="exec-conv-val" style="color:var(--text2)">${ingTot>0 ? Math.round(orgConv).toLocaleString('pt-BR') : '\u2014'}</span>
-    </div>
+    <div class="section-title" style="margin-bottom:14px">Conversões por Origem</div>
+    ${convRow('Meta Ads', metaConv, metaSpend, null)}
+    ${convRow('Meta ads &middot; Nova conta Motos <span style="font-size:.6rem;color:#666">novo</span>', metaMotosConv, metaMotosSpend, 'rgba(200,255,0,.9)')}
+    ${convRow('Google Ads', gadsConv, gadsSpend, null)}
+    ${convRow('TikTok Ads <span style="font-size:.6rem;color:#555">manual</span>', tiktokConv, tiktokSpend, 'rgba(0,191,255,.9)')}
+    ${convRow('Orgânico / Direto / Outros <span style="font-size:.6rem;color:#666">(ingressos − ADS)</span>', orgConv, 0, 'var(--text2)')}
     <div class="exec-conv-row" style="border-top:1px solid rgba(200,255,0,.15);margin-top:4px;padding-top:10px">
       <span class="exec-conv-label"><strong>Total Ingressos</strong> <span style="font-size:.6rem;color:#666">planilha</span></span>
-      <span class="exec-conv-val" style="color:var(--lime)">${ingTot>0 ? ingTot.toLocaleString('pt-BR') : '\u2014'}</span>
+      <span class="exec-conv-val" style="color:var(--lime)">${ingTot>0 ? ingTot.toLocaleString('pt-BR') : '—'}</span>
     </div>
     <div class="exec-conv-row">
-      <span class="exec-conv-label">CPA (ADS)</span>
-      <span class="exec-conv-val">${cpaAds ? execFmtFull(cpaAds) : '\u2014'}</span>
+      <span class="exec-conv-label">Total investido <span style="font-size:.6rem;color:#666">(ADS)</span></span>
+      <span class="exec-conv-val">${totalInv>0 ? execFmtK(totalInv) : '—'}</span>
+    </div>
+    <div class="exec-conv-row">
+      <span class="exec-conv-label">CPA médio <span style="font-size:.6rem;color:#666">(ADS)</span></span>
+      <span class="exec-conv-val">${cpaAds ? execFmtFull(cpaAds) : '—'}</span>
     </div>
   `;
 
