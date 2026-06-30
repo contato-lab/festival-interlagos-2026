@@ -2948,5 +2948,54 @@ if(b)b.addEventListener('click',function(){window.scrollTo({top:document.documen
   refresh();
 })();
 </script>
+
+<!-- ══ Quadros minimizaveis (Vendas / Investimento / Ticket Medio / Recuperacao) ══ -->
+<style>
+.exec-collapsible .section-header{cursor:pointer;border-radius:8px;transition:background .15s}
+.exec-collapsible .section-header:hover{background:rgba(255,255,255,.03)}
+.exec-collapsible .exec-chev{display:inline-block;margin-left:9px;color:#C8FF00;font-size:.72rem;transition:transform .2s;vertical-align:middle}
+.exec-collapsible.exec-collapsed .exec-chev{transform:rotate(-90deg)}
+.exec-collapsible.exec-collapsed > :not(.section-header){display:none!important}
+.exec-collapsible.exec-collapsed .section-header{margin-bottom:0!important}
+.exec-collapsible.exec-collapsed .pill-group{display:none!important}
+.exec-collapsible .exec-collapsed-tag{display:none;font-size:.58rem;color:#777;margin-left:8px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;vertical-align:middle}
+.exec-collapsible.exec-collapsed .exec-collapsed-tag{display:inline}
+</style>
+<script>
+(function(){
+  var IDS = ['exec-chartVendas','exec-chartInvest','exec-chartTkt','tkt-hero-grid'];
+  function init(){
+    IDS.forEach(function(id){
+      var el = document.getElementById(id);
+      var card = el && el.closest('.exec-chart-card');
+      if(!card || card.dataset.colInit) return;
+      card.dataset.colInit = '1';
+      card.classList.add('exec-collapsible');
+      var title = card.querySelector('.section-title');
+      var hdr   = card.querySelector('.section-header');
+      if(title){
+        var chev = document.createElement('span');
+        chev.className = 'exec-chev'; chev.textContent = '▾';
+        var tag = document.createElement('span');
+        tag.className = 'exec-collapsed-tag'; tag.textContent = 'clique para abrir';
+        title.appendChild(chev); title.appendChild(tag);
+      }
+      if(hdr){
+        hdr.addEventListener('click', function(e){
+          if(e.target.closest('.pill-group, button, a, .clickable, input, select')) return;
+          var col = card.classList.toggle('exec-collapsed');
+          if(!col){   // ao abrir, reencaixa os graficos que renderizaram escondidos
+            setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 30);
+            setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 260);
+          }
+        });
+      }
+      card.classList.add('exec-collapsed');   // comeca minimizado
+    });
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
 </body>
 </html>
