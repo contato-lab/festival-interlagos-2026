@@ -550,6 +550,27 @@ def apify_call(actor, payload, token, timeout=300):
         return json.loads(r.read())
 
 
+def _first(d, *keys):
+    """Primeiro valor nao-vazio entre chaves possiveis (campos do Apify variam por ator)."""
+    for k in keys:
+        v = d.get(k)
+        if v:
+            return v
+    return None
+
+
+def _yt_url(c):
+    """Link do comentario no YouTube: vai pro video e (quando da) destaca o comentario via &lc=."""
+    vu = _first(c, 'videoUrl', 'url', 'video_url', 'startUrl', 'postUrl')
+    cu = _first(c, 'commentUrl')
+    cid = _first(c, 'commentId', 'cid', 'id')
+    if cu:
+        return cu
+    if vu and cid:
+        return vu + ('&' if '?' in vu else '?') + 'lc=' + str(cid)
+    return vu
+
+
 def social_comments(pulse):
     """Coleta comentarios publicos (IG oficial, TikTok oficial, videos de criadores no YouTube).
     Roda 1x ao dia (execucao da manha) para caber nos creditos gratis do Apify."""
@@ -570,6 +591,8 @@ def social_comments(pulse):
             if k in merged:
                 if not merged[k].get('data') and it.get('data'):
                     merged[k]['data'] = it['data']
+                if not merged[k].get('url') and it.get('url'):
+                    merged[k]['url'] = it['url']
             else:
                 merged[k] = dict(it)
         # descarta reclamacao da seguradora; ordena por data e fica com os 30 MAIS RECENTES que existirem
@@ -603,6 +626,7 @@ def social_comments(pulse):
             items = [{'texto': (c.get('text') or '')[:220], 'autor': c.get('ownerUsername') or '?',
                       'likes': c.get('likesCount') or 0, 'data': _data_iso(c.get('timestamp'), c.get('createdAt')),
                       'sentimento': sentimento_comentario(c.get('text')),
+                      'url': _first(c, 'postUrl', 'post_url', 'inputUrl'),
                       'origem': 'post oficial'} for c in coms if c.get('text')]
             push('instagram', items)
             print(f'[coment-ig] {len(items)} comentarios')
@@ -625,6 +649,7 @@ def social_comments(pulse):
                                         datetime.fromtimestamp(c['createTime'], tz=timezone.utc).strftime('%Y-%m-%d')
                                         if isinstance(c.get('createTime'), (int, float)) and c.get('createTime') else None),
                       'sentimento': sentimento_comentario(c.get('text')),
+                      'url': _first(c, 'videoWebUrl', 'videoUrl', 'submittedVideoUrl', 'postUrl'),
                       'origem': 'vídeo oficial'} for c in coms if c.get('text')]
             push('tiktok', items)
             print(f'[coment-tt] {len(items)} comentarios')
@@ -642,6 +667,7 @@ def social_comments(pulse):
                       'likes': c.get('voteCount') or c.get('likes') or 0,
                       'data': _data_iso(c.get('date'), c.get('publishedAt'), c.get('publishedTimeText')),
                       'sentimento': sentimento_comentario(c.get('comment') or c.get('text')),
+                      'url': _yt_url(c),
                       'origem': 'vídeo de criador'} for c in coms if (c.get('comment') or c.get('text'))]
             push('youtube', items)
             print(f'[coment-yt] {len(items)} comentarios')

@@ -220,6 +220,13 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;font-si
   <div class="card">
     <div class="h">O que estão <b>comentando</b> <span class="qm" data-tip="Comentários públicos coletados automaticamente 1x ao dia: posts mais recentes do Instagram oficial, vídeos do TikTok oficial e vídeos de criadores no YouTube. O sentimento é classificado automaticamente; a leitura qualitativa entra a cada varredura profunda.">?</span> <span style="font-weight:400;font-size:.68rem;text-transform:none;letter-spacing:0;color:var(--tx3)" id="com-note"></span></div>
     <div id="comentarios" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px"></div>
+    <style>
+      #comentarios .com-c{display:block;border-top:1px solid var(--line);padding:7px 6px;border-radius:6px}
+      #comentarios a.com-link{text-decoration:none;color:inherit;transition:background .12s}
+      #comentarios a.com-link:hover{background:rgba(255,255,255,.045)}
+      #comentarios .com-go{color:var(--tx3);font-size:.62rem;white-space:nowrap}
+      #comentarios a.com-link:hover .com-go{color:#8ab4ff}
+    </style>
   </div>
 
   <!-- INTEGRAÇÕES -->
@@ -501,11 +508,17 @@ function render(){
       const pct=Math.round(pc.positivos/pc.coletados*100);
       const resumo=(SC.resumo||{})[k];
       const list=(pc.comentarios||[]).slice(-6).reverse();
+      const fb={instagram:'https://www.instagram.com/festival.interlagos/',tiktok:'https://www.tiktok.com/@festivalinterlagos',youtube:''};
       return `<div class="men"><div class="f" style="color:${cor}">${nome} · ${pc.coletados} comentários · ${pct}% positivos${pc.negativos?` · <span style="color:var(--red)">${pc.negativos} negativos ⚠</span>`:''}</div>
         ${resumo?`<div style="font-size:.72rem;color:var(--tx2);margin:7px 0;line-height:1.45;border-left:2px solid ${cor};padding-left:8px">${esc(resumo)}</div>`:''}
-        ${list.map(c=>`<div style="border-top:1px solid var(--line);padding:7px 0">
-          <div style="font-size:.73rem;line-height:1.4">${esc(c.texto)}</div>
-          <div class="meta" style="margin-top:3px">@${esc(c.autor)}${c.likes?' · '+fmt(c.likes)+' curtidas':''}${c.data?' · '+esc(String(c.data).split('-').reverse().join('/').slice(0,5)):''} <span class="pill ${c.sentimento==='positivo'?'pos':c.sentimento==='negativo'?'neg':'neu'}">${c.sentimento}</span></div></div>`).join('')}</div>`;
+        ${list.map(c=>{
+          const link=c.url||fb[k]||'';
+          const corpo=`<div style="font-size:.73rem;line-height:1.4">${esc(c.texto)}</div>
+          <div class="meta" style="margin-top:3px">@${esc(c.autor)}${c.likes?' · '+fmt(c.likes)+' curtidas':''}${c.data?' · '+esc(String(c.data).split('-').reverse().join('/').slice(0,5)):''} <span class="pill ${c.sentimento==='positivo'?'pos':c.sentimento==='negativo'?'neg':'neu'}">${c.sentimento}</span>${link?` <span class="com-go">ver post ↗</span>`:''}</div>`;
+          return link
+            ? `<a class="com-c com-link" href="${esc(link)}" target="_blank" rel="noopener">${corpo}</a>`
+            : `<div class="com-c">${corpo}</div>`;
+        }).join('')}</div>`;
     }).join('');
   } else {
     document.getElementById('comentarios').innerHTML='<div style="font-size:.74rem;color:var(--tx3)">Primeira coleta acontece na próxima rodada do robô.</div>';
