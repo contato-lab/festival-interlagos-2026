@@ -208,8 +208,10 @@ function aggregate(movements, opts = {}) {
   totals.moto_receita    = Math.round(totals.moto_receita * 100) / 100;
   totals.auto_receita    = Math.round(totals.auto_receita * 100) / 100;
   if (clamp) {
-    totals.moto_ingressos = Math.max(0, totals.moto_ingressos);
-    totals.auto_ingressos = Math.max(0, totals.auto_ingressos);
+    totals.moto_ingressos  = Math.max(0, totals.moto_ingressos);
+    totals.auto_ingressos  = Math.max(0, totals.auto_ingressos);
+    totals.moto_cortesias  = Math.max(0, totals.moto_cortesias);
+    totals.auto_cortesias  = Math.max(0, totals.auto_cortesias);
   }
   totals.total_receita   = Math.round((totals.moto_receita + totals.auto_receita) * 100) / 100;
   totals.total_ingressos = totals.moto_ingressos + totals.auto_ingressos;
@@ -226,8 +228,8 @@ function aggregate(movements, opts = {}) {
       // (Desligado quando clamp=false, ver comentario no topo da funcao.)
       moto_ingressos:   clampFn(daily[dateStr].moto_ingressos),
       auto_ingressos:   clampFn(daily[dateStr].auto_ingressos),
-      moto_cortesias:   daily[dateStr].moto_cortesias,
-      auto_cortesias:   daily[dateStr].auto_cortesias,
+      moto_cortesias:   clampFn(daily[dateStr].moto_cortesias),
+      auto_cortesias:   clampFn(daily[dateStr].auto_cortesias),
     }));
 
   return { totals, daily: dailyList, last_sale_moto_at: lastSaleMotoAt, last_sale_auto_at: lastSaleAutoAt };
@@ -269,8 +271,8 @@ function mergeDaily(baseDaily, deltaDaily) {
     cur.auto_receita   = Math.round((cur.auto_receita + d.auto_receita) * 100) / 100;
     cur.moto_ingressos = Math.max(0, cur.moto_ingressos + d.moto_ingressos);
     cur.auto_ingressos = Math.max(0, cur.auto_ingressos + d.auto_ingressos);
-    cur.moto_cortesias = cur.moto_cortesias + d.moto_cortesias;
-    cur.auto_cortesias = cur.auto_cortesias + d.auto_cortesias;
+    cur.moto_cortesias = Math.max(0, cur.moto_cortesias + d.moto_cortesias);
+    cur.auto_cortesias = Math.max(0, cur.auto_cortesias + d.auto_cortesias);
     map[d.date] = cur;
   }
   return Object.values(map).sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
@@ -314,6 +316,8 @@ async function buildTmDataIncremental(baseline) {
   totals.auto_receita    = Math.round(totals.auto_receita * 100) / 100;
   totals.moto_ingressos  = Math.max(0, totals.moto_ingressos);
   totals.auto_ingressos  = Math.max(0, totals.auto_ingressos);
+  totals.moto_cortesias  = Math.max(0, totals.moto_cortesias);
+  totals.auto_cortesias  = Math.max(0, totals.auto_cortesias);
   totals.total_receita   = Math.round((totals.moto_receita + totals.auto_receita) * 100) / 100;
   totals.total_ingressos = totals.moto_ingressos + totals.auto_ingressos;
 
@@ -385,8 +389,10 @@ export default {
     // v4 = trata cancelamento de cortesia como cortesia (nao como venda).
     // v5 = busca incremental sobre o snapshot do robo, em vez de reprocessar
     //      o historico inteiro a cada cache-miss (estava estourando CPU).
-    const cacheKey      = new Request(baseUrl + '?v=fresh-utc-v5', request);
-    const staleCacheKey = new Request(baseUrl + '?v=stale-utc-v5', request);
+    // v6 = clamp em 0 tambem pras cortesias no merge do delta (v5 deixou
+    //      passar -1387 cortesias num dia por nao clampar esse campo).
+    const cacheKey      = new Request(baseUrl + '?v=fresh-utc-v6', request);
+    const staleCacheKey = new Request(baseUrl + '?v=stale-utc-v6', request);
 
     // 1) Cache fresco?
     let cached = await cache.match(cacheKey);
