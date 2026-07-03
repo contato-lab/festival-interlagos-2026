@@ -234,6 +234,8 @@ def aggregate_tm_totais(movements):
         'moto_ingressos': 0,  'auto_ingressos': 0,
         'moto_cortesias': 0,  'auto_cortesias': 0,
     }
+    last_sale_moto_at = None
+    last_sale_auto_at = None
 
     for m in movements:
         op   = m.get('operation')
@@ -273,6 +275,10 @@ def aggregate_tm_totais(movements):
                 daily[ds]['moto_ingressos'] += tc
                 totals['moto_receita']      += amt
                 totals['moto_ingressos']    += tc
+                if op == 'ISSUANCE' and tc > 0:
+                    mv_date = m.get('date') or ''
+                    if mv_date and (last_sale_moto_at is None or mv_date > last_sale_moto_at):
+                        last_sale_moto_at = mv_date
         else:
             if is_cortesia:
                 daily[ds]['auto_cortesias'] += tc
@@ -282,6 +288,10 @@ def aggregate_tm_totais(movements):
                 daily[ds]['auto_ingressos'] += tc
                 totals['auto_receita']      += amt
                 totals['auto_ingressos']    += tc
+                if op == 'ISSUANCE' and tc > 0:
+                    mv_date = m.get('date') or ''
+                    if mv_date and (last_sale_auto_at is None or mv_date > last_sale_auto_at):
+                        last_sale_auto_at = mv_date
 
     totals['total_receita']   = round(totals['moto_receita'] + totals['auto_receita'], 2)
     totals['total_ingressos'] = totals['moto_ingressos'] + totals['auto_ingressos']
@@ -298,7 +308,7 @@ def aggregate_tm_totais(movements):
         'auto_cortesias': d['auto_cortesias'],
     } for ds, d in sorted(daily.items())]
 
-    return totals, daily_list
+    return totals, daily_list, last_sale_moto_at, last_sale_auto_at
 
 
 def aggregate_tm_tipos(movements):
@@ -445,7 +455,7 @@ def build_vendas_data(moto_by_day, auto_by_day):
     }
 
 
-def build_ticketmaster_data(totals, daily, source='api'):
+def build_ticketmaster_data(totals, daily, source='api', last_sale_moto_at=None, last_sale_auto_at=None):
     source_label = {
         'api':      'Ticketmaster API via getcrowder.com',
         'planilha': 'Planilha Linha do Tempo (fallback enquanto API TM está fora)',
@@ -459,6 +469,8 @@ def build_ticketmaster_data(totals, daily, source='api'):
         'auto_show_ids':  sorted(AUTO_SHOW_IDS),
         'totals':         totals,
         'daily':          daily,
+        'last_sale_moto_at': last_sale_moto_at,
+        'last_sale_auto_at': last_sale_auto_at,
     }
 
 
@@ -709,7 +721,7 @@ def main():
         print(f'  ⚠️  TM API falhou: {tm_error}', file=sys.stderr)
 
     if tm_movs is not None:
-        tm_totals, tm_daily = aggregate_tm_totais(tm_movs)
+        tm_totals, tm_daily, tm_last_moto, tm_last_auto = aggregate_tm_totais(tm_movs)
         tm_moto, tm_auto    = aggregate_tm_tipos(tm_movs)
     else:
         # Carrega dados anteriores como baseline (último snapshot bom da API)
@@ -718,6 +730,9 @@ def main():
         prev_daily = {d['date']: d for d in (prev_tm.get('daily') or [])}
         prev_moto  = ((prev_tipos.get('ticketmaster') or {}).get('moto') or {})
         prev_auto  = ((prev_tipos.get('ticketmaster') or {}).get('auto') or {})
+        # Sem movimentos frescos pra recalcular ultima venda: preserva o que ja tinha.
+        tm_last_moto = prev_tm.get('last_sale_moto_at')
+        tm_last_auto = prev_tm.get('last_sale_auto_at')
 
         # Fallback 1: planilha. Faz MERGE com o baseline (planilha sobrescreve
         # dias que tem; baseline preserva dias que planilha não cobre — ex.:
@@ -773,7 +788,9 @@ def main():
     print('\n[4/4] Escrevendo JSONs...')
     write_json(OUT_VENDAS, build_vendas_data(moto_by_day, auto_by_day))
     if tm_ok:
-        write_json(OUT_TM, build_ticketmaster_data(tm_totals, tm_daily, source=tm_source))
+        write_json(OUT_TM, build_ticketmaster_data(tm_totals, tm_daily, source=tm_source,
+                                                    last_sale_moto_at=tm_last_moto,
+                                                    last_sale_auto_at=tm_last_auto))
     else:
         # NÃO sobrescreve OUT_TM: timestamp ficaria mentiroso. Deixa o arquivo
         # antigo no lugar pra dashboard mostrar 'stale' via updated_at antigo.
