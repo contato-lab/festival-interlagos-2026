@@ -981,8 +981,14 @@ async function fetchTicketmaster() {
       }
     }
     if (!res) {
-      console.warn('[TM Worker] Falhou apos 3 tentativas. Mantendo dados anteriores (se houver):', workerErr?.message);
-      return;
+      console.warn('[TM Worker] Falhou apos 3 tentativas, usando fallback ticketmaster-data.json:', workerErr?.message);
+      try {
+        res = await fetch('ticketmaster-data.json?t=' + Date.now(), {cache:'no-store'});
+        if (!res.ok) throw new Error('ticketmaster-data.json HTTP ' + res.status);
+      } catch (fallbackErr) {
+        console.warn('[TM fallback] tambem falhou, mantendo dados anteriores (se houver):', fallbackErr.message);
+        return;
+      }
     }
     const data = await res.json();
     if (!data.daily || !data.daily.length) return;
