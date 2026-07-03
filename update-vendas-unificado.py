@@ -215,11 +215,14 @@ def _classify_meia_inteira(rate_name, rate_cat):
 def aggregate_tm_totais(movements):
     """Agrega para ticketmaster-data.json (totais diários por edição)."""
     issuance_date = {}
+    cortesia_purchase = set()  # ids de compra cuja emissao original foi cortesia (amt=0)
     for m in movements:
         if m.get('operation') == 'ISSUANCE':
             pid = (m.get('purchase') or {}).get('id')
             if pid is not None and pid not in issuance_date:
                 issuance_date[pid] = (m.get('date') or '')[:10]
+            if pid is not None and float(m.get('amount', 0)) == 0 and int(m.get('ticketCount', 0)) > 0:
+                cortesia_purchase.add(pid)
 
     daily = defaultdict(lambda: {
         'moto_receita': 0.0, 'auto_receita': 0.0,
@@ -239,8 +242,8 @@ def aggregate_tm_totais(movements):
         edi  = _classify_show(m.get('tickets', []))
         if not edi:
             continue
+        pid = (m.get('purchase') or {}).get('id')
         if op in ('CANCELLATION', 'REFUND'):
-            pid = (m.get('purchase') or {}).get('id')
             ds  = issuance_date.get(pid) or (m.get('date') or '')[:10]
         else:
             ds = (m.get('date') or '')[:10]
@@ -250,7 +253,16 @@ def aggregate_tm_totais(movements):
         # Cortesias / vouchers: ISSUANCE com R$ 0 não são vendas comerciais.
         # Em 21/05/2026 entraram 151 cortesias de moto inflando o número
         # de "ingressos vendidos". Separamos em moto_cortesias/auto_cortesias.
-        is_cortesia = (op == 'ISSUANCE' and amt == 0 and tc > 0)
+        # Cancelamento/reembolso de uma compra que NASCEU cortesia tem que abater
+        # da MESMA conta (senao ele cai nas vendas reais e derruba o numero de
+        # ingressos vendidos por engano — bug real observado em 01/07/2026,
+        # moto_ingressos foi parar negativo).
+        if op == 'ISSUANCE':
+            is_cortesia = (amt == 0 and tc > 0)
+        elif op in ('CANCELLATION', 'REFUND'):
+            is_cortesia = pid in cortesia_purchase
+        else:
+            is_cortesia = False
 
         if edi == 'moto':
             if is_cortesia:
