@@ -174,7 +174,9 @@ def aggregate_proprio_tipos(sales):
 # ╚══════════════════════════════════════════════════════════╝
 
 def fetch_tm_movements():
-    """Busca todos os movimentos do Ticketmaster. Uma única vez."""
+    """Busca todos os movimentos do Ticketmaster. Uma única vez.
+    Retorna tambem o cursor final (lastUpdate/lastMovementId) pra o Worker
+    de tempo real conseguir retomar dai em diante (busca incremental)."""
     all_movs = []
     last_update, last_mov_id = CAMPAIGN_START_MS, 1
     while True:
@@ -191,7 +193,7 @@ def fetch_tm_movements():
             break
         last_update = d.get('lastUpdate', last_update)
         last_mov_id = d.get('lastMovementId', last_mov_id)
-    return all_movs
+    return all_movs, last_update, last_mov_id
 
 
 def _classify_show(tickets):
@@ -455,7 +457,8 @@ def build_vendas_data(moto_by_day, auto_by_day):
     }
 
 
-def build_ticketmaster_data(totals, daily, source='api', last_sale_moto_at=None, last_sale_auto_at=None):
+def build_ticketmaster_data(totals, daily, source='api', last_sale_moto_at=None, last_sale_auto_at=None,
+                            tm_cursor_last_update=None, tm_cursor_last_movement_id=None):
     source_label = {
         'api':      'Ticketmaster API via getcrowder.com',
         'planilha': 'Planilha Linha do Tempo (fallback enquanto API TM está fora)',
@@ -471,6 +474,11 @@ def build_ticketmaster_data(totals, daily, source='api', last_sale_moto_at=None,
         'daily':          daily,
         'last_sale_moto_at': last_sale_moto_at,
         'last_sale_auto_at': last_sale_auto_at,
+        # Cursor de paginacao onde essa rodada parou (usado pelo Worker de
+        # tempo real pra buscar so o que e NOVO desde aqui, em vez de
+        # reprocessar o historico inteiro a cada 5 min).
+        'tm_cursor_last_update':     tm_cursor_last_update,
+        'tm_cursor_last_movement_id': tm_cursor_last_movement_id,
     }
 
 
@@ -712,8 +720,10 @@ def main():
     tm_movs = None
     tm_error = None
     tm_source = None
+    tm_cursor_update = None
+    tm_cursor_mov_id = None
     try:
-        tm_movs = fetch_tm_movements()
+        tm_movs, tm_cursor_update, tm_cursor_mov_id = fetch_tm_movements()
         print(f'  {len(tm_movs)} movimentos')
         tm_source = 'api'
     except Exception as e:
@@ -730,9 +740,11 @@ def main():
         prev_daily = {d['date']: d for d in (prev_tm.get('daily') or [])}
         prev_moto  = ((prev_tipos.get('ticketmaster') or {}).get('moto') or {})
         prev_auto  = ((prev_tipos.get('ticketmaster') or {}).get('auto') or {})
-        # Sem movimentos frescos pra recalcular ultima venda: preserva o que ja tinha.
+        # Sem movimentos frescos pra recalcular ultima venda/cursor: preserva o que ja tinha.
         tm_last_moto = prev_tm.get('last_sale_moto_at')
         tm_last_auto = prev_tm.get('last_sale_auto_at')
+        tm_cursor_update = prev_tm.get('tm_cursor_last_update')
+        tm_cursor_mov_id = prev_tm.get('tm_cursor_last_movement_id')
 
         # Fallback 1: planilha. Faz MERGE com o baseline (planilha sobrescreve
         # dias que tem; baseline preserva dias que planilha não cobre — ex.:
@@ -790,7 +802,9 @@ def main():
     if tm_ok:
         write_json(OUT_TM, build_ticketmaster_data(tm_totals, tm_daily, source=tm_source,
                                                     last_sale_moto_at=tm_last_moto,
-                                                    last_sale_auto_at=tm_last_auto))
+                                                    last_sale_auto_at=tm_last_auto,
+                                                    tm_cursor_last_update=tm_cursor_update,
+                                                    tm_cursor_last_movement_id=tm_cursor_mov_id))
     else:
         # NÃO sobrescreve OUT_TM: timestamp ficaria mentiroso. Deixa o arquivo
         # antigo no lugar pra dashboard mostrar 'stale' via updated_at antigo.
