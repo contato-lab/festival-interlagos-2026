@@ -189,10 +189,14 @@ def fetch_tm_movements():
         d = r.json()
         movs = d.get('movements', [])
         all_movs.extend(movs)
-        if not d.get('hasMore') or not movs:
-            break
+        # Avanca o cursor SEMPRE, inclusive na ultima pagina. Antes o break vinha
+        # antes desta atualizacao, entao o cursor ficava posicionado ANTES da ultima
+        # pagina de movimentos: o Worker incremental re-buscava essa pagina e contava
+        # tudo em dobro (inflou o dia atual em +32 em 03/07/2026).
         last_update = d.get('lastUpdate', last_update)
         last_mov_id = d.get('lastMovementId', last_mov_id)
+        if not d.get('hasMore') or not movs:
+            break
     return all_movs, last_update, last_mov_id
 
 
