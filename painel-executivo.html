@@ -511,7 +511,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 </div><!-- /exec-charts-grid -->
 
 <!-- ══ VENDAS POR HORARIO DO DIA ══ -->
-<div class="exec-chart-card" style="margin-top:16px">
+<div class="exec-chart-card" style="margin-top:16px" id="horaCard">
   <div class="section-header" style="margin-bottom:10px">
     <div>
       <div class="section-title">🕐 Vendas por horário do dia</div>
@@ -2854,13 +2854,13 @@ function buildExecTMCharts() {
 
 </script>
 
-<!-- ═══ What's New — tour de novidade (Test Ride) ═══ -->
+<!-- ═══ What's New — tour de novidade (Vendas por horário) ═══ -->
 <div id="wn-toast" class="wn-hidden" role="dialog" aria-label="Novidade">
   <div class="wn-toast-ic">🎉</div>
   <div class="wn-toast-body">
     <span class="wn-toast-tag">Novidade</span>
-    <div class="wn-toast-tt">Test Ride & Test Drive ao vivo</div>
-    <div class="wn-toast-tx">Adicionamos um quadro que mostra os horários de test ride (moto) e test drive (auto) ainda disponíveis, atualizando sozinho. Quer ver onde fica?</div>
+    <div class="wn-toast-tt">Vendas por horário do dia</div>
+    <div class="wn-toast-tx">Novo gráfico: veja em qual horário mais se vende e filtre por data (ontem, 7 dias, período). Quer ver onde fica?</div>
     <div class="wn-toast-actions">
       <button class="wn-btn wn-btn-primary" id="wn-see">Ver agora</button>
       <button class="wn-btn wn-btn-ghost" id="wn-skip">Agora não</button>
@@ -2871,20 +2871,20 @@ function buildExecTMCharts() {
 <div id="wn-ring" class="wn-hidden"></div>
 <div id="wn-pop" class="wn-hidden" role="dialog">
   <span class="wn-pop-tag">Novidade · 1 de 1</span>
-  <div class="wn-pop-tt">🏍️🚗 Test Ride & Test Drive — Disponibilidade</div>
-  <div class="wn-pop-tx">Aqui aparecem os horários de test ride (moto) e test drive (auto) <b>ainda disponíveis</b>, atualizando sozinho (base da planilha menos as vendas ao vivo da API). Para abrir a lista completa por marca, clique em <b>"Ver todas as marcas"</b> dentro do quadro.</div>
+  <div class="wn-pop-tt">🕐 Vendas por horário do dia</div>
+  <div class="wn-pop-tx">Mostra em <b>qual hora do dia</b> mais se vende (horário de Brasília), motos + autos juntos. E <b>respeita o filtro de data</b> lá do topo: escolha "Ontem", "7 dias" ou um período pra ver o padrão daquele recorte. Serve pra programar e-mail e anúncio na hora que o público mais compra.</div>
   <div class="wn-pop-actions">
     <button class="wn-btn wn-btn-primary" id="wn-done">Entendi 👍</button>
   </div>
 </div>
 <script>
 (function(){
-  var KEY = 'wn_testride_disponibilidade_v1';
+  var KEY = 'wn_vendas_por_hora_v1';
   try { if (localStorage.getItem(KEY)) return; } catch(e){}
   var toast  = document.getElementById('wn-toast');
   var ring   = document.getElementById('wn-ring');
   var pop    = document.getElementById('wn-pop');
-  var target = document.getElementById('estoqueCard');
+  var target = document.getElementById('horaCard');
   if (!toast || !target) return;
   var show = function(el){ el.classList.remove('wn-hidden'); };
   var hide = function(el){ el.classList.add('wn-hidden'); };
