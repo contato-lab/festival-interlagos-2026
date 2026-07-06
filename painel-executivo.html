@@ -2620,7 +2620,12 @@ function buildExecTimelineChart() {
   // Eixo unificado por DIA DE CAMPANHA: D+1..D+94 (94 dias)
   // D+1 de 2025 = 14/03/2025 = D+1 de 2026 = 31/03/2026 (mesmo ponto no eixo)
   // Tooltip mostra ambas datas reais. Labels mostram "D+N" + datas embaixo.
-  const n = D25_CAMPAIGN.length; // 94
+  // Eixo cresce com a campanha mais longa. 2025 teve 94 dias, mas 2026 e mais
+  // longa: o eixo continua ate o dia atual de 2026 e a linha de 2025 fica null
+  // (sem comparativo) depois do D+94.
+  const nBase = D25_CAMPAIGN.length; // 94 (tamanho da campanha 2025)
+  const maxD26 = (D26_FULL && D26_FULL.length) ? Math.max.apply(null, D26_FULL.map(r=>r.d)) : 0;
+  const n = Math.max(nBase, maxD26);
   const labels = Array.from({length:n}, (_,i) => 'D+'+(i+1));
 
   const getVal = (r) => {
@@ -2629,9 +2634,10 @@ function buildExecTimelineChart() {
     return execTlMetric === 'receita' ? (mv + av) : (mq + aq);
   };
 
-  // 2025: D+1..D+94 da campanha 2025 (14/03 a 15/06/2025)
-  const s25 = D25_CAMPAIGN.map(getVal);
-  // 2026: D+1..D+N da campanha 2026 (31/03/2026 em diante), alinhado por dia de campanha
+  // 2025: so existe ate D+94; depois disso null
+  const s25 = Array(n).fill(null);
+  D25_CAMPAIGN.forEach((r,i) => { s25[i] = getVal(r); });
+  // 2026: D+1..D+atual, alinhado por dia de campanha
   const s26 = Array(n).fill(null);
   (D26_FULL || []).forEach(r => {
     const i = r.d - 1; // D+1 vai pro indice 0 do eixo
@@ -2676,10 +2682,11 @@ function buildExecTimelineChart() {
             title: items => {
               const idx = items[0].dataIndex;
               const dPlus = idx + 1;
-              // Datas calendario: 2025 D+N = 14/03/2025 + (N-1); 2026 D+N = 31/03/2026 + (N-1)
-              const dt25 = new Date('2025-03-14T00:00:00'); dt25.setDate(dt25.getDate() + idx);
-              const dt26 = new Date(DATA_INICIO);           dt26.setDate(dt26.getDate() + idx);
               const f = d => d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+              const dt26 = new Date(DATA_INICIO); dt26.setDate(dt26.getDate() + idx);
+              // Depois do D+94 nao ha campanha 2025 equivalente
+              if (idx >= nBase) return 'D+' + dPlus + '  ·  2026: ' + f(dt26) + '  (sem 2025)';
+              const dt25 = new Date('2025-03-14T00:00:00'); dt25.setDate(dt25.getDate() + idx);
               return 'D+' + dPlus + '  ·  2025: ' + f(dt25) + '  ·  2026: ' + f(dt26);
             },
             label: c => {
