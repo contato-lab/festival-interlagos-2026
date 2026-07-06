@@ -510,6 +510,21 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 
 </div><!-- /exec-charts-grid -->
 
+<!-- ══ VENDAS POR HORARIO DO DIA ══ -->
+<div class="exec-chart-card" style="margin-top:16px">
+  <div class="section-header" style="margin-bottom:10px">
+    <div>
+      <div class="section-title">🕐 Vendas por horário do dia</div>
+      <div style="font-size:.7rem;color:#666;margin-top:3px" id="horaSub">Acumulado da campanha &middot; horário de Brasília</div>
+    </div>
+  </div>
+  <div class="exec-leg">
+    <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>Motos</div>
+    <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#2196F3"></span>Autos</div>
+  </div>
+  <div class="exec-chart-wrap"><canvas id="exec-chartHora"></canvas></div>
+</div>
+
 <!-- ══ TICKET MEDIO — 2025 vs 2026 ══ -->
 <div class="exec-chart-card" style="margin-top:16px">
   <div class="section-header" style="margin-bottom:10px">
@@ -2972,6 +2987,41 @@ if(b)b.addEventListener('click',function(){window.scrollTo({top:document.documen
   document.addEventListener('click',function(){wrap.classList.remove('open');});
   function _fdupd(){var r=bar.getBoundingClientRect();wrap.classList.toggle('hidden',(r.bottom>0&&r.top<window.innerHeight));if(r.bottom<=0||r.top>=window.innerHeight){refresh();}}window.addEventListener('scroll',_fdupd,{passive:true});window.addEventListener('resize',_fdupd);_fdupd();
   refresh();
+})();
+</script>
+
+<!-- ══ Grafico: vendas por horario do dia ══ -->
+<script>
+(function(){
+  async function renderHora(){
+    var cv = document.getElementById('exec-chartHora');
+    if(!cv || typeof Chart==='undefined') return;
+    var d;
+    try{ d = await (await fetch('vendas-por-hora.json?t='+Date.now(),{cache:'no-store'})).json(); }
+    catch(e){ return; }
+    var ph = d.por_hora||[];
+    if(!ph.length) return;
+    var labels = ph.map(function(x){return x.hora+'h';});
+    var peak = ph.reduce(function(a,b){return b.total>a.total?b:a;}, ph[0]);
+    var sub = document.getElementById('horaSub');
+    if(sub) sub.innerHTML = 'Acumulado da campanha &middot; horário de Brasília &middot; '+
+      '<b style="color:#C8FF00">melhor horário: '+peak.hora+'h ('+peak.total.toLocaleString('pt-BR')+' ingressos)</b>';
+    if(window._chHora) window._chHora.destroy();
+    window._chHora = new Chart(cv.getContext('2d'), {
+      type:'bar',
+      data:{labels:labels, datasets:[
+        {label:'Motos',data:ph.map(function(x){return x.moto;}),backgroundColor:'#C8FF00',stack:'s',borderRadius:3},
+        {label:'Autos',data:ph.map(function(x){return x.auto;}),backgroundColor:'#2196F3',stack:'s',borderRadius:3}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},
+          tooltip:{callbacks:{footer:function(items){var t=0;items.forEach(function(i){t+=i.parsed.y;});return 'Total: '+t+' ingressos';}}}},
+        scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#888',font:{size:10}}},
+          y:{stacked:true,beginAtZero:true,grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#888'}}}}
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderHora);
+  else renderHora();
 })();
 </script>
 
