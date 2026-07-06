@@ -46,6 +46,7 @@ SHOW_TO_DATE = {
 OUT_VENDAS = 'vendas-data.json'
 OUT_TM     = 'ticketmaster-data.json'
 OUT_TIPOS  = 'vendas-tipos-data.json'
+OUT_HORA   = 'vendas-por-hora.json'
 
 # ── PLANILHA (fallback quando a API TM cai) ────────────────
 PLANILHA_ID  = os.environ.get('PLANILHA_LINHA_TEMPO_ID', '1osgyQdQlf21kbsZCt65CnrbsONTdiLyXAd32Hngvbfk')
@@ -701,6 +702,58 @@ def _load_existing(path):
         return None
 
 
+def aggregate_por_hora(tm_movs, moto_sales, auto_sales):
+    """Vendas por HORA DO DIA (0-23, horario de Brasilia), retroativo.
+    TM (campo date) vem em UTC -> converte pra BRT (-3h). Proprio (created_at)
+    assumido em BRT. So conta venda REAL (exclui cortesia amount=0)."""
+    moto = [0]*24; auto = [0]*24; rec = [0.0]*24
+    tm_dbg = [0]*24; pr_dbg = [0]*24   # debug: pico de cada fonte pra validar fuso
+    for m in (tm_movs or []):
+        if m.get('operation') != 'ISSUANCE':
+            continue
+        amt = float(m.get('amount', 0) or 0)
+        tc  = int(m.get('ticketCount', 0) or 0)
+        if amt == 0 or tc <= 0:            # cortesia/vazio nao e venda
+            continue
+        edi = _classify_show(m.get('tickets', []))
+        if not edi:
+            continue
+        ts = m.get('date') or ''
+        if 'T' not in ts or len(ts) < 13:
+            continue
+        try:
+            h = (int(ts[11:13]) - 3) % 24  # UTC -> BRT
+        except ValueError:
+            continue
+        tm_dbg[h] += tc
+        (moto if edi == 'moto' else auto)[h] += tc
+        rec[h] += amt
+    for lista, edi in ((moto_sales, 'moto'), (auto_sales, 'auto')):
+        for v in (lista or []):
+            if str(v.get('venda_status')) != '3':
+                continue
+            cs = v.get('created_at') or ''
+            if ' ' not in cs or len(cs) < 13:
+                continue
+            try:
+                h = int(cs[11:13])
+            except ValueError:
+                continue
+            q = len(v.get('qrcodes') or [])
+            pr_dbg[h] += q
+            (moto if edi == 'moto' else auto)[h] += q
+            rec[h] += float(v.get('venda_valor') or 0)
+    return {
+        'updated_at': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'fuso': 'America/Sao_Paulo (BRT)',
+        'obs': 'Acumulado de toda a campanha, por hora do dia. TM convertido de UTC pra BRT; Proprio assumido BRT.',
+        'por_hora': [{'hora': h, 'moto': moto[h], 'auto': auto[h],
+                      'total': moto[h]+auto[h], 'receita': round(rec[h], 2)} for h in range(24)],
+        '_debug_tm_brt': tm_dbg,
+        '_debug_proprio_raw': pr_dbg,
+    }
+
+
 def main():
     print('=== update-vendas-unificado.py ===')
     print(f'Início: {datetime.now().isoformat()}')
@@ -814,6 +867,10 @@ def main():
         # antigo no lugar pra dashboard mostrar 'stale' via updated_at antigo.
         print(f'  (mantendo {OUT_TM} antigo intacto — API e planilha falharam)')
     write_json(OUT_TIPOS, build_tipos_data(proprio_moto, proprio_auto, tm_moto, tm_auto))
+    # Vendas por hora do dia (so quando a API TM respondeu, pra nao perder ~80% do volume)
+    if tm_movs is not None:
+        write_json(OUT_HORA, aggregate_por_hora(tm_movs, moto_sales, auto_sales))
+        print(f'  {OUT_HORA} atualizado (vendas por hora do dia)')
 
     print(f'\nOK Sistema Próprio atualizado em {OUT_VENDAS} e {OUT_TIPOS} (parte proprio)')
     print(f'Ticketmaster: source={tm_source}')
