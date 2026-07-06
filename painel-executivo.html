@@ -737,9 +737,19 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 // ═══════════════════════════════════════════════
 const _AUTH_PWD = 'exec2026';
 const _AUTH_KEY = 'dash_auth_exec';
+function _setAuth(){
+  try{ localStorage.setItem(_AUTH_KEY,'1'); }catch(e){}
+  // cookie de 1 ano como reforco: persiste em navegadores/webviews (ex: WhatsApp)
+  // que limpam o localStorage ao fechar.
+  try{ document.cookie = _AUTH_KEY+'=1;path=/;max-age=31536000;samesite=lax'; }catch(e){}
+}
+function _isAuth(){
+  try{ if(localStorage.getItem(_AUTH_KEY)==='1') return true; }catch(e){}
+  return document.cookie.indexOf(_AUTH_KEY+'=1')!==-1;
+}
 function checkLogin(){
   if(document.getElementById('loginPwd').value===_AUTH_PWD){
-    localStorage.setItem(_AUTH_KEY,'1');
+    _setAuth();
     document.getElementById('loginOverlay').style.display='none';
     initDashboard();
   } else {
@@ -2542,11 +2552,21 @@ function initDashboard(){
   }, 30000);
 }
 
-// Auto-start if already authenticated
-if(localStorage.getItem(_AUTH_KEY)==='1'){
-  document.getElementById('loginOverlay').style.display='none';
-  initDashboard();
-}
+// Auto-start se ja autenticado (localStorage/cookie) OU se a senha veio na URL (?k=...)
+(function(){
+  try{
+    var k = new URLSearchParams(location.search).get('k');
+    if(!k && location.hash) k = new URLSearchParams(location.hash.slice(1)).get('k');
+    if(k && k===_AUTH_PWD){
+      _setAuth();
+      try{ history.replaceState(null,'',location.pathname); }catch(e){}
+    }
+  }catch(e){}
+  if(_isAuth()){
+    document.getElementById('loginOverlay').style.display='none';
+    initDashboard();
+  }
+})();
 
 // ═══════════════════════════════════════════════
 // EXEC — VENDAS MOTOS + AUTOS (Sistema Próprio vs TM)
