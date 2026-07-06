@@ -46,7 +46,7 @@ jobs:
         run: |
           git config user.name  "GitHub Actions"
           git config user.email "actions@github.com"
-          git add vendas-data.json ticketmaster-data.json vendas-tipos-data.json
+          git add vendas-data.json ticketmaster-data.json vendas-tipos-data.json vendas-por-hora.json
 
           if git diff --staged --quiet; then
             echo "Sem mudancas - nada a commitar"
@@ -59,7 +59,7 @@ jobs:
             git pull --rebase origin main 2>&1 || {
               echo "Pull falhou na tentativa $attempt, abortando rebase..."
               git rebase --abort 2>/dev/null || true
-              git add vendas-data.json ticketmaster-data.json vendas-tipos-data.json
+              git add vendas-data.json ticketmaster-data.json vendas-tipos-data.json vendas-por-hora.json
               git diff --staged --quiet || git commit -m "chore: update vendas+tm+tipos (snapshot unificado) [skip ci]" --allow-empty
             }
             if git push 2>&1; then
