@@ -2101,6 +2101,7 @@ function renderPainelExecutivo() {
   buildExecMixCharts();
   buildExecTimelineChart();
   buildExecTMCharts();
+  if(typeof buildExecHoraChart==='function') buildExecHoraChart();
   renderExecConversoes();
   if (TIPOS_DATA) renderTipos();
   const now = new Date();
@@ -2990,38 +2991,65 @@ if(b)b.addEventListener('click',function(){window.scrollTo({top:document.documen
 })();
 </script>
 
-<!-- ══ Grafico: vendas por horario do dia ══ -->
+<!-- ══ Grafico: vendas por horario do dia (respeita o filtro de data) ══ -->
 <script>
-(function(){
-  async function renderHora(){
-    var cv = document.getElementById('exec-chartHora');
-    if(!cv || typeof Chart==='undefined') return;
-    var d;
-    try{ d = await (await fetch('vendas-por-hora.json?t='+Date.now(),{cache:'no-store'})).json(); }
-    catch(e){ return; }
-    var ph = d.por_hora||[];
-    if(!ph.length) return;
-    var labels = ph.map(function(x){return x.hora+'h';});
-    var peak = ph.reduce(function(a,b){return b.total>a.total?b:a;}, ph[0]);
-    var sub = document.getElementById('horaSub');
-    if(sub) sub.innerHTML = 'Acumulado da campanha &middot; horário de Brasília &middot; '+
-      '<b style="color:#C8FF00">melhor horário: '+peak.hora+'h ('+peak.total.toLocaleString('pt-BR')+' ingressos)</b>';
-    if(window._chHora) window._chHora.destroy();
-    window._chHora = new Chart(cv.getContext('2d'), {
-      type:'bar',
-      data:{labels:labels, datasets:[
-        {label:'Motos',data:ph.map(function(x){return x.moto;}),backgroundColor:'#C8FF00',stack:'s',borderRadius:3},
-        {label:'Autos',data:ph.map(function(x){return x.auto;}),backgroundColor:'#2196F3',stack:'s',borderRadius:3}
-      ]},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false},
-          tooltip:{callbacks:{footer:function(items){var t=0;items.forEach(function(i){t+=i.parsed.y;});return 'Total: '+t+' ingressos';}}}},
-        scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#888',font:{size:10}}},
-          y:{stacked:true,beginAtZero:true,grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#888'}}}}
+var HORA_DATA = null;
+function _horaBuckets(){
+  if(!HORA_DATA) return null;
+  var from = (typeof execFiltFrom!=='undefined') ? execFiltFrom : null;
+  var to   = (typeof execFiltTo!=='undefined')   ? execFiltTo   : null;
+  var moto = new Array(24).fill(0), auto = new Array(24).fill(0);
+  if(!from && !to){
+    (HORA_DATA.por_hora||[]).forEach(function(x){ moto[x.hora]=x.moto; auto[x.hora]=x.auto; });
+  } else {
+    var pdh = HORA_DATA.por_dia_hora||{};
+    Object.keys(pdh).forEach(function(dt){
+      if(from && dt<from) return;
+      if(to && dt>to) return;
+      var d=pdh[dt];
+      for(var h=0;h<24;h++){ moto[h]+=(d.moto[h]||0); auto[h]+=(d.auto[h]||0); }
     });
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderHora);
-  else renderHora();
+  return {moto:moto, auto:auto};
+}
+function buildExecHoraChart(){
+  var cv=document.getElementById('exec-chartHora');
+  if(!cv || typeof Chart==='undefined' || !HORA_DATA) return;
+  var b=_horaBuckets(); if(!b) return;
+  var totals=b.moto.map(function(m,h){return m+b.auto[h];});
+  var peakH=0, peakV=-1; totals.forEach(function(t,h){ if(t>peakV){peakV=t;peakH=h;} });
+  var totalPer=totals.reduce(function(a,c){return a+c;},0);
+  var sub=document.getElementById('horaSub');
+  if(sub){
+    var from=(typeof execFiltFrom!=='undefined')?execFiltFrom:null;
+    var per = from ? 'período selecionado' : 'campanha toda';
+    sub.innerHTML='Horário de Brasília &middot; '+per+' &middot; '+
+      (totalPer>0 ? '<b style="color:#C8FF00">melhor horário: '+peakH+'h ('+peakV.toLocaleString('pt-BR')+' ingressos)</b>'
+                  : 'sem vendas no período');
+  }
+  var labels=[]; for(var h=0;h<24;h++) labels.push(h+'h');
+  if(window._chHora) window._chHora.destroy();
+  window._chHora=new Chart(cv.getContext('2d'),{
+    type:'bar',
+    data:{labels:labels,datasets:[
+      {label:'Motos',data:b.moto,backgroundColor:'#C8FF00',stack:'s',borderRadius:3},
+      {label:'Autos',data:b.auto,backgroundColor:'#2196F3',stack:'s',borderRadius:3}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{footer:function(items){var t=0;items.forEach(function(i){t+=i.parsed.y;});return 'Total: '+t+' ingressos';}}}},
+      scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#888',font:{size:10}}},
+        y:{stacked:true,beginAtZero:true,grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#888'}}}}
+  });
+}
+(function(){
+  async function load(){
+    try{ HORA_DATA = await (await fetch('vendas-por-hora.json?t='+Date.now(),{cache:'no-store'})).json(); }
+    catch(e){ return; }
+    buildExecHoraChart();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',load);
+  else load();
 })();
 </script>
 

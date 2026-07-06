@@ -702,55 +702,74 @@ def _load_existing(path):
         return None
 
 
+_BRT = timezone(timedelta(hours=-3))
+
+
+def _tm_brt(ts):
+    """Timestamp UTC do TM -> (data_brt 'YYYY-MM-DD', hora_brt 0-23). None se invalido."""
+    s = (ts or '').strip().replace('Z', '+00:00')
+    try:
+        dt = datetime.fromisoformat(s)
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    dt = dt.astimezone(_BRT)
+    return dt.strftime('%Y-%m-%d'), dt.hour
+
+
+def _proprio_brt(cs):
+    """created_at 'YYYY-MM-DD HH:MM:SS' (ja BRT) -> (data, hora). None se invalido."""
+    s = (cs or '').strip().replace(' ', 'T')
+    try:
+        dt = datetime.fromisoformat(s)
+    except ValueError:
+        return None
+    return dt.strftime('%Y-%m-%d'), dt.hour
+
+
 def aggregate_por_hora(tm_movs, moto_sales, auto_sales):
-    """Vendas por HORA DO DIA (0-23, horario de Brasilia), retroativo.
-    TM (campo date) vem em UTC -> converte pra BRT (-3h). Proprio (created_at)
-    assumido em BRT. So conta venda REAL (exclui cortesia amount=0)."""
-    moto = [0]*24; auto = [0]*24; rec = [0.0]*24
-    tm_dbg = [0]*24; pr_dbg = [0]*24   # debug: pico de cada fonte pra validar fuso
+    """Vendas por HORA DO DIA (0-23, BRT), retroativo. Guarda overall (campanha
+    toda) E por data, pra o dashboard filtrar por periodo. TM (UTC) -> BRT (-3h);
+    Proprio (created_at) ja em BRT. So conta venda REAL (exclui cortesia)."""
+    overall = {'moto': [0]*24, 'auto': [0]*24}
+    por_data = {}   # 'YYYY-MM-DD' -> {'moto':[24], 'auto':[24]}
+
+    def add(data, hora, edi, q):
+        overall[edi][hora] += q
+        d = por_data.get(data)
+        if d is None:
+            d = por_data[data] = {'moto': [0]*24, 'auto': [0]*24}
+        d[edi][hora] += q
+
     for m in (tm_movs or []):
         if m.get('operation') != 'ISSUANCE':
             continue
-        amt = float(m.get('amount', 0) or 0)
-        tc  = int(m.get('ticketCount', 0) or 0)
-        if amt == 0 or tc <= 0:            # cortesia/vazio nao e venda
-            continue
+        if float(m.get('amount', 0) or 0) == 0 or int(m.get('ticketCount', 0) or 0) <= 0:
+            continue   # cortesia/vazio nao e venda
         edi = _classify_show(m.get('tickets', []))
         if not edi:
             continue
-        ts = m.get('date') or ''
-        if 'T' not in ts or len(ts) < 13:
-            continue
-        try:
-            h = (int(ts[11:13]) - 3) % 24  # UTC -> BRT
-        except ValueError:
-            continue
-        tm_dbg[h] += tc
-        (moto if edi == 'moto' else auto)[h] += tc
-        rec[h] += amt
+        r = _tm_brt(m.get('date'))
+        if r:
+            add(r[0], r[1], edi, int(m.get('ticketCount', 0) or 0))
+
     for lista, edi in ((moto_sales, 'moto'), (auto_sales, 'auto')):
         for v in (lista or []):
             if str(v.get('venda_status')) != '3':
                 continue
-            cs = v.get('created_at') or ''
-            if ' ' not in cs or len(cs) < 13:
-                continue
-            try:
-                h = int(cs[11:13])
-            except ValueError:
-                continue
-            q = len(v.get('qrcodes') or [])
-            pr_dbg[h] += q
-            (moto if edi == 'moto' else auto)[h] += q
-            rec[h] += float(v.get('venda_valor') or 0)
+            r = _proprio_brt(v.get('created_at'))
+            if r:
+                add(r[0], r[1], edi, len(v.get('qrcodes') or []))
+
+    por_hora = [{'hora': h, 'moto': overall['moto'][h], 'auto': overall['auto'][h],
+                 'total': overall['moto'][h]+overall['auto'][h]} for h in range(24)]
     return {
         'updated_at': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
         'fuso': 'America/Sao_Paulo (BRT)',
-        'obs': 'Acumulado de toda a campanha, por hora do dia. TM convertido de UTC pra BRT; Proprio assumido BRT.',
-        'por_hora': [{'hora': h, 'moto': moto[h], 'auto': auto[h],
-                      'total': moto[h]+auto[h], 'receita': round(rec[h], 2)} for h in range(24)],
-        '_debug_tm_brt': tm_dbg,
-        '_debug_proprio_raw': pr_dbg,
+        'obs': 'por_hora = campanha toda. por_dia_hora[data] = {moto:[24], auto:[24]} pro filtro de data.',
+        'por_hora': por_hora,
+        'por_dia_hora': {d: por_data[d] for d in sorted(por_data)},
     }
 
 
