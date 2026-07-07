@@ -510,6 +510,21 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 
 </div><!-- /exec-charts-grid -->
 
+<!-- ══ VENDAS POR DIA DA SEMANA ══ -->
+<div class="exec-chart-card" style="margin-top:16px" id="diaSemanaCard">
+  <div class="section-header" style="margin-bottom:10px">
+    <div>
+      <div class="section-title">📅 Vendas por dia da semana</div>
+      <div style="font-size:.7rem;color:#666;margin-top:3px" id="diaSemanaSub">Acumulado da campanha &middot; horário de Brasília</div>
+    </div>
+  </div>
+  <div class="exec-leg">
+    <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#C8FF00"></span>Motos</div>
+    <div class="exec-leg-item"><span class="exec-leg-dot" style="background:#2196F3"></span>Autos</div>
+  </div>
+  <div class="exec-chart-wrap"><canvas id="exec-chartDiaSemana"></canvas></div>
+</div>
+
 <!-- ══ VENDAS POR HORARIO DO DIA ══ -->
 <div class="exec-chart-card" style="margin-top:16px" id="horaCard">
   <div class="section-header" style="margin-bottom:10px">
@@ -2101,6 +2116,7 @@ function renderPainelExecutivo() {
   buildExecMixCharts();
   buildExecTimelineChart();
   buildExecTMCharts();
+  if(typeof buildExecDiaSemanaChart==='function') buildExecDiaSemanaChart();
   if(typeof buildExecHoraChart==='function') buildExecHoraChart();
   renderExecConversoes();
   if (TIPOS_DATA) renderTipos();
@@ -3049,10 +3065,58 @@ function buildExecHoraChart(){
         y:{stacked:true,beginAtZero:true,grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#888'}}}}
   });
 }
+var _DIAS_SEM = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+function _diaSemanaBuckets(){
+  if(!HORA_DATA) return null;
+  var from = (typeof execFiltFrom!=='undefined') ? execFiltFrom : null;
+  var to   = (typeof execFiltTo!=='undefined')   ? execFiltTo   : null;
+  var moto = new Array(7).fill(0), auto = new Array(7).fill(0);
+  var pdh = HORA_DATA.por_dia_hora||{};
+  Object.keys(pdh).forEach(function(dt){
+    if(from && dt<from) return;
+    if(to && dt>to) return;
+    var wd = new Date(dt+'T00:00:00').getDay();  // 0=Dom .. 6=Sáb
+    var d=pdh[dt];
+    var sm=0, sa=0;
+    for(var h=0;h<24;h++){ sm+=(d.moto[h]||0); sa+=(d.auto[h]||0); }
+    moto[wd]+=sm; auto[wd]+=sa;
+  });
+  return {moto:moto, auto:auto};
+}
+function buildExecDiaSemanaChart(){
+  var cv=document.getElementById('exec-chartDiaSemana');
+  if(!cv || typeof Chart==='undefined' || !HORA_DATA) return;
+  var b=_diaSemanaBuckets(); if(!b) return;
+  var totals=b.moto.map(function(m,i){return m+b.auto[i];});
+  var peakI=0, peakV=-1; totals.forEach(function(t,i){ if(t>peakV){peakV=t;peakI=i;} });
+  var totalPer=totals.reduce(function(a,c){return a+c;},0);
+  var sub=document.getElementById('diaSemanaSub');
+  if(sub){
+    var from=(typeof execFiltFrom!=='undefined')?execFiltFrom:null;
+    var per = from ? 'período selecionado' : 'campanha toda';
+    sub.innerHTML='Horário de Brasília &middot; '+per+' &middot; '+
+      (totalPer>0 ? '<b style="color:#C8FF00">dia que mais vende: '+_DIAS_SEM[peakI]+' ('+peakV.toLocaleString('pt-BR')+' ingressos)</b>'
+                  : 'sem vendas no período');
+  }
+  if(window._chDiaSem) window._chDiaSem.destroy();
+  window._chDiaSem=new Chart(cv.getContext('2d'),{
+    type:'bar',
+    data:{labels:_DIAS_SEM,datasets:[
+      {label:'Motos',data:b.moto,backgroundColor:'#C8FF00',stack:'s',borderRadius:3},
+      {label:'Autos',data:b.auto,backgroundColor:'#2196F3',stack:'s',borderRadius:3}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:300},
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{footer:function(items){var t=0;items.forEach(function(i){t+=i.parsed.y;});return 'Total: '+t+' ingressos';}}}},
+      scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#888',font:{size:11}}},
+        y:{stacked:true,beginAtZero:true,grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#888'}}}}
+  });
+}
 (function(){
   async function load(){
     try{ HORA_DATA = await (await fetch('vendas-por-hora.json?t='+Date.now(),{cache:'no-store'})).json(); }
     catch(e){ return; }
+    buildExecDiaSemanaChart();
     buildExecHoraChart();
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',load);
