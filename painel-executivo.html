@@ -388,19 +388,27 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
           <div class="section-title">&#127873; Cortesias
             <span style="font-weight:600;font-size:.6rem;color:#ff9d00;margin-left:10px;padding:3px 8px;border:1px solid #ff9d00;border-radius:10px;letter-spacing:.06em;vertical-align:middle">NÃO ENTRAM EM VENDAS</span>
           </div>
-          <div style="font-size:.7rem;color:#666;margin-top:4px">Imprensa, patrocinador, equipe e convidados &middot; Apenas Ticket Master</div>
+          <div style="font-size:.7rem;color:#666;margin-top:4px">Imprensa, patrocinador, equipe e convidados &middot; Digital (Ticket Master) + Físico (manual)</div>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px">
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:14px 16px">
-          <div style="font-size:.6rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:4px">&#127949;&#65039; Motos &middot; Cortesias</div>
+          <div style="font-size:.6rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:8px">&#127949;&#65039; Motos &middot; Cortesias</div>
           <div id="exec-cortesias-moto-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.9rem;color:#ff9d00;line-height:1">&mdash;</div>
-          <div id="exec-cortesias-moto-meta" style="font-size:.65rem;color:#888;margin-top:6px">&mdash;</div>
+          <div style="display:flex;gap:14px;margin-top:8px">
+            <div><span style="font-size:.58rem;color:#777;text-transform:uppercase;letter-spacing:.06em">Digital</span><div id="exec-cortesias-moto-dig" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;color:#ccc">&mdash;</div></div>
+            <div style="border-left:1px solid #2a2a2a;padding-left:14px"><span style="font-size:.58rem;color:#777;text-transform:uppercase;letter-spacing:.06em">Físico</span><div id="exec-cortesias-moto-fis" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;color:#ccc">&mdash;</div></div>
+          </div>
+          <div id="exec-cortesias-moto-meta" style="font-size:.65rem;color:#888;margin-top:8px">&mdash;</div>
         </div>
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:14px 16px">
-          <div style="font-size:.6rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:4px">&#128663; Autos &middot; Cortesias</div>
+          <div style="font-size:.6rem;letter-spacing:.08em;color:#888;text-transform:uppercase;margin-bottom:8px">&#128663; Autos &middot; Cortesias</div>
           <div id="exec-cortesias-auto-val" style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.9rem;color:#ff9d00;line-height:1">&mdash;</div>
-          <div id="exec-cortesias-auto-meta" style="font-size:.65rem;color:#888;margin-top:6px">&mdash;</div>
+          <div style="display:flex;gap:14px;margin-top:8px">
+            <div><span style="font-size:.58rem;color:#777;text-transform:uppercase;letter-spacing:.06em">Digital</span><div id="exec-cortesias-auto-dig" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;color:#ccc">&mdash;</div></div>
+            <div style="border-left:1px solid #2a2a2a;padding-left:14px"><span style="font-size:.58rem;color:#777;text-transform:uppercase;letter-spacing:.06em">Físico</span><div id="exec-cortesias-auto-fis" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;color:#ccc">&mdash;</div></div>
+          </div>
+          <div id="exec-cortesias-auto-meta" style="font-size:.65rem;color:#888;margin-top:8px">&mdash;</div>
         </div>
       </div>
     </div>
@@ -412,7 +420,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="section-header" style="margin-bottom:10px">
         <div>
           <div class="section-title">🎫 Tipos de Ingresso · Motos</div>
-          <div style="font-size:.7rem;color:#666;margin-top:3px">Sistema Próprio + Ticket Master</div>
+          <div style="font-size:.7rem;color:#666;margin-top:3px">Sistema Próprio + Ticket Master &middot; apenas vendas (cortesias no card acima)</div>
         </div>
         <span class="badge" id="execTiposMotoBadge">—</span>
       </div>
@@ -424,7 +432,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <div class="section-header" style="margin-bottom:10px">
         <div>
           <div class="section-title">🎫 Tipos de Ingresso · Autos</div>
-          <div style="font-size:.7rem;color:#666;margin-top:3px">Sistema Próprio + Ticket Master</div>
+          <div style="font-size:.7rem;color:#666;margin-top:3px">Sistema Próprio + Ticket Master &middot; apenas vendas (cortesias no card acima)</div>
         </div>
         <span class="badge" id="execTiposAutoBadge">—</span>
       </div>
@@ -876,10 +884,26 @@ let GADS_DATA = null;
 // totals de venda — sao linhas paralelas no agregado da TM (imprensa,
 // patrocinador, equipe). Esse objeto SO alimenta o card de cortesias.
 const TM_CORTESIAS = {
-  moto: 0, auto: 0,           // total acumulado da campanha (liquido: emitidas - canceladas)
-  motoHoje: 0, autoHoje: 0,   // cortesias do dia (UTC)
+  moto: 0, auto: 0,           // cortesia DIGITAL acumulada da campanha (liquido: emitidas - canceladas)
+  motoHoje: 0, autoHoje: 0,   // cortesias digitais do dia (UTC)
   motoVendas: 0, autoVendas: 0, // total de VENDAS REAIS — usado SO pra mostrar % do total emitido
 };
+// Cortesia FISICA — alimentada manualmente (cortesias-fisicas-data.json). Nao
+// tem no digital, entao o usuario passa 1 numero por evento e eu preencho.
+const CORTESIAS_FISICAS = { moto: 0, auto: 0 };
+
+async function fetchCortesiasFisicas() {
+  try {
+    const res = await fetch('cortesias-fisicas-data.json?t=' + Date.now(), {cache: 'no-store'});
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const d = await res.json();
+    CORTESIAS_FISICAS.moto = +d.moto || 0;
+    CORTESIAS_FISICAS.auto = +d.auto || 0;
+  } catch (e) {
+    console.warn('[CortesiasFisicas] erro:', e.message);
+  }
+  renderCortesiasCard();
+}
 
 function renderCortesiasCard() {
   const elMv = document.getElementById('exec-cortesias-moto-val');
@@ -888,20 +912,28 @@ function renderCortesiasCard() {
   const elAm = document.getElementById('exec-cortesias-auto-meta');
   if (!elMv || !elAv) return;
   const fmt = n => (n || 0).toLocaleString('pt-BR');
-  elMv.textContent = fmt(TM_CORTESIAS.moto);
-  elAv.textContent = fmt(TM_CORTESIAS.auto);
-  // % do total emitido = cortesias / (cortesias + vendas). Mostra o
-  // peso das cortesias no total de ingressos circulando, sem afetar
-  // o numero de venda em si.
-  const motoTotalEmitido = TM_CORTESIAS.moto + TM_CORTESIAS.motoVendas;
-  const autoTotalEmitido = TM_CORTESIAS.auto + TM_CORTESIAS.autoVendas;
-  const motoPct = motoTotalEmitido > 0 ? (TM_CORTESIAS.moto / motoTotalEmitido * 100) : 0;
-  const autoPct = autoTotalEmitido > 0 ? (TM_CORTESIAS.auto / autoTotalEmitido * 100) : 0;
+
+  // Total da cortesia = digital (TM) + fisica (manual), por evento.
+  const motoDig = TM_CORTESIAS.moto, autoDig = TM_CORTESIAS.auto;
+  const motoFis = CORTESIAS_FISICAS.moto, autoFis = CORTESIAS_FISICAS.auto;
+  const motoTot = motoDig + motoFis, autoTot = autoDig + autoFis;
+
+  elMv.textContent = fmt(motoTot);
+  elAv.textContent = fmt(autoTot);
+  const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = fmt(v); };
+  setTxt('exec-cortesias-moto-dig', motoDig); setTxt('exec-cortesias-moto-fis', motoFis);
+  setTxt('exec-cortesias-auto-dig', autoDig); setTxt('exec-cortesias-auto-fis', autoFis);
+
+  // % do total emitido = cortesias (digital+fisica) / (cortesias + vendas).
+  const motoTotalEmitido = motoTot + TM_CORTESIAS.motoVendas;
+  const autoTotalEmitido = autoTot + TM_CORTESIAS.autoVendas;
+  const motoPct = motoTotalEmitido > 0 ? (motoTot / motoTotalEmitido * 100) : 0;
+  const autoPct = autoTotalEmitido > 0 ? (autoTot / autoTotalEmitido * 100) : 0;
   elMm.innerHTML =
-    'Hoje: <b style="color:#ccc">' + fmt(TM_CORTESIAS.motoHoje) + '</b>' +
+    'Hoje (digital): <b style="color:#ccc">' + fmt(TM_CORTESIAS.motoHoje) + '</b>' +
     ' &middot; ' + motoPct.toFixed(1) + '% do total emitido';
   elAm.innerHTML =
-    'Hoje: <b style="color:#ccc">' + fmt(TM_CORTESIAS.autoHoje) + '</b>' +
+    'Hoje (digital): <b style="color:#ccc">' + fmt(TM_CORTESIAS.autoHoje) + '</b>' +
     ' &middot; ' + autoPct.toFixed(1) + '% do total emitido';
 }
 
@@ -2560,6 +2592,7 @@ function initDashboard(){
     fetchMetaData(),
     tiktokLoad(),
     fetchTipos(),
+    fetchCortesiasFisicas(),
     fetchInvestimento2025()
   ]).then(() => renderPainelExecutivo());
 

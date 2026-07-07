@@ -169,6 +169,15 @@ def aggregate_tm(movements):
 
         amt = float(m.get('amount', 0))
         qtd = int(m.get('ticketCount', 0))
+
+        # Cortesia = ISSUANCE com R$ 0 (mesma regra do update-ticketmaster.py).
+        # NAO e venda comercial, entao nao entra em "Tipos de Ingresso" (que so
+        # mostra venda). A cortesia digital ja e contabilizada, separada, no card
+        # de Cortesias via ticketmaster-data.json. Cancelamento/estorno (amount != 0)
+        # continua sendo processado normalmente pra abater a venda correspondente.
+        if op == 'ISSUANCE' and amt == 0 and qtd > 0:
+            continue
+
         rate_name = (m.get('rate') or {}).get('name', '')
         rate_cat  = ((m.get('rate') or {}).get('category') or {}).get('name', '')
         tipo_mi = classify_meia_inteira(rate_name, rate_cat)

@@ -367,6 +367,14 @@ def aggregate_tm_tipos(movements):
 
         amt       = float(m.get('amount', 0))
         qtd       = int(m.get('ticketCount', 0))
+
+        # Cortesia = ISSUANCE com R$ 0 (mesma regra do card de cortesias).
+        # NAO e venda comercial, entao nao entra em "Tipos de Ingresso" (so venda).
+        # A cortesia digital ja e contabilizada, separada, no card de Cortesias.
+        # Cancelamento/estorno (amount != 0) segue sendo processado pra abater a venda.
+        if op == 'ISSUANCE' and amt == 0 and qtd > 0:
+            continue
+
         rate_name = (m.get('rate') or {}).get('name', '')
         rate_cat  = ((m.get('rate') or {}).get('category') or {}).get('name', '')
         tipo_mi   = _classify_meia_inteira(rate_name, rate_cat)
