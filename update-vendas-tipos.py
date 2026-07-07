@@ -121,11 +121,14 @@ def aggregate_tm(movements):
     }
 
     issuance_date = {}
+    cortesia_purchase = set()  # compras cuja emissao original foi cortesia (amt=0)
     for m in movements:
         if m.get('operation') == 'ISSUANCE':
             pid = (m.get('purchase') or {}).get('id')
             if pid is not None and pid not in issuance_date:
                 issuance_date[pid] = (m.get('date') or '')[:10]
+            if pid is not None and float(m.get('amount', 0)) == 0 and int(m.get('ticketCount', 0)) > 0:
+                cortesia_purchase.add(pid)
 
     def make_bucket():
         return {
@@ -170,12 +173,18 @@ def aggregate_tm(movements):
         amt = float(m.get('amount', 0))
         qtd = int(m.get('ticketCount', 0))
 
-        # Cortesia = ISSUANCE com R$ 0 (mesma regra do update-ticketmaster.py).
-        # NAO e venda comercial, entao nao entra em "Tipos de Ingresso" (que so
-        # mostra venda). A cortesia digital ja e contabilizada, separada, no card
-        # de Cortesias via ticketmaster-data.json. Cancelamento/estorno (amount != 0)
-        # continua sendo processado normalmente pra abater a venda correspondente.
-        if op == 'ISSUANCE' and amt == 0 and qtd > 0:
+        # Cortesia fora dos Tipos (so venda). Emissao cortesia = R$ 0; o
+        # cancelamento dela pertence a uma compra que nasceu cortesia (pid no set),
+        # entao tambem sai — senao viraria -qtd nas vendas. Cortesia digital fica
+        # no card de Cortesias via ticketmaster-data.json.
+        pid = (m.get('purchase') or {}).get('id')
+        if op == 'ISSUANCE':
+            is_cortesia = (amt == 0 and qtd > 0)
+        elif op in ('CANCELLATION', 'REFUND'):
+            is_cortesia = pid in cortesia_purchase
+        else:
+            is_cortesia = False
+        if is_cortesia:
             continue
 
         rate_name = (m.get('rate') or {}).get('name', '')

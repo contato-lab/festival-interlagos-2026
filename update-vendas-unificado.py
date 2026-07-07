@@ -319,13 +319,21 @@ def aggregate_tm_totais(movements):
 
 
 def aggregate_tm_tipos(movements):
-    """Agrega para vendas-tipos-data.json (breakdown por product.name + meia/inteira)."""
+    """Agrega para vendas-tipos-data.json (breakdown por product.name + meia/inteira).
+
+    So VENDA entra aqui: cortesia (ISSUANCE R$ 0) e o cancelamento dela ficam de
+    fora, senao o cancelamento cairia nas vendas e deixaria a qtd negativa (mesmo
+    bug tratado em aggregate_tm_totais). A cortesia digital e mostrada, separada,
+    no card de Cortesias."""
     issuance_date = {}
+    cortesia_purchase = set()  # compras cuja emissao original foi cortesia (amt=0)
     for m in movements:
         if m.get('operation') == 'ISSUANCE':
             pid = (m.get('purchase') or {}).get('id')
             if pid is not None and pid not in issuance_date:
                 issuance_date[pid] = (m.get('date') or '')[:10]
+            if pid is not None and float(m.get('amount', 0)) == 0 and int(m.get('ticketCount', 0)) > 0:
+                cortesia_purchase.add(pid)
 
     def make():
         return {
@@ -368,11 +376,17 @@ def aggregate_tm_tipos(movements):
         amt       = float(m.get('amount', 0))
         qtd       = int(m.get('ticketCount', 0))
 
-        # Cortesia = ISSUANCE com R$ 0 (mesma regra do card de cortesias).
-        # NAO e venda comercial, entao nao entra em "Tipos de Ingresso" (so venda).
-        # A cortesia digital ja e contabilizada, separada, no card de Cortesias.
-        # Cancelamento/estorno (amount != 0) segue sendo processado pra abater a venda.
-        if op == 'ISSUANCE' and amt == 0 and qtd > 0:
+        # Cortesia fora dos Tipos (so venda). Emissao cortesia = R$ 0; o
+        # cancelamento dela pertence a uma compra que nasceu cortesia (pid no
+        # set), entao tambem sai — assim nao vira -qtd nas vendas.
+        pid = (m.get('purchase') or {}).get('id')
+        if op == 'ISSUANCE':
+            is_cortesia = (amt == 0 and qtd > 0)
+        elif op in ('CANCELLATION', 'REFUND'):
+            is_cortesia = pid in cortesia_purchase
+        else:
+            is_cortesia = False
+        if is_cortesia:
             continue
 
         rate_name = (m.get('rate') or {}).get('name', '')
