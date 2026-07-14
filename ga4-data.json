@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-07-14T15:47:25.472644+00:00",
+  "updated_at": "2026-07-14T16:53:59.938258+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-04-15",
     "end": "2026-07-14"
   },
   "totals": {
-    "sessions": 757936,
-    "users": 678135,
+    "sessions": 757942,
+    "users": 678139,
     "new_users": 543849,
-    "pageviews": 1570209,
-    "events": 3849189,
+    "pageviews": 1570223,
+    "events": 3849213,
     "conversions": 7231.0,
     "pages_per_session": 2.07,
-    "avg_bounce_rate": 53.67
+    "avg_bounce_rate": 53.63
   },
   "daily_series": [
     {
@@ -1005,6 +1005,17 @@
       "conversions": 103.0,
       "bounce_rate": 49.45,
       "avg_session_s": 159.1
+    },
+    {
+      "date": "2026-07-14",
+      "sessions": 6,
+      "users": 4,
+      "new_users": 0,
+      "pageviews": 14,
+      "events": 24,
+      "conversions": 0.0,
+      "bounce_rate": 50.0,
+      "avg_session_s": 218.5
     }
   ],
   "traffic_sources": [
@@ -1082,7 +1093,7 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 919424,
+      "pageviews": 919426,
       "sessions": 523739
     },
     {
@@ -1097,7 +1108,7 @@
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-moto",
-      "pageviews": 91318,
+      "pageviews": 91321,
       "sessions": 67066
     },
     {
@@ -1122,8 +1133,8 @@
     },
     {
       "page": "/login",
-      "pageviews": 22142,
-      "sessions": 11455
+      "pageviews": 22147,
+      "sessions": 11460
     },
     {
       "page": "/conta/informacoes/",
@@ -2042,20 +2053,20 @@
       "medium": "paid",
       "new_users": 110035,
       "sessions": 154985,
-      "pageviews": 288428,
+      "pageviews": 288436,
       "avg_session_s": 66.2,
       "engagement_rate": 32.2,
-      "event_count": 688875
+      "event_count": 688887
     },
     {
       "source": "google",
       "medium": "cpc",
       "new_users": 72754,
       "sessions": 115223,
-      "pageviews": 342279,
+      "pageviews": 342282,
       "avg_session_s": 204.3,
       "engagement_rate": 60.86,
-      "event_count": 802077
+      "event_count": 802084
     },
     {
       "source": "(direct)",
@@ -2172,10 +2183,10 @@
       "medium": "referral",
       "new_users": 6547,
       "sessions": 11343,
-      "pageviews": 17487,
+      "pageviews": 17490,
       "avg_session_s": 290.4,
       "engagement_rate": 64.78,
-      "event_count": 60858
+      "event_count": 60863
     },
     {
       "source": "Tiktok",
@@ -50508,6 +50519,39 @@
       "eng_dur_s": 201.0,
       "eng_sessions": 1,
       "event_count": 15
+    },
+    {
+      "date": "2026-07-14",
+      "source": "google",
+      "medium": "cpc",
+      "new_users": 0,
+      "sessions": 1,
+      "pageviews": 3,
+      "eng_dur_s": 10.0,
+      "eng_sessions": 1,
+      "event_count": 7
+    },
+    {
+      "date": "2026-07-14",
+      "source": "ig",
+      "medium": "paid",
+      "new_users": 0,
+      "sessions": 3,
+      "pageviews": 8,
+      "eng_dur_s": 1.0,
+      "eng_sessions": 1,
+      "event_count": 12
+    },
+    {
+      "date": "2026-07-14",
+      "source": "ingressosmoto.festivalinterlagos.com.br",
+      "medium": "referral",
+      "new_users": 0,
+      "sessions": 2,
+      "pageviews": 3,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 1,
+      "event_count": 5
     }
   ]
 }
