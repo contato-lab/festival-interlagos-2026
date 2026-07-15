@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Campanha DOOH no ar · Suhai Festival Interlagos 2026</title>
+<style>
+  :root{
+    --ink:#0A0A0A; --panel:#141414; --panel2:#1B1B1B; --line:rgba(255,255,255,.09);
+    --text:#F5F4F0; --text2:#A8A49C; --text3:#6E6B65;
+    --red:#E31E24; --lime:#C8FF00;
+    --disp:'Bahnschrift','Arial Narrow','Roboto Condensed',sans-serif;
+    --body:'Segoe UI',-apple-system,'Inter',sans-serif;
+    --mono:ui-monospace,'Cascadia Code',Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text);font-family:var(--body);
+    font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1020px;margin:0 auto;padding:0 24px 90px}
+  h1,h2{font-family:var(--disp);text-wrap:balance;margin:0}
+  .n{font-variant-numeric:tabular-nums}
+
+  header{padding:52px 0 34px;border-bottom:1px solid var(--line)}
+  .status{display:inline-flex;align-items:center;gap:8px;font-family:var(--disp);
+    font-weight:700;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--lime);background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.28);
+    border-radius:20px;padding:6px 14px 6px 10px;margin-bottom:18px}
+  .status .dot{width:8px;height:8px;border-radius:50%;background:var(--lime);
+    box-shadow:0 0 0 0 rgba(200,255,0,.5);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(200,255,0,.45)}70%{box-shadow:0 0 0 8px rgba(200,255,0,0)}100%{box-shadow:0 0 0 0 rgba(200,255,0,0)}}
+  @media (prefers-reduced-motion: reduce){.status .dot{animation:none}}
+  h1{font-weight:800;font-size:clamp(2rem,5vw,3rem);line-height:1.04;letter-spacing:-.01em}
+  h1 .red{color:var(--red)}
+  .sub{color:var(--text2);margin-top:14px;font-size:1rem;max-width:60ch}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+  .chip{font-family:var(--mono);font-size:.72rem;color:var(--text2);border:1px solid var(--line);
+    background:var(--panel);border-radius:20px;padding:5px 13px}
+  .chip b{color:var(--text)}
+
+  .totalbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line);
+    margin-top:28px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .totalbar .cell{background:var(--panel);padding:18px 20px}
+  .totalbar .lbl{font-family:var(--disp);font-size:.64rem;letter-spacing:.13em;text-transform:uppercase;color:var(--text3)}
+  .totalbar .val{font-family:var(--disp);font-weight:800;font-size:1.7rem;margin-top:6px;color:var(--text)}
+  .totalbar .val.red{color:var(--red)}
+  .totalbar .sub2{font-size:.68rem;color:var(--text3);margin-top:3px}
+
+  .loc{margin-top:58px}
+  .loc-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    border-left:3px solid var(--red);padding-left:16px;margin-bottom:20px}
+  .loc-name{font-family:var(--disp);font-weight:800;font-size:1.5rem;text-transform:uppercase;letter-spacing:.01em}
+  .loc-tag{font-family:var(--mono);font-size:.7rem;color:var(--text3)}
+
+  .statrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:22px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .stat .v{font-family:var(--disp);font-weight:800;font-size:1.6rem;color:var(--lime);line-height:1.05}
+  .stat .l{font-size:.76rem;color:var(--text2);margin-top:7px;line-height:1.4}
+
+  .videogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+  .vcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .vcard video{width:100%;display:block;background:#000;aspect-ratio:9/16;object-fit:cover}
+  .vcard.wide{grid-column:1/-1}
+  .vcard.wide video{aspect-ratio:16/9;object-fit:contain;max-height:70vh}
+  .vcap{padding:10px 13px;font-family:var(--mono);font-size:.7rem;color:var(--text3)}
+
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel);margin-top:22px}
+  table{border-collapse:collapse;width:100%;font-size:.85rem;min-width:600px}
+  th,td{padding:10px 16px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{font-family:var(--disp);text-transform:uppercase;font-size:.66rem;letter-spacing:.1em;color:var(--text3);font-weight:700}
+  td{color:var(--text2)}
+  td.b{color:var(--text);font-weight:600}
+  td.num{font-family:var(--mono);color:var(--lime);font-variant-numeric:tabular-nums;text-align:right}
+  tr:last-child td{border-bottom:none}
+
+  .note{margin-top:16px;font-size:.84rem;color:var(--text3);padding-top:14px;border-top:1px solid var(--line)}
+  .note b{color:var(--text2)}
+
+  footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--line);
+    font-size:.76rem;color:var(--text3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="status"><span class="dot"></span>Campanha no ar</div>
+  <h1>DOOH do festival rodando em <span class="red">3 praças estratégicas</span> de São Paulo.</h1>
+  <p class="sub">Prova em vídeo, gravada ao vivo nas telas: passarela de Pinheiros, estação Palmeiras-Barra Funda e 13 prédios corporativos da Faria Lima.</p>
+  <div class="meta">
+    <div class="chip"><b>Estação Pinheiros</b> · Passarela Premium</div>
+    <div class="chip"><b>Palmeiras-Barra Funda</b> · painéis LED</div>
+    <div class="chip"><b>Faria Lima</b> · elevadores de 13 prédios</div>
+    <div class="chip">gravações de 13 a 15/07/2026</div>
+  </div>
+  <div class="totalbar">
+    <div class="cell"><div class="lbl">Pinheiros · fluxo diário</div><div class="val red n">115 mil+</div><div class="sub2">pessoas passando pelas telas</div></div>
+    <div class="cell"><div class="lbl">Barra Funda · fluxo diário</div><div class="val n">60 mil+</div><div class="sub2">2º maior terminal de SP</div></div>
+    <div class="cell"><div class="lbl">Elevadores · impactos em 28 dias</div><div class="val n">20,1 milhões</div><div class="sub2">dado oficial Eletromidia</div></div>
+  </div>
+</header>
+
+<!-- ══ PINHEIROS ══ -->
+<section class="loc">
+  <div class="loc-head">
+    <div class="loc-name">Estação Pinheiros</div>
+    <div class="loc-tag">CPTM Linha 9 + Metrô Linha 4 · Passarela Premium</div>
+  </div>
+  <div class="statrow">
+    <div class="stat"><div class="v n">115.353</div><div class="l">Recorde de passageiros em um único dia só na CPTM Linha 9 (2025)</div></div>
+    <div class="stat"><div class="v n">+60 mil</div><div class="l">Passageiros/dia do Metrô Linha 4-Amarela, que também passa por Pinheiros</div></div>
+    <div class="stat"><div class="v">Rota Interlagos</div><div class="l">A Linha 9 é o caminho de trem direto pro Autódromo: público que vai ao festival passa por aqui</div></div>
+    <div class="stat"><div class="v">Berrini + V. Olímpia</div><div class="l">Conecta os grandes polos corporativos: público qualificado 2x por dia, todo dia útil</div></div>
+  </div>
+  <div class="videogrid">
+    <div class="vcard"><video controls preload="metadata" src="dooh/pinheiros-1.mp4"></video><div class="vcap">Passarela Pinheiros · 13/07 · 18h50</div></div>
+    <div class="vcard"><video controls preload="metadata" src="dooh/pinheiros-2.mp4"></video><div class="vcap">Passarela Pinheiros · 13/07 · 19h40</div></div>
+    <div class="vcard"><video controls preload="metadata" src="dooh/pinheiros-3.mp4"></video><div class="vcap">Passarela Pinheiros · 15/07 · 11h09</div></div>
+  </div>
+</section>
+
+<!-- ══ BARRA FUNDA ══ -->
+<section class="loc">
+  <div class="loc-head">
+    <div class="loc-name">Estação Palmeiras-Barra Funda</div>
+    <div class="loc-tag">CPTM (3 linhas) + Metrô Linha 3-Vermelha + Terminal Rodoviário</div>
+  </div>
+  <div class="statrow">
+    <div class="stat"><div class="v n">60 mil+</div><div class="l">Passageiros/dia · 2º maior terminal de integração de São Paulo (trem + metrô + ônibus)</div></div>
+    <div class="stat"><div class="v">3 linhas de trem</div><div class="l">Convergindo na mesma estação, além do Metrô Linha 3-Vermelha</div></div>
+    <div class="stat"><div class="v">Allianz Parque</div><div class="l">A minutos a pé: público de shows, baladas e grandes eventos passa direto pela estação, dia e noite</div></div>
+  </div>
+  <div class="videogrid">
+    <div class="vcard"><video controls preload="metadata" src="dooh/barrafunda-1.mp4"></video><div class="vcap">Barra Funda · 14/07 · 10h47</div></div>
+    <div class="vcard"><video controls preload="metadata" src="dooh/barrafunda-2.mp4"></video><div class="vcap">Barra Funda · 14/07 · 10h50</div></div>
+    <div class="vcard"><video controls preload="metadata" src="dooh/barrafunda-3.mp4"></video><div class="vcap">Barra Funda · 14/07 · 11h06</div></div>
+  </div>
+</section>
+
+<!-- ══ ELEVADORES FARIA LIMA ══ -->
+<section class="loc">
+  <div class="loc-head">
+    <div class="loc-name">Elevadores · Faria Lima</div>
+    <div class="loc-tag">13 prédios corporativos · 13/07 a 09/08 (28 dias) · dados oficiais Eletromidia</div>
+  </div>
+  <div class="statrow">
+    <div class="stat"><div class="v n">20.164.326</div><div class="l">Impactos no período (plataforma Eletromidia)</div></div>
+    <div class="stat"><div class="v n">1.047.800</div><div class="l">Alcance estimado · 4,73% do universo de 22,1 milhões de pessoas</div></div>
+    <div class="stat"><div class="v n">19,2x</div><div class="l">Frequência média: cada pessoa vê o anúncio ~19 vezes no período</div></div>
+    <div class="stat"><div class="v">CPM R$ 6,45</div><div class="l">R$ 130 mil de mídia impactando o público de maior renda de SP</div></div>
+  </div>
+  <div class="videogrid">
+    <div class="vcard wide"><video controls preload="metadata" src="dooh/elevador-pov.mp4"></video><div class="vcap">Criativo rodando nos elevadores · POV test ride · foco em Ducati Pass / Drive Pass</div></div>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Prédio</th><th>Endereço</th><th>Exibições previstas</th></tr></thead>
+      <tbody>
+        <tr><td class="b">Birmann 32 · Premium</td><td>Av. Brigadeiro Faria Lima, 3732, Itaim Bibi</td><td class="num">100.800</td></tr>
+        <tr><td class="b">Faria Lima Tower</td><td>Av. Brigadeiro Faria Lima, 3064, Jardim Paulistano</td><td class="num">75.600</td></tr>
+        <tr><td class="b">Faria Lima Plaza · Premium</td><td>Av. Brigadeiro Faria Lima, 949, Pinheiros</td><td class="num">75.600</td></tr>
+        <tr><td class="b">Faria Lima Financial Center · Premium</td><td>Av. Brigadeiro Faria Lima, 3400, Itaim Bibi</td><td class="num">65.520</td></tr>
+        <tr><td class="b">JK 1455 · Premium</td><td>Av. Pres. Juscelino Kubitschek, 1455, V. N. Conceição</td><td class="num">60.480</td></tr>
+        <tr><td class="b">Infinity Tower · Premium</td><td>R. Leopoldo Couto de Magalhães Jr., 700, Itaim Bibi</td><td class="num">60.480</td></tr>
+        <tr><td class="b">Faria Lima Square · Premium</td><td>Av. Brigadeiro Faria Lima, 3600, Itaim Bibi</td><td class="num">50.400</td></tr>
+        <tr><td class="b">FI 4440 · Premium</td><td>Av. Brigadeiro Faria Lima, 4440, Itaim Bibi</td><td class="num">45.360</td></tr>
+        <tr><td class="b">Faria Lima Corporate · Zabo</td><td>R. Santa Justina, 660, Vila Olímpia</td><td class="num">45.360</td></tr>
+        <tr><td class="b">Birmann 31</td><td>Av. Brigadeiro Faria Lima, 3900, Itaim Bibi</td><td class="num">45.360</td></tr>
+        <tr><td class="b">Helbor Lead Offices Faria Lima</td><td>R. Prof. Atílio Innocenti, 474, V. N. Conceição</td><td class="num">40.320</td></tr>
+        <tr><td class="b">Faria Lima Square Offices</td><td>R. Cardeal Arcoverde, 2450, Pinheiros</td><td class="num">40.320</td></tr>
+        <tr><td class="b">New Work Offices Services</td><td>R. Pais de Araújo, 29, Itaim Bibi</td><td class="num">35.280</td></tr>
+        <tr><td class="b">Faria Lima Offices</td><td>R. Cardeal Arcoverde, 2365, Pinheiros</td><td class="num">35.280</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note"><b>Por que essa praça importa:</b> é o corredor de maior renda de São Paulo, com as mesmas pessoas vendo o anúncio ~19x em 28 dias. A praça perfeita pra vender os ingressos premium (VIP Lounge, Pista Premium, Ducati Pass e Drive Pass com test ride).</div>
+</section>
+
+<footer>
+  <span>Prova de veiculação DOOH · Eletromidia · Suhai Festival Interlagos 2026</span>
+  <span>Coordenação de Mídia · 15/07/2026 · fontes: plataforma Eletromidia, CPTM e Metrô SP</span>
+</footer>
+
+</div>
+</body>
+</html>
