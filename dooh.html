@@ -38,13 +38,20 @@
     background:var(--panel);border-radius:20px;padding:5px 13px}
   .chip b{color:var(--text)}
 
-  .totalbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line);
-    margin-top:28px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  .totalbar .cell{background:var(--panel);padding:18px 20px}
-  .totalbar .lbl{font-family:var(--disp);font-size:.64rem;letter-spacing:.13em;text-transform:uppercase;color:var(--text3)}
-  .totalbar .val{font-family:var(--disp);font-weight:800;font-size:1.7rem;margin-top:6px;color:var(--text)}
-  .totalbar .val.red{color:var(--red)}
-  .totalbar .sub2{font-size:.68rem;color:var(--text3);margin-top:3px}
+  /* total da campanha */
+  .totalblock{margin-top:30px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel)}
+  .totalblock .bh{padding:14px 20px;border-bottom:1px solid var(--line);
+    font-family:var(--disp);font-weight:700;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+  .totalgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line)}
+  .totalgrid .cell{background:var(--panel);padding:18px 20px}
+  .totalgrid .lbl{font-family:var(--disp);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
+  .totalgrid .val{font-family:var(--disp);font-weight:800;font-size:1.9rem;margin-top:6px;color:var(--text)}
+  .totalgrid .val.red{color:var(--red)}
+  .totalgrid .sub2{font-size:.68rem;color:var(--text3);margin-top:3px}
+  .flowstrip{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .flowstrip .fp{font-family:var(--mono);font-size:.74rem;color:var(--text2);border:1px solid var(--line);
+    background:var(--panel);border-radius:8px;padding:8px 13px}
+  .flowstrip .fp b{color:var(--lime)}
 
   .loc{margin-top:58px}
   .loc-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:10px;
@@ -57,14 +64,19 @@
   .stat .v{font-family:var(--disp);font-weight:800;font-size:1.6rem;color:var(--lime);line-height:1.05}
   .stat .l{font-size:.76rem;color:var(--text2);margin-top:7px;line-height:1.4}
 
-  .videogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
-  .vcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  .vcard video{width:100%;display:block;background:#000;aspect-ratio:9/16;object-fit:cover}
-  .vcard.wide{grid-column:1/-1}
-  .vcard.wide video{aspect-ratio:16/9;object-fit:contain;max-height:70vh}
-  .vcap{padding:10px 13px;font-family:var(--mono);font-size:.7rem;color:var(--text3)}
+  .subhead{font-family:var(--disp);font-weight:700;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--text3);margin:22px 0 12px}
 
-  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel);margin-top:22px}
+  .mediagrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;align-items:start}
+  .mcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .mcard video,.mcard img{width:100%;display:block;background:#000}
+  .mcard video{aspect-ratio:9/16;object-fit:cover}
+  .mcard.wide{grid-column:1/-1}
+  .mcard.wide video{aspect-ratio:16/9;object-fit:contain;max-height:70vh}
+  .mcard img{height:auto}
+  .mcap{padding:10px 13px;font-family:var(--mono);font-size:.7rem;color:var(--text3)}
+
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel);margin-top:12px}
   table{border-collapse:collapse;width:100%;font-size:.85rem;min-width:600px}
   th,td{padding:10px 16px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
   th{font-family:var(--disp);text-transform:uppercase;font-size:.66rem;letter-spacing:.1em;color:var(--text3);font-weight:700}
@@ -86,17 +98,27 @@
 <header>
   <div class="status"><span class="dot"></span>Campanha no ar</div>
   <h1>DOOH do festival rodando em <span class="red">3 praças estratégicas</span> de São Paulo.</h1>
-  <p class="sub">Prova em vídeo, gravada ao vivo nas telas: passarela de Pinheiros, estação Palmeiras-Barra Funda e 13 prédios corporativos da Faria Lima.</p>
+  <p class="sub">Prova em vídeo e foto, capturada ao vivo nas telas: passarela de Pinheiros, estação Palmeiras-Barra Funda e 13 prédios corporativos da Faria Lima.</p>
   <div class="meta">
     <div class="chip"><b>Estação Pinheiros</b> · Passarela Premium</div>
     <div class="chip"><b>Palmeiras-Barra Funda</b> · painéis LED</div>
     <div class="chip"><b>Faria Lima</b> · elevadores de 13 prédios</div>
-    <div class="chip">gravações de 13 a 15/07/2026</div>
+    <div class="chip">registros de 13 a 16/07/2026</div>
   </div>
-  <div class="totalbar">
-    <div class="cell"><div class="lbl">Pinheiros · fluxo diário</div><div class="val red n">115 mil+</div><div class="sub2">pessoas passando pelas telas</div></div>
-    <div class="cell"><div class="lbl">Barra Funda · fluxo diário</div><div class="val n">60 mil+</div><div class="sub2">2º maior terminal de SP</div></div>
-    <div class="cell"><div class="lbl">Elevadores · impactos em 28 dias</div><div class="val n">20,1 milhões</div><div class="sub2">dado oficial Eletromidia</div></div>
+
+  <div class="totalblock">
+    <div class="bh">Total da campanha · plano DOOH consolidado (Eletromidia) · 13/07 a 09/08 · 28 dias</div>
+    <div class="totalgrid">
+      <div class="cell"><div class="lbl">Impactos no período</div><div class="val red n">20.164.326</div><div class="sub2">as 3 praças somadas</div></div>
+      <div class="cell"><div class="lbl">Alcance estimado</div><div class="val n">1.047.800</div><div class="sub2">4,73% do universo de 22,1 milhões</div></div>
+      <div class="cell"><div class="lbl">Frequência média</div><div class="val n">19,2x</div><div class="sub2">cada pessoa vê o anúncio</div></div>
+      <div class="cell"><div class="lbl">Investimento</div><div class="val n">R$ 130 mil</div><div class="sub2">CPM R$ 6,45</div></div>
+    </div>
+  </div>
+  <div class="flowstrip">
+    <div class="fp">Fluxo Pinheiros: <b>115 mil+</b> pessoas/dia</div>
+    <div class="fp">Fluxo Barra Funda: <b>60 mil+</b> pessoas/dia</div>
+    <div class="fp">Faria Lima: <b>público executivo</b> de maior renda de SP</div>
   </div>
 </header>
 
@@ -112,10 +134,18 @@
     <div class="stat"><div class="v">Rota Interlagos</div><div class="l">A Linha 9 é o caminho de trem direto pro Autódromo: público que vai ao festival passa por aqui</div></div>
     <div class="stat"><div class="v">Berrini + V. Olímpia</div><div class="l">Conecta os grandes polos corporativos: público qualificado 2x por dia, todo dia útil</div></div>
   </div>
-  <div class="videogrid">
-    <div class="vcard"><video controls preload="metadata" src="dooh/pinheiros-1.mp4"></video><div class="vcap">Passarela Pinheiros · 13/07 · 18h50</div></div>
-    <div class="vcard"><video controls preload="metadata" src="dooh/pinheiros-2.mp4"></video><div class="vcap">Passarela Pinheiros · 13/07 · 19h40</div></div>
-    <div class="vcard"><video controls preload="metadata" src="dooh/pinheiros-3.mp4"></video><div class="vcap">Passarela Pinheiros · 15/07 · 11h09</div></div>
+  <div class="subhead">Vídeos nas telas</div>
+  <div class="mediagrid">
+    <div class="mcard"><video controls preload="metadata" src="dooh/pinheiros-1.mp4"></video><div class="mcap">Passarela · 13/07 · 18h50</div></div>
+    <div class="mcard"><video controls preload="metadata" src="dooh/pinheiros-2.mp4"></video><div class="mcap">Passarela · 13/07 · 19h40</div></div>
+    <div class="mcard"><video controls preload="metadata" src="dooh/pinheiros-3.mp4"></video><div class="mcap">Passarela · 15/07 · 11h09</div></div>
+    <div class="mcard"><video controls preload="metadata" src="dooh/pinheiros-4.mp4"></video><div class="mcap">Passarela · 16/07 · 09h11</div></div>
+  </div>
+  <div class="subhead">Fotos</div>
+  <div class="mediagrid">
+    <div class="mcard"><img src="dooh/pinheiros-foto-1.jpg" alt="Painel LED da passarela de Pinheiros" loading="lazy"><div class="mcap">Painel LED da passarela · lineup + lote</div></div>
+    <div class="mcard"><img src="dooh/pinheiros-foto-2.jpg" alt="Painel LED da passarela de Pinheiros" loading="lazy"><div class="mcap">Painel LED da passarela · abertura da marca</div></div>
+    <div class="mcard"><img src="dooh/pinheiros-foto-3.jpg" alt="Fluxo de pessoas na passarela de Pinheiros" loading="lazy"><div class="mcap">Fluxo de gente na passarela em horário de pico</div></div>
   </div>
 </section>
 
@@ -130,10 +160,16 @@
     <div class="stat"><div class="v">3 linhas de trem</div><div class="l">Convergindo na mesma estação, além do Metrô Linha 3-Vermelha</div></div>
     <div class="stat"><div class="v">Allianz Parque</div><div class="l">A minutos a pé: público de shows, baladas e grandes eventos passa direto pela estação, dia e noite</div></div>
   </div>
-  <div class="videogrid">
-    <div class="vcard"><video controls preload="metadata" src="dooh/barrafunda-1.mp4"></video><div class="vcap">Barra Funda · 14/07 · 10h47</div></div>
-    <div class="vcard"><video controls preload="metadata" src="dooh/barrafunda-2.mp4"></video><div class="vcap">Barra Funda · 14/07 · 10h50</div></div>
-    <div class="vcard"><video controls preload="metadata" src="dooh/barrafunda-3.mp4"></video><div class="vcap">Barra Funda · 14/07 · 11h06</div></div>
+  <div class="subhead">Vídeos nas telas</div>
+  <div class="mediagrid">
+    <div class="mcard"><video controls preload="metadata" src="dooh/barrafunda-1.mp4"></video><div class="mcap">Painel LED · 14/07 · 10h47</div></div>
+    <div class="mcard"><video controls preload="metadata" src="dooh/barrafunda-2.mp4"></video><div class="mcap">Painel LED · 14/07 · 10h50</div></div>
+    <div class="mcard"><video controls preload="metadata" src="dooh/barrafunda-3.mp4"></video><div class="mcap">Painel LED · 14/07 · 11h06</div></div>
+  </div>
+  <div class="subhead">Fotos</div>
+  <div class="mediagrid">
+    <div class="mcard"><img src="dooh/barrafunda-foto-1.jpg" alt="Painel LED do festival na Barra Funda" loading="lazy"><div class="mcap">Painel LED · arte de abertura com as datas</div></div>
+    <div class="mcard"><img src="dooh/barrafunda-foto-2.jpg" alt="Painel LED com lineup do festival na Barra Funda" loading="lazy"><div class="mcap">Painel LED · lineup + lote a partir de R$ 125</div></div>
   </div>
 </section>
 
@@ -141,17 +177,15 @@
 <section class="loc">
   <div class="loc-head">
     <div class="loc-name">Elevadores · Faria Lima</div>
-    <div class="loc-tag">13 prédios corporativos · 13/07 a 09/08 (28 dias) · dados oficiais Eletromidia</div>
+    <div class="loc-tag">13 prédios corporativos · criativo POV "test ride"</div>
   </div>
-  <div class="statrow">
-    <div class="stat"><div class="v n">20.164.326</div><div class="l">Impactos no período (plataforma Eletromidia)</div></div>
-    <div class="stat"><div class="v n">1.047.800</div><div class="l">Alcance estimado · 4,73% do universo de 22,1 milhões de pessoas</div></div>
-    <div class="stat"><div class="v n">19,2x</div><div class="l">Frequência média: cada pessoa vê o anúncio ~19 vezes no período</div></div>
-    <div class="stat"><div class="v">CPM R$ 6,45</div><div class="l">R$ 130 mil de mídia impactando o público de maior renda de SP</div></div>
+  <div class="subhead">Criativo rodando nos elevadores</div>
+  <div class="mediagrid">
+    <div class="mcard wide"><video controls preload="metadata" src="dooh/elevador-pov.mp4"></video><div class="mcap">Vídeo POV test ride · foco em Ducati Pass / Drive Pass</div></div>
+    <div class="mcard"><img src="dooh/elevador-foto-1.jpg" alt="Tela do festival em elevador comercial" loading="lazy"><div class="mcap">Tela em elevador · prédio corporativo</div></div>
+    <div class="mcard"><img src="dooh/elevador-foto-2.jpg" alt="Tela do festival em elevador comercial" loading="lazy"><div class="mcap">Tela em elevador · "Pilotar em Interlagos"</div></div>
   </div>
-  <div class="videogrid">
-    <div class="vcard wide"><video controls preload="metadata" src="dooh/elevador-pov.mp4"></video><div class="vcap">Criativo rodando nos elevadores · POV test ride · foco em Ducati Pass / Drive Pass</div></div>
-  </div>
+  <div class="subhead">Os 13 prédios com a campanha ativa</div>
   <div class="tbl-wrap">
     <table>
       <thead><tr><th>Prédio</th><th>Endereço</th><th>Exibições previstas</th></tr></thead>
@@ -173,12 +207,12 @@
       </tbody>
     </table>
   </div>
-  <div class="note"><b>Por que essa praça importa:</b> é o corredor de maior renda de São Paulo, com as mesmas pessoas vendo o anúncio ~19x em 28 dias. A praça perfeita pra vender os ingressos premium (VIP Lounge, Pista Premium, Ducati Pass e Drive Pass com test ride).</div>
+  <div class="note"><b>Por que essa praça importa:</b> é o corredor de maior renda de São Paulo, com as mesmas pessoas vendo o anúncio ~19x ao longo dos 28 dias. A praça perfeita pra vender os ingressos premium (VIP Lounge, Pista Premium, Ducati Pass e Drive Pass com test ride).</div>
 </section>
 
 <footer>
   <span>Prova de veiculação DOOH · Eletromidia · Suhai Festival Interlagos 2026</span>
-  <span>Coordenação de Mídia · 15/07/2026 · fontes: plataforma Eletromidia, CPTM e Metrô SP</span>
+  <span>Coordenação de Mídia · 16/07/2026 · fontes: plataforma Eletromidia, CPTM e Metrô SP</span>
 </footer>
 
 </div>
