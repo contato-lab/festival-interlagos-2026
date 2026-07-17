@@ -84,30 +84,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .exec-conv-valwrap{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
 .exec-conv-sub{display:block;font-family:'Inter',sans-serif;font-weight:500;font-size:.62rem;color:#7a7a7a;margin-top:3px;letter-spacing:.01em}
 .exec-conv-sub.cpa{color:#9a9a9a}
-/* ── What's New (tour de novidade) ── */
-.wn-hidden{display:none!important}
-#wn-toast{position:fixed;right:20px;bottom:20px;z-index:9000;max-width:330px;display:flex;gap:12px;align-items:flex-start;background:#141414;border:1px solid rgba(200,255,0,.35);border-radius:14px;padding:16px 30px 14px 16px;box-shadow:0 16px 50px rgba(0,0,0,.6);animation:wnIn .35s cubic-bezier(.2,.8,.2,1)}
-@keyframes wnIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
-.wn-toast-ic{font-size:1.4rem;line-height:1.1}
-.wn-toast-tag{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:#0A0A0A;background:var(--lime);padding:2px 7px;border-radius:5px;margin-bottom:6px}
-.wn-toast-tt{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.02rem;color:#fff;margin-bottom:3px;line-height:1.1}
-.wn-toast-tx{font-size:.76rem;color:#bbb;line-height:1.45;margin-bottom:11px}
-.wn-toast-actions{display:flex;gap:8px}
-.wn-toast-x{position:absolute;top:8px;right:10px;background:none;border:none;color:#666;font-size:1.15rem;cursor:pointer;line-height:1}
-.wn-toast-x:hover{color:#aaa}
-.wn-btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.8rem;letter-spacing:.02em;border-radius:8px;padding:7px 14px;cursor:pointer;border:1px solid transparent}
-.wn-btn-primary{background:var(--lime);color:#0A0A0A}
-.wn-btn-primary:hover{filter:brightness(1.08)}
-.wn-btn-ghost{background:transparent;color:#999;border-color:rgba(255,255,255,.14)}
-.wn-btn-ghost:hover{color:#ddd}
-#wn-ring{position:fixed;z-index:9001;border:2px solid var(--lime);border-radius:14px;box-shadow:0 0 0 9999px rgba(0,0,0,.74),0 0 24px rgba(200,255,0,.35);pointer-events:none;transition:top .25s ease,left .25s ease,width .25s ease,height .25s ease}
-#wn-pop{position:fixed;z-index:9002;max-width:340px;background:#141414;border:1px solid rgba(200,255,0,.35);border-radius:14px;padding:16px;box-shadow:0 16px 50px rgba(0,0,0,.6)}
-.wn-pop-tag{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:#0A0A0A;background:var(--lime);padding:2px 7px;border-radius:5px;margin-bottom:7px}
-.wn-pop-tt{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#fff;margin-bottom:6px}
-.wn-pop-tx{font-size:.78rem;color:#cfcfcf;line-height:1.5;margin-bottom:12px}
-.wn-pop-tx b{color:var(--lime);font-weight:700}
-.wn-pop-actions{display:flex;justify-content:flex-end}
-@media(max-width:600px){#wn-toast{left:14px;right:14px;max-width:none}#wn-pop{left:14px!important;right:14px;max-width:none}}
 /* Exec filter bar */
 .exec-filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px}
 .exec-filter-label{font-size:.65rem;color:#666;text-transform:uppercase;letter-spacing:.08em;margin-right:4px}
@@ -2903,87 +2879,6 @@ function buildExecTMCharts() {
 
 </script>
 
-<!-- ═══ What's New — tour de novidade (Vendas por horário) ═══ -->
-<div id="wn-toast" class="wn-hidden" role="dialog" aria-label="Novidade">
-  <div class="wn-toast-ic">🎉</div>
-  <div class="wn-toast-body">
-    <span class="wn-toast-tag">Novidade</span>
-    <div class="wn-toast-tt">Vendas por horário do dia</div>
-    <div class="wn-toast-tx">Novo gráfico: veja em qual horário mais se vende e filtre por data (ontem, 7 dias, período). Quer ver onde fica?</div>
-    <div class="wn-toast-actions">
-      <button class="wn-btn wn-btn-primary" id="wn-see">Ver agora</button>
-      <button class="wn-btn wn-btn-ghost" id="wn-skip">Agora não</button>
-    </div>
-  </div>
-  <button class="wn-toast-x" id="wn-close" aria-label="Fechar">×</button>
-</div>
-<div id="wn-ring" class="wn-hidden"></div>
-<div id="wn-pop" class="wn-hidden" role="dialog">
-  <span class="wn-pop-tag">Novidade · 1 de 1</span>
-  <div class="wn-pop-tt">🕐 Vendas por horário do dia</div>
-  <div class="wn-pop-tx">Mostra em <b>qual hora do dia</b> mais se vende (horário de Brasília), motos + autos juntos. E <b>respeita o filtro de data</b> lá do topo: escolha "Ontem", "7 dias" ou um período pra ver o padrão daquele recorte. Serve pra programar e-mail e anúncio na hora que o público mais compra.</div>
-  <div class="wn-pop-actions">
-    <button class="wn-btn wn-btn-primary" id="wn-done">Entendi 👍</button>
-  </div>
-</div>
-<script>
-(function(){
-  var KEY = 'wn_vendas_por_hora_v1';
-  try { if (localStorage.getItem(KEY)) return; } catch(e){}
-  var toast  = document.getElementById('wn-toast');
-  var ring   = document.getElementById('wn-ring');
-  var pop    = document.getElementById('wn-pop');
-  var target = document.getElementById('horaCard');
-  if (!toast || !target) return;
-  var show = function(el){ el.classList.remove('wn-hidden'); };
-  var hide = function(el){ el.classList.add('wn-hidden'); };
-  var seen = function(){ try { localStorage.setItem(KEY, Date.now().toString()); } catch(e){} };
-
-  function place(){
-    var r = target.getBoundingClientRect(), pad = 8;
-    ring.style.top    = (r.top - pad) + 'px';
-    ring.style.left   = (r.left - pad) + 'px';
-    ring.style.width  = (r.width + pad*2) + 'px';
-    ring.style.height = (r.height + pad*2) + 'px';
-    var popH = pop.offsetHeight || 190, popW = pop.offsetWidth || 320;
-    var top = r.top - popH - 14;
-    if (top < 10) top = Math.min(r.bottom + 14, window.innerHeight - popH - 10);
-    var left = r.left;
-    if (left + popW > window.innerWidth - 10) left = window.innerWidth - popW - 10;
-    if (left < 10) left = 10;
-    pop.style.top = top + 'px';
-    pop.style.left = left + 'px';
-  }
-  var _ro = (typeof ResizeObserver !== 'undefined') ? new ResizeObserver(function(){ place(); }) : null;
-  function startTour(){
-    hide(toast);
-    target.scrollIntoView({ behavior:'smooth', block:'center' });
-    setTimeout(function(){
-      // fallback: o Chrome as vezes nao completa scroll suave longo -> garante o destino
-      var r = target.getBoundingClientRect();
-      if (r.top < 60 || r.bottom > window.innerHeight - 60) target.scrollIntoView({ block:'center' });
-      show(ring); show(pop); place();
-      window.addEventListener('scroll', place, { passive:true });
-      window.addEventListener('resize', place);
-      if (_ro) _ro.observe(target);            // re-gruda se o card crescer (dados async)
-      setTimeout(place, 350); setTimeout(place, 900);  // belt-and-suspenders
-    }, 580);
-  }
-  function endTour(){
-    hide(ring); hide(pop);
-    window.removeEventListener('scroll', place);
-    window.removeEventListener('resize', place);
-    if (_ro) _ro.disconnect();
-  }
-  document.getElementById('wn-see').addEventListener('click', startTour);
-  document.getElementById('wn-done').addEventListener('click', endTour);
-  document.getElementById('wn-skip').addEventListener('click', function(){ hide(toast); });
-  document.getElementById('wn-close').addEventListener('click', function(){ hide(toast); });
-
-  // aparece uma vez, pouco depois do dashboard pintar; marca como visto na hora pra nao repetir
-  setTimeout(function(){ show(toast); seen(); }, 1500);
-})();
-</script>
 <!-- scroll nav (topo / fim) -->
 <div class="scrollnav" aria-hidden="true">
   <button class="scrollnav-btn" id="snTop" title="Ir para o topo" aria-label="Ir para o topo">&#9650;</button>
