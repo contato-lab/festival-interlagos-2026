@@ -1,15 +1,15 @@
 {
-    "updated_at":  "2026-07-17T14:29:42Z",
+    "updated_at":  "2026-07-20T17:07:41Z",
     "source":  "TikTok Ads Manager (manual - prints do painel dia a dia, linha Total das campanhas, aguardando aprovacao API)",
     "campaign_start":  "2026-03-31",
     "note":  "Totais = soma da serie diaria (linha Total = campanha de VENDAS + campanha de trafego). Dados diarios REAIS (print): 15/05-30/06. FALTA preencher: 01/07 em diante. Ainda uniformes (estimativa = total do periodo dividido): 31/03-30/04 e 01/05-14/05. Sera substituido pela API automatica assim que o acesso for aprovado.",
     "totals":  {
-                   "cost":  36242.42,
-                   "impressions":  4955237,
-                   "clicks":  97193,
+                   "cost":  37214.21,
+                   "impressions":  5193778,
+                   "clicks":  98553,
                    "add_to_cart":  0,
-                   "purchases":  887.66,
-                   "ctr":  1.96
+                   "purchases":  904.66,
+                   "ctr":  1.9
                },
     "daily_series":  [
                          {
@@ -870,10 +870,34 @@
                          },
                          {
                              "cost":  419.3,
-                             "purchases":  9,
+                             "purchases":  13,
                              "impressions":  93606,
                              "clicks":  1371,
                              "date":  "2026-07-16",
+                             "add_to_cart":  0
+                         },
+                         {
+                             "cost":  330.46,
+                             "purchases":  3,
+                             "impressions":  41186,
+                             "clicks":  412,
+                             "date":  "2026-07-17",
+                             "add_to_cart":  0
+                         },
+                         {
+                             "cost":  317.35,
+                             "purchases":  8,
+                             "impressions":  46270,
+                             "clicks":  442,
+                             "date":  "2026-07-18",
+                             "add_to_cart":  0
+                         },
+                         {
+                             "cost":  323.98,
+                             "purchases":  2,
+                             "impressions":  151085,
+                             "clicks":  506,
+                             "date":  "2026-07-19",
                              "add_to_cart":  0
                          }
                      ]
