@@ -1,14 +1,14 @@
 {
-    "updated_at":  "2026-07-20T17:07:41Z",
+    "updated_at":  "2026-07-21T12:59:23Z",
     "source":  "TikTok Ads Manager (manual - prints do painel dia a dia, linha Total das campanhas, aguardando aprovacao API)",
     "campaign_start":  "2026-03-31",
     "note":  "Totais = soma da serie diaria (linha Total = campanha de VENDAS + campanha de trafego). Dados diarios REAIS (print): 15/05-30/06. FALTA preencher: 01/07 em diante. Ainda uniformes (estimativa = total do periodo dividido): 31/03-30/04 e 01/05-14/05. Sera substituido pela API automatica assim que o acesso for aprovado.",
     "totals":  {
-                   "cost":  37214.21,
-                   "impressions":  5193778,
-                   "clicks":  98553,
+                   "cost":  37633.33,
+                   "impressions":  5243128,
+                   "clicks":  99625,
                    "add_to_cart":  0,
-                   "purchases":  904.66,
+                   "purchases":  911.66,
                    "ctr":  1.9
                },
     "daily_series":  [
@@ -898,6 +898,14 @@
                              "impressions":  151085,
                              "clicks":  506,
                              "date":  "2026-07-19",
+                             "add_to_cart":  0
+                         },
+                         {
+                             "cost":  419.12,
+                             "purchases":  7,
+                             "impressions":  49350,
+                             "clicks":  1072,
+                             "date":  "2026-07-20",
                              "add_to_cart":  0
                          }
                      ]
