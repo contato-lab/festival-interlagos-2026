@@ -266,6 +266,25 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
     </div>
   </div>
 
+  <!-- Total de Visitantes (pagos + cortesias, acumulado das 2 edicoes) -->
+  <div class="exec-kpi-strip" style="margin-top:12px">
+    <div class="exec-kpi" style="border:1px solid var(--lime-border);background:rgba(200,255,0,.04)">
+      <div class="exec-kpi-label">&#128101; Total de Visitantes <span style="font-weight:600;color:var(--text3);text-transform:none;letter-spacing:0">&middot; pagos + cortesias</span></div>
+      <div id="exec-visit-total" class="exec-kpi-val" style="color:var(--lime)">&mdash;</div>
+      <div id="exec-visit-total-sub" style="margin-top:4px;font-size:.7rem;color:var(--text3);letter-spacing:.02em">&mdash;</div>
+    </div>
+    <div class="exec-kpi">
+      <div class="exec-kpi-label">&#127949;&#65039; Visitantes Motos</div>
+      <div id="exec-visit-moto" class="exec-kpi-val">&mdash;</div>
+      <div id="exec-visit-moto-sub" style="margin-top:4px;font-size:.7rem;color:var(--text3);letter-spacing:.02em">&mdash;</div>
+    </div>
+    <div class="exec-kpi">
+      <div class="exec-kpi-label">&#128663; Visitantes Autos</div>
+      <div id="exec-visit-auto" class="exec-kpi-val">&mdash;</div>
+      <div id="exec-visit-auto-sub" style="margin-top:4px;font-size:.7rem;color:var(--text3);letter-spacing:.02em">&mdash;</div>
+    </div>
+  </div>
+
   <!-- Hoje / Ontem / Campanha -->
   <div class="exec-hoje-ontem">
     <div class="exec-card" id="exec-card-ontem">
@@ -911,6 +930,37 @@ function renderCortesiasCard() {
   elAm.innerHTML =
     'Hoje (digital): <b style="color:#ccc">' + fmt(TM_CORTESIAS.autoHoje) + '</b>' +
     ' &middot; ' + autoPct.toFixed(1) + '% do total emitido';
+
+  renderVisitantes();
+}
+
+// Total de Visitantes = ingressos PAGOS (acumulado da campanha) + CORTESIAS
+// (digital TM + fisico manual), por edicao e no geral. Acumulado, nao filtrado
+// por data: cresce sozinho conforme pagos e cortesias sobem nos JSONs.
+function renderVisitantes() {
+  const total = document.getElementById('exec-visit-total');
+  if (!total) return;
+  const fmt = n => (n || 0).toLocaleString('pt-BR');
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+
+  // pagos acumulados da campanha inteira (D26_FULL: mq/aq = ingressos pagos por dia)
+  const pagoMoto = (Array.isArray(D26_FULL) ? D26_FULL : []).reduce((s, r) => s + (r.mq || 0), 0);
+  const pagoAuto = (Array.isArray(D26_FULL) ? D26_FULL : []).reduce((s, r) => s + (r.aq || 0), 0);
+  // cortesias = digital (TM) + fisico (manual)
+  const cortMoto = (TM_CORTESIAS.moto || 0) + (CORTESIAS_FISICAS.moto || 0);
+  const cortAuto = (TM_CORTESIAS.auto || 0) + (CORTESIAS_FISICAS.auto || 0);
+
+  const visMoto = pagoMoto + cortMoto;
+  const visAuto = pagoAuto + cortAuto;
+  const visTot  = visMoto + visAuto;
+  const pagoTot = pagoMoto + pagoAuto, cortTot = cortMoto + cortAuto;
+
+  set('exec-visit-total', fmt(visTot));
+  set('exec-visit-total-sub', fmt(pagoTot) + ' pagos · ' + fmt(cortTot) + ' cortesias');
+  set('exec-visit-moto', fmt(visMoto));
+  set('exec-visit-moto-sub', fmt(pagoMoto) + ' pagos · ' + fmt(cortMoto) + ' cortesias');
+  set('exec-visit-auto', fmt(visAuto));
+  set('exec-visit-auto-sub', fmt(pagoAuto) + ' pagos · ' + fmt(cortAuto) + ' cortesias');
 }
 
 // ═══════════════════════════════════════════════
@@ -1683,6 +1733,8 @@ function renderExecKPIs() {
   const autos25El = document.getElementById('exec-kpi-autos-2025');
   if (autos25El) autos25El.innerHTML =
     'Total 2025: R$ ' + fmtBR(REAL_2025.auto.rec) + ' &middot; ' + fmtBR(REAL_2025.auto.ing) + ' ingressos';
+
+  if (typeof renderVisitantes === 'function') renderVisitantes();
 }
 
 /* ═══ Grafico Vendas ═══ */
