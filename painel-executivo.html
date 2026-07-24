@@ -3152,5 +3152,48 @@ function buildExecDiaSemanaChart(){
   else init();
 })();
 </script>
+
+<!-- ═══ Aviso de novidade: Total de Visitantes (aparece 1x, some ao ver) ═══ -->
+<style>
+  #nv-toast{position:fixed;right:18px;bottom:18px;z-index:9000;max-width:320px;display:none;
+    gap:12px;align-items:flex-start;background:#141414;border:1px solid rgba(200,255,0,.4);
+    border-radius:14px;padding:15px 34px 14px 16px;box-shadow:0 16px 46px rgba(0,0,0,.6);
+    animation:nvIn .35s cubic-bezier(.2,.8,.2,1)}
+  #nv-toast.show{display:flex}
+  @keyframes nvIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  #nv-toast .ic{font-size:1.35rem;line-height:1}
+  #nv-toast .tag{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-weight:700;
+    font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#0A0A0A;background:var(--lime);
+    padding:2px 7px;border-radius:5px;margin-bottom:6px}
+  #nv-toast .tt{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#fff;margin-bottom:3px}
+  #nv-toast .tx{font-size:.76rem;color:#bbb;line-height:1.45;margin-bottom:11px}
+  #nv-toast .btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.8rem;
+    background:var(--lime);color:#0A0A0A;border:none;border-radius:8px;padding:7px 15px;cursor:pointer}
+  #nv-toast .x{position:absolute;top:7px;right:10px;background:none;border:none;color:#666;
+    font-size:1.15rem;cursor:pointer;line-height:1}
+  #nv-toast .x:hover{color:#aaa}
+  @media(max-width:600px){#nv-toast{left:14px;right:14px;max-width:none}}
+</style>
+<div id="nv-toast" role="dialog" aria-label="Novidade">
+  <div class="ic">🎉</div>
+  <div>
+    <span class="tag">Novidade</span>
+    <div class="tt">Total de Visitantes</div>
+    <div class="tx">Novo quadro somando <b>pagos + cortesias</b> das duas edições (Moto e Auto). Fica logo abaixo dos cards de receita.</div>
+    <button class="btn" id="nv-ok">Entendi</button>
+  </div>
+  <button class="x" id="nv-x" aria-label="Fechar">×</button>
+</div>
+<script>
+(function(){
+  var KEY='nv_total_visitantes_v1';
+  try{ if(localStorage.getItem(KEY)) return; }catch(e){}
+  var t=document.getElementById('nv-toast'); if(!t) return;
+  var seen=function(){ try{ localStorage.setItem(KEY,'1'); }catch(e){} t.classList.remove('show'); };
+  document.getElementById('nv-ok').addEventListener('click', seen);
+  document.getElementById('nv-x').addEventListener('click', seen);
+  setTimeout(function(){ t.classList.add('show'); }, 1600);
+})();
+</script>
 </body>
 </html>
