@@ -826,18 +826,37 @@ def main():
     print(f'Início: {datetime.now().isoformat()}')
 
     # ── Sistema Próprio ─ uma única busca, dois agregados ───
-    print('\n[1/4] Buscando vendas Próprio MOTO...')
-    moto_sales = fetch_proprio_sales(API_MOTO_BASE)
-    print(f'  {len(moto_sales)} vendas')
+    # Se a API do próprio cair, NÃO derruba o resto: o Ticketmaster tem os
+    # próprios fallbacks e é ~80% do volume, tem que continuar atualizando.
+    # (Em 29/07/2026 a v2.0 quebrou o token e o script morria aqui, no passo 1,
+    # levando o Ticketmaster junto — 21h de dado parado no dashboard.)
+    proprio_ok, proprio_error = True, None
+    moto_sales, auto_sales = [], []
+    try:
+        print('\n[1/4] Buscando vendas Próprio MOTO...')
+        moto_sales = fetch_proprio_sales(API_MOTO_BASE)
+        print(f'  {len(moto_sales)} vendas')
 
-    print('[2/4] Buscando vendas Próprio AUTO...')
-    auto_sales = fetch_proprio_sales(API_AUTO_BASE)
-    print(f'  {len(auto_sales)} vendas')
+        print('[2/4] Buscando vendas Próprio AUTO...')
+        auto_sales = fetch_proprio_sales(API_AUTO_BASE)
+        print(f'  {len(auto_sales)} vendas')
+    except Exception as e:
+        proprio_ok, proprio_error = False, str(e)
+        moto_sales, auto_sales = [], []
+        print(f'  ⚠️  Sistema Próprio falhou: {proprio_error}', file=sys.stderr)
 
-    moto_by_day  = aggregate_proprio_totais(moto_sales)
-    auto_by_day  = aggregate_proprio_totais(auto_sales)
-    proprio_moto = aggregate_proprio_tipos(moto_sales)
-    proprio_auto = aggregate_proprio_tipos(auto_sales)
+    if proprio_ok:
+        moto_by_day  = aggregate_proprio_totais(moto_sales)
+        auto_by_day  = aggregate_proprio_totais(auto_sales)
+        proprio_moto = aggregate_proprio_tipos(moto_sales)
+        proprio_auto = aggregate_proprio_tipos(auto_sales)
+    else:
+        # Preserva o último breakdown bom do próprio (0 seria mentira, não falha)
+        prev_p       = (_load_existing(OUT_TIPOS) or {}).get('proprio') or {}
+        proprio_moto = prev_p.get('moto') or {}
+        proprio_auto = prev_p.get('auto') or {}
+        moto_by_day  = {}
+        auto_by_day  = {}
 
     # ── Ticketmaster ─ tenta API; se falhar, tenta planilha; senão, mantém antigo ──
     print('\n[3/4] Buscando movimentos Ticketmaster (API)...')
@@ -922,7 +941,11 @@ def main():
 
     # ── Escrita dos JSONs ──
     print('\n[4/4] Escrevendo JSONs...')
-    write_json(OUT_VENDAS, build_vendas_data(moto_by_day, auto_by_day))
+    if proprio_ok:
+        write_json(OUT_VENDAS, build_vendas_data(moto_by_day, auto_by_day))
+    else:
+        # Mesma regra do TM: não sobrescreve com timestamp mentiroso.
+        print(f'  (mantendo {OUT_VENDAS} antigo intacto — API do próprio falhou)')
     if tm_ok:
         write_json(OUT_TM, build_ticketmaster_data(tm_totals, tm_daily, source=tm_source,
                                                     last_sale_moto_at=tm_last_moto,
@@ -935,11 +958,19 @@ def main():
         print(f'  (mantendo {OUT_TM} antigo intacto — API e planilha falharam)')
     write_json(OUT_TIPOS, build_tipos_data(proprio_moto, proprio_auto, tm_moto, tm_auto))
     # Vendas por hora do dia (so quando a API TM respondeu, pra nao perder ~80% do volume)
-    if tm_movs is not None:
+    # Exige os dois lados: com um deles vazio o gráfico por hora ficaria com
+    # buraco silencioso (não dá pra distinguir 'não vendeu' de 'não consultei').
+    if tm_movs is not None and proprio_ok:
         write_json(OUT_HORA, aggregate_por_hora(tm_movs, moto_sales, auto_sales))
         print(f'  {OUT_HORA} atualizado (vendas por hora do dia)')
 
-    print(f'\nOK Sistema Próprio atualizado em {OUT_VENDAS} e {OUT_TIPOS} (parte proprio)')
+    if proprio_ok:
+        print(f'\nOK Sistema Próprio atualizado em {OUT_VENDAS} e {OUT_TIPOS} (parte proprio)')
+    else:
+        print(f'\nSistema Próprio: FALHOU ({proprio_error}) — arquivos antigos preservados')
+        # Anotação do Actions: o run continua verde (pra não travar o commit do
+        # Ticketmaster), mas o aviso aparece no resumo da execução.
+        print(f'::warning title=Sistema Proprio sem atualizar::{proprio_error}')
     print(f'Ticketmaster: source={tm_source}')
     if tm_source == 'stale':
         print(f'  Causa API: {tm_error}')

@@ -126,6 +126,7 @@ def main():
         data = json.load(f)
     eds = data.get('edicoes') or {}
     resumo = []
+    falhou = []
 
     for ed_key in ('moto', 'auto'):
         ed = eds.get(ed_key)
@@ -134,8 +135,15 @@ def main():
         try:
             sales, nq = vendas_pos_snapshot(ed_key)
         except Exception as e:
+            # Sem a API, o que sobra e o baseline de 24/06. Marca a edicao como
+            # nao-ao-vivo em vez de entregar numero velho com cara de fresco.
             print(f'[warn] {ed_key}: {e}', file=sys.stderr)
+            falhou.append(ed_key)
+            ed['ao_vivo'] = False
+            ed['erro_api'] = str(e)[:200]
             continue
+        ed['ao_vivo'] = True
+        ed.pop('erro_api', None)
 
         day_keys = [str(d)[:2] for d in as_list(ed.get('dias'))]
         descontado = 0
@@ -171,7 +179,13 @@ def main():
         resumo.append(f"{ed_key}: {subtotal} disp ({descontado} descontados de {nq} vendas pos-snapshot)")
 
     data['updated_at'] = datetime.now(BRT).strftime('%Y-%m-%d %H:%M')
-    data['source'] = 'Base da planilha (24/06) menos vendas ao vivo da API do sistema proprio'
+    if falhou:
+        data['source'] = ('Base da planilha (24/06) — API do sistema proprio indisponivel para '
+                          + '/'.join(falhou) + ', numeros dessas edicoes sao do snapshot, nao ao vivo')
+        data['api_indisponivel'] = falhou
+    else:
+        data['source'] = 'Base da planilha (24/06) menos vendas ao vivo da API do sistema proprio'
+        data.pop('api_indisponivel', None)
 
     tmp = OUT_FILE + '.tmp'
     with open(tmp, 'w', encoding='utf-8') as f:
