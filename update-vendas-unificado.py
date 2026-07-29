@@ -32,6 +32,11 @@ DATA_INICIO     = date(2026, 3, 31)
 DATA_INICIO_STR = '2026-01-01'
 PAGE_SIZE       = 100
 
+# API v2.0 (a partir de 29/07/2026): o token deixou de ser publico.
+# Agora e POST /apis/token com a chave no header X-Api-Key, e o token vale 1 HORA.
+# A chave NUNCA entra no codigo: este repositorio e publico.
+FI_API_KEY = os.environ.get('FI_API_KEY', '')
+
 TM_API_BASE       = 'https://data.getcrowder.com'
 TM_API_ENDPOINT   = '/activity/organizer'
 TM_API_KEY        = os.environ.get('TM_API_KEY', '52087b883f65e8d2a684ee680c5beca66e425fdcc46c2b653da0fffd50088734')
@@ -76,19 +81,40 @@ def _proprio_headers(base, token=None):
     return h
 
 
-def fetch_proprio_sales(base):
-    """Busca todas as vendas do Sistema Próprio. Uma única vez."""
-    r = requests.get(base + '/apis/token', headers=_proprio_headers(base), timeout=30)
+def get_proprio_token(base):
+    """API v2.0: troca a chave por um token de 1 hora. POST + header X-Api-Key."""
+    if not FI_API_KEY:
+        raise RuntimeError(
+            'FI_API_KEY nao definida. A API do sistema proprio virou v2.0 em 29/07/2026 '
+            'e exige a chave do Festival Interlagos. Cadastre o secret FI_API_KEY no '
+            'repositorio (Settings > Secrets and variables > Actions).')
+    h = _proprio_headers(base)
+    h['X-Api-Key'] = FI_API_KEY
+    r = requests.post(base + '/apis/token', headers=h, timeout=30)
     r.raise_for_status()
-    token = r.json()['token']
+    d = r.json()
+    if d.get('status') != 'success' or not d.get('token'):
+        raise RuntimeError(f'/apis/token nao devolveu token: {str(d)[:200]}')
+    return d['token']
+
+
+def fetch_proprio_sales(base):
+    """Busca todas as vendas do Sistema Próprio, renovando o token se expirar."""
+    token = get_proprio_token(base)
 
     fim = datetime.now().strftime('%Y-%m-%d')
-    sales, page = [], 1
+    sales, page, renovou = [], 1, False
     while True:
         url = (f'{base}/apis/vendas?data_inicio={DATA_INICIO_STR}&data_fim={fim}'
                f'&page_size={PAGE_SIZE}&page={page}')
         r = requests.get(url, headers=_proprio_headers(base, token), timeout=30)
+        # token de 1h pode vencer no meio da paginacao: renova uma vez e repete a pagina
+        if r.status_code == 401 and not renovou:
+            renovou = True
+            token = get_proprio_token(base)
+            continue
         r.raise_for_status()
+        renovou = False
         d = r.json()
         if d.get('status') != 'success' or not d.get('data'):
             break

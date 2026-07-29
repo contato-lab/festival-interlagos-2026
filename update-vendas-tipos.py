@@ -14,11 +14,16 @@ from datetime import datetime, timezone
 from collections import defaultdict
 
 # ── PRÓPRIO ────────────────────────────────────────────────
+FI_API_KEY = os.environ.get('FI_API_KEY', '')
+
 def fetch_proprio_sales(base):
     headers = {'Accept':'application/json','Content-Type':'application/json',
                'Origin':base,'Referer':base+'/',
                'User-Agent':'Mozilla/5.0','X-Requested-With':'XMLHttpRequest'}
-    r = requests.get(base+'/apis/token', headers=headers, timeout=30)
+    # API v2.0 (29/07/2026): POST com X-Api-Key, token vale 1 hora
+    if not FI_API_KEY:
+        raise RuntimeError('FI_API_KEY nao definida (API do sistema proprio virou v2.0)')
+    r = requests.post(base+'/apis/token', headers={**headers, 'X-Api-Key': FI_API_KEY}, timeout=30)
     r.raise_for_status()
     headers['Authorization'] = f'Bearer {r.json()["token"]}'
     sales, page = [], 1

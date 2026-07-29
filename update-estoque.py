@@ -7,7 +7,7 @@ Vivo  = base MENOS as vendas confirmadas (venda_status=3) que entraram DEPOIS do
         puxadas da API do sistema proprio (/apis/token + /apis/vendas).
 Saida = estoque-data.json (lido pelo dashboard).
 
-Sem secret: /apis/token e publico. Roda via GitHub Actions a cada ~15 min.
+Precisa do secret FI_API_KEY (API v2.0 desde 29/07/2026). Roda via GitHub Actions a cada ~15 min.
 Granularidade: por edicao -> passe -> marca -> dia (igual o dashboard mostra).
 """
 import json, os, sys
@@ -46,6 +46,23 @@ def _get(url, base, token=None):
         return json.loads(r.read())
 
 
+# API v2.0 (29/07/2026): o token deixou de ser publico. Agora e POST com a chave
+# no header X-Api-Key e vale 1 hora. A chave vem do secret, nunca do codigo.
+FI_API_KEY = os.environ.get('FI_API_KEY', '')
+
+def get_token(base):
+    if not FI_API_KEY:
+        raise RuntimeError('FI_API_KEY nao definida (API do sistema proprio virou v2.0)')
+    h = _headers(base)
+    h['X-Api-Key'] = FI_API_KEY
+    req = Request(base + '/apis/token', headers=h, method='POST', data=b'')
+    with urlopen(req, timeout=30) as r:
+        d = json.loads(r.read())
+    if d.get('status') != 'success' or not d.get('token'):
+        raise RuntimeError('/apis/token nao devolveu token')
+    return d['token']
+
+
 def as_list(x):
     return x if isinstance(x, list) else ([] if x is None else [x])
 
@@ -78,7 +95,7 @@ def fetch_vendas(base, token):
 def vendas_pos_snapshot(ed_key):
     """{(passe, MARCA, 'DD'): qtd_vendida_depois_do_snapshot}."""
     base, ts = BASES[ed_key], SNAPSHOT_TS[ed_key]
-    token = _get(base + '/apis/token', base)['token']
+    token = get_token(base)
     sales = {}
     total_q = 0
     _vendas = fetch_vendas(base, token)

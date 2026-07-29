@@ -40,6 +40,7 @@ jobs:
       - name: Run unified update script
         env:
           TM_API_KEY: ${{ secrets.TM_API_KEY }}
+          FI_API_KEY: ${{ secrets.FI_API_KEY }}
         run: python update-vendas-unificado.py
 
       - name: Commit JSONs (com retry loop)

@@ -59,10 +59,19 @@ async function fetchWithRetry(url, opts, label) {
   throw new Error(`${label} falhou apos ${MAX_RETRIES} tentativas: ${lastErr.message}`);
 }
 
-async function getToken(base) {
-  const r = await fetchWithRetry(base + '/apis/token', { headers: buildHeaders(base) }, `Token ${base}`);
+// API v2.0 (29/07/2026): o token deixou de ser publico. Agora e POST com a chave
+// no header X-Api-Key e vale 1 HORA. A chave vem do secret do Worker (env.FI_API_KEY),
+// configurado com `wrangler secret put FI_API_KEY`. Nunca no codigo.
+async function getToken(base, env) {
+  const key = env && env.FI_API_KEY;
+  if (!key) throw new Error('FI_API_KEY nao configurada no Worker (API do sistema proprio virou v2.0)');
+  const r = await fetchWithRetry(
+    base + '/apis/token',
+    { method: 'POST', headers: { ...buildHeaders(base), 'X-Api-Key': key } },
+    `Token ${base}`
+  );
   const d = await r.json();
-  if (d.status !== 'success') throw new Error('Token status: ' + d.status);
+  if (d.status !== 'success' || !d.token) throw new Error('Token status: ' + d.status);
   return d.token;
 }
 
@@ -115,8 +124,8 @@ function lastSaleAt(sales) {
   } catch { return null; }
 }
 
-async function buildVendasData() {
-  const [motoToken, autoToken] = await Promise.all([getToken(API_MOTO), getToken(API_AUTO)]);
+async function buildVendasData(env) {
+  const [motoToken, autoToken] = await Promise.all([getToken(API_MOTO, env), getToken(API_AUTO, env)]);
   const [motoSales, autoSales] = await Promise.all([
     getAllVendas(API_MOTO, motoToken),
     getAllVendas(API_AUTO, autoToken),
@@ -213,7 +222,7 @@ export default {
 
     // 2) Tenta API
     try {
-      const data = await buildVendasData();
+      const data = await buildVendasData(env);
       const body = JSON.stringify(data);
 
       // Cache fresco (30s)

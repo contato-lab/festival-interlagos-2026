@@ -11,10 +11,14 @@ Roda via GitHub Actions a cada 5 minutos.
 """
 
 import json
+import os
 import sys
 from datetime import date, datetime, timedelta, timezone
 from urllib.request import urlopen, Request
 from urllib.error import HTTPError, URLError
+
+# API v2.0 (29/07/2026): chave obrigatoria, vem do secret e nunca do codigo
+FI_API_KEY = os.environ.get("FI_API_KEY", "")
 
 # ─── CONFIGURAÇÃO ─────────────────────────────────────────
 API_MOTO_BASE    = "https://ingressosmoto.festivalinterlagos.com.br"
@@ -42,9 +46,13 @@ def _headers(base, token=None):
 # ─── FUNÇÕES ──────────────────────────────────────────────
 
 def get_token(base):
-    """Obtém Bearer token do endpoint /apis/token."""
+    """API v2.0 (29/07/2026): POST /apis/token com X-Api-Key. Token vale 1 hora."""
+    if not FI_API_KEY:
+        raise RuntimeError("FI_API_KEY nao definida (API do sistema proprio virou v2.0)")
     url = base + "/apis/token"
-    req = Request(url, headers=_headers(base), method="GET")
+    h = _headers(base)
+    h["X-Api-Key"] = FI_API_KEY
+    req = Request(url, headers=h, method="POST", data=b"")
     try:
         with urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read())

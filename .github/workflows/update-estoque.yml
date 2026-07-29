@@ -17,6 +17,8 @@ jobs:
           python-version: '3.11'
 
       - name: Rodar update-estoque
+        env:
+          FI_API_KEY: ${{ secrets.FI_API_KEY }}
         run: python update-estoque.py
 
       - name: Commit estoque-data.json
