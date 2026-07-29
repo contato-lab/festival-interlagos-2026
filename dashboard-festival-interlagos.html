@@ -494,6 +494,40 @@ tr:hover td{background:rgba(255,255,255,.018)}
   </div>
 </div>
 
+<!-- ══ PROJEÇÃO ATÉ O FIM ══ -->
+<div class="chart-card">
+  <div class="section-header">
+    <div class="section-title">🔮 Projeção de Vendas — até 30/08</div>
+    <div class="pill-group" id="projPills">
+      <button class="pill active" onclick="setProjMetric('receita',this)">Receita</button>
+      <button class="pill" onclick="setProjMetric('ingressos',this)">Ingressos</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px">
+    <div style="background:rgba(107,124,138,.08);border:1px solid rgba(107,124,138,.35);border-radius:10px;padding:10px 14px">
+      <div style="font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);font-weight:700">Conservador · ritmo atual</div>
+      <div id="projCons" style="font-family:'Barlow Condensed',sans-serif;font-size:1.45rem;font-weight:700;color:#9AA7B0">—</div>
+      <div id="projConsSub" style="font-size:.68rem;color:var(--text3)">—</div>
+    </div>
+    <div style="background:rgba(200,255,0,.07);border:1px solid rgba(200,255,0,.4);border-radius:10px;padding:10px 14px">
+      <div style="font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:#C8FF00;font-weight:700">Realista · curva 2025</div>
+      <div id="projReal" style="font-family:'Barlow Condensed',sans-serif;font-size:1.45rem;font-weight:700;color:#C8FF00">—</div>
+      <div id="projRealSub" style="font-size:.68rem;color:var(--text3)">—</div>
+    </div>
+    <div style="background:rgba(0,188,212,.06);border:1px solid rgba(0,188,212,.35);border-radius:10px;padding:10px 14px">
+      <div style="font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:#00BCD4;font-weight:700">Otimista · +25%</div>
+      <div id="projOtim" style="font-family:'Barlow Condensed',sans-serif;font-size:1.45rem;font-weight:700;color:#00BCD4">—</div>
+      <div id="projOtimSub" style="font-size:.68rem;color:var(--text3)">—</div>
+    </div>
+  </div>
+  <div style="position:relative;height:300px"><canvas id="chartProjecao"></canvas></div>
+  <div class="chart-footnote" style="font-size:.68rem;color:var(--text3);margin-top:10px">
+    Acumulado dos dois canais (sistema próprio + Ticketmaster). O cenário realista repete o formato da reta final
+    de 2025 (venda real, por edição) escalado pro ritmo atual dos últimos 14 dias, e soma o pico da virada de lote
+    em 04/08 no padrão de 2025. Vendas encerram: moto 16/08, auto 30/08. Recalculado a cada atualização de dados.
+  </div>
+</div>
+
 <!-- ══ VENDAS POR EDIÇÃO ══ -->
 <div class="two-col">
   <div class="chart-card">
@@ -1237,6 +1271,8 @@ function applyFiltro(){
   // Test Ride é snapshot do estoque, não depende do filtro de data
   // Atualiza Tipos de Ingresso com o mesmo range
   if(TIPOS_DATA) renderTipos();
+  // Projeção usa D26_FULL (temporada inteira), não depende do filtro
+  try{ buildProjecao(); }catch(e){ console.warn('[Projecao]', e); }
 }
 
 function initFiltro(){
@@ -1248,6 +1284,151 @@ function initFiltro(){
   const de14=new Date(dateMax.getTime()-13*86400000);
   document.getElementById('filtroATE').value=dateToIso(dateMax);
   document.getElementById('filtroDE').value=dateToIso(de14<minDate?minDate:de14);
+}
+
+// ═══════════════════════════════════════════════
+// PROJEÇÃO ATÉ O FIM DA TEMPORADA
+// Método: repete o FORMATO da reta final de 2025 (venda real, por edição),
+// escalado pro ritmo atual (últimos 14 dias), + pico da virada de lote 04/08.
+// Usa D26_FULL (ignora o filtro de datas) e recalcula sozinha a cada carga.
+// ═══════════════════════════════════════════════
+let chartProj = null, projMetric = 'receita';
+const PROJ_MOTO_END = 139;   // 16/08/2026 (D+1 = 31/03)
+const PROJ_AUTO_END = 153;   // 30/08/2026
+const PROJ_VIRADA   = 127;   // 04/08/2026 (pico de 3 dias)
+const PROJ_D25_MOTO_END = 63, PROJ_D25_AUTO_END = 77;
+
+function setProjMetric(m, btn){
+  projMetric = m;
+  document.querySelectorAll('#projPills .pill').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  buildProjecao();
+}
+
+function buildProjecao(){
+  const el = document.getElementById('chartProjecao'); if(!el) return;
+  const full = (typeof D26_FULL !== 'undefined' && D26_FULL.length) ? D26_FULL : D26;
+  if(!full || !full.length) return;
+  const R = (projMetric === 'receita');
+
+  // ritmo atual por edição: média dos últimos 14 dias com dado
+  const last = full.slice(-14);
+  const rateM = last.reduce((a,r)=>a+(R?(r.mv||0):(r.mq||0)),0) / last.length;
+  const rateA = last.reduce((a,r)=>a+(R?(r.av||0):(r.aq||0)),0) / last.length;
+  const dHoje = full[full.length-1].d;
+
+  // séries 2025 reais por edição
+  const m25 = D25.map(r=>R?r.mv:r.mq);
+  const a25 = D25.map(r=>R?r.av:r.aq);
+
+  // escala = ritmo 2026 / ritmo dos primeiros 5 dias da janela 2025 equivalente
+  function escala(serie, end25, rest, rate){
+    if(rest <= 0 || rate <= 0) return 0;
+    const ini = Math.max(0, end25 - rest);           // índice 0-based do 1º dia da janela
+    let s = 0, n = 0;
+    for(let k = ini; k < Math.min(ini+5, end25); k++){ s += serie[k]; n++; }
+    return (n && s > 0) ? rate/(s/n) : 0;
+  }
+  const restM = PROJ_MOTO_END - dHoje, restA = PROJ_AUTO_END - dHoje;
+  const sM = escala(m25, PROJ_D25_MOTO_END, restM, rateM);
+  const sA = escala(a25, PROJ_D25_AUTO_END, restA, rateA);
+
+  // realizado acumulado
+  const labels = [], realiz = [], cons = [], real = [], otim = [];
+  let acum = 0;
+  full.forEach(r=>{
+    acum += R ? ((r.mv||0)+(r.av||0)) : ((r.mq||0)+(r.aq||0));
+    labels.push('D+'+r.d); realiz.push(acum);
+    cons.push(null); real.push(null); otim.push(null);
+  });
+  // emenda: as projeções nascem do último ponto realizado
+  cons[cons.length-1] = acum; real[real.length-1] = acum; otim[otim.length-1] = acum;
+
+  const incVirada = [1.8, 0.9, 0.6];   // acréscimo sobre o ritmo, padrão do pico de lote 2025
+  let cCons = acum, cReal = acum;
+  const marcas = [];                    // linhas verticais no gráfico
+  for(let d = dHoje+1; d <= PROJ_AUTO_END; d++){
+    labels.push('D+'+d); realiz.push(null);
+    let vc = 0, vr = 0;
+    if(d <= PROJ_MOTO_END){
+      vc += rateM;
+      const im = PROJ_D25_MOTO_END - (PROJ_MOTO_END - d) - 1;
+      vr += (m25[im] || 0) * sM;
+    }
+    vc += rateA;
+    const ia = PROJ_D25_AUTO_END - (PROJ_AUTO_END - d) - 1;
+    vr += (a25[ia] || 0) * sA;
+    if(d >= PROJ_VIRADA && d < PROJ_VIRADA + 3){
+      const f = incVirada[d - PROJ_VIRADA];
+      vr += (d <= PROJ_MOTO_END ? rateM * f : 0) + rateA * f;
+    }
+    cCons += vc; cReal += vr;
+    cons.push(cCons); real.push(cReal); otim.push(acum + (cReal - acum) * 1.25);
+    if(d === PROJ_VIRADA)  marcas.push({i: labels.length-1, txt:'Virada 04/08', cor:'#FF5CA8'});
+    if(d === 135)          marcas.push({i: labels.length-1, txt:'Moto 12–16/08', cor:'#C8FF00'});
+    if(d === 150)          marcas.push({i: labels.length-1, txt:'Auto 27–30/08', cor:'#00BCD4'});
+  }
+  const cOtim = acum + (cReal - acum) * 1.25;
+
+  // KPIs dos cenários
+  const fmtV = v => R ? fmtR(v) : fmtN(Math.round(v)) + ' ing';
+  const sub  = v => 'entra ' + (R ? fmtR(v - acum) : fmtN(Math.round(v - acum)) + ' ing');
+  const setK = (id, v) => {
+    const e1 = document.getElementById(id), e2 = document.getElementById(id+'Sub');
+    if(e1) e1.textContent = fmtV(v);
+    if(e2) e2.textContent = sub(v);
+  };
+  setK('projCons', cCons); setK('projReal', cReal); setK('projOtim', cOtim);
+
+  // gráfico
+  if(chartProj) chartProj.destroy();
+  const marcaPlugin = {
+    id: 'projMarcas',
+    afterDraw(c){
+      const ctx = c.ctx, x = c.scales.x, top = c.chartArea.top, bot = c.chartArea.bottom;
+      marcas.forEach(m=>{
+        const px = x.getPixelForValue(m.i);
+        if(!isFinite(px)) return;
+        ctx.save();
+        ctx.strokeStyle = m.cor; ctx.setLineDash([4,4]); ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(px, top); ctx.lineTo(px, bot); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = m.cor; ctx.font = '600 10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(m.txt, px, top - 4);
+        ctx.restore();
+      });
+    }
+  };
+  chartProj = new Chart(el, {
+    type: 'line',
+    data: { labels, datasets: [
+      { label:'Realizado 2026', data:realiz, borderColor:'#C8FF00', backgroundColor:'rgba(200,255,0,.09)',
+        borderWidth:2.5, pointRadius:0, fill:true, tension:.25, spanGaps:false },
+      { label:'Realista (curva 2025)', data:real, borderColor:'#C8FF00', borderDash:[6,5],
+        borderWidth:2, pointRadius:0, fill:false, tension:.25, spanGaps:false },
+      { label:'Conservador (ritmo atual)', data:cons, borderColor:'#6B7C8A', borderDash:[4,4],
+        borderWidth:1.5, pointRadius:0, fill:false, tension:.25, spanGaps:false },
+      { label:'Otimista (+25%)', data:otim, borderColor:'#00BCD4', borderDash:[3,5],
+        borderWidth:1.5, pointRadius:0, fill:false, tension:.25, spanGaps:false }
+    ]},
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      layout:{ padding:{ top:16 } },
+      plugins:{
+        legend:{ labels:{ color:'#9AA7B0', boxWidth:18, font:{size:11} } },
+        tooltip:{ callbacks:{ label: c => c.dataset.label + ': ' + (c.parsed.y==null ? '—' : fmtV(c.parsed.y)) } }
+      },
+      scales:{
+        x:{ ticks:{ color:'#6B7C8A', maxTicksLimit:14, font:{size:10} }, grid:{ color:'rgba(255,255,255,.04)' } },
+        y:{ ticks:{ color:'#6B7C8A', font:{size:10},
+              callback: v => R ? 'R$ '+(v/1e6).toFixed(1)+'M' : (v/1000).toFixed(0)+'k' },
+            grid:{ color:'rgba(255,255,255,.06)' } }
+      }
+    },
+    plugins:[marcaPlugin]
+  });
 }
 
 // ═══════════════════════════════════════════════
