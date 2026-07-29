@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-07-29 17:15",
-  "source": "Base da planilha (24/06) menos vendas ao vivo da API do sistema proprio",
+  "updated_at": "2026-07-29 18:33",
+  "source": "Base da planilha (24/06) — API do sistema proprio indisponivel para moto/auto, numeros dessas edicoes sao do snapshot, nao ao vivo",
   "edicoes": {
     "moto": {
       "label": "Edicao Moto",
@@ -310,7 +310,9 @@
           "marca": "Royal Enfield",
           "total": 454
         }
-      ]
+      ],
+      "ao_vivo": false,
+      "erro_api": "FI_API_KEY nao definida (API do sistema proprio virou v2.0)"
     },
     "auto": {
       "label": "Edicao Auto",
@@ -675,7 +677,13 @@
           "marca": "JEEP",
           "total": 212
         }
-      ]
+      ],
+      "ao_vivo": false,
+      "erro_api": "FI_API_KEY nao definida (API do sistema proprio virou v2.0)"
     }
-  }
+  },
+  "api_indisponivel": [
+    "moto",
+    "auto"
+  ]
 }
