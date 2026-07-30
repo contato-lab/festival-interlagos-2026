@@ -1,21 +1,21 @@
 {
-  "updated_at": "2026-07-29T23:34:09Z",
-  "source": "Plataforma própria (ingressosmoto/ingressosauto.festivalinterlagos.com.br). ATENCAO: a API virou v2.0 em 29/07/2026 e parou de responder. Os dias 28/07 (que estava truncado nas 20:45 BRT) e 29/07 foram lancados a mao, lidos do admin em 29/07 23:34 UTC. Voltam a ser automaticos quando o secret FI_API_KEY for cadastrado. Dias marcados com \"manual\": true.",
+  "updated_at": "2026-07-30T02:03:04Z",
+  "source": "Plataforma própria (ingressosmoto/ingressosauto.festivalinterlagos.com.br)",
   "campaign_start": "2026-03-31",
   "totals": {
-    "moto_receita": 1884206.56,
+    "moto_receita": 1892111.86,
     "auto_receita": 1140886.47,
-    "moto_ingressos": 3105,
+    "moto_ingressos": 3117,
     "auto_ingressos": 1227,
-    "total_receita": 3025093.03,
-    "total_ingressos": 4332
+    "total_receita": 3032998.33,
+    "total_ingressos": 4344
   },
   "daily": [
     {
       "d": 1,
       "date": "2026-03-31",
-      "moto_receita": 619873.03,
-      "moto_ingressos": 1035,
+      "moto_receita": 625255.11,
+      "moto_ingressos": 1043,
       "auto_receita": 330581.43,
       "auto_ingressos": 380
     },
@@ -969,17 +969,15 @@
       "moto_receita": 6437.52,
       "moto_ingressos": 10,
       "auto_receita": 4371.28,
-      "auto_ingressos": 5,
-      "manual": true
+      "auto_ingressos": 5
     },
     {
       "d": 121,
       "date": "2026-07-29",
-      "moto_receita": 9047.0,
-      "moto_ingressos": 11,
+      "moto_receita": 11570.22,
+      "moto_ingressos": 15,
       "auto_receita": 11169.51,
-      "auto_ingressos": 10,
-      "manual": true
+      "auto_ingressos": 10
     }
   ]
 }
