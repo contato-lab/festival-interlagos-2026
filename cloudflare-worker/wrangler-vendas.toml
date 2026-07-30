@@ -1,0 +1,11 @@
+name = "vendas-festival-interlagos"
+main = "worker.js"
+compatibility_date = "2026-04-23"
+
+[observability]
+enabled = true
+
+# O secret FI_API_KEY NAO fica aqui. Ele e cadastrado no painel da Cloudflare
+# (Workers & Pages > vendas-festival-interlagos > Settings > Variables and
+# Secrets) ou por `wrangler secret put FI_API_KEY`, e chega no codigo como
+# env.FI_API_KEY. Este arquivo esta em repositorio publico.

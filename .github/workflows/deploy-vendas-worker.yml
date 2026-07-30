@@ -1,0 +1,37 @@
+name: Deploy Vendas Worker
+
+# Faz deploy automático do Worker de vendas próprias no Cloudflare sempre que o
+# código mudar. Antes disso o worker.js era colado à mão no editor da Cloudflare,
+# o que deixou o código velho no ar quando a API virou v2.0 em 29/07/2026.
+#
+# Pré-requisitos:
+#   - secret CLOUDFLARE_API_TOKEN no repo (já existe, o worker do Ticketmaster usa)
+#   - secret FI_API_KEY cadastrado NO PRÓPRIO WORKER, no painel da Cloudflare.
+#     Esse não passa por aqui: o Worker lê de env.FI_API_KEY em tempo de execução.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare-worker/worker.js'
+      - 'cloudflare-worker/wrangler-vendas.toml'
+      - '.github/workflows/deploy-vendas-worker.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: cloudflare-worker
+          wranglerVersion: '3'
+          command: deploy --config wrangler-vendas.toml
