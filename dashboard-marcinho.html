@@ -712,6 +712,12 @@ let D25_INVEST = (() => {
   return arr;
 })();
 
+// Total dos 4 canais de 2025 (Meta + Google + TikTok + Spotify). TikTok e
+// Spotify só existem como total de campanha no relatório de 2025, sem abertura
+// diária, então ficam fora de D25_INVEST.
+let D25_INVEST_TOTAL4 = 0;
+let D25_DIAS_TOTAIS   = 0;
+
 async function fetchInvestimento2025() {
   try {
     const res = await fetch('investimento-2025.json?t=' + Date.now(), {cache:'no-store'});
@@ -720,6 +726,8 @@ async function fetchInvestimento2025() {
     const diario = data?.diario_por_dia_campanha || [];
     if (!diario.length) return;
     D25_INVEST = diario.map(r => ({ d: r.d, v: r.total }));
+    D25_INVEST_TOTAL4 = data?.totals?.cost_total_4_canais || 0;
+    D25_DIAS_TOTAIS   = data?.campanha?.dias || diario.length;
     console.info('[investimento-2025] baseline real carregado:', data.totals);
   } catch(e) { /* arquivo ainda não existe — segue com hardcoded */ }
 }
@@ -1118,14 +1126,19 @@ function renderHojeOntem() {
   const media = dias > 0 ? totalInv/dias : 0;
 
   // 2025 same days
-  const invest25Same = D25_INVEST.filter(r=>r.d<=dias).reduce((a,r)=>a+r.v,0);
+  const _dias25 = D25_INVEST.filter(r=>r.d<=dias);
+  const _cobreTudo25 = D25_DIAS_TOTAIS > 0 && _dias25.length >= D25_DIAS_TOTAIS;
+  const _completo25  = _cobreTudo25 && D25_INVEST_TOTAL4 > 0;
+  const invest25Same = _completo25 ? D25_INVEST_TOTAL4 : _dias25.reduce((a,r)=>a+r.v,0);
 
   document.getElementById('investTotal').textContent = fmtFull(totalInv);
   document.getElementById('mediaDaily').textContent  = fmtFull(media);
   document.getElementById('diasCamp').textContent    = dias + 'º dia';
   document.getElementById('investVs25').textContent  =
     invest25Same > 0
-      ? `2025 (mesmos ${dias} dias): ${fmtFull(invest25Same)}`
+      ? (_completo25
+          ? `2025 (campanha inteira, ${D25_DIAS_TOTAIS} dias · 4 canais): ${fmtFull(invest25Same)}`
+          : `2025 (mesmos ${dias} dias · só Meta + Google): ${fmtFull(invest25Same)}`)
       : 'Comparativo 2025 indisponível';
 }
 

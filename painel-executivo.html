@@ -1315,6 +1315,14 @@ let EXEC_D25_INVEST = (() => {
 })();
 let EXEC_D25_INVEST_SOURCE = 'planilha (estimativa)';
 
+// Total dos 4 canais de 2025 (Meta + Google + TikTok + Spotify).
+// TikTok e Spotify existem só como total de campanha no relatório de 2025, sem
+// abertura diária, então NÃO entram em EXEC_D25_INVEST. Quem compara a campanha
+// inteira usa este número; quem compara um recorte de datas usa o diário, que é
+// Meta + Google. EXEC_D25_DIAS_TOTAIS diz quantos dias a campanha de 2025 teve.
+let EXEC_D25_INVEST_TOTAL4 = 0;
+let EXEC_D25_DIAS_TOTAIS   = 0;
+
 async function fetchInvestimento2025() {
   try {
     const res = await fetch('investimento-2025.json?t=' + Date.now(), {cache:'no-store'});
@@ -1324,6 +1332,8 @@ async function fetchInvestimento2025() {
     if (!diario.length) return;
     // Substitui o array baseline pelos valores reais dia-a-dia
     EXEC_D25_INVEST = diario.map(r => ({ d: r.d, date: r.date, v: r.total }));
+    EXEC_D25_INVEST_TOTAL4 = data?.totals?.cost_total_4_canais || 0;
+    EXEC_D25_DIAS_TOTAIS   = data?.campanha?.dias || diario.length;
     EXEC_D25_INVEST_SOURCE = 'API Meta + Google (real)';
     const badge = document.getElementById('exec-invest-source');
     if (badge) {
@@ -1334,12 +1344,19 @@ async function fetchInvestimento2025() {
   } catch(e) { /* arquivo ainda não existe */ }
 }
 
-// Mapeia uma data 2026 (YYYY-MM-DD) pra a mesma data calendário em 2025.
-// 2026-05-20 -> 2025-05-20. Retorna null se a string não tem prefixo "2026-".
+// Mapeia uma data de 2026 pro DIA DE CAMPANHA equivalente em 2025.
+// Antes isso casava data de calendário ('2026-05-20' -> '2025-05-20'), e estava
+// errado: a campanha de 2025 abriu em 14/03/2025 e a de 2026 em 31/03/2026, 17
+// dias de defasagem. Mapear '2026-03-31' -> '2025-03-31' jogava fora tudo que
+// foi investido de 14/03 a 30/03/2025 (R$ 72.813,03) e inflava toda comparação
+// contra 2025. Dia 1 de 2026 tem que cair no dia 1 de 2025.
 function _execMap2026To2025(dateStr) {
   if (!dateStr || typeof dateStr !== 'string') return null;
   if (!dateStr.startsWith('2026-')) return null;
-  return '2025-' + dateStr.slice(5);
+  const dia = execDayOf26(dateStr);   // 1 = 31/03/2026
+  if (!isFinite(dia) || dia < 1) return null;
+  const d25 = new Date(EXEC_D25_INVEST_START.getTime() + (dia - 1) * 86400000);
+  return d25.toISOString().slice(0, 10);   // 1 = 14/03/2025
 }
 
 let execChartVendas = null, execChartInvest = null;
@@ -1658,15 +1675,26 @@ function renderExecKPIs() {
   const _filtTo26   = execFiltTo   || _todayIso26;
   const _filtFrom25 = _execMap2026To2025(_filtFrom26);
   const _filtTo25   = _execMap2026To2025(_filtTo26);
-  const total25 = (_filtFrom25 && _filtTo25)
-    ? EXEC_D25_INVEST.filter(r => r.date >= _filtFrom25 && r.date <= _filtTo25).reduce((s,r) => s+r.v, 0)
-    : 0;
+  const _diario25 = (_filtFrom25 && _filtTo25)
+    ? EXEC_D25_INVEST.filter(r => r.date >= _filtFrom25 && r.date <= _filtTo25)
+    : [];
+  // Quando o per\u00edodo pega a campanha de 2025 inteira (dia 1 at\u00e9 o \u00faltimo dia),
+  // vale o total dos 4 canais, que inclui TikTok e Spotify. Num recorte parcial
+  // s\u00f3 existe o di\u00e1rio, que \u00e9 Meta + Google, e o card avisa isso.
+  const _cobreTudo25 = EXEC_D25_DIAS_TOTAIS > 0 && _diario25.length >= EXEC_D25_DIAS_TOTAIS;
+  const _completo25  = _cobreTudo25 && EXEC_D25_INVEST_TOTAL4 > 0;
+  const total25 = _completo25
+    ? EXEC_D25_INVEST_TOTAL4
+    : _diario25.reduce((s,r) => s+r.v, 0);
   const invEl = document.getElementById('exec-kpi-invest');
   if(invEl) {
     const pct = total25>0 ? ((total26-total25)/total25*100) : null;
     const cls = pct===null?'':pct>=0?'up':'down';
     const dStr = pct===null?'vs 2025: aguardando':(pct>=0?'\u25b2':'\u25bc')+Math.abs(pct).toFixed(1)+'% vs 2025';
-    invEl.innerHTML = `<div class="exec-kpi-val">${execFmtK(total26)}</div><div class="exec-kpi-delta ${cls}">${dStr}</div>`;
+    const _subSty = 'margin-top:6px;font-size:.7rem;color:var(--text3);opacity:.75;letter-spacing:.02em';
+    const base = pct===null ? '' :
+      `<div style="${_subSty}">2025: ${execFmtK(total25)} \u00b7 ${_completo25 ? '4 canais' : 's\u00f3 Meta + Google'}</div>`;
+    invEl.innerHTML = `<div class="exec-kpi-val">${execFmtK(total26)}</div><div class="exec-kpi-delta ${cls}">${dStr}</div>${base}`;
   }
 
   // Contexto dinamico

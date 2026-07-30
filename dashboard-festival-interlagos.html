@@ -2847,6 +2847,13 @@ let D25_INVEST = (() => {
   return arr;
 })();
 
+// Total dos 4 canais de 2025 (Meta + Google + TikTok + Spotify). TikTok e
+// Spotify só existem como total de campanha no relatório de 2025, sem abertura
+// diária, então ficam fora de D25_INVEST. Quem compara a campanha inteira usa
+// este número; num recorte parcial só dá pra usar o diário (Meta + Google).
+let D25_INVEST_TOTAL4 = 0;
+let D25_DIAS_TOTAIS   = 0;
+
 async function fetchInvestimento2025() {
   try {
     const res = await fetch('investimento-2025.json?t=' + Date.now(), {cache:'no-store'});
@@ -2855,6 +2862,8 @@ async function fetchInvestimento2025() {
     const diario = data?.diario_por_dia_campanha || [];
     if (!diario.length) return;
     D25_INVEST = diario.map(r => ({ d: r.d, v: r.total }));
+    D25_INVEST_TOTAL4 = data?.totals?.cost_total_4_canais || 0;
+    D25_DIAS_TOTAIS   = data?.campanha?.dias || diario.length;
     console.info('[investimento-2025] baseline real carregado:', data.totals);
   } catch(e) { /* arquivo ainda não existe — segue com hardcoded */ }
 }
@@ -2888,7 +2897,10 @@ function updateMediaTotals(dateFrom, dateTo) {
   const hoje = new Date(); hoje.setHours(0,0,0,0);
   const dias = Math.max(1, Math.round((hoje - DATA_INICIO) / 86400000) + 1);
   const media = dias > 0 ? inv / dias : 0;
-  const invest25Same = D25_INVEST.filter(r => r.d <= dias).reduce((s,r) => s + r.v, 0);
+  const _dias25 = D25_INVEST.filter(r => r.d <= dias);
+  const _cobreTudo25 = D25_DIAS_TOTAIS > 0 && _dias25.length >= D25_DIAS_TOTAIS;
+  const _completo25  = _cobreTudo25 && D25_INVEST_TOTAL4 > 0;
+  const invest25Same = _completo25 ? D25_INVEST_TOTAL4 : _dias25.reduce((s,r) => s + r.v, 0);
 
   const ciVal = document.getElementById('campInvestVal');
   if (ciVal) ciVal.textContent = fmtR(inv);
@@ -2897,7 +2909,9 @@ function updateMediaTotals(dateFrom, dateTo) {
   const ciDias = document.getElementById('campInvestDias');
   if (ciDias) ciDias.textContent = dias + '\u00ba dia';
   const ci25 = document.getElementById('campInvest25');
-  if (ci25) ci25.textContent = '2025 (mesmos ' + dias + ' dias): ' + fmtR(invest25Same);
+  if (ci25) ci25.textContent = _completo25
+    ? '2025 (campanha inteira, ' + D25_DIAS_TOTAIS + ' dias · 4 canais): ' + fmtR(invest25Same)
+    : '2025 (mesmos ' + dias + ' dias · só Meta + Google): ' + fmtR(invest25Same);
 }
 
 // ═══════════════════════════════════════════════════════════════════════

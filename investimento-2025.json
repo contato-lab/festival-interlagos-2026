@@ -1839,7 +1839,23 @@
   "totals": {
     "cost_total": 382287.75,
     "meta_cost": 170034.15,
-    "google_cost": 212253.6
+    "google_cost": 212253.6,
+    "tiktok_cost": 49311.04,
+    "spotify_cost": 29910.72,
+    "cost_total_4_canais": 461509.51
+  },
+  "nota_canais": {
+    "com_dado_diario": ["meta", "google"],
+    "so_total_de_campanha": ["tiktok", "spotify"],
+    "explicacao": "Meta e Google vieram da API, dia a dia. TikTok e Spotify vieram do relatorio de midia de 2025, que traz apenas o total da campanha por plataforma, sem abertura diaria. Por isso 'diario_por_dia_campanha' continua sendo Meta + Google, e o total dos 4 canais fica em 'cost_total_4_canais'. Nao ratear TikTok e Spotify por dia foi decisao consciente: inventaria uma curva que ninguem mediu.",
+    "divergencia_conhecida": "O relatorio de 2025 traz Meta em R$ 169.873,12 e a API em R$ 170.034,15, diferenca de R$ 161,03 (0,03%). Vale o numero da API, que e a fonte. Por isso o total aqui e R$ 461.509,51 e nao os R$ 461.348,47 do relatorio.",
+    "relatorio_2025_por_plataforma": {
+      "google": 212253.6,
+      "meta": 169873.12,
+      "tiktok": 49311.04,
+      "spotify": 29910.72,
+      "total": 461348.47
+    }
   },
   "diario_por_dia_campanha": [
     {
