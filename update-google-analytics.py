@@ -292,6 +292,15 @@ def fetch_influencer_breakdown(client) -> list:
         "SekuMello", "Vans", "lucasxaparral",
         "dinamize", "perfilfestival", "fullpower", "duasrodas",
         "uol", "viradalote",
+        # varredura de 31/07/2026 (UTMs novas achadas no GA4)
+        "JoaoAnacleto", "CassioCortes", "LudmilaDuarte",
+    }
+
+    # Links gerados com o nome escrito diferente do padrao.
+    # Aqui a variacao e somada no nome principal, senao o trafego se perde.
+    INFLUENCER_ALIASES = {
+        "Amanda Pagliari": "AmandaP",
+        "Eliana Malizia":  "ElianaMalizia",
     }
 
     TICKET_PAGES = {
@@ -324,15 +333,21 @@ def fetch_influencer_breakdown(client) -> list:
         print(f"  campaign={row.dimension_values[0].value!r} sess={row.metric_values[0].value} conv={row.metric_values[1].value}")
     sources: dict = {}
     for row in r1.rows:
-        campaign = row.dimension_values[0].value
+        campaign = INFLUENCER_ALIASES.get(row.dimension_values[0].value,
+                                          row.dimension_values[0].value)
         if campaign not in INFLUENCER_CAMPAIGNS:
             continue
-        sources[campaign] = {
-            "source":      campaign,
-            "sessions":    int(row.metric_values[0].value),
-            "conversions": round(float(row.metric_values[1].value)),
-            "tickets":     {},
-        }
+        if campaign in sources:
+            # variacao de escrita caiu no mesmo nome: soma em vez de sobrescrever
+            sources[campaign]["sessions"]    += int(row.metric_values[0].value)
+            sources[campaign]["conversions"] += round(float(row.metric_values[1].value))
+        else:
+            sources[campaign] = {
+                "source":      campaign,
+                "sessions":    int(row.metric_values[0].value),
+                "conversions": round(float(row.metric_values[1].value)),
+                "tickets":     {},
+            }
 
     if not sources:
         return []
@@ -346,7 +361,8 @@ def fetch_influencer_breakdown(client) -> list:
         limit=5000,
     ))
     for row in r2.rows:
-        campaign = row.dimension_values[0].value
+        campaign = INFLUENCER_ALIASES.get(row.dimension_values[0].value,
+                                          row.dimension_values[0].value)
         page     = row.dimension_values[1].value.lower()
         sess     = int(row.metric_values[0].value)
         if campaign not in sources:
@@ -365,7 +381,8 @@ def fetch_influencer_breakdown(client) -> list:
         limit=5000,
     ))
     for row in r3.rows:
-        campaign = row.dimension_values[0].value
+        campaign = INFLUENCER_ALIASES.get(row.dimension_values[0].value,
+                                          row.dimension_values[0].value)
         raw_date = row.dimension_values[1].value  # "20260401"
         sess     = int(row.metric_values[0].value)
         if campaign not in sources:
