@@ -1,15 +1,15 @@
 {
-    "updated_at":  "2026-07-27T12:47:29Z",
+    "updated_at":  "2026-08-01T01:14:28Z",
     "source":  "TikTok Ads Manager (manual - prints do painel dia a dia, linha Total das campanhas, aguardando aprovacao API)",
     "campaign_start":  "2026-03-31",
-    "note":  "Totais = soma da serie diaria (linha Total = campanha de VENDAS + campanha de trafego). Dados diarios REAIS (print): 15/05-26/07. FALTA preencher: 27/07 em diante. Ainda uniformes (estimativa = total do periodo dividido): 31/03-30/04 e 01/05-14/05. Sera substituido pela API automatica assim que o acesso for aprovado.",
+    "note":  "Totais = soma da serie diaria (linha Total = campanha de VENDAS + campanha de trafego). Dados diarios REAIS (print): 15/05-31/07. O dia 31/07 e PARCIAL, o dia ainda nao fechou. Conversoes dos ultimos dias tendem a subir: a atribuicao do TikTok credita a venda de volta no dia do clique (o 26/07 saiu de 1 para 4 conversoes entre 27/07 e 31/07). Ainda uniformes (estimativa = total do periodo dividido): 31/03-30/04 e 01/05-14/05. Sera substituido pela API automatica assim que o acesso for aprovado.",
     "totals":  {
-                   "cost":  39689.66,
-                   "impressions":  5453054,
-                   "clicks":  106624,
+                   "cost":  41200.23,
+                   "impressions":  5618882,
+                   "clicks":  112511,
                    "add_to_cart":  0,
-                   "purchases":  947.66,
-                   "ctr":  1.96
+                   "purchases":  996.66,
+                   "ctr":  2
                },
     "daily_series":  [
                          {
@@ -950,11 +950,51 @@
                          },
                          {
                              "cost":  347.05,
-                             "purchases":  1,
-                             "impressions":  51610,
+                             "purchases":  4,
+                             "impressions":  51611,
                              "clicks":  1171,
                              "date":  "2026-07-26",
                              "add_to_cart":  0
+                         },
+                         {
+                             "date":  "2026-07-27",
+                             "cost":  366.14,
+                             "impressions":  42790,
+                             "clicks":  1139,
+                             "add_to_cart":  0,
+                             "purchases":  7
+                         },
+                         {
+                             "date":  "2026-07-28",
+                             "cost":  319.86,
+                             "impressions":  33263,
+                             "clicks":  1004,
+                             "add_to_cart":  0,
+                             "purchases":  6
+                         },
+                         {
+                             "date":  "2026-07-29",
+                             "cost":  298.64,
+                             "impressions":  44256,
+                             "clicks":  995,
+                             "add_to_cart":  0,
+                             "purchases":  18
+                         },
+                         {
+                             "date":  "2026-07-30",
+                             "cost":  241.06,
+                             "impressions":  21798,
+                             "clicks":  1229,
+                             "add_to_cart":  0,
+                             "purchases":  9
+                         },
+                         {
+                             "date":  "2026-07-31",
+                             "cost":  284.87,
+                             "impressions":  23720,
+                             "clicks":  1520,
+                             "add_to_cart":  0,
+                             "purchases":  6
                          }
                      ]
 }
