@@ -14,6 +14,7 @@ Roda via GitHub Actions a cada hora.
 
 import json
 import os
+import re
 from datetime import datetime, timedelta, timezone
 
 from google.analytics.data_v1beta import BetaAnalyticsDataClient
@@ -303,6 +304,34 @@ def fetch_influencer_breakdown(client) -> list:
         "Eliana Malizia":  "ElianaMalizia",
     }
 
+    # INCLUSAO AUTOMATICA (31/07/2026, ampliada a pedido da coordenacao):
+    # o bloco recebe TODA UTM personalizada, nao so influenciador — e-mail,
+    # parceria, link avulso do time. UTM nova entra sozinha, sem mexer aqui.
+    # So fica de fora o que e midia paga ou valor de sistema:
+    #   (organic)/(direct)/(not set)  -> sistema do GA4
+    #   so numeros                    -> ID de campanha do Meta
+    #   comeca com [LM]               -> campanha paga da Lime
+    #   contem | ou {{ ou __          -> macro de plataforma (TikTok, Ticketmaster)
+    #   festival-2026_adsplay_*       -> ja tem bloco proprio no dashboard
+    #   numero_numero_data            -> parceiro pago (Spotify)
+    # Se aparecer lixo novo, poe o nome exato no NOISE_BLOCK.
+    NOISE_BLOCK = {"PWA测试"}
+    NOISE_PATTERNS = (
+        re.compile(r"^\(.*\)$"),
+        re.compile(r"^\d+$"),
+        re.compile(r"^\[LM\]", re.I),
+        re.compile(r"^festival-2026_adsplay_", re.I),
+        re.compile(r"^\d+_\d+_"),
+    )
+
+    def eh_ruido(nome: str) -> bool:
+        nome = nome.strip()
+        if not nome or nome in NOISE_BLOCK:
+            return True
+        if "|" in nome or "{{" in nome or nome.startswith("__"):
+            return True
+        return any(p.match(nome) for p in NOISE_PATTERNS)
+
     TICKET_PAGES = {
         "ride-pass":   "Ride Pass",
         "sport-pass":  "Sport Pass",
@@ -335,7 +364,8 @@ def fetch_influencer_breakdown(client) -> list:
     for row in r1.rows:
         campaign = INFLUENCER_ALIASES.get(row.dimension_values[0].value,
                                           row.dimension_values[0].value)
-        if campaign not in INFLUENCER_CAMPAIGNS:
+        # lista fixa entra sempre; o resto entra desde que nao seja ruido
+        if campaign not in INFLUENCER_CAMPAIGNS and eh_ruido(campaign):
             continue
         if campaign in sources:
             # variacao de escrita caiu no mesmo nome: soma em vez de sobrescrever
@@ -392,7 +422,9 @@ def fetch_influencer_breakdown(client) -> list:
             sources[campaign]["daily"] = {}
         sources[campaign]["daily"][iso_date] = sources[campaign]["daily"].get(iso_date, 0) + sess
 
-    return sorted(sources.values(), key=lambda x: x["conversions"], reverse=True)
+    return sorted(sources.values(),
+                  key=lambda x: (x["conversions"], x["sessions"]),
+                  reverse=True)
 def fetch_adsplay_breakdown(client) -> list:
     """
     Sessoes/conversoes/tickets por sub-campanha Adsplay (Display, Video,
