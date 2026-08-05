@@ -1,14 +1,14 @@
 {
-    "updated_at":  "2026-08-04T15:36:07Z",
+    "updated_at":  "2026-08-05T16:59:55Z",
     "source":  "TikTok Ads Manager (manual - prints do painel dia a dia, linha Total das campanhas, aguardando aprovacao API)",
     "campaign_start":  "2026-03-31",
-    "note":  "Totais = soma da serie diaria (linha Total = campanha de VENDAS + campanha de trafego). Dados diarios REAIS (print): 15/05-03/08. Falta 04/08 em diante. O 31/07 foi corrigido: tinha sido anotado com o dia ainda correndo (R$ 284,87) e fechou em R$ 329,13. Conversoes dos ultimos dias tendem a subir: a atribuicao do TikTok credita a venda de volta no dia do clique. Ainda uniformes (estimativa = total do periodo dividido): 31/03-30/04 e 01/05-14/05. Sera substituido pela API automatica assim que o acesso for aprovado.",
+    "note":  "Totais = soma da serie diaria (linha Total = campanha de VENDAS + campanha de trafego). Dados diarios REAIS (print): 15/05-04/08. Falta 05/08 em diante. Conversoes dos ultimos dias tendem a subir: a atribuicao do TikTok credita a venda de volta no dia do clique. Ainda uniformes (estimativa = total do periodo dividido): 31/03-30/04 e 01/05-14/05. Sera substituido pela API automatica assim que o acesso for aprovado.",
     "totals":  {
-                   "cost":  42255.74,
-                   "impressions":  5718384,
-                   "clicks":  116370,
+                   "cost":  42533.39,
+                   "impressions":  5726152,
+                   "clicks":  116672,
                    "add_to_cart":  0,
-                   "purchases":  1058.66,
+                   "purchases":  1067.66,
                    "ctr":  2.04
                },
     "daily_series":  [
@@ -1019,6 +1019,14 @@
                              "clicks":  861,
                              "add_to_cart":  0,
                              "purchases":  23
+                         },
+                         {
+                             "date":  "2026-08-04",
+                             "cost":  277.65,
+                             "impressions":  7768,
+                             "clicks":  302,
+                             "add_to_cart":  0,
+                             "purchases":  9
                          }
                      ]
 }
