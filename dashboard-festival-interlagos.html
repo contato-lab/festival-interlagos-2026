@@ -3806,8 +3806,14 @@ function initDashboard(){
     fetchInvestimento2025()
   ]).then(() => applyFiltro());
 
-  // Vendas própria + TM: refresh a cada 5s com guard de "uma rodada por vez"
+  // Vendas própria + TM: refresh a cada 15s com guard de "uma rodada por vez"
   // (evita race condition quando TM Worker leva > 3s na cache MISS)
+  //
+  // Era 5s. Os dois Workers guardam a resposta por 30s, então perguntar de 5 em
+  // 5s trazia o MESMO dado 5 vezes seguidas e só queimava cota da Cloudflare
+  // (plano gratuito: 100 mil chamadas/dia). Com 15s o dado percebido é
+  // praticamente o mesmo e o consumo cai ~4x. O carregamento inicial não passa
+  // por aqui: ele é a chamada direta lá em cima, e continua instantâneo.
   let __vendasRefreshing = false;
   setInterval(async () => {
     if (__vendasRefreshing) return;
@@ -3818,7 +3824,7 @@ function initDashboard(){
     } finally {
       __vendasRefreshing = false;
     }
-  }, 5000);
+  }, 15000);
 
   // Mídia (Google Ads, Meta, GA4, TikTok): a cada 30s (esses APIs têm latência grande mesmo)
   setInterval(() => {
