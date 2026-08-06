@@ -490,7 +490,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
 
   <div class="chart-footnote" style="font-size:.68rem;color:var(--text3);margin-top:10px;display:flex;justify-content:space-between;align-items:center">
     <span>💡 Passe o mouse sobre as linhas do gráfico para ver detalhes de cada ação</span>
-    <span>* Eixo X = dia relativo de vendas &nbsp;|&nbsp; D+1 = primeiro dia da temporada</span>
+    <span>* Eixo X = dia relativo de vendas &nbsp;|&nbsp; D+1 = primeiro dia da temporada &nbsp;|&nbsp; mostra a campanha inteira, não respeita o filtro de data acima</span>
   </div>
 </div>
 
@@ -1544,13 +1544,18 @@ function buildComp() {
   // D+1 de 2025 = 14/03/2025 = D+1 de 2026 = 31/03/2026 (mesma posicao no eixo)
   // O eixo vai ate o maior dia entre as duas campanhas: 2025 teve 94 dias e
   // 2026 ja passou disso, entao travar em 94 cortava a linha de 2026 no meio.
-  const maxD26 = D26.length ? Math.max(...D26.map(r=>r.d)) : 0;
+  // Usa a temporada INTEIRA de 2026 (D26_FULL), nao o D26 filtrado pela data.
+  // A serie de 2025 sempre foi a campanha completa; com 2026 filtrada, a linha
+  // roxa aparecia so no pedaco do filtro e sumia no resto do grafico. Este e um
+  // comparativo de campanha, entao os dois lados mostram tudo, igual ao executivo.
+  const base26 = (typeof D26_FULL !== 'undefined' && D26_FULL.length) ? D26_FULL : D26;
+  const maxD26 = base26.length ? Math.max(...base26.map(r=>r.d)) : 0;
   const n = Math.max(D25_CAMPAIGN.length, maxD26);
   const labels = Array.from({length:n}, (_,i) => 'D+'+(i+1));
   const s25 = getSeries(D25_CAMPAIGN, metricAtiva, edicaoAtiva);
   // 2026: alinhado por D+ de campanha (D+1 vai pro indice 0)
   const s26=Array(n).fill(null);
-  D26.forEach(r=>{
+  base26.forEach(r=>{
     const i=r.d-1;
     if(i<0||i>=n)return;
     const mv=r.mv||0,mq=r.mq||0,av=r.av||0,aq=r.aq||0;
