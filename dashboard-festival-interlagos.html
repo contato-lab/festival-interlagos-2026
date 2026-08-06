@@ -103,6 +103,27 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .referrer-card:hover{border-color:var(--lime-border)}
 .referrer-name{font-size:.75rem;color:#BBB;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px;cursor:help}
 .referrer-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.88rem;color:var(--lime);flex-shrink:0}
+.utm-busca{width:100%;max-width:340px;background:var(--card2);border:1px solid var(--border);border-radius:var(--rad-sm);color:#DDD;font-size:.72rem;padding:7px 12px;margin-bottom:10px;outline:none;font-family:'Inter',sans-serif}
+.utm-busca:focus{border-color:var(--lime-border)}
+.utm-busca::placeholder{color:#666}
+.utm-grupo{background:var(--card2);border:1px solid var(--border);border-radius:var(--rad-sm);padding:10px 14px;margin-bottom:10px}
+.utm-grupo-cab{display:flex;align-items:baseline;gap:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:#CCC;padding-bottom:6px}
+.utm-grupo-tot{margin-left:auto;font-family:'Inter',sans-serif;font-weight:400;font-size:.62rem;color:var(--text3);text-transform:none;letter-spacing:0}
+.utm-linha{display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.045)}
+.utm-rank{width:18px;text-align:right;font-size:.6rem;color:var(--text3);flex-shrink:0}
+.utm-nome{flex:1 1 200px;min-width:150px;overflow:hidden}
+.utm-nome-txt{display:block;font-size:.72rem;color:#CCC;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:help}
+.utm-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:4px}
+.utm-bar i{display:block;height:3px;border-radius:2px}
+.utm-pills{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;flex:0 1 auto;max-width:42%}
+.utm-conv{width:56px;text-align:right;font-size:.62rem;flex-shrink:0}
+.utm-val{width:60px;text-align:right;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.84rem;color:var(--lime);flex-shrink:0}
+.utm-vermais{display:block;width:100%;background:none;border:none;border-top:1px solid rgba(255,255,255,.045);color:var(--text3);font-size:.64rem;padding:7px 0 2px;cursor:pointer;text-align:center;font-family:'Inter',sans-serif}
+.utm-vermais:hover{color:var(--lime)}
+@media (max-width:768px){
+  .utm-linha{flex-wrap:wrap;gap:6px}
+  .utm-pills{max-width:100%;width:100%;justify-content:flex-start;order:9;padding-left:28px}
+}
 
 /* FUNNEL */
 .funnel-wrap{padding:8px 0}
@@ -863,7 +884,8 @@ Google Ads
       <span style="color:var(--lime)">✱</span> Influenciadores &amp; UTMs Personalizadas
     </div>
     <div style="font-size:.62rem;color:var(--text3);margin-bottom:10px;line-height:1.6;padding:7px 10px;background:rgba(255,255,255,.03);border-left:2px solid rgba(200,255,0,.25);border-radius:0 4px 4px 0">Todo link com UTM personalizada entra aqui automaticamente: influenciadores, e-mail marketing, parcerias e links avulsos do time (mídia paga fica fora — tem blocos próprios). O GA4 não consegue atribuir conversões exatas por link (limitação de atribuição de último clique). O que é exibido: <strong style="color:#CCC">número de sessões</strong> e <strong style="color:#CCC">visitas às páginas de cada ingresso</strong>. Os valores em <strong style="color:#4dff91">verde</strong> são <strong style="color:#4dff91">estimativas de conversão (~1,5%)</strong> — taxa padrão do setor para influenciadores em eventos ao vivo, calculada proporcionalmente pelas páginas de ingresso visitadas.</div>
-    <div class="referrer-grid" id="ga4Referrers"></div>
+    <input type="text" class="utm-busca" id="utmBusca" placeholder="🔍 Buscar link, influenciador, e-mail...">
+    <div id="ga4Referrers"></div>
   </div>
 
   <!-- Mídia Programática Adsplay -->
@@ -1210,6 +1232,216 @@ const GA4_REFERRERS = [
   {name:'DaianeGaia',sessions:29,conversions:1},
   {name:'DayMiguel',sessions:25,conversions:1}
 ];
+
+// ═══════════════════════════════════════════════
+// UTMs — APELIDOS, CATEGORIAS e RENDER AGRUPADO
+// ═══════════════════════════════════════════════
+// Apelido legível (o UTM cru fica no tooltip) + categoria de cada link.
+// Categorias: infl (influenciador) | email | time (links do time/bio) | outros.
+// Link novo que não estiver aqui cai na heurística utmCategoriaAuto().
+const UTM_INFO = {
+  'perfilfestival':                       { ap:'Perfil do festival · link na bio', cat:'time' },
+  'uol':                                  { ap:'UOL', cat:'outros' },
+  'email_broad_marketing_suhaifestivalinterlagos_ronco_clientessudeste_ce_20260729_ip96': { ap:'E-mail Suhai · Ronco · Sudeste (CE) · 29/07', cat:'email' },
+  'BR_ADH_CARS_EVEN_FWEC_EM_ENG_THRL':    { ap:'BR_ADH_CARS · ENG_THRL', cat:'outros' },
+  'festival-interlagos-b2':               { ap:'Link do time · b2', cat:'time' },
+  'email_broad_marketing_suhaifestivalinterlagos_ronco_clientessudeste__se_20260729_ip96': { ap:'E-mail Suhai · Ronco · Sudeste (SE) · 29/07', cat:'email' },
+  'festival-interlagos-b1':               { ap:'Link do time · b1', cat:'time' },
+  'emailmkt':                             { ap:'E-mail marketing · genérico', cat:'email' },
+  'remarketingvirada4':                   { ap:'Remarketing · virada 4º lote', cat:'email' },
+  'JoaoAnacleto':                         { ap:'João Anacleto', cat:'infl' },
+  'amp_suhai_aon_social_topo_alcance_cpma_meta_fb-ig_impulsionamento': { ap:'Suhai · impulsionamento FB/IG (topo)', cat:'outros' },
+  'DurvalCareca':                         { ap:'Durval Careca', cat:'infl' },
+  'email_broad_marketing_suhaifestivalinterlagos_roncodosmotores_clientessudeste_semeinstein_20260729': { ap:'E-mail Suhai · Ronco · sem Einstein · 29/07', cat:'email' },
+  'fullpower':                            { ap:'Fullpower', cat:'outros' },
+  'emailremarketingvirada4ultimashoras':  { ap:'E-mail · virada 4º lote · últimas horas', cat:'email' },
+  'BR_ADH_CARS_EVEN_FWEC_EM_ENG_ADVT':    { ap:'BR_ADH_CARS · ENG_ADVT', cat:'outros' },
+  'AmandaP':                              { ap:'Amanda P.', cat:'infl' },
+  'RodrigoRateiro':                       { ap:'Rodrigo Rateiro', cat:'infl' },
+  'ge_in_2026_ago_festival_interlagos_email1_abertura': { ap:'GE · e-mail 1 · abertura', cat:'email' },
+  'ElianaMalizia':                        { ap:'Eliana Malizia', cat:'infl' },
+  'remarketing':                          { ap:'Remarketing · genérico', cat:'email' },
+  'RodolfinhoZ':                          { ap:'Rodolfinho Z', cat:'infl' },
+  'viradalote':                           { ap:'Link virada de lote', cat:'time' },
+  'Atualização de cadastro - 10/06':      { ap:'E-mail · atualização de cadastro · 10/06', cat:'email' },
+  'STORYVOGE':                            { ap:'Story · Voge', cat:'outros' },
+  'email_jornada_marketing_retencao-suhai_cliente__ip96': { ap:'E-mail jornada · retenção Suhai', cat:'email' },
+  'Vans':                                 { ap:'Vans', cat:'outros' },
+  'RafaelTogni':                          { ap:'Rafael Togni', cat:'infl' },
+  'LudmilaDuarte':                        { ap:'Ludmila Duarte', cat:'infl' },
+  'CassioCortes':                         { ap:'Cassio Cortes', cat:'infl' },
+  'email_jornada_marketing_nutricao-leads_boas-vindas_lead_ip96': { ap:'E-mail jornada · boas-vindas leads', cat:'email' },
+  'VIRADA DE LOTE (02/06)':               { ap:'E-mail · virada de lote · 02/06', cat:'email' },
+  'SekuMello':                            { ap:'Seku Mello', cat:'infl' },
+  'GiseleFavaro':                         { ap:'Gisele Favaro', cat:'infl' },
+  'email_jornada_marketing_retencao-suhai_cliente_ip96': { ap:'E-mail jornada · retenção Suhai (2)', cat:'email' },
+  'metodo moto':                          { ap:'Método Moto', cat:'infl' },
+  'lucasxaparral':                        { ap:'Lucas Xaparral', cat:'infl' },
+  'email_jornada_marketing_engajamento-suhai_cliente_ip96': { ap:'E-mail jornada · engajamento Suhai', cat:'email' },
+  'Tiktok+Ads':                           { ap:'TikTok Ads · link avulso', cat:'outros' },
+  'Tiktok Ads':                           { ap:'TikTok Ads · link avulso (2)', cat:'outros' },
+  'email_broad_marketing_suhai-festival-interlagos_lancamento-vendas_ip128': { ap:'E-mail Suhai · lançamento de vendas', cat:'email' },
+  'KarinaSimoes':                         { ap:'Karina Simoes', cat:'infl' },
+  'FANYRAINHA':                           { ap:'Fany Rainha', cat:'infl' },
+  'DavidJensen':                          { ap:'David Jensen', cat:'infl' },
+  'e-mail_marketing_32':                  { ap:'E-mail marketing · nº 32', cat:'email' },
+  'DaianeGaia':                           { ap:'Daiane Gaia', cat:'infl' },
+  'DayMiguel':                            { ap:'Day Miguel', cat:'infl' },
+  'dinamize':                             { ap:'Dinamize · genérico', cat:'email' },
+  'DanielD2':                             { ap:'Daniel D2', cat:'infl' },
+  'marcadolivremoto':                     { ap:'Mercado Livre · moto', cat:'outros' },
+  'marcadolivreauto':                     { ap:'Mercado Livre · auto', cat:'outros' },
+  'email_jornada_marketing_renovacao-suhai_dados-distintos_ip86': { ap:'E-mail jornada · renovação (dados distintos)', cat:'email' },
+  'email_jornada_marketing_renovacao-suhai_cliente_ip96': { ap:'E-mail jornada · renovação Suhai', cat:'email' },
+  'festival-interlagos-b1-rp':            { ap:'Link do time · b1 RP', cat:'time' },
+  'email_jornada_marketing_renovacao-suhai_cliente_sem-apolice_ip96': { ap:'E-mail jornada · renovação sem apólice', cat:'email' },
+  'festival-interlagos-b2-rp':            { ap:'Link do time · b2 RP', cat:'time' },
+  'email_jornada_marketing_nutricao-leads_step2_boas-vindas_lead_ip96': { ap:'E-mail jornada · boas-vindas leads (passo 2)', cat:'email' },
+  'suhay':                                { ap:'Suhay', cat:'outros' },
+  'email_broad_marketing_suhaifestivalinterlagos_roncodosmotores_clientessudeste_semeinstein_20260729_ip96': { ap:'E-mail Suhai · Ronco · sem Einstein · 29/07 (ip96)', cat:'email' },
+  'email_broad_marketing_suhai_festival_clientes_20260728_ip96': { ap:'E-mail Suhai · clientes · 28/07', cat:'email' },
+  'email_broad_marketing_suhaifestivalinterlagos_roncodosmotores_clientessudeste_comeinstein_20260729_ip96': { ap:'E-mail Suhai · Ronco · com Einstein · 29/07', cat:'email' },
+  'suhai_suhai_cadastros_cupons_festival_interlagos_cv_facebook': { ap:'Suhai · cupons cadastro (Facebook)', cat:'outros' },
+  'trafego':                              { ap:'trafego · link avulso', cat:'outros' },
+  'email_broad_marketing_suhaifestivalinterlagos_roncodosmotores_clientessudeste_20260729_ip96': { ap:'E-mail Suhai · Ronco · Sudeste · 29/07 (ip96)', cat:'email' },
+  'categorias':                           { ap:'categorias · link avulso', cat:'outros' },
+  'email_broad_marketing_suhai_festival_leads_einstein_20260728_ip96': { ap:'E-mail Suhai · leads Einstein · 28/07', cat:'email' },
+  'duasrodas':                            { ap:'Duas Rodas', cat:'outros' },
+};
+
+const UTM_GRUPOS = {
+  infl:  { icone:'⭐', label:'Influenciadores',   cor:'#B18BE8' },
+  email: { icone:'📧', label:'E-mail marketing',  cor:'#5DAEFF' },
+  time:  { icone:'🔗', label:'Links do time',     cor:'#C8FF00' },
+  outros:{ icone:'🧩', label:'Parcerias & outros',cor:'#FFB800' },
+};
+
+// Heurística pra link novo que ainda não está no UTM_INFO:
+// e-mail só no início ou depois de separador (senão "MailsonRacing" viraria
+// e-mail); NomeSobrenome (tolerando dígito e underscore) → influenciador;
+// prefixos que o time já usa → links do time. Erro de grupo é possível —
+// por isso o tooltip marca link auto-classificado.
+function utmCategoriaAuto(nome){
+  if(/(^|[_\-\s.])e-?mail/i.test(nome) || /dinamize|jornada|remarketing/i.test(nome)) return 'email';
+  if(/^festival-interlagos|^viradalote|^perfilfestival/i.test(nome)) return 'time';
+  const semSep = nome.replace(/[_\s\-]+/g, '');
+  if(/^[A-Za-zÀ-ÿ0-9]+$/.test(semSep) && /[a-zà-ÿ][A-ZÀ-Þ]/.test(semSep)) return 'infl';
+  return 'outros';
+}
+function utmEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+
+let _utmRefs = [];          // último resultado filtrado por data (setado no render do GA4)
+let _utmExpand = {};        // grupos com "ver mais" aberto
+const UTM_LINHAS_VISIVEIS = 10;
+
+function renderUtmGrupos(){
+  const refDiv = document.getElementById('ga4Referrers');
+  if(!refDiv) return;
+  refDiv.innerHTML = '';
+
+  const buscaEl = document.getElementById('utmBusca');
+  const busca = (buscaEl ? buscaEl.value : '').trim().toLowerCase();
+  if(buscaEl && !buscaEl.dataset.ligado){
+    buscaEl.dataset.ligado = '1';
+    buscaEl.addEventListener('input', renderUtmGrupos);
+  }
+
+  const INFL_CONV_RATE = 0.015;
+  // agrupa
+  const grupos = {};
+  _utmRefs.forEach(r => {
+    const raw  = r.source || r.name || '';
+    const info = UTM_INFO[raw] || { ap: raw, cat: utmCategoriaAuto(raw), auto: true };
+    if(busca && !(info.ap.toLowerCase().includes(busca) || raw.toLowerCase().includes(busca))) return;
+    (grupos[info.cat] = grupos[info.cat] || []).push({ r, raw, ap: info.ap, auto: !!info.auto });
+  });
+
+  // grupos ordenados por total de sessões
+  const ordem = Object.keys(grupos).sort((a,b) => {
+    const s = g => grupos[g].reduce((acc,x)=>acc+(x.r.sessions||0),0);
+    return s(b) - s(a);
+  });
+
+  if(!ordem.length){
+    refDiv.innerHTML = '<div style="font-size:.68rem;color:var(--text3);padding:14px 4px">' +
+      (!_utmRefs.length
+        ? 'Os dados do GA4 ainda não carregaram.'
+        : 'Nenhum link encontrado' + (busca ? ' pra busca "' + utmEsc(busca) + '"' : '') + '.') +
+      '</div>';
+    return;
+  }
+
+  ordem.forEach(cat => {
+    const cfg   = UTM_GRUPOS[cat] || UTM_GRUPOS.outros;
+    const itens = grupos[cat];   // _utmRefs já vem ordenado por sessões desc
+    const totSess = itens.reduce((a,x)=>a+(x.r.sessions||0),0);
+    const totConv = itens.reduce((a,x)=>a+(x.r.conversions||0),0);
+    const maxSess = itens[0] ? (itens[0].r.sessions||0) : 1;
+
+    const box = document.createElement('div');
+    box.className = 'utm-grupo';
+    box.innerHTML =
+      '<div class="utm-grupo-cab"><span>'+cfg.icone+'</span><span style="color:'+cfg.cor+'">'+cfg.label+'</span>'+
+        '<span class="utm-grupo-tot">'+itens.length+' link'+(itens.length>1?'s':'')+' · '+fmtN(totSess)+' sessões'+
+        (totConv>0 ? ' · <span style="color:var(--lime)">'+fmtN(totConv)+' conv</span>' : '')+'</span></div>';
+
+    const aberto = busca ? true : !!_utmExpand[cat];
+    const visiveis = aberto ? itens : itens.slice(0, UTM_LINHAS_VISIVEIS);
+
+    visiveis.forEach((x, idx) => {
+      const r = x.r;
+      const conv = r.conversions || 0;
+      const tickets = r.tickets || {};
+      const tktEntries = Object.entries(tickets).sort((a,b)=>b[1]-a[1]);
+      const totalTktViews = tktEntries.reduce((s,[,n])=>s+n, 0);
+      const estTotal = Math.round((r.sessions||0) * INFL_CONV_RATE);
+      const barW = maxSess > 0 ? Math.max(2, Math.round((r.sessions||0)/maxSess*100)) : 2;
+
+      const linha = document.createElement('div');
+      linha.className = 'utm-linha';
+      linha.innerHTML =
+        '<span class="utm-rank">'+(idx+1)+'</span>'+
+        '<span class="utm-nome">'+
+          '<span class="utm-nome-txt" title="UTM: '+utmEsc(x.raw)+(x.auto ? ' (link novo, agrupado automaticamente)' : '')+'">'+utmEsc(x.ap)+'</span>'+
+          '<span class="utm-bar"><i style="width:'+barW+'%;background:'+cfg.cor+'"></i></span>'+
+        '</span>'+
+        (tktEntries.length
+          ? '<span class="utm-pills">'+
+              tktEntries.map(([nome, n])=>{
+                const estN = totalTktViews>0 ? Math.round(estTotal*n/totalTktViews) : 0;
+                return '<span style="font-size:.58rem;background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.18);color:#AAA;border-radius:4px;padding:1px 6px">'+
+                  utmEsc(nome)+' <strong style="color:var(--lime)">'+n+'</strong>'+
+                  (estN>0 ? ' <span style="color:#4dff91;font-size:.55rem">~'+estN+'</span>' : '')+
+                '</span>';
+              }).join('')+
+            '</span>'
+          : '')+
+        '<span class="utm-conv" style="color:'+(conv>0?'var(--green)':'var(--text3)')+'">'+(conv>0?conv+' conv':'—')+'</span>'+
+        '<span class="utm-val">'+fmtN(r.sessions)+'</span>';
+      box.appendChild(linha);
+    });
+
+    if(!busca && itens.length > UTM_LINHAS_VISIVEIS){
+      const btn = document.createElement('button');
+      btn.className = 'utm-vermais';
+      const resto = itens.length - UTM_LINHAS_VISIVEIS;
+      btn.textContent = aberto
+        ? 'mostrar menos ▲'
+        : 'mostrar mais ' + resto + ' link' + (resto > 1 ? 's' : '') + ' ▼';
+      btn.onclick = () => { _utmExpand[cat] = !_utmExpand[cat]; renderUtmGrupos(); };
+      box.appendChild(btn);
+    }
+
+    refDiv.appendChild(box);
+  });
+}
+
+// Liga a busca já no carregamento — se o fetch do GA4 falhar, o campo
+// responde mesmo assim ("dados ainda não carregaram") em vez de ficar morto.
+(function(){
+  const b = document.getElementById('utmBusca');
+  if(b && !b.dataset.ligado){ b.dataset.ligado = '1'; b.addEventListener('input', renderUtmGrupos); }
+})();
 
 // ═══════════════════════════════════════════════
 // STATE e CHARTS
@@ -2255,7 +2487,6 @@ function buildGA4Sources(dateFrom, dateTo) {
   const refDiv = document.getElementById('ga4Referrers');
   refDiv.innerHTML = '';
   const rawReferrers = (GA4_DATA?.influencer_breakdown?.length ? GA4_DATA.influencer_breakdown : GA4_REFERRERS.map(r=>({...r, source:r.name})));
-  const INFL_CONV_RATE = 0.015;
   // Aplica filtro de datas se disponível — escala proporcional sessões + conversões
   const referrers = rawReferrers.map(r => {
     if (!hasFilter || !r.daily) return r;
@@ -2272,37 +2503,10 @@ function buildGA4Sources(dateFrom, dateTo) {
     }
     return {...r, sessions: dailySess, conversions: filteredConv, tickets: filteredTickets};
   }).filter(r => r.sessions > 0).sort((a,b) => b.sessions - a.sessions);
-  referrers.forEach(r => {
-    const conv    = r.conversions || 0;
-    const tickets = r.tickets || {};
-    const tktEntries = Object.entries(tickets).sort((a,b)=>b[1]-a[1]);
-    const totalTktViews = tktEntries.reduce((s,[,n])=>s+n, 0);
-    const estTotal = Math.round((r.sessions||0) * INFL_CONV_RATE);
-    const card = document.createElement('div');
-    card.className = 'referrer-card';
-    const fullName = (r.source||r.name||'').replace(/"/g, '&quot;');
-    card.innerHTML =
-      '<span class="referrer-name" title="'+fullName+'">'+(r.source||r.name)+'</span>'+
-      '<span style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">'+
-        '<span style="display:flex;align-items:center;gap:10px">'+
-          '<span style="font-size:.65rem;color:'+(conv>0?'var(--green)':'var(--text3)')+'">'+(conv>0?conv+' conv':'—')+'</span>'+
-          '<span class="referrer-val">'+fmtN(r.sessions)+'</span>'+
-        '</span>'+
-        (tktEntries.length
-          ? '<span style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">'+
-              tktEntries.map(([name, n])=>{
-                const estN = totalTktViews>0 ? Math.round(estTotal*n/totalTktViews) : 0;
-                return '<span style="font-size:.58rem;background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.18);color:#AAA;border-radius:4px;padding:1px 6px">'+
-                  name+' <strong style="color:var(--lime)">'+n+'</strong>'+
-                  (estN>0 ? ' <span style="color:#4dff91;font-size:.55rem">~'+estN+'</span>' : '')+
-                '</span>';
-              }).join('')+
-            '</span>'
-          : ''
-        )+
-      '</span>';
-    refDiv.appendChild(card);
-  });
+  // Render agrupado por origem (influenciadores / e-mail / time / outros),
+  // com apelidos legíveis e busca — ver renderUtmGrupos() e UTM_INFO.
+  _utmRefs = referrers;
+  renderUtmGrupos();
 
   // ── Mídia Programática Adsplay ─────────────────────────────────────────
   const adsplayDiv = document.getElementById('ga4Adsplay');
