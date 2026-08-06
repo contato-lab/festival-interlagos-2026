@@ -1,14 +1,15 @@
 {
-  "updated_at": "2026-08-06T15:23:54Z",
+  "updated_at": "2026-08-06T19:35:00Z",
   "source": "Plataforma própria (ingressosmoto/ingressosauto.festivalinterlagos.com.br)",
+  "atualizacao_manual": "Snapshot de D+129 (06/08) preenchido a mao a partir do painel admin, porque o GitHub Actions ficou fora do ar e o robo parou de rodar as 12h23. Valores: Vendas Aprovadas do admmoto e do admauto. Quando o robo voltar ele sobrescreve este arquivo com o dado da API e esta linha some.",
   "campaign_start": "2026-03-31",
   "totals": {
-    "moto_receita": 1977993.37,
-    "auto_receita": 1224770.57,
-    "moto_ingressos": 3259,
-    "auto_ingressos": 1288,
-    "total_receita": 3202763.94,
-    "total_ingressos": 4547
+    "moto_receita": 1983001.97,
+    "auto_receita": 1227501.27,
+    "moto_ingressos": 3267,
+    "auto_ingressos": 1290,
+    "total_receita": 3210503.24,
+    "total_ingressos": 4557
   },
   "daily": [
     {
@@ -1038,10 +1039,10 @@
     {
       "d": 129,
       "date": "2026-08-06",
-      "moto_receita": 3515.2,
-      "moto_ingressos": 4,
-      "auto_receita": 7127.1,
-      "auto_ingressos": 4
+      "moto_receita": 8523.8,
+      "moto_ingressos": 12,
+      "auto_receita": 9857.8,
+      "auto_ingressos": 6
     }
   ]
 }
