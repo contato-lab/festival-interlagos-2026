@@ -53,7 +53,7 @@ const MAX_PAGES      = 150;
 // Versao da chave de cache. A logica de agregacao mudou, entao a chave muda
 // junto: senao um corpo gravado pela versao antiga continua sendo servido do
 // edge por ate STALE_TTL depois do deploy.
-const CACHE_VER      = 'inc-v1';
+const CACHE_VER      = 'inc-v2';
 
 // ─── HEADERS para escapar do 403 ─────────────────────────
 function buildHeaders(base, token) {
@@ -300,8 +300,18 @@ async function buildVendasDataIncremental(env) {
   // 2) dias da janela: valem os que acabaram de vir da API (SUBSTITUEM o snapshot).
   //    Dia da janela sem venda nenhuma simplesmente nao entra, que e o certo:
   //    a linha antiga dele ja ficou de fora no passo 1.
+  //
+  //    A GUARDA d >= corteDia NAO E OPCIONAL. O filtro data_inicio/data_fim da
+  //    API nao corta por created_at: venda antiga que foi MEXIDA agora volta na
+  //    janela. Sem a guarda, o dia dela (que esta fora da janela) era
+  //    substituido por essa fatia de um registro so. Aconteceu de verdade em
+  //    producao: D+1 caiu de R$ 625.255,11 / 1043 ingressos para R$ 571,06 / 1,
+  //    e D+121 de R$ 12.150,77 / 16 para R$ 730,81 / 1. Dia fora da janela fica
+  //    com o valor do snapshot, que veio de varredura completa e esta inteiro.
   const novos = mapaDeVendas(aggregateByDay(motoSales), aggregateByDay(autoSales));
-  for (const [d, row] of novos) mapa.set(d, row);
+  for (const [d, row] of novos) {
+    if (d >= corteDia) mapa.set(d, row);
+  }
 
   return montarSaida(
     mapa,
