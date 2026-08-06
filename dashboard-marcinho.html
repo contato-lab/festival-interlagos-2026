@@ -547,6 +547,13 @@ const TV_GLOBO = [
   {date:'2026-04-03', day26:4, programs:['Bom Dia SP','Bom Dia Brasil']},
   {date:'2026-04-05', day26:6, programs:['Auto Esporte','Esporte Espetacular']},
   {date:'2026-04-06', day26:7, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  // praça de agosto: 16 inserções de 30", concentradas na véspera da edição moto
+  {date:'2026-08-09', day26:132, programs:['Auto Esporte','Esporte Espetacular']},
+  {date:'2026-08-10', day26:133, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  {date:'2026-08-11', day26:134, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  {date:'2026-08-12', day26:135, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  {date:'2026-08-13', day26:136, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  {date:'2026-08-14', day26:137, programs:['Bom Dia SP','Bom Dia Brasil']},
 ];
 
 /* ═══════════════════════════════════════════
@@ -581,6 +588,15 @@ const ACOES_EXTRA = [
 
   // ── MÍDIA PROGRAMÁTICA ─────────────────────────
   { dia:35, tipo:'prog',       titulo:'Mídia Programática — início',   desc:'Início da campanha de mídia programática Adsplay (04/05) — Display, Vídeo, CTV/OTT e Áudio' },
+
+  // ── VIRADAS DE LOTE ────────────────────────────
+  // As três datas batem com os três maiores picos de venda da série.
+  { dia:36,  tipo:'virada',    titulo:'Virada de lote — 2º lote',      desc:'Virada para o 2º lote (05/05). Pico de 651 ingressos; caiu 66% no dia seguinte.' },
+  { dia:64,  tipo:'virada',    titulo:'Virada de lote — 3º lote',      desc:'Virada para o 3º lote (02/06). Pico de 433 ingressos; caiu 67% no dia seguinte.' },
+  { dia:127, tipo:'virada',    titulo:'Virada de lote — 4º lote',      desc:'Virada para o 4º lote, R$ 125 para R$ 152 (04/08). Maior dia da campanha: 1.069 ingressos e R$ 146.610.' },
+
+  // ── MERCADO LIVRE ──────────────────────────────
+  { dia:127, tipo:'meli',      titulo:'Mercado Livre — início',        desc:'Ativação das campanhas de Display e Vídeo no Mercado Livre (04/08), direcionando para a loja do evento e para as LPs de moto e auto.' },
 ];
 
 // Configuração visual por tipo
@@ -595,6 +611,7 @@ const ACAO_CONFIG = {
   spotify:    { cor:'#1DB954', icone:'🎵', label:'Link Vendas Spotify',  dash:[5,3] },
   whatsapp:   { cor:'#25D366', icone:'💬', label:'Disparos WhatsApp',    dash:[4,3] },
   virada:     { cor:'#FF6B9D', icone:'💰', label:'Virada de Lote',       dash:[6,4] },
+  meli:       { cor:'#FFE600', icone:'🛒', label:'Mercado Livre',        dash:[5,4] },
 };
 
 // ACOES = TV_GLOBO (auto) + ACOES_EXTRA (manual)
@@ -611,7 +628,7 @@ const ACOES = [
 // Estado de visibilidade por tipo (toggle na legenda)
 // Default: TV + divulgação + WhatsApp ligadas (ações de maior impacto)
 const acoesVisiveis = Object.fromEntries(
-  Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv' || k === 'divulgacao' || k === 'whatsapp' || k === 'virada' || k === 'radio' || k === 'prog'])
+  Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv' || k === 'divulgacao' || k === 'whatsapp' || k === 'virada' || k === 'radio' || k === 'prog' || k === 'meli'])
 );
 
 /* ═══════════════════════════════════════════

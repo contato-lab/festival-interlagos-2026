@@ -1051,6 +1051,21 @@ const ACOES = [
 
   // ── MÍDIA PROGRAMÁTICA ─────────────────────────
   { dia:35, tipo:'prog',      titulo:'Mídia Programática — início', desc:'Início da campanha de mídia programática Adsplay (04/05) — Display, Vídeo, CTV/OTT e Áudio' },
+
+  // ── VIRADAS DE LOTE ────────────────────────────
+  // As três datas abaixo batem com os três maiores picos de venda da série.
+  { dia:36,  tipo:'virada',   titulo:'Virada de lote — 2º lote',  desc:'Virada para o 2º lote (05/05). Pico de 651 ingressos no dia; caiu 66% no dia seguinte.' },
+  { dia:64,  tipo:'virada',   titulo:'Virada de lote — 3º lote',  desc:'Virada para o 3º lote (02/06). Pico de 433 ingressos no dia; caiu 67% no dia seguinte.' },
+  { dia:127, tipo:'virada',   titulo:'Virada de lote — 4º lote',  desc:'Virada para o 4º lote, R$ 125 para R$ 152 (04/08). Maior dia da campanha: 1.069 ingressos e R$ 146.610.' },
+
+  // ── MERCADO LIVRE ──────────────────────────────
+  { dia:127, tipo:'meli',     titulo:'Mercado Livre — início',    desc:'Ativação das campanhas de Display e Vídeo no Mercado Livre (04/08), direcionando para a loja do evento e para as LPs de moto e auto.' },
+
+  // ── TV GLOBO, PRAÇA DE AGOSTO ──────────────────
+  // Autorização de agosto: 16 inserções de 30", R$ 501.765 de tabela
+  // e R$ 353.242,56 líquido. Concentradas na véspera da edição moto.
+  { dia:132, tipo:'tv',       titulo:'TV Globo — Auto Esporte',   desc:'Auto Esporte e Esporte Espetacular (09/08), 1 inserção de 30" em cada. Também é a data do boletim Duas Rodas.' },
+  { dia:133, tipo:'tv',       titulo:'TV Globo — praça 10 a 14/08', desc:'Bom Dia SP e Bom Dia Brasil de 10 a 14/08 (5 inserções cada) e Globo Esporte de 10 a 13/08 (4 inserções). Tudo em 30".' },
 ];
 
 // Configuração visual por tipo
@@ -1065,11 +1080,12 @@ const ACAO_CONFIG = {
   spotify:    { cor:'#1DB954', icone:'🎵', label:'Link Vendas Spotify', dash:[5,3] },
   whatsapp:   { cor:'#25D366', icone:'💬', label:'Disparos WhatsApp',   dash:[4,3] },
   virada:     { cor:'#FF6B9D', icone:'💰', label:'Virada de Lote',      dash:[6,4] },
+  meli:       { cor:'#FFE600', icone:'🛒', label:'Mercado Livre',       dash:[5,4] },
 };
 
 // Estado de visibilidade por tipo (toggle na legenda)
 // Default: TV, divulgação e WhatsApp visíveis (ações recentes/relevantes)
-const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv' || k === 'divulgacao' || k === 'whatsapp' || k === 'virada' || k === 'radio' || k === 'prog']));
+const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv' || k === 'divulgacao' || k === 'whatsapp' || k === 'virada' || k === 'radio' || k === 'prog' || k === 'meli']));
 // Ex: 'https://docs.google.com/spreadsheets/d/SEU_ID/export?format=csv&gid=0'
 
 // ═══════════════════════════════════════════════
