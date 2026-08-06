@@ -1562,7 +1562,11 @@ function buildComp() {
   // comparativo de campanha, entao os dois lados mostram tudo, igual ao executivo.
   const base26 = (typeof D26_FULL !== 'undefined' && D26_FULL.length) ? D26_FULL : D26;
   const maxD26 = base26.length ? Math.max(...base26.map(r=>r.d)) : 0;
-  const n = Math.max(D25_CAMPAIGN.length, maxD26);
+  // O eixo tambem precisa alcançar as ações JÁ CONTRATADAS que ainda não
+  // aconteceram, senão a praça de TV de agosto (D+132 a D+137) aparece na
+  // régua de baixo mas não tem onde desenhar a linha no gráfico.
+  const maxAcao = (typeof ACOES !== 'undefined' && ACOES.length) ? Math.max(...ACOES.map(a=>a.dia)) : 0;
+  const n = Math.max(D25_CAMPAIGN.length, maxD26, maxAcao);
   const labels = Array.from({length:n}, (_,i) => 'D+'+(i+1));
   const s25 = getSeries(D25_CAMPAIGN, metricAtiva, edicaoAtiva);
   // 2026: alinhado por D+ de campanha (D+1 vai pro indice 0)

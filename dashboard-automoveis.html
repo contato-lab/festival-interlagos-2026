@@ -1086,7 +1086,10 @@ function buildComp() {
   // O eixo vai até o maior dia entre as duas campanhas: a de 2025 teve 94 dias
   // e a de 2026 já passou disso, então travar em 94 escondia o resto de 2026.
   const maxD26 = D26.length ? Math.max(...D26.map(r=>r.d)) : 0;
-  const n = Math.max(D25_CAMPAIGN.length, maxD26);
+  // alcança também as ações já contratadas que ainda não aconteceram,
+  // senão a praça de TV de agosto não tem onde desenhar
+  const maxAcao = (typeof ACOES !== 'undefined' && ACOES.length) ? Math.max(...ACOES.map(a=>a.dia)) : 0;
+  const n = Math.max(D25_CAMPAIGN.length, maxD26, maxAcao);
   const labels=Array.from({length:n},(_,i)=>'D+'+(i+1));
   const s25=getSeries(D25_CAMPAIGN,metricAtiva);
   // Posiciona cada ponto de D26 no indice correto do grafico (d-1),
