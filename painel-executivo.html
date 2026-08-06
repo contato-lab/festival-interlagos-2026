@@ -704,6 +704,14 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
         <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(0,191,255,.9)"></span>
         <span style="color:#00BFFF">🖥️ Mídia Programática</span>
       </div>
+      <div class="exec-leg-item clickable" id="exec-oohLegTl" style="display:none" onclick="execToggleAcaoTl('ooh',this)">
+        <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,107,53,.9)"></span>
+        <span style="color:#FF6B35">🏙️ Eletromídia</span>
+      </div>
+      <div class="exec-leg-item clickable" id="exec-meliLegTl" style="display:none" onclick="execToggleAcaoTl('meli',this)">
+        <span style="display:inline-block;width:18px;height:2px;border-top:2px dashed rgba(255,230,0,.9)"></span>
+        <span style="color:#FFE600">🛒 Mercado Livre</span>
+      </div>
     </div>
     <div style="position:relative;height:320px"><canvas id="exec-chartTimeline"></canvas></div>
   </div>
@@ -1267,15 +1275,33 @@ const EXEC_WHATSAPP = [
 ];
 
 const EXEC_VIRADA = [
-  {date:'2026-04-30', day26:31, desc:'Post Virada de Lote'},
+  {date:'2026-04-30', day26:31,  desc:'Post Virada de Lote'},
+  // as tres datas abaixo batem com os tres maiores picos da serie de vendas
+  {date:'2026-05-05', day26:36,  desc:'Virada do 2º lote — pico de 651 ingressos; caiu 66% no dia seguinte'},
+  {date:'2026-06-02', day26:64,  desc:'Virada do 3º lote — pico de 433 ingressos; caiu 67% no dia seguinte'},
+  {date:'2026-08-04', day26:127, desc:'Virada do 4º lote, R$ 125 para R$ 152 — maior dia da campanha: 1.069 ingressos e R$ 146.610'},
 ];
 
 const EXEC_RADIO = [
-  {date:'2026-05-04', day26:35, desc:'Rádio MIX FM SP — início (04/05 a 18/05, 100 spots)'},
+  {date:'2026-05-04', day26:35,  desc:'Rádio MIX FM SP — início (04/05 a 18/05, 100 spots)'},
+  {date:'2026-05-18', day26:49,  desc:'Rádio MIX FM SP — fim da veiculação'},
+  {date:'2026-07-28', day26:120, desc:'Rádio — veiculação em 28/07'},
+  {date:'2026-08-04', day26:127, desc:'Rádio Band — veiculação em 04/08, mesmo dia da virada do 4º lote'},
 ];
 
 const EXEC_PROG = [
   {date:'2026-05-04', day26:35, desc:'Mídia Programática Adsplay — início (04/05) — Display, Vídeo, CTV/OTT, Áudio'},
+  {date:'2026-07-01', day26:93, desc:'Mídia Programática Adsplay — fim (01/07). Rodou 59 dias.'},
+];
+
+// DOOH: Eletromidia, de 13/07 a 09/08, terminando na vespera da edicao moto
+const EXEC_OOH = [
+  {date:'2026-07-13', day26:105, desc:'Eletromídia — início (13/07 a 09/08)'},
+  {date:'2026-08-09', day26:132, desc:'Eletromídia — fim (09/08). Rodou 28 dias.'},
+];
+
+const EXEC_MELI = [
+  {date:'2026-08-04', day26:127, desc:'Mercado Livre — ativação das campanhas de Display e Vídeo (04/08)'},
 ];
 
 const EXEC_TV_GLOBO = [
@@ -1284,6 +1310,13 @@ const EXEC_TV_GLOBO = [
   {date:'2026-04-03', day26:4, programs:['Bom Dia SP','Bom Dia Brasil']},
   {date:'2026-04-05', day26:6, programs:['Auto Esporte','Esporte Espetacular']},
   {date:'2026-04-06', day26:7, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  // praca de agosto: 16 insercoes de 30", concentradas na vespera da edicao moto
+  {date:'2026-08-09', day26:132, programs:['Auto Esporte','Esporte Espetacular']},
+  {date:'2026-08-10', day26:133, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  {date:'2026-08-11', day26:134, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  {date:'2026-08-12', day26:135, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  {date:'2026-08-13', day26:136, programs:['Bom Dia SP','Bom Dia Brasil','Globo Esporte']},
+  {date:'2026-08-14', day26:137, programs:['Bom Dia SP','Bom Dia Brasil']},
 ];
 
 // Baseline 2025: cada item tem {d, date, v}.
@@ -1418,7 +1451,7 @@ function execGetAllDays(invest) {
 }
 
 /* Estado de visibilidade das ações (toggle na legenda) */
-const execAcoesVisiveis = { tv: true, influencer: true, divulgacao: true, spotify: true, whatsapp: true, virada: true, radio: true, prog: true };
+const execAcoesVisiveis = { tv: true, influencer: true, divulgacao: true, spotify: true, whatsapp: true, virada: true, radio: true, prog: true, ooh: true, meli: true };
 
 function execToggleAcao(tipo, el) {
   execAcoesVisiveis[tipo] = !execAcoesVisiveis[tipo];
@@ -1506,6 +1539,26 @@ function execGetTvAnnotations(days) {
       anns['prog_'+pg.day26] = {
         type:'line', xMin:idx, xMax:idx,
         borderColor:'rgba(0,191,255,0.9)', borderWidth:2, borderDash:[4,4]
+      };
+    });
+  }
+  if(execAcoesVisiveis.ooh) {
+    EXEC_OOH.forEach(oh => {
+      const idx = days.indexOf(oh.day26);
+      if(idx === -1) return;
+      anns['ooh_'+oh.day26] = {
+        type:'line', xMin:idx, xMax:idx,
+        borderColor:'rgba(255,107,53,0.9)', borderWidth:2, borderDash:[10,3]
+      };
+    });
+  }
+  if(execAcoesVisiveis.meli) {
+    EXEC_MELI.forEach(ml => {
+      const idx = days.indexOf(ml.day26);
+      if(idx === -1) return;
+      anns['meli_'+ml.day26] = {
+        type:'line', xMin:idx, xMax:idx,
+        borderColor:'rgba(255,230,0,0.9)', borderWidth:2, borderDash:[5,4]
       };
     });
   }
@@ -2860,6 +2913,10 @@ function buildExecTimelineChart() {
   if(radLegTl) radLegTl.style.display = EXEC_RADIO.some(t=>days.includes(t.day26))?'flex':'none';
   const progLegTl = document.getElementById('exec-progLegTl');
   if(progLegTl) progLegTl.style.display = EXEC_PROG.some(t=>days.includes(t.day26))?'flex':'none';
+  const oohLegTl = document.getElementById('exec-oohLegTl');
+  if(oohLegTl) oohLegTl.style.display = EXEC_OOH.some(t=>days.includes(t.day26))?'flex':'none';
+  const meliLegTl = document.getElementById('exec-meliLegTl');
+  if(meliLegTl) meliLegTl.style.display = EXEC_MELI.some(t=>days.includes(t.day26))?'flex':'none';
 }
 
 let execTMView = 'receita'; // 'receita' | 'ingressos'

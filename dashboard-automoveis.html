@@ -457,6 +457,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
     </button>
     <span style="font-size:.7rem;color:var(--text3);margin-left:4px">clique para mostrar/ocultar cada ano</span>
   </div>
+  <div id="acoesLegenda" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px"></div>
   <div id="chartCompWrap" style="position:relative;height:300px"><canvas id="chartComp"></canvas></div>
 
   <div class="chart-footnote" style="font-size:.68rem;color:var(--text3);margin-top:10px;display:flex;justify-content:space-between;align-items:center">
@@ -537,6 +538,72 @@ const SEMANA_START = new Date('2026-03-30T00:00:00'); // usado para cálculo de 
 
 // Data de início das vendas (D+1). Ajuste para a data real quando disponível.
 const DATA_INICIO = new Date('2026-03-31T00:00:00'); // D+1 = abertura das vendas
+
+// ═══════════════════════════════════════════════
+// AÇÕES DE MÍDIA — mesma lista dos outros dashboards.
+// dia = dia relativo de campanha (D+1 = 31/03/2026).
+// Aqui as linhas são desenhadas no próprio afterDraw do gráfico, sem
+// depender do chartjs-plugin-annotation, que este dashboard não carrega.
+// ═══════════════════════════════════════════════
+const ACOES = [
+  { dia:1,   tipo:'influencer',titulo:'Influencers — Abertura' },
+  { dia:2,   tipo:'tv',        titulo:'TV — Início' },
+  { dia:6,   tipo:'tv',        titulo:'TV Globo (05/04)' },
+  { dia:15,  tipo:'divulgacao',titulo:'Divulgação Ja Rule + Line-up' },
+  { dia:21,  tipo:'spotify',   titulo:'Link de Vendas Spotify' },
+  { dia:24,  tipo:'whatsapp',  titulo:'Disparos WhatsApp' },
+  { dia:31,  tipo:'virada',    titulo:'Post Virada de Lote' },
+  { dia:35,  tipo:'radio',     titulo:'Rádio MIX FM SP — início' },
+  { dia:35,  tipo:'prog',      titulo:'Mídia Programática — início' },
+  { dia:36,  tipo:'virada',    titulo:'Virada do 2º lote' },
+  { dia:49,  tipo:'radio',     titulo:'Rádio MIX FM SP — fim' },
+  { dia:64,  tipo:'virada',    titulo:'Virada do 3º lote' },
+  { dia:93,  tipo:'prog',      titulo:'Mídia Programática — fim' },
+  { dia:105, tipo:'ooh',       titulo:'Eletromídia — início' },
+  { dia:120, tipo:'radio',     titulo:'Rádio — 28/07' },
+  { dia:127, tipo:'radio',     titulo:'Rádio Band' },
+  { dia:127, tipo:'virada',    titulo:'Virada do 4º lote' },
+  { dia:127, tipo:'meli',      titulo:'Mercado Livre — início' },
+  { dia:132, tipo:'ooh',       titulo:'Eletromídia — fim' },
+  { dia:132, tipo:'tv',        titulo:'TV Globo — Auto Esporte' },
+  { dia:133, tipo:'tv',        titulo:'TV Globo — praça 10 a 14/08' },
+];
+
+const ACAO_CONFIG = {
+  tv:         { cor:'#FFB800', icone:'📺', label:'TV Globo',             dash:[4,3] },
+  radio:      { cor:'#FF9500', icone:'📻', label:'Rádio',                dash:[6,3] },
+  prog:       { cor:'#00BFFF', icone:'🖥️',  label:'Mídia Programática',   dash:[4,4] },
+  ooh:        { cor:'#FF6B35', icone:'🏙️',  label:'Eletromídia',          dash:[10,3] },
+  meli:       { cor:'#FFE600', icone:'🛒', label:'Mercado Livre',        dash:[5,4] },
+  influencer: { cor:'#7B2D8B', icone:'⭐', label:'Influenciadores',      dash:[5,5] },
+  divulgacao: { cor:'#FFD700', icone:'🎤', label:'Divulgação / Line-up', dash:[7,4] },
+  spotify:    { cor:'#1DB954', icone:'🎵', label:'Link Vendas Spotify',  dash:[5,3] },
+  whatsapp:   { cor:'#25D366', icone:'💬', label:'Disparos WhatsApp',    dash:[4,3] },
+  virada:     { cor:'#FF6B9D', icone:'💰', label:'Virada de Lote',       dash:[6,4] },
+};
+
+const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k =>
+  [k, k==='tv' || k==='virada' || k==='radio' || k==='prog' || k==='ooh' || k==='meli']));
+
+function toggleAcao(tipo, el){
+  acoesVisiveis[tipo] = !acoesVisiveis[tipo];
+  el.classList.toggle('inactive', !acoesVisiveis[tipo]);
+  if (typeof buildComp === 'function') buildComp();
+}
+
+// legenda: só mostra os tipos que têm alguma ação dentro do período do gráfico
+function buildAcoesLegenda(maxDia){
+  const box = document.getElementById('acoesLegenda');
+  if(!box) return;
+  const presentes = [...new Set(ACOES.filter(a => a.dia <= maxDia).map(a => a.tipo))];
+  box.innerHTML = presentes.map(t => {
+    const c = ACAO_CONFIG[t];
+    const n = ACOES.filter(a => a.tipo === t && a.dia <= maxDia).length;
+    return '<div class="acao-leg-item' + (acoesVisiveis[t] ? '' : ' inactive') + '" onclick="toggleAcao(\'' + t + '\',this)" style="color:' + c.cor + '">' +
+      '<span class="acao-leg-line dashed" style="color:' + c.cor + '"></span>' +
+      '<span>' + c.icone + ' ' + c.label + (n > 1 ? ' (' + n + ')' : '') + '</span></div>';
+  }).join('');
+}
 let D26_FULL = [];
 
 // ═══════════════════════════════════════════════
@@ -1006,8 +1073,11 @@ function getSeries(data, met) {
 
 // ─── Gera as anotações de linha vertical para o Chart.js ───────────────────
 function buildComp() {
-  // Eixo unificado D+1..D+94 usando D25_CAMPAIGN (D+1 = 14/03/2025 = 31/03/2026)
-  const n=D25_CAMPAIGN.length;
+  // Eixo unificado (D+1 = 14/03/2025 = 31/03/2026).
+  // O eixo vai até o maior dia entre as duas campanhas: a de 2025 teve 94 dias
+  // e a de 2026 já passou disso, então travar em 94 escondia o resto de 2026.
+  const maxD26 = D26.length ? Math.max(...D26.map(r=>r.d)) : 0;
+  const n = Math.max(D25_CAMPAIGN.length, maxD26);
   const labels=Array.from({length:n},(_,i)=>'D+'+(i+1));
   const s25=getSeries(D25_CAMPAIGN,metricAtiva);
   // Posiciona cada ponto de D26 no indice correto do grafico (d-1),
@@ -1045,13 +1115,35 @@ function buildComp() {
     plugins:[{
       id:'dPlusRow',
       afterDraw(chart){
-        const ctx=chart.ctx, xS=chart.scales.x, n=chart.data.labels.length;
+        const ctx=chart.ctx, xS=chart.scales.x, yS=chart.scales.y, n=chart.data.labels.length;
+
+        // linhas verticais das ações de mídia, atrás do texto do eixo
+        ctx.save();
+        ACOES.forEach(a => {
+          if(!acoesVisiveis[a.tipo]) return;
+          const i = a.dia - 1;
+          if(i < 0 || i >= n) return;
+          const c = ACAO_CONFIG[a.tipo]; if(!c) return;
+          const x = xS.getPixelForValue(i);
+          ctx.beginPath();
+          ctx.setLineDash(c.dash);
+          ctx.strokeStyle = c.cor;
+          ctx.globalAlpha = 0.75;
+          ctx.lineWidth = 2;
+          ctx.moveTo(x, yS.top);
+          ctx.lineTo(x, yS.bottom);
+          ctx.stroke();
+        });
+        ctx.restore();
+
         ctx.save();
         ctx.font="9px 'Barlow Condensed',sans-serif";
         ctx.fillStyle='#777';
         ctx.textAlign='center';
         for(let i=0;i<n;i++){const d=i+1;if((d-1)%7===0){ctx.fillText('D+'+d,xS.getPixelForValue(i),xS.bottom+13);}}
         ctx.restore();
+
+        buildAcoesLegenda(n);
       }
     }],
     options:{
