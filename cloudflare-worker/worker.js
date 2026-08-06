@@ -18,12 +18,42 @@
 
 const API_MOTO        = 'https://ingressosmoto.festivalinterlagos.com.br';
 const API_AUTO        = 'https://ingressosauto.festivalinterlagos.com.br';
-const DATA_INICIO_STR = '2026-01-01';              // busca tudo desde jan/26
+const DATA_INICIO_STR = '2026-01-01';              // fetch completo: tudo desde jan/26
 const DATA_INICIO     = new Date('2026-03-31T00:00:00Z'); // D+1
 const PAGE_SIZE       = 100;
 const CACHE_TTL       = 30;        // segundos - cache normal
 const STALE_TTL       = 600;       // 10min - cache 'velho aceitavel' quando API falha
 const MAX_RETRIES     = 3;         // retry para chamadas individuais a API
+
+// ─── BUSCA INCREMENTAL (parte do snapshot do GitHub Actions) ─────
+//
+// O fetch completo varria a campanha inteira (data_inicio=2026-01-01) de 100
+// em 100 registros a cada cache-miss. Contando canceladas e expiradas isso ja
+// passou de cem paginas por acesso e comecou a estourar o limite da Cloudflare
+// (erro 1102 -> 503), deixando o dashboard so com o JSON estatico.
+//
+// Agora: parte do vendas-data.json que o robo Python gera (roda no GitHub
+// Actions, sem limite de CPU) e rebusca SO a janela recente. Como a API filtra
+// por data, a janela volta em DIAS INTEIROS e cada dia rebuscado SUBSTITUI o
+// valor do snapshot em vez de somar. Isso e mais seguro que somar delta: nao
+// existe risco de contar duas vezes, e qualquer divergencia se autocorrige na
+// proxima vez que o robo rodar. Sem estado proprio no Worker (sem KV).
+//
+// A janela e sempre [snapshot - SAFETY_DAYS, hoje], entao ela cresce sozinha
+// se o robo ficar parado, e cobre venda que mudou de status no periodo.
+const BASELINE_URL   = 'https://contato-lab.github.io/festival-interlagos-2026/vendas-data.json';
+const SAFETY_DAYS    = 2;    // dias rebuscados antes da data do snapshot
+const MAX_DELTA_DAYS = 45;   // janela maior que isso: nao compensa, vai de fetch completo
+// Teto de paginas por API, so pra nao existir loop infinito. Fica ALTO de
+// proposito: o caminho completo legitimamente precisa de muitas paginas, e
+// quando o teto e atingido a funcao LANCA em vez de devolver lista parcial
+// (ver getAllVendas). Devolver metade do faturamento com HTTP 200 seria pior
+// que falhar: o dashboard so cai no vendas-data.json correto quando da erro.
+const MAX_PAGES      = 150;
+// Versao da chave de cache. A logica de agregacao mudou, entao a chave muda
+// junto: senao um corpo gravado pela versao antiga continua sendo servido do
+// edge por ate STALE_TTL depois do deploy.
+const CACHE_VER      = 'inc-v1';
 
 // ─── HEADERS para escapar do 403 ─────────────────────────
 function buildHeaders(base, token) {
@@ -75,18 +105,39 @@ async function getToken(base, env) {
   return d.token;
 }
 
-async function getAllVendas(base, token) {
-  const fim   = new Date().toISOString().split('T')[0];
-  const sales = [];
-  let page    = 1;
-  while (true) {
-    const url = `${base}/apis/vendas?data_inicio=${DATA_INICIO_STR}&data_fim=${fim}&page_size=${PAGE_SIZE}&page=${page}`;
+// dataInicio: 'YYYY-MM-DD'. Sem argumento, varre a campanha inteira.
+//
+// LANCA em vez de devolver lista parcial nos dois casos ruins:
+//   - a API respondeu 200 mas com status != success (token vencido, erro no
+//     corpo). Antes isso virava "lista vazia", e lista vazia na janela APAGA
+//     os dias dela do resultado, derrubando o faturamento sem avisar.
+//   - a paginacao bateu no teto com pagina seguinte pendente.
+// Falhar aqui e o comportamento certo: o handler serve o cache stale ou 503,
+// e os dashboards caem no vendas-data.json inteiro.
+async function getAllVendas(base, token, dataInicio) {
+  const inicio = dataInicio || DATA_INICIO_STR;
+  const fim    = new Date().toISOString().split('T')[0];
+  const sales  = [];
+  let page     = 1;
+  let temMais  = false;   // isNextPage da ultima pagina lida
+  while (page <= MAX_PAGES) {
+    const url = `${base}/apis/vendas?data_inicio=${inicio}&data_fim=${fim}&page_size=${PAGE_SIZE}&page=${page}`;
     const r   = await fetchWithRetry(url, { headers: buildHeaders(base, token) }, `Vendas ${base} pag.${page}`);
     const d = await r.json();
-    if (d.status !== 'success' || !d.data || !d.data.length) break;
+    if (d.status !== 'success') {
+      throw new Error(`Vendas ${base} pag.${page}: status "${d.status}" (esperado success)`);
+    }
+    if (!d.data || !d.data.length) { temMais = false; break; }
     sales.push(...d.data);
-    if (d.pagination?.isNextPage !== 'Y') break;
+    temMais = d.pagination?.isNextPage === 'Y';
+    if (!temMais) break;
     page++;
+  }
+  if (temMais) {
+    throw new Error(
+      `Vendas ${base}: paginacao truncada em ${MAX_PAGES} paginas ` +
+      `(${sales.length} registros desde ${inicio}); recusando resultado parcial`
+    );
   }
   return sales;
 }
@@ -124,63 +175,172 @@ function lastSaleAt(sales) {
   } catch { return null; }
 }
 
-async function buildVendasData(env) {
+// ─── HELPERS DE DATA / MONTAGEM ──────────────────────────
+function dataDoDia(d) {
+  const dt = new Date(DATA_INICIO);
+  dt.setUTCDate(dt.getUTCDate() + d - 1);
+  return dt.toISOString().split('T')[0];
+}
+
+function diaDeCampanha(ds) {
+  const dt = new Date(ds + 'T00:00:00Z');
+  if (isNaN(dt)) return null;
+  return Math.floor((dt - DATA_INICIO) / 86400000) + 1;
+}
+
+// Monta a resposta final a partir de um Map(d -> linha), recalculando os totais
+// pela soma dos dias. Recalcular (em vez de somar delta em cima do total antigo)
+// garante que totals sempre bate com daily, mesmo se a janela mexeu em varios dias.
+function montarSaida(mapaDias, lastMoto, lastAuto, source) {
+  const daily = [...mapaDias.values()].sort((a, b) => a.d - b.d);
+  const totals = { moto_receita: 0, auto_receita: 0, moto_ingressos: 0, auto_ingressos: 0 };
+  for (const r of daily) {
+    totals.moto_receita   += r.moto_receita   || 0;
+    totals.moto_ingressos += r.moto_ingressos || 0;
+    totals.auto_receita   += r.auto_receita   || 0;
+    totals.auto_ingressos += r.auto_ingressos || 0;
+  }
+  totals.moto_receita    = Math.round(totals.moto_receita * 100) / 100;
+  totals.auto_receita    = Math.round(totals.auto_receita * 100) / 100;
+  totals.total_receita   = Math.round((totals.moto_receita + totals.auto_receita) * 100) / 100;
+  totals.total_ingressos = totals.moto_ingressos + totals.auto_ingressos;
+
+  return {
+    updated_at:        new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+    source,
+    campaign_start:    '2026-03-31',
+    last_sale_moto_at: lastMoto,
+    last_sale_auto_at: lastAuto,
+    totals,
+    daily,
+  };
+}
+
+// Junta os dois lados (moto/auto) num Map(d -> linha) no formato de saida.
+function mapaDeVendas(motoByDay, autoByDay) {
+  const mapa = new Map();
+  const dias = new Set([
+    ...Object.keys(motoByDay).map(Number),
+    ...Object.keys(autoByDay).map(Number),
+  ]);
+  for (const d of dias) {
+    const m = motoByDay[d] || { receita: 0, qtd: 0 };
+    const a = autoByDay[d] || { receita: 0, qtd: 0 };
+    mapa.set(d, {
+      d,
+      date:           dataDoDia(d),
+      moto_receita:   Math.round(m.receita * 100) / 100,
+      moto_ingressos: m.qtd,
+      auto_receita:   Math.round(a.receita * 100) / 100,
+      auto_ingressos: a.qtd,
+    });
+  }
+  return mapa;
+}
+
+function maisRecente(a, b) {
+  if (!a) return b || null;
+  if (!b) return a;
+  return b > a ? b : a;
+}
+
+// ─── SNAPSHOT DO GITHUB (baseline do incremental) ────────
+async function fetchBaseline() {
+  const r = await fetch(BASELINE_URL, { cf: { cacheTtl: 60, cacheEverything: true } });
+  if (!r.ok) throw new Error('baseline HTTP ' + r.status);
+  const d = await r.json();
+  if (!d || !Array.isArray(d.daily) || !d.daily.length) throw new Error('baseline sem daily');
+  if (!d.updated_at) throw new Error('baseline sem updated_at');
+  return d;
+}
+
+// Primeira data a rebuscar: dia do snapshot (em BRT) menos SAFETY_DAYS.
+// updated_at vem em UTC e o created_at da API vem em BRT (UTC-3), por isso o -3h
+// antes de cortar a data: perto da meia-noite os dois nao caem no mesmo dia.
+function dataCorteISO(updatedAt) {
+  const t = new Date(updatedAt).getTime();
+  if (!isFinite(t)) return null;
+  // Snapshot com carimbo no futuro (relogio errado, ou edicao manual do JSON)
+  // empurraria a janela pra frente e os dias recentes sumiriam do resultado.
+  // Trava no agora: no pior caso rebusca de mais, nunca de menos.
+  const base = Math.min(t, Date.now());
+  const brt  = new Date(base - 3 * 3600 * 1000 - SAFETY_DAYS * 86400000);
+  return brt.toISOString().split('T')[0];
+}
+
+async function buildVendasDataIncremental(env) {
+  const baseline = await fetchBaseline();
+
+  const corteISO = dataCorteISO(baseline.updated_at);
+  if (!corteISO) throw new Error('baseline com updated_at invalido');
+  const corteDia = diaDeCampanha(corteISO);
+  if (corteDia == null) throw new Error('data de corte invalida');
+
+  const hojeDia = diaDeCampanha(new Date(Date.now() - 3 * 3600 * 1000).toISOString().split('T')[0]);
+  if (hojeDia == null) throw new Error('nao consegui calcular o dia de hoje');
+  // Corte depois de hoje nao rebuscaria nada e ainda apagaria os dias recentes
+  // do snapshot (eles caem fora do passo 1 e nao voltam no passo 2).
+  if (corteDia > hojeDia) throw new Error('data de corte no futuro');
+  // Snapshot velho demais: a janela ficaria grande e o incremental perde a graca.
+  if (hojeDia - corteDia > MAX_DELTA_DAYS) {
+    throw new Error(`janela de ${hojeDia - corteDia} dias passa do limite de ${MAX_DELTA_DAYS}`);
+  }
+
+  const [motoToken, autoToken] = await Promise.all([getToken(API_MOTO, env), getToken(API_AUTO, env)]);
+  const [motoSales, autoSales] = await Promise.all([
+    getAllVendas(API_MOTO, motoToken, corteISO),
+    getAllVendas(API_AUTO, autoToken, corteISO),
+  ]);
+
+  const mapa = new Map();
+  // 1) dias anteriores a janela: valem os do snapshot
+  for (const row of baseline.daily) {
+    if (typeof row.d === 'number' && row.d < corteDia) mapa.set(row.d, { ...row });
+  }
+  // 2) dias da janela: valem os que acabaram de vir da API (SUBSTITUEM o snapshot).
+  //    Dia da janela sem venda nenhuma simplesmente nao entra, que e o certo:
+  //    a linha antiga dele ja ficou de fora no passo 1.
+  const novos = mapaDeVendas(aggregateByDay(motoSales), aggregateByDay(autoSales));
+  for (const [d, row] of novos) mapa.set(d, row);
+
+  return montarSaida(
+    mapa,
+    maisRecente(baseline.last_sale_moto_at, lastSaleAt(motoSales)),
+    maisRecente(baseline.last_sale_auto_at, lastSaleAt(autoSales)),
+    `Cloudflare Worker (incremental desde ${corteISO}, sobre snapshot de ${baseline.updated_at})`
+  );
+}
+
+async function buildVendasDataCompleto(env) {
   const [motoToken, autoToken] = await Promise.all([getToken(API_MOTO, env), getToken(API_AUTO, env)]);
   const [motoSales, autoSales] = await Promise.all([
     getAllVendas(API_MOTO, motoToken),
     getAllVendas(API_AUTO, autoToken),
   ]);
+  return montarSaida(
+    mapaDeVendas(aggregateByDay(motoSales), aggregateByDay(autoSales)),
+    lastSaleAt(motoSales),
+    lastSaleAt(autoSales),
+    'Cloudflare Worker (fetch completo, sem baseline)'
+  );
+}
 
-  const motoByDay = aggregateByDay(motoSales);
-  const autoByDay = aggregateByDay(autoSales);
-  const lastSaleMotoAt = lastSaleAt(motoSales);
-  const lastSaleAutoAt = lastSaleAt(autoSales);
-
-  const daySet = new Set([
-    ...Object.keys(motoByDay).map(Number),
-    ...Object.keys(autoByDay).map(Number),
-  ]);
-  const allDays = [...daySet].sort((a, b) => a - b);
-
-  const daily  = [];
-  const totals = {
-    moto_receita: 0, auto_receita: 0,
-    moto_ingressos: 0, auto_ingressos: 0,
-  };
-
-  for (const d of allDays) {
-    const m  = motoByDay[d] || { receita: 0, qtd: 0 };
-    const a  = autoByDay[d] || { receita: 0, qtd: 0 };
-    const dt = new Date(DATA_INICIO);
-    dt.setUTCDate(dt.getUTCDate() + d - 1);
-    daily.push({
-      d,
-      date:            dt.toISOString().split('T')[0],
-      moto_receita:    Math.round(m.receita * 100) / 100,
-      moto_ingressos:  m.qtd,
-      auto_receita:    Math.round(a.receita * 100) / 100,
-      auto_ingressos:  a.qtd,
-    });
-    totals.moto_receita   += m.receita;
-    totals.moto_ingressos += m.qtd;
-    totals.auto_receita   += a.receita;
-    totals.auto_ingressos += a.qtd;
+async function buildVendasData(env) {
+  // Caminho leve: snapshot + janela recente. Poucas paginas por acesso.
+  let motivo = null;
+  try {
+    return await buildVendasDataIncremental(env);
+  } catch (err) {
+    // Sem snapshot utilizavel (1a implantacao, Pages fora do ar, snapshot velho
+    // demais): cai pro fetch completo, que e pesado mas nao depende de ninguem.
+    // O motivo vai junto na resposta: engolir o erro em silencio deixava
+    // impossivel saber, olhando o JSON, que o worker foi pro caminho pesado.
+    motivo = (err && err.message) ? err.message : String(err);
   }
-
-  totals.moto_receita    = Math.round(totals.moto_receita   * 100) / 100;
-  totals.auto_receita    = Math.round(totals.auto_receita   * 100) / 100;
-  totals.total_receita   = Math.round((totals.moto_receita + totals.auto_receita) * 100) / 100;
-  totals.total_ingressos = totals.moto_ingressos + totals.auto_ingressos;
-
-  return {
-    updated_at:          new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
-    source:              'Cloudflare Worker (real-time, cache 30s)',
-    campaign_start:      '2026-03-31',
-    last_sale_moto_at:   lastSaleMotoAt,
-    last_sale_auto_at:   lastSaleAutoAt,
-    totals,
-    daily,
-  };
+  const completo = await buildVendasDataCompleto(env);
+  completo.fallback_reason = motivo;
+  completo.source += ` [incremental indisponivel: ${motivo}]`;
+  return completo;
 }
 
 // ─── WORKER HANDLER ──────────────────────────────────────
@@ -209,8 +369,8 @@ export default {
 
     const cache         = caches.default;
     const baseUrl       = new URL(request.url).toString().split('?')[0];
-    const cacheKey      = new Request(baseUrl + '?v=fresh', request);
-    const staleCacheKey = new Request(baseUrl + '?v=stale', request);
+    const cacheKey      = new Request(baseUrl + '?v=fresh-' + CACHE_VER, request);
+    const staleCacheKey = new Request(baseUrl + '?v=stale-' + CACHE_VER, request);
 
     // 1) Cache fresco?
     let cached = await cache.match(cacheKey);
