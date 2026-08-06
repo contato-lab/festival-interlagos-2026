@@ -190,6 +190,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .acoes-timeline{display:flex;align-items:flex-start;gap:0;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;overflow-x:auto}
 .acao-marker{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:60px;cursor:pointer;padding:4px;border-radius:6px;transition:.2s}
 .acao-marker:hover{background:rgba(255,255,255,.04)}
+.acao-marker.foco{outline:1px solid rgba(200,255,0,.45);background:rgba(200,255,0,.06)}
 .acao-marker-icon{font-size:1rem}
 .acao-marker-dia{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;color:#999}
 .acao-marker-label{font-size:.62rem;color:var(--text3);text-align:center;max-width:56px;line-height:1.3}
@@ -1538,6 +1539,45 @@ function getSeries(data, met, ed) {
 // ─── Gera as anotações de linha vertical para o Chart.js ───────────────────
 function getAnnotations() {
   const annotations = {};
+
+  // Marca ONDE ESTAMOS HOJE e sombreia o que ainda não aconteceu.
+  // Sem isso, o trecho à direita fica vazio e parece que a linha de 2026
+  // "parou de funcionar", quando na verdade é o futuro: o eixo vai até a
+  // última ação já contratada (a TV de agosto), mas venda só existe até hoje.
+  const _base26 = (typeof D26_FULL !== 'undefined' && D26_FULL.length) ? D26_FULL : D26;
+  const hoje = _base26.length ? Math.max(..._base26.map(r => r.d)) : 0;
+  const fim  = (typeof ACOES !== 'undefined' && ACOES.length)
+    ? Math.max(hoje, ...ACOES.map(a => a.dia)) : hoje;
+  if (hoje > 0 && fim > hoje) {
+    annotations.futuro = {
+      type: 'box',
+      xMin: hoje - 1, xMax: fim - 1,
+      backgroundColor: 'rgba(255,255,255,.025)',
+      borderWidth: 0,
+      drawTime: 'beforeDatasetsDraw',
+      label: {
+        display: true, content: 'ainda não aconteceu',
+        position: { x: 'center', y: 'start' }, yAdjust: 16,
+        color: '#6b7280', font: { size: 10, weight: '600' },
+        backgroundColor: 'transparent',
+      },
+    };
+    annotations.hoje = {
+      type: 'line',
+      xMin: hoje - 1, xMax: hoje - 1,
+      borderColor: 'rgba(255,255,255,.35)',
+      borderWidth: 1,
+      borderDash: [2, 3],
+      drawTime: 'beforeDatasetsDraw',
+      label: {
+        display: true, content: 'hoje',
+        position: 'start',
+        color: '#9ca3af', font: { size: 10, weight: '700' },
+        backgroundColor: 'rgba(0,0,0,.55)', padding: 3,
+      },
+    };
+  }
+
   ACOES.forEach((a, i) => {
     if (!acoesVisiveis[a.tipo]) return;
     const cfg = ACAO_CONFIG[a.tipo];
@@ -1740,10 +1780,11 @@ function buildAcoesTimeline() {
   const el = document.getElementById('acoesTimeline');
   el.innerHTML = '';
   const visiveis = ACOES
-    .filter(a => acoesVisiveis[a.tipo])
-    .sort((a,b) => a.dia - b.dia);
+    .map((a, i) => ({ a, i }))          // i = indice em ACOES = chave da anotação no gráfico
+    .filter(x => acoesVisiveis[x.a.tipo])
+    .sort((p, q) => p.a.dia - q.a.dia);
 
-  visiveis.forEach(a => {
+  visiveis.forEach(({ a, i }) => {
     const cfg = ACAO_CONFIG[a.tipo];
     const div = document.createElement('div');
     div.className = 'acao-marker';
@@ -1755,9 +1796,59 @@ function buildAcoesTimeline() {
       <div class="acao-marker-label">${a.titulo}</div>`;
     div.style.cssText=`min-width:64px;padding:4px;border-radius:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:.2s`;
     div.onmouseenter=()=>div.style.background='rgba(255,255,255,0.04)';
-    div.onmouseleave=()=>div.style.background='transparent';
+    div.onmouseleave=()=>{ if(!div.classList.contains('foco')) div.style.background='transparent'; };
+    div.onclick=()=>focusAcao(a, i, div);
     el.appendChild(div);
   });
+}
+
+// ─── Clique num cartão da régua → destaca a ação lá no gráfico ──────────────
+// Abre o tooltip no dia da ação (quando o dia tem dado) e engorda a linha
+// tracejada por ~1,6s pra mostrar exatamente qual marcação é.
+let _acaoFoco = null;   // { timer, reset } do destaque ativo
+function focusAcao(a, i, card) {
+  if (!cComp) return;
+
+  // estado visual do cartão clicado
+  document.querySelectorAll('#acoesTimeline .acao-marker.foco').forEach(m => {
+    m.classList.remove('foco'); m.style.background = 'transparent';
+  });
+  if (card) { card.classList.add('foco'); card.style.background = 'rgba(200,255,0,0.06)'; }
+
+  // desfaz o destaque anterior antes de aplicar o novo
+  if (_acaoFoco) { clearTimeout(_acaoFoco.timer); _acaoFoco.reset(); _acaoFoco = null; }
+
+  const ch = cComp;
+  const xIndex = a.dia - 1;
+
+  // tooltip no dia da ação (dia futuro não tem ponto — só a linha pisca)
+  const actives = [];
+  ch.data.datasets.forEach((ds, di) => {
+    if (ds.data[xIndex] != null) actives.push({ datasetIndex: di, index: xIndex });
+  });
+  ch.setActiveElements(actives);
+  if (ch.tooltip) ch.tooltip.setActiveElements(actives, {
+    x: ch.scales.x.getPixelForValue(xIndex),
+    y: (ch.scales.y.top + ch.scales.y.bottom) / 2,
+  });
+
+  // engorda a linha da anotação correspondente
+  const anns = ch.options.plugins.annotation.annotations;
+  const ann = anns['acao_' + i];
+  if (ann) {
+    const orig = { w: ann.borderWidth, d: ann.borderDash };
+    const reset = () => {
+      // se a legenda foi togglada nesse meio-tempo o chart foi recriado — checa
+      if (Chart.getChart('chartComp') === ch) {
+        ann.borderWidth = orig.w; ann.borderDash = orig.d;
+        ch.update('none');
+      }
+    };
+    ann.borderWidth = 4; ann.borderDash = [];
+    _acaoFoco = { timer: setTimeout(() => { reset(); _acaoFoco = null; }, 1600), reset };
+  }
+  ch.update('none');
+  document.getElementById('chartComp').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // ═══════════════════════════════════════════════

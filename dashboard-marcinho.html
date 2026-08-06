@@ -845,6 +845,34 @@ function getAcoesAnnotations(filteredDays26) {
   // Retorna config de anotações Chart.js para todas as ações visíveis
   // (TV, divulgação, influenciador, rádio, OOH, etc)
   const annotations = {};
+
+  // Linha HOJE + sombra no trecho futuro — o eixo alcança as ações já
+  // contratadas (TV de agosto), mas dado só existe até hoje; sem essa
+  // marcação o fim do gráfico parece vazio/quebrado.
+  const diasComDado = [
+    ...D26_SALES.map(r=>r.d),
+    ...D26_INVEST.map(r=>r.d),
+  ];
+  const hoje = diasComDado.length ? Math.max(...diasComDado) : 0;
+  const idxHoje = filteredDays26.indexOf(hoje);
+  if (idxHoje !== -1 && idxHoje < filteredDays26.length - 1) {
+    annotations.futuro = {
+      type:'box', xMin:idxHoje, xMax:filteredDays26.length-1,
+      backgroundColor:'rgba(255,255,255,.025)', borderWidth:0,
+      drawTime:'beforeDatasetsDraw',
+      label:{ display:true, content:'ainda não aconteceu',
+        position:{x:'center', y:'start'}, yAdjust:16, color:'#6b7280',
+        font:{size:10, weight:'600'}, backgroundColor:'transparent' },
+    };
+    annotations.hoje = {
+      type:'line', xMin:idxHoje, xMax:idxHoje,
+      borderColor:'rgba(255,255,255,.35)', borderWidth:1, borderDash:[2,3],
+      drawTime:'beforeDatasetsDraw',
+      label:{ display:true, content:'hoje', position:'start',
+        color:'#9ca3af', font:{size:10, weight:'700'},
+        backgroundColor:'rgba(0,0,0,.55)', padding:3 },
+    };
+  }
   ACOES.forEach((a, i) => {
     if (!acoesVisiveis[a.tipo]) return;
     const idx = filteredDays26.indexOf(a.dia);
@@ -1266,6 +1294,24 @@ const gridLine = { color:'rgba(255,255,255,0.05)', drawBorder:false };
 
 function buildVendasChart(days26) {
   const metric = currentVendasMetric;
+  // Na visão "Desde o início" (campanha inteira, alcançando o presente),
+  // o eixo se estende até a última ação JÁ CONTRATADA (praça de TV de
+  // agosto), senão essas marcações não têm onde ser desenhadas.
+  // OBS: o preset 'tudo' NÃO deixa from/to null — ele seta CAMP_START_2026
+  // até hoje, então a detecção é pelo intervalo, não por null.
+  // Só aqui — invest/tkt não desenham ações.
+  const _ultimo = days26.length ? days26[days26.length-1] : 0;
+  const _campInteira = !currentFiltroFrom || currentFiltroFrom <= CAMP_START_2026;
+  const _diasDado = [...D26_SALES.map(r=>r.d), ...D26_INVEST.map(r=>r.d)];
+  const _alcancaPresente = _diasDado.length ? _ultimo >= Math.max(..._diasDado) : false;
+  if (_campInteira && _alcancaPresente) {
+    const maxAcao = (typeof ACOES !== 'undefined' && ACOES.length)
+      ? Math.max(...ACOES.map(a=>a.dia)) : 0;
+    if (maxAcao > _ultimo) {
+      days26 = days26.slice();
+      for (let d = _ultimo + 1; d <= maxAcao; d++) days26.push(d);
+    }
+  }
   // Eixo unificado: cada D+N do filtro mostra 2025 D+N e 2026 D+N na mesma posicao
   // 2025 D+1 = 14/03/2025; 2026 D+1 = 31/03/2026
   const labels = days26.map(d => 'D+'+d);

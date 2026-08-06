@@ -181,6 +181,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .acoes-timeline{display:flex;align-items:flex-start;gap:0;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;overflow-x:auto}
 .acao-marker{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:60px;cursor:pointer;padding:4px;border-radius:6px;transition:.2s}
 .acao-marker:hover{background:rgba(255,255,255,.04)}
+.acao-marker.foco{outline:1px solid rgba(200,255,0,.45);background:rgba(200,255,0,.06)}
 .acao-marker-icon{font-size:1rem}
 .acao-marker-dia{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.72rem;color:#999}
 .acao-marker-label{font-size:.62rem;color:var(--text3);text-align:center;max-width:56px;line-height:1.3}
@@ -459,6 +460,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
   </div>
   <div id="acoesLegenda" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px"></div>
   <div id="chartCompWrap" style="position:relative;height:300px"><canvas id="chartComp"></canvas></div>
+  <div id="acoesTimeline" style="display:flex;gap:4px;overflow-x:auto;padding:8px 2px 2px"></div>
 
   <div class="chart-footnote" style="font-size:.68rem;color:var(--text3);margin-top:10px;display:flex;justify-content:space-between;align-items:center">
     <span>* Eixo X = dia relativo de vendas &nbsp;|&nbsp; D+1 = primeiro dia da temporada</span>
@@ -614,6 +616,56 @@ function buildAcoesLegenda(maxDia){
       '<span class="acao-leg-line dashed" style="color:' + c.cor + '"></span>' +
       '<span>' + c.icone + ' ' + c.label + (n > 1 ? ' (' + n + ')' : '') + '</span></div>';
   }).join('');
+}
+
+// régua de cartões abaixo do gráfico — clicar destaca a ação no gráfico
+function buildAcoesTimeline(){
+  const el = document.getElementById('acoesTimeline');
+  if(!el) return;
+  el.innerHTML = '';
+  ACOES
+    .filter(a => acoesVisiveis[a.tipo])
+    .slice().sort((a,b) => a.dia - b.dia)
+    .forEach(a => {
+      const c = ACAO_CONFIG[a.tipo]; if(!c) return;
+      const div = document.createElement('div');
+      div.className = 'acao-marker';
+      div.title = a.titulo;
+      div.innerHTML =
+        '<div style="width:2px;height:12px;background:'+c.cor+';border-radius:1px;opacity:.7"></div>' +
+        '<div class="acao-marker-icon">'+c.icone+'</div>' +
+        '<div class="acao-marker-dia" style="color:'+c.cor+'">D+'+a.dia+'</div>' +
+        '<div class="acao-marker-label">'+a.titulo+'</div>';
+      div.onclick = () => focusAcao(a, div);
+      el.appendChild(div);
+    });
+}
+
+// clique no cartão → tooltip no dia + linha da ação engrossa por ~1,6s
+let _acaoFocoDia = null, _acaoFocoTipo = null, _acaoFocoTimer = null;
+function focusAcao(a, card){
+  if(!cComp) return;
+  document.querySelectorAll('#acoesTimeline .acao-marker.foco').forEach(m => m.classList.remove('foco'));
+  if(card) card.classList.add('foco');
+  if(_acaoFocoTimer) clearTimeout(_acaoFocoTimer);
+  const ch = cComp, xIndex = a.dia - 1;
+  _acaoFocoDia = a.dia; _acaoFocoTipo = a.tipo;
+  // dia futuro (TV de agosto) não tem ponto na linha — só o destaque pisca
+  const actives = [];
+  ch.data.datasets.forEach((ds, di) => {
+    if(ds.data[xIndex] != null) actives.push({datasetIndex: di, index: xIndex});
+  });
+  ch.setActiveElements(actives);
+  if(ch.tooltip) ch.tooltip.setActiveElements(actives, {
+    x: ch.scales.x.getPixelForValue(xIndex),
+    y: (ch.scales.y.top + ch.scales.y.bottom) / 2
+  });
+  ch.update('none');
+  _acaoFocoTimer = setTimeout(() => {
+    _acaoFocoDia = null; _acaoFocoTipo = null; _acaoFocoTimer = null;
+    if(Chart.getChart('chartComp') === ch) ch.update('none');
+  }, 1600);
+  document.getElementById('chartComp').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 let D26_FULL = [];
 
@@ -1131,6 +1183,31 @@ function buildComp() {
       afterDraw(chart){
         const ctx=chart.ctx, xS=chart.scales.x, yS=chart.scales.y, n=chart.data.labels.length;
 
+        // HOJE + trecho futuro: o eixo alcança as ações já contratadas
+        // (TV de agosto), mas venda só existe até hoje — sem essa marcação
+        // o fim do gráfico parece que a linha "parou de funcionar".
+        const hoje = D26.length ? Math.max(...D26.map(r=>r.d)) : 0;
+        if(hoje > 0 && n > hoje){
+          const xH = xS.getPixelForValue(hoje-1), xF = xS.getPixelForValue(n-1);
+          ctx.save();
+          ctx.fillStyle='rgba(255,255,255,.025)';
+          ctx.fillRect(xH, yS.top, xF-xH, yS.bottom-yS.top);
+          ctx.setLineDash([2,3]);
+          ctx.strokeStyle='rgba(255,255,255,.35)';
+          ctx.lineWidth=1;
+          ctx.beginPath(); ctx.moveTo(xH,yS.top); ctx.lineTo(xH,yS.bottom); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.font="700 10px 'Barlow Condensed',sans-serif";
+          ctx.textAlign='left';  ctx.fillStyle='#9ca3af';
+          ctx.fillText('HOJE', xH+4, yS.top+11);
+          // texto do trecho futuro fica ABAIXO do HOJE e só se couber
+          if(xF-xH > 120){
+            ctx.textAlign='center'; ctx.fillStyle='#6b7280';
+            ctx.fillText('ainda não aconteceu', (xH+xF)/2, yS.top+25);
+          }
+          ctx.restore();
+        }
+
         // linhas verticais das ações de mídia, atrás do texto do eixo
         ctx.save();
         ACOES.forEach(a => {
@@ -1139,11 +1216,13 @@ function buildComp() {
           if(i < 0 || i >= n) return;
           const c = ACAO_CONFIG[a.tipo]; if(!c) return;
           const x = xS.getPixelForValue(i);
+          // ação clicada na régua de baixo fica em destaque por ~1,6s
+          const emFoco = (_acaoFocoDia === a.dia && _acaoFocoTipo === a.tipo);
           ctx.beginPath();
-          ctx.setLineDash(c.dash);
+          ctx.setLineDash(emFoco ? [] : c.dash);
           ctx.strokeStyle = c.cor;
-          ctx.globalAlpha = 0.75;
-          ctx.lineWidth = 2;
+          ctx.globalAlpha = emFoco ? 1 : 0.75;
+          ctx.lineWidth = emFoco ? 4 : 2;
           ctx.moveTo(x, yS.top);
           ctx.lineTo(x, yS.bottom);
           ctx.stroke();
@@ -1203,6 +1282,7 @@ function buildComp() {
       }
     }
   });
+  buildAcoesTimeline();
 }
 
 // ═══════════════════════════════════════════════

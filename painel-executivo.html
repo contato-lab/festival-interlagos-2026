@@ -1452,6 +1452,27 @@ function execGetAllDays(invest) {
   return Array.from(set).filter(d=>d>=1).sort((a,b)=>a-b);
 }
 
+/* Estende o eixo até a última ação JÁ CONTRATADA (praça de TV de agosto),
+   senão essas marcações não têm onde ser desenhadas. Só nos gráficos que
+   desenham ações — invest/ticket médio não, e ficariam com rabo vazio. */
+function execExtenderDiasComAcoes(days) {
+  if (execFiltFrom || !days.length) return days;   // com filtro de data, respeita o filtro
+  const ultimoDado = days[days.length - 1];
+  const maxAcao = Math.max(0, ...[].concat(
+    EXEC_TV_GLOBO, EXEC_INFLUENCER_DIAS, EXEC_DIVULGACAO, EXEC_SPOTIFY,
+    EXEC_WHATSAPP, EXEC_VIRADA, EXEC_RADIO, EXEC_PROG, EXEC_OOH, EXEC_MELI
+  ).map(a => a.day26 || 0));
+  const out = days.slice();
+  for (let d = ultimoDado + 1; d <= maxAcao; d++) out.push(d);
+  return out;
+}
+
+/* Último dia de campanha que TEM dado de venda (= hoje). Usado pra marcar
+   onde a série real termina e sombrear o trecho futuro do eixo. */
+function execUltimoDiaComDado() {
+  return D26_FULL.length ? Math.max(...D26_FULL.map(r=>r.d)) : 0;
+}
+
 /* Estado de visibilidade das ações (toggle na legenda) */
 const execAcoesVisiveis = { tv: true, influencer: true, divulgacao: true, spotify: true, whatsapp: true, virada: true, radio: true, prog: true, ooh: true, meli: true };
 
@@ -1464,6 +1485,29 @@ function execToggleAcao(tipo, el) {
 /* Anotacoes por tipo (filtrado pelo estado execAcoesVisiveis) */
 function execGetTvAnnotations(days) {
   const anns = {};
+
+  // Linha HOJE + sombra no trecho futuro do eixo — sem isso o fim do
+  // gráfico parece vazio/quebrado, quando na verdade é o que ainda vem.
+  const hoje = execUltimoDiaComDado();
+  const idxHoje = days.indexOf(hoje);
+  if (idxHoje !== -1 && idxHoje < days.length - 1) {
+    anns.futuro = {
+      type:'box', xMin:idxHoje, xMax:days.length-1,
+      backgroundColor:'rgba(255,255,255,.025)', borderWidth:0,
+      drawTime:'beforeDatasetsDraw',
+      label:{ display:true, content:'ainda não aconteceu',
+        position:{x:'center', y:'start'}, yAdjust:16, color:'#6b7280',
+        font:{size:10, weight:'600'}, backgroundColor:'transparent' },
+    };
+    anns.hoje = {
+      type:'line', xMin:idxHoje, xMax:idxHoje,
+      borderColor:'rgba(255,255,255,.35)', borderWidth:1, borderDash:[2,3],
+      drawTime:'beforeDatasetsDraw',
+      label:{ display:true, content:'hoje', position:'start',
+        color:'#9ca3af', font:{size:10, weight:'700'},
+        backgroundColor:'rgba(0,0,0,.55)', padding:3 },
+    };
+  }
   if(execAcoesVisiveis.tv) {
     EXEC_TV_GLOBO.forEach(tv => {
       const idx = days.indexOf(tv.day26);
@@ -1824,7 +1868,7 @@ function renderExecKPIs() {
 
 function buildExecVendasChart() {
   const invest = buildExecD26Invest(execFiltFrom, execFiltTo);
-  const days = execGetAllDays(invest); if(!days.length) return;
+  const days = execExtenderDiasComAcoes(execGetAllDays(invest)); if(!days.length) return;
   const metric = execCurrentVendasMetric;
   const labels = days.map(d => 'D+'+d);
   const getRec26 = d => { const r=D26_FULL.find(x=>x.d===d); if(!r) return null; return metric==='motos'?r.mv:metric==='autos'?r.av:r.mv+r.av; };
@@ -2785,7 +2829,13 @@ function buildExecTimelineChart() {
   // (sem comparativo) depois do D+94.
   const nBase = D25_CAMPAIGN.length; // 94 (tamanho da campanha 2025)
   const maxD26 = (D26_FULL && D26_FULL.length) ? Math.max.apply(null, D26_FULL.map(r=>r.d)) : 0;
-  const n = Math.max(nBase, maxD26);
+  // alcança também as ações já contratadas que ainda não aconteceram
+  // (praça de TV de agosto), senão elas não têm onde ser desenhadas
+  const maxAcao = Math.max(0, ...[].concat(
+    EXEC_TV_GLOBO, EXEC_INFLUENCER_DIAS, EXEC_DIVULGACAO, EXEC_SPOTIFY,
+    EXEC_WHATSAPP, EXEC_VIRADA, EXEC_RADIO, EXEC_PROG, EXEC_OOH, EXEC_MELI
+  ).map(a => a.day26 || 0));
+  const n = Math.max(nBase, maxD26, maxAcao);
   const labels = Array.from({length:n}, (_,i) => 'D+'+(i+1));
 
   const getVal = (r) => {
