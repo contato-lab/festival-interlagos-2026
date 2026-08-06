@@ -1098,20 +1098,46 @@ const ACOES = [
   // ── MERCADO LIVRE ──────────────────────────────
   { dia:127, tipo:'meli',     titulo:'Mercado Livre — início',    desc:'Ativação das campanhas de Display e Vídeo no Mercado Livre (04/08), direcionando para a loja do evento e para as LPs de moto e auto.' },
 
-  // ── TV GLOBO, PRAÇA DE AGOSTO ──────────────────
-  // Autorização de agosto: 16 inserções de 30", R$ 501.765 de tabela
-  // e R$ 353.242,56 líquido. Concentradas na véspera da edição moto.
-  // Praça de agosto, dia a dia. São 16 inserções de 30" no total, R$ 501.765
-  // de tabela e R$ 353.242,56 líquido, concentradas na véspera da edição moto.
-  { dia:132, tipo:'tv',       titulo:'TV Globo — 09/08',       desc:'Auto Esporte e Esporte Espetacular (09/08), 1 inserção de 30" em cada. Também é a data do boletim Duas Rodas.' },
-  { dia:133, tipo:'tv',       titulo:'TV Globo — 10/08',       desc:'Bom Dia SP, Bom Dia Brasil e Globo Esporte (10/08)' },
-  { dia:134, tipo:'tv',       titulo:'TV Globo — 11/08',       desc:'Bom Dia SP, Bom Dia Brasil e Globo Esporte (11/08)' },
-  { dia:135, tipo:'tv',       titulo:'TV Globo — 12/08',       desc:'Bom Dia SP, Bom Dia Brasil e Globo Esporte (12/08)' },
-  { dia:136, tipo:'tv',       titulo:'TV Globo — 13/08',       desc:'Bom Dia SP, Bom Dia Brasil e Globo Esporte (13/08). Primeiro dia da edição moto.' },
-  { dia:137, tipo:'tv',       titulo:'TV Globo — 14/08',       desc:'Bom Dia SP e Bom Dia Brasil (14/08)' },
-  // 2º boletim do Auto Esporte. A proposta tem dois: 09/08 pra moto e 23/08
-  // pro carro, a R$ 168.942 cada. O de 23/08 estava faltando na linha do tempo.
-  { dia:146, tipo:'tv',       titulo:'Boletim Auto Esporte — 23/08', desc:'2º boletim Duas Rodas no Auto Esporte (23/08), da edição carro. Véspera da edição auto, que vai de 27 a 30/08.' },
+  // ── TV GLOBO, PRAÇAS DE AGOSTO ─────────────────
+  // Fonte: mapa de inserções da Globo (mercado SP1), duas praças separadas:
+  //   praça 1 — edição moto, 01 a 16/08: 30 chamadas de público + 4 vinhetas
+  //   praça 2 — edição auto, 15 a 30/08: 30 chamadas de público + 4 vinhetas
+  // O número em cada dia é a CONTAGEM DE INSERÇÕES daquele dia, conferida
+  // contra a linha "TOTAL ITENS DO PROGRAMA" das duas tabelas.
+  // Programas da grade: Bom Dia SP (8), SP1 (6), Globo Esporte (5), SP2 (4),
+  // Jornal da Globo (2), Jornal Hoje, Jornal Nacional, Bom Dia Sábado,
+  // Antena Paulista e Fantástico (1 cada) — por praça.
+  // As 4 vinhetas de bloco no Auto Esporte caem sempre em domingo:
+  // 09 e 16/08 (praça moto), 23 e 30/08 (praça auto). As de 23 e 09/08 são
+  // os dois boletins Duas Rodas, a R$ 168.942 cada.
+
+  // praça 1 — edição moto
+  { dia:128, tipo:'tv',       titulo:'TV Globo — 05/08',       desc:'Início da praça de agosto da edição moto. 3 chamadas de público no dia.' },
+  { dia:129, tipo:'tv',       titulo:'TV Globo — 06/08',       desc:'4 chamadas de público (maior volume diário da praça moto, junto com 07/08).' },
+  { dia:130, tipo:'tv',       titulo:'TV Globo — 07/08',       desc:'4 chamadas de público.' },
+  { dia:131, tipo:'tv',       titulo:'TV Globo — 08/08',       desc:'Sábado: 2 chamadas de público, uma delas no Bom Dia Sábado.' },
+  { dia:132, tipo:'tv',       titulo:'TV Globo — 09/08',       desc:'Domingo: 2 chamadas (Antena Paulista e Fantástico) + 1 vinheta de bloco no Auto Esporte. É a data do 1º boletim Duas Rodas, da edição moto.' },
+  { dia:133, tipo:'tv',       titulo:'TV Globo — 10/08',       desc:'3 chamadas de público.' },
+  { dia:134, tipo:'tv',       titulo:'TV Globo — 11/08',       desc:'3 chamadas de público.' },
+  { dia:135, tipo:'tv',       titulo:'TV Globo — 12/08',       desc:'3 chamadas de público.' },
+  { dia:136, tipo:'tv',       titulo:'TV Globo — 13/08',       desc:'Primeiro dia da edição moto: 3 chamadas de público + 1 vinheta de bloco no SP2.' },
+  { dia:137, tipo:'tv',       titulo:'TV Globo — 14/08',       desc:'3 chamadas de público + 1 vinheta de bloco no SP1. Última data com chamada da praça moto.' },
+  { dia:139, tipo:'tv',       titulo:'TV Globo — 16/08',       desc:'Último dia da edição moto: 1 vinheta de bloco no Auto Esporte (domingo). Sem chamada de público.' },
+
+  // praça 2 — edição auto
+  { dia:140, tipo:'tv',       titulo:'TV Globo — 17/08',       desc:'Início da praça de agosto da edição auto. 2 chamadas de público no dia.' },
+  { dia:141, tipo:'tv',       titulo:'TV Globo — 18/08',       desc:'2 chamadas de público.' },
+  { dia:142, tipo:'tv',       titulo:'TV Globo — 19/08',       desc:'3 chamadas de público.' },
+  { dia:143, tipo:'tv',       titulo:'TV Globo — 20/08',       desc:'3 chamadas de público.' },
+  { dia:144, tipo:'tv',       titulo:'TV Globo — 21/08',       desc:'3 chamadas de público.' },
+  { dia:145, tipo:'tv',       titulo:'TV Globo — 22/08',       desc:'Sábado: 2 chamadas de público, uma delas no Bom Dia Sábado.' },
+  { dia:146, tipo:'tv',       titulo:'TV Globo — 23/08',       desc:'Domingo: 2 chamadas (Antena Paulista e Fantástico) + 1 vinheta de bloco no Auto Esporte. É a data do 2º boletim Duas Rodas, da edição carro.' },
+  { dia:147, tipo:'tv',       titulo:'TV Globo — 24/08',       desc:'3 chamadas de público.' },
+  { dia:148, tipo:'tv',       titulo:'TV Globo — 25/08',       desc:'3 chamadas de público.' },
+  { dia:149, tipo:'tv',       titulo:'TV Globo — 26/08',       desc:'3 chamadas de público.' },
+  { dia:150, tipo:'tv',       titulo:'TV Globo — 27/08',       desc:'Primeiro dia da edição auto: 2 chamadas de público + 1 vinheta de bloco no SP2.' },
+  { dia:151, tipo:'tv',       titulo:'TV Globo — 28/08',       desc:'2 chamadas de público + 1 vinheta de bloco no SP1. Última data com chamada da praça auto.' },
+  { dia:153, tipo:'tv',       titulo:'TV Globo — 30/08',       desc:'Último dia da edição auto: 1 vinheta de bloco no Auto Esporte (domingo). Sem chamada de público.' },
 ];
 
 // Configuração visual por tipo
