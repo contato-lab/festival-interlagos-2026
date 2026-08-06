@@ -31,8 +31,12 @@ from google.analytics.data_v1beta.types import (
 # ── Configurações ─────────────────────────────────────────────────────────────
 PROPERTY_ID   = os.environ.get("GA4_PROPERTY_ID", "378336436")
 OUTPUT_FILE   = "ga4-data.json"
-LOOKBACK_DAYS = 90   # histórico para séries diárias
-CHANNEL_DAYS  = 45   # histórico para menções por canal (≈6 semanas)
+# A série diária cobre a CAMPANHA INTEIRA, não uma janela móvel.
+# Antes eram 90 dias corridos, e por isso o gráfico de acessos do dashboard
+# começava no meio da campanha e ia empurrando o início pra frente todo dia.
+CAMPANHA_INICIO = "2026-03-30"   # primeiro dia de veiculação
+LOOKBACK_MIN    = 90             # piso de segurança, se a data acima for mexida
+CHANNEL_DAYS    = 45             # histórico para menções por canal (≈6 semanas)
 
 # Mapeamento: canal GA4 → nome no dashboard (Menções Gerais)
 CHANNEL_MAP = {
@@ -608,7 +612,10 @@ def main():
     client = get_client()
 
     today      = datetime.now(timezone.utc).date()
-    start_date = (today - timedelta(days=LOOKBACK_DAYS)).strftime("%Y-%m-%d")
+    # começa no primeiro dia de campanha; o piso só entra se alguém apagar a data
+    inicio     = datetime.strptime(CAMPANHA_INICIO, "%Y-%m-%d").date()
+    piso       = today - timedelta(days=LOOKBACK_MIN)
+    start_date = min(inicio, piso).strftime("%Y-%m-%d")
     # Inclui o dia de hoje. GA4 retorna dados parciais (~2h de atraso de
     # processamento), mas é o que o usuário quer ver no gráfico em tempo
     # quase real. A linha do tempo do dashboard mostra até hoje.

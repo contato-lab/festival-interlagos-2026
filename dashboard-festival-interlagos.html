@@ -1864,7 +1864,9 @@ Object.entries(_GA4_CHANNEL_MAP).forEach(([k,v]) => { _GA4_CHANNEL_MAP_REV[v] = 
 // SEMPRE mostra do início da campanha (31/03/2026) até hoje, ignorando
 // o filtro de data global. A ideia desse card é a linha do tempo
 // COMPLETA da campanha, pra ver crescimento ao longo dos meses.
-const _GA4_GROWTH_START = '2026-03-31';
+// primeiro dia de veiculação. O robô do GA4 busca a partir desta mesma data,
+// então o gráfico passa a cobrir a campanha inteira em vez dos últimos 90 dias.
+const _GA4_GROWTH_START = '2026-03-30';
 let _ga4GrowthChart = null;
 
 function buildGA4Growth(_dateFromIgnored, _dateToIgnored) {
