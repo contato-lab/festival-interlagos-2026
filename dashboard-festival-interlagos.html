@@ -1046,11 +1046,19 @@ const ACOES = [
   // ── VIRADA DE LOTE ─────────────────────────────
   { dia:31, tipo:'virada',    titulo:'Post Virada de Lote',    desc:'Post virada de lote (30/04)' },
 
-  // ── RÁDIO MIX FM SP ────────────────────────────
-  { dia:35, tipo:'radio',     titulo:'Rádio MIX FM SP — início', desc:'Início Rádio MIX FM SP (04/05) — 100 spots de 30s, vigência até 18/05' },
+  // ── RÁDIO ──────────────────────────────────────
+  { dia:35,  tipo:'radio',    titulo:'Rádio MIX FM SP — início', desc:'Início Rádio MIX FM SP (04/05) — 100 spots de 30s, vigência até 18/05' },
+  { dia:49,  tipo:'radio',    titulo:'Rádio MIX FM SP — fim',    desc:'Fim da veiculação na MIX FM SP (18/05)' },
+  { dia:120, tipo:'radio',    titulo:'Rádio — 28/07',            desc:'Veiculação em rádio em 28/07' },
+  { dia:127, tipo:'radio',    titulo:'Rádio Band',               desc:'Veiculação na Band em 04/08, mesmo dia da virada do 4º lote' },
 
   // ── MÍDIA PROGRAMÁTICA ─────────────────────────
-  { dia:35, tipo:'prog',      titulo:'Mídia Programática — início', desc:'Início da campanha de mídia programática Adsplay (04/05) — Display, Vídeo, CTV/OTT e Áudio' },
+  { dia:35,  tipo:'prog',     titulo:'Mídia Programática — início', desc:'Início da campanha de mídia programática Adsplay (04/05) — Display, Vídeo, CTV/OTT e Áudio' },
+  { dia:93,  tipo:'prog',     titulo:'Mídia Programática — fim',    desc:'Fim da campanha Adsplay (01/07). Rodou 59 dias.' },
+
+  // ── ELETROMÍDIA (DOOH) ─────────────────────────
+  { dia:105, tipo:'ooh',      titulo:'Eletromídia — início',     desc:'Início da veiculação em Eletromídia (13/07), com vigência até 09/08' },
+  { dia:132, tipo:'ooh',      titulo:'Eletromídia — fim',        desc:'Fim da veiculação em Eletromídia (09/08). Rodou 28 dias, terminando na véspera da edição moto.' },
 
   // ── VIRADAS DE LOTE ────────────────────────────
   // As três datas abaixo batem com os três maiores picos de venda da série.
@@ -1085,7 +1093,7 @@ const ACAO_CONFIG = {
 
 // Estado de visibilidade por tipo (toggle na legenda)
 // Default: TV, divulgação e WhatsApp visíveis (ações recentes/relevantes)
-const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv' || k === 'divulgacao' || k === 'whatsapp' || k === 'virada' || k === 'radio' || k === 'prog' || k === 'meli']));
+const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv' || k === 'divulgacao' || k === 'whatsapp' || k === 'virada' || k === 'radio' || k === 'prog' || k === 'meli' || k === 'ooh']));
 // Ex: 'https://docs.google.com/spreadsheets/d/SEU_ID/export?format=csv&gid=0'
 
 // ═══════════════════════════════════════════════
