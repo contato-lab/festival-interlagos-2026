@@ -1540,9 +1540,12 @@ function getAnnotations() {
 }
 
 function buildComp() {
-  // Eixo unificado por DIA DE CAMPANHA: D+1..D+94 (94 dias)
+  // Eixo unificado por DIA DE CAMPANHA.
   // D+1 de 2025 = 14/03/2025 = D+1 de 2026 = 31/03/2026 (mesma posicao no eixo)
-  const n = D25_CAMPAIGN.length; // 94
+  // O eixo vai ate o maior dia entre as duas campanhas: 2025 teve 94 dias e
+  // 2026 ja passou disso, entao travar em 94 cortava a linha de 2026 no meio.
+  const maxD26 = D26.length ? Math.max(...D26.map(r=>r.d)) : 0;
+  const n = Math.max(D25_CAMPAIGN.length, maxD26);
   const labels = Array.from({length:n}, (_,i) => 'D+'+(i+1));
   const s25 = getSeries(D25_CAMPAIGN, metricAtiva, edicaoAtiva);
   // 2026: alinhado por D+ de campanha (D+1 vai pro indice 0)
@@ -1899,14 +1902,23 @@ function buildGA4Growth(_dateFromIgnored, _dateToIgnored) {
 
   // Monta annotations das ACOES (TV Globo, Influenciadores, Programática etc.)
   // mapeando a.dia (D+N a partir de 31/03) pro index do series.
-  // Como series tambem comeca em 31/03, dia=1 -> index 0.
-  const seriesStart = new Date(_GA4_GROWTH_START + 'T00:00:00');
+  //
+  // ATENCAO: o series NAO comeca necessariamente em 31/03. O GA4 devolve uma
+  // janela movel (hoje sao os ultimos ~90 dias), entao o primeiro ponto do
+  // grafico costuma ser bem depois da abertura da campanha. Antes isso era
+  // ignorado e o xIndex saia por a.dia-1: as acoes antigas apareciam dezenas
+  // de dias fora do lugar e as recentes eram descartadas por "passar do fim".
+  // Agora o indice e medido a partir da primeira data que o grafico realmente tem.
+  const CAMPANHA_D1 = new Date('2026-03-31T00:00:00');
+  const primeiroDia = Math.round(
+    (new Date(series[0].date + 'T00:00:00') - CAMPANHA_D1) / 86400000
+  ) + 1;                                   // dia de campanha do 1o ponto do grafico
   const ga4Annotations = {};
   ACOES.forEach((a, i) => {
     if (!acoesVisiveis[a.tipo]) return;
     const cfg = ACAO_CONFIG[a.tipo];
     if (!cfg) return;
-    const xIndex = a.dia - 1;
+    const xIndex = a.dia - primeiroDia;
     if (xIndex < 0 || xIndex >= labels.length) return;
     ga4Annotations[`ga4_acao_${i}`] = {
       type: 'line',
