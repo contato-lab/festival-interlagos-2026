@@ -1028,8 +1028,14 @@ let TIKTOK_DATA = { daily_series: [] }; // declarado cedo para evitar TDZ
 // ═══════════════════════════════════════════════
 const ACOES = [
   // ── TV ─────────────────────────────────────────
-  { dia:2,  tipo:'tv',        titulo:'TV — Início',            desc:'TV — início da veiculação (01/04)' },
-  { dia:6,  tipo:'tv',        titulo:'TV — Globo (05/04)',      desc:'Inserção TV Globo — pico de acesso (05/04)' },
+  // Praça de abril, dia a dia conforme a autorização de programação.
+  // Antes só existiam dois marcadores aqui (01/04 e 05/04) e os outros três
+  // dias de veiculação ficavam de fora.
+  { dia:2,  tipo:'tv',        titulo:'TV Globo — 01/04',       desc:'Bom Dia SP, Bom Dia Brasil e Globo Esporte (01/04). Início da veiculação.' },
+  { dia:3,  tipo:'tv',        titulo:'TV Globo — 02/04',       desc:'Bom Dia SP, Bom Dia Brasil e Globo Esporte (02/04)' },
+  { dia:4,  tipo:'tv',        titulo:'TV Globo — 03/04',       desc:'Bom Dia SP e Bom Dia Brasil (03/04)' },
+  { dia:6,  tipo:'tv',        titulo:'TV Globo — 05/04',       desc:'Auto Esporte e Esporte Espetacular (05/04). Foi o dia de pico de acesso da campanha.' },
+  { dia:7,  tipo:'tv',        titulo:'TV Globo — 06/04',       desc:'Bom Dia SP, Bom Dia Brasil e Globo Esporte (06/04)' },
 
   // ── INFLUENCIADORES ────────────────────────────
   { dia:1,  tipo:'influencer',titulo:'Influencers — Abertura', desc:'Influenciadores postaram na abertura (31/03)' },
@@ -1072,8 +1078,14 @@ const ACOES = [
   // ── TV GLOBO, PRAÇA DE AGOSTO ──────────────────
   // Autorização de agosto: 16 inserções de 30", R$ 501.765 de tabela
   // e R$ 353.242,56 líquido. Concentradas na véspera da edição moto.
-  { dia:132, tipo:'tv',       titulo:'TV Globo — Auto Esporte',   desc:'Auto Esporte e Esporte Espetacular (09/08), 1 inserção de 30" em cada. Também é a data do boletim Duas Rodas.' },
-  { dia:133, tipo:'tv',       titulo:'TV Globo — praça 10 a 14/08', desc:'Bom Dia SP e Bom Dia Brasil de 10 a 14/08 (5 inserções cada) e Globo Esporte de 10 a 13/08 (4 inserções). Tudo em 30".' },
+  // Praça de agosto, dia a dia. São 16 inserções de 30" no total, R$ 501.765
+  // de tabela e R$ 353.242,56 líquido, concentradas na véspera da edição moto.
+  { dia:132, tipo:'tv',       titulo:'TV Globo — 09/08',       desc:'Auto Esporte e Esporte Espetacular (09/08), 1 inserção de 30" em cada. Também é a data do boletim Duas Rodas.' },
+  { dia:133, tipo:'tv',       titulo:'TV Globo — 10/08',       desc:'Bom Dia SP, Bom Dia Brasil e Globo Esporte (10/08)' },
+  { dia:134, tipo:'tv',       titulo:'TV Globo — 11/08',       desc:'Bom Dia SP, Bom Dia Brasil e Globo Esporte (11/08)' },
+  { dia:135, tipo:'tv',       titulo:'TV Globo — 12/08',       desc:'Bom Dia SP, Bom Dia Brasil e Globo Esporte (12/08)' },
+  { dia:136, tipo:'tv',       titulo:'TV Globo — 13/08',       desc:'Bom Dia SP, Bom Dia Brasil e Globo Esporte (13/08). Primeiro dia da edição moto.' },
+  { dia:137, tipo:'tv',       titulo:'TV Globo — 14/08',       desc:'Bom Dia SP e Bom Dia Brasil (14/08)' },
 ];
 
 // Configuração visual por tipo
