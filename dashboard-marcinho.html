@@ -658,8 +658,11 @@ const ACOES = [
 
 // Estado de visibilidade por tipo (toggle na legenda)
 // Default: TV + divulgação + WhatsApp ligadas (ações de maior impacto)
+// TUDO DESLIGADO por padrao. Com todos os tipos ligados o grafico virava um
+// emaranhado de dezenas de linhas tracejadas e nao dava pra ler venda nenhuma.
+// Agora o usuario liga só a ação que quer analisar, clicando na legenda.
 const acoesVisiveis = Object.fromEntries(
-  Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv' || k === 'divulgacao' || k === 'whatsapp' || k === 'virada' || k === 'radio' || k === 'prog' || k === 'meli' || k === 'ooh'])
+  Object.keys(ACAO_CONFIG).map(k => [k, false])
 );
 
 /* ═══════════════════════════════════════════

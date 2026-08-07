@@ -616,8 +616,11 @@ const ACAO_CONFIG = {
   virada:     { cor:'#FF6B9D', icone:'💰', label:'Virada de Lote',       dash:[6,4] },
 };
 
-const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k =>
-  [k, k==='tv' || k==='virada' || k==='radio' || k==='prog' || k==='ooh' || k==='meli']));
+// TUDO DESLIGADO por padrao. Com todos os tipos ligados o grafico virava um
+// emaranhado de dezenas de linhas tracejadas e nao dava pra ler venda nenhuma.
+// Agora o usuario liga só a ação que quer analisar, clicando na legenda ou
+// num cartão da régua de baixo.
+const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k => [k, false]));
 
 function toggleAcao(tipo, el){
   acoesVisiveis[tipo] = !acoesVisiveis[tipo];
@@ -644,31 +647,47 @@ function buildAcoesTimeline(){
   const el = document.getElementById('acoesTimeline');
   if(!el) return;
   el.innerHTML = '';
+  // A régua mostra TODAS as ações, mesmo as de tipo desligado: ela é o índice
+  // do que existe pra ver. Filtrar por visibilidade deixava a régua vazia
+  // agora que tudo começa desligado. Cartão apagado = tipo desligado; clicar
+  // nele LIGA aquele tipo.
   ACOES
-    .filter(a => acoesVisiveis[a.tipo])
-    .slice().sort((a,b) => a.dia - b.dia)
-    .forEach(a => {
+    .map((a, i) => ({a, i}))
+    .slice().sort((p,q) => p.a.dia - q.a.dia)
+    .forEach(({a, i}) => {
       const c = ACAO_CONFIG[a.tipo]; if(!c) return;
+      const ligado = !!acoesVisiveis[a.tipo];
       const div = document.createElement('div');
-      div.className = 'acao-marker';
-      div.title = a.titulo;
+      div.className = 'acao-marker' + (ligado ? '' : ' apagado');
+      div.dataset.i = i;
+      div.title = a.titulo + (ligado ? '' : ' · clique para mostrar no gráfico');
+      if(!ligado) div.style.opacity = '.42';
       div.innerHTML =
         '<div style="width:2px;height:12px;background:'+c.cor+';border-radius:1px;opacity:.7"></div>' +
         '<div class="acao-marker-icon">'+c.icone+'</div>' +
         '<div class="acao-marker-dia" style="color:'+c.cor+'">D+'+a.dia+'</div>' +
         '<div class="acao-marker-label">'+a.titulo+'</div>';
-      div.onclick = () => focusAcao(a, div);
+      div.onmouseenter = () => { div.style.opacity = '1'; };
+      div.onmouseleave = () => { if(!acoesVisiveis[a.tipo] && !div.classList.contains('foco')) div.style.opacity = '.42'; };
+      div.onclick = () => focusAcao(a, i);
       el.appendChild(div);
     });
 }
 
 // clique no cartão → tooltip no dia + linha da ação engrossa por ~1,6s
 let _acaoFocoDia = null, _acaoFocoTipo = null, _acaoFocoTimer = null;
-function focusAcao(a, card){
+function focusAcao(a, i){
+  if(_acaoFocoTimer) { clearTimeout(_acaoFocoTimer); _acaoFocoDia = null; _acaoFocoTipo = null; _acaoFocoTimer = null; }
+  // Tipo desligado: liga primeiro, senão não existe linha pra destacar.
+  // É o caminho principal agora que tudo começa desligado.
+  if(!acoesVisiveis[a.tipo]){
+    acoesVisiveis[a.tipo] = true;
+    buildComp();            // recria o chart E a legenda E a régua
+  }
   if(!cComp) return;
+  const card = document.querySelector('#acoesTimeline .acao-marker[data-i="' + i + '"]');
   document.querySelectorAll('#acoesTimeline .acao-marker.foco').forEach(m => m.classList.remove('foco'));
-  if(card) card.classList.add('foco');
-  if(_acaoFocoTimer) clearTimeout(_acaoFocoTimer);
+  if(card){ card.classList.add('foco'); card.style.opacity = '1'; }
   const ch = cComp, xIndex = a.dia - 1;
   _acaoFocoDia = a.dia; _acaoFocoTipo = a.tipo;
   // dia futuro (TV de agosto) não tem ponto na linha — só o destaque pisca
@@ -1303,6 +1322,11 @@ function buildComp() {
       }
     }
   });
+  // Legenda e régua montadas AQUI, não só no afterDraw do gráfico. O afterDraw
+  // só roda quando o Chart.js efetivamente desenha, e em aba oculta ou com
+  // animação suprimida ele pode não rodar — a legenda ficava vazia e não havia
+  // como ligar ação nenhuma. Montar direto aqui não depende do ciclo de render.
+  buildAcoesLegenda(n);
   buildAcoesTimeline();
 }
 

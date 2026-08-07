@@ -1157,7 +1157,11 @@ const ACAO_CONFIG = {
 
 // Estado de visibilidade por tipo (toggle na legenda)
 // Default: TV, divulgação e WhatsApp visíveis (ações recentes/relevantes)
-const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k => [k, k === 'tv' || k === 'divulgacao' || k === 'whatsapp' || k === 'virada' || k === 'radio' || k === 'prog' || k === 'meli' || k === 'ooh']));
+// TUDO DESLIGADO por padrao. Com todos os tipos ligados o grafico virava um
+// emaranhado de dezenas de linhas tracejadas e nao dava pra ler venda nenhuma.
+// Agora o usuario liga só a ação que quer analisar, clicando na legenda ou
+// num cartão da régua de baixo.
+const acoesVisiveis = Object.fromEntries(Object.keys(ACAO_CONFIG).map(k => [k, false]));
 // Ex: 'https://docs.google.com/spreadsheets/d/SEU_ID/export?format=csv&gid=0'
 
 // ═══════════════════════════════════════════════
@@ -2037,25 +2041,34 @@ function buildAcoesLegend() {
 function buildAcoesTimeline() {
   const el = document.getElementById('acoesTimeline');
   el.innerHTML = '';
-  const visiveis = ACOES
+  // A régua mostra TODAS as ações, mesmo as de tipo desligado: ela é o índice
+  // do que existe pra ver. Filtrar por visibilidade deixava a régua vazia
+  // agora que tudo começa desligado, e aí não havia por onde descobrir nada.
+  // Cartão de tipo desligado fica apagado; clicar nele LIGA aquele tipo.
+  const todas = ACOES
     .map((a, i) => ({ a, i }))          // i = indice em ACOES = chave da anotação no gráfico
-    .filter(x => acoesVisiveis[x.a.tipo])
     .sort((p, q) => p.a.dia - q.a.dia);
 
-  visiveis.forEach(({ a, i }) => {
+  todas.forEach(({ a, i }) => {
     const cfg = ACAO_CONFIG[a.tipo];
+    const ligado = !!acoesVisiveis[a.tipo];
     const div = document.createElement('div');
-    div.className = 'acao-marker';
-    div.title = a.desc;
+    div.className = 'acao-marker' + (ligado ? '' : ' apagado');
+    div.dataset.i = i;                  // pra reencontrar o cartão após rebuild
+    div.title = (a.desc || a.titulo) + (ligado ? '' : ' · clique para mostrar no gráfico');
     div.innerHTML = `
       <div style="width:2px;height:12px;background:${cfg.cor};border-radius:1px;opacity:.7"></div>
       <div class="acao-marker-icon">${cfg.icone}</div>
       <div class="acao-marker-dia" style="color:${cfg.cor}">D+${a.dia}</div>
       <div class="acao-marker-label">${a.titulo}</div>`;
     div.style.cssText=`min-width:64px;padding:4px;border-radius:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:.2s`;
-    div.onmouseenter=()=>div.style.background='rgba(255,255,255,0.04)';
-    div.onmouseleave=()=>{ if(!div.classList.contains('foco')) div.style.background='transparent'; };
-    div.onclick=()=>focusAcao(a, i, div);
+    if (!ligado) div.style.opacity = '.42';
+    div.onmouseenter=()=>{ div.style.background='rgba(255,255,255,0.04)'; div.style.opacity='1'; };
+    div.onmouseleave=()=>{
+      if(!div.classList.contains('foco')) div.style.background='transparent';
+      if(!acoesVisiveis[a.tipo] && !div.classList.contains('foco')) div.style.opacity='.42';
+    };
+    div.onclick=()=>focusAcao(a, i);
     el.appendChild(div);
   });
 }
@@ -2064,17 +2077,28 @@ function buildAcoesTimeline() {
 // Abre o tooltip no dia da ação (quando o dia tem dado) e engorda a linha
 // tracejada por ~1,6s pra mostrar exatamente qual marcação é.
 let _acaoFoco = null;   // { timer, reset } do destaque ativo
-function focusAcao(a, i, card) {
+function focusAcao(a, i) {
+  // Desfaz o destaque anterior ANTES de qualquer rebuild: se o chart for
+  // recriado com a anotação engordada, ela fica grossa pra sempre.
+  if (_acaoFoco) { clearTimeout(_acaoFoco.timer); _acaoFoco.reset(); _acaoFoco = null; }
+
+  // Tipo desligado: liga primeiro, senão não existe linha pra destacar.
+  // É o caminho principal agora que tudo começa desligado.
+  if (!acoesVisiveis[a.tipo]) {
+    acoesVisiveis[a.tipo] = true;
+    buildAcoesLegend();
+    buildComp();                 // recria o chart -> cComp aponta pro novo
+    buildAcoesTimeline();        // recria os cartões -> o antigo virou lixo
+    if (GA4_DATA) buildGA4Growth();
+  }
   if (!cComp) return;
 
-  // estado visual do cartão clicado
+  // reencontra o cartão pelo índice (o de antes pode ter sido recriado)
+  const card = document.querySelector('#acoesTimeline .acao-marker[data-i="' + i + '"]');
   document.querySelectorAll('#acoesTimeline .acao-marker.foco').forEach(m => {
     m.classList.remove('foco'); m.style.background = 'transparent';
   });
-  if (card) { card.classList.add('foco'); card.style.background = 'rgba(200,255,0,0.06)'; }
-
-  // desfaz o destaque anterior antes de aplicar o novo
-  if (_acaoFoco) { clearTimeout(_acaoFoco.timer); _acaoFoco.reset(); _acaoFoco = null; }
+  if (card) { card.classList.add('foco'); card.style.background = 'rgba(200,255,0,0.06)'; card.style.opacity = '1'; }
 
   const ch = cComp;
   const xIndex = a.dia - 1;

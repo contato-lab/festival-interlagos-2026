@@ -1527,13 +1527,23 @@ function execUltimoDiaComDado() {
 }
 
 /* Estado de visibilidade das ações (toggle na legenda) */
-const execAcoesVisiveis = { tv: true, influencer: true, divulgacao: true, spotify: true, whatsapp: true, virada: true, radio: true, prog: true, ooh: true, meli: true };
+// TUDO DESLIGADO por padrao. Com todos os tipos ligados o grafico virava um
+// emaranhado de dezenas de linhas tracejadas e nao dava pra ler venda nenhuma.
+// Agora o usuario liga só a ação que quer analisar, clicando na legenda.
+const execAcoesVisiveis = { tv: false, influencer: false, divulgacao: false, spotify: false, whatsapp: false, virada: false, radio: false, prog: false, ooh: false, meli: false };
 
-function execToggleAcao(tipo, el) {
+// Os dois gráficos (Vendas e Linha do Tempo) compartilham execAcoesVisiveis,
+// então qualquer clique tem que redesenhar os DOIS. Antes o clique na legenda
+// de Vendas só redesenhava Vendas, e a Linha do Tempo ficava para trás; com
+// tudo desligado por padrão isso passou a acontecer o tempo todo.
+// Não precisa mexer na classe do chip aqui: mostra()/mostraTl(), dentro de
+// cada build, reaplicam 'inactive' nos dois lados a partir do estado.
+function execToggleAcaoAmbos(tipo) {
   execAcoesVisiveis[tipo] = !execAcoesVisiveis[tipo];
-  el.classList.toggle('inactive', !execAcoesVisiveis[tipo]);
+  buildExecTimelineChart();
   buildExecVendasChart();
 }
+function execToggleAcao(tipo, el) { execToggleAcaoAmbos(tipo); }
 
 /* Anotacoes por tipo (filtrado pelo estado execAcoesVisiveis) */
 function execGetTvAnnotations(days) {
@@ -1965,22 +1975,23 @@ function buildExecVendasChart() {
       }
     }
   });
-  const tvLeg = document.getElementById('exec-tvLegVendas');
-  if(tvLeg) tvLeg.style.display = days.some(d=>EXEC_TV_GLOBO.some(t=>t.day26===d))?'flex':'none';
-  const inflLeg = document.getElementById('exec-inflLegVendas');
-  if(inflLeg) inflLeg.style.display = days.some(d=>EXEC_INFLUENCER_DIAS.some(t=>t.day26===d))?'flex':'none';
-  const divLeg = document.getElementById('exec-divLegVendas');
-  if(divLeg) divLeg.style.display = days.some(d=>EXEC_DIVULGACAO.some(t=>t.day26===d))?'flex':'none';
-  const spotLeg = document.getElementById('exec-spotLegVendas');
-  if(spotLeg) spotLeg.style.display = days.some(d=>EXEC_SPOTIFY.some(t=>t.day26===d))?'flex':'none';
-  const waLeg = document.getElementById('exec-waLegVendas');
-  if(waLeg) waLeg.style.display = days.some(d=>EXEC_WHATSAPP.some(t=>t.day26===d))?'flex':'none';
-  const virLeg = document.getElementById('exec-virLegVendas');
-  if(virLeg) virLeg.style.display = days.some(d=>EXEC_VIRADA.some(t=>t.day26===d))?'flex':'none';
-  const radLeg = document.getElementById('exec-radLegVendas');
-  if(radLeg) radLeg.style.display = days.some(d=>EXEC_RADIO.some(t=>t.day26===d))?'flex':'none';
-  const progLeg = document.getElementById('exec-progLegVendas');
-  if(progLeg) progLeg.style.display = days.some(d=>EXEC_PROG.some(t=>t.day26===d))?'flex':'none';
+  // display = tem ação desse tipo no período; inactive = está desligado agora.
+  // As duas coisas são independentes: sem aplicar 'inactive' aqui, o chip
+  // nascia com cara de ligado enquanto a linha não aparecia no gráfico.
+  const mostra = (id, tipo, temNoPeriodo) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.style.display = temNoPeriodo ? 'flex' : 'none';
+    el.classList.toggle('inactive', !execAcoesVisiveis[tipo]);
+  };
+  mostra('exec-tvLegVendas',   'tv',         days.some(d=>EXEC_TV_GLOBO.some(t=>t.day26===d)));
+  mostra('exec-inflLegVendas', 'influencer', days.some(d=>EXEC_INFLUENCER_DIAS.some(t=>t.day26===d)));
+  mostra('exec-divLegVendas',  'divulgacao', days.some(d=>EXEC_DIVULGACAO.some(t=>t.day26===d)));
+  mostra('exec-spotLegVendas', 'spotify',    days.some(d=>EXEC_SPOTIFY.some(t=>t.day26===d)));
+  mostra('exec-waLegVendas',   'whatsapp',   days.some(d=>EXEC_WHATSAPP.some(t=>t.day26===d)));
+  mostra('exec-virLegVendas',  'virada',     days.some(d=>EXEC_VIRADA.some(t=>t.day26===d)));
+  mostra('exec-radLegVendas',  'radio',      days.some(d=>EXEC_RADIO.some(t=>t.day26===d)));
+  mostra('exec-progLegVendas', 'prog',       days.some(d=>EXEC_PROG.some(t=>t.day26===d)));
 }
 
 /* ═══ Grafico Investimento ═══ */
@@ -2862,19 +2873,7 @@ function execSetTlMetric(metric, btn) {
   buildExecTimelineChart();
 }
 
-function execToggleAcaoTl(tipo, el) {
-  execAcoesVisiveis[tipo] = !execAcoesVisiveis[tipo];
-  el.classList.toggle('inactive', !execAcoesVisiveis[tipo]);
-  // Sincroniza com o outro chart
-  const keyMap = {tv:'tv', influencer:'infl', divulgacao:'div', spotify:'spot', whatsapp:'wa', virada:'vir', radio:'rad', prog:'prog'};
-  const key = keyMap[tipo];
-  if(key) {
-    const outro = document.getElementById('exec-' + key + 'LegVendas');
-    if(outro) outro.classList.toggle('inactive', !execAcoesVisiveis[tipo]);
-  }
-  buildExecTimelineChart();
-  buildExecVendasChart();
-}
+function execToggleAcaoTl(tipo, el) { execToggleAcaoAmbos(tipo); }
 
 function buildExecTimelineChart() {
   const ctx = document.getElementById('exec-chartTimeline');
@@ -3007,27 +3006,24 @@ function buildExecTimelineChart() {
     }
   });
 
-  // Mostra legendas das ações que caem no range
-  const tvLegTl = document.getElementById('exec-tvLegTl');
-  if(tvLegTl) tvLegTl.style.display = EXEC_TV_GLOBO.some(t=>days.includes(t.day26))?'flex':'none';
-  const inflLegTl = document.getElementById('exec-inflLegTl');
-  if(inflLegTl) inflLegTl.style.display = EXEC_INFLUENCER_DIAS.some(t=>days.includes(t.day26))?'flex':'none';
-  const divLegTl = document.getElementById('exec-divLegTl');
-  if(divLegTl) divLegTl.style.display = EXEC_DIVULGACAO.some(t=>days.includes(t.day26))?'flex':'none';
-  const spotLegTl = document.getElementById('exec-spotLegTl');
-  if(spotLegTl) spotLegTl.style.display = EXEC_SPOTIFY.some(t=>days.includes(t.day26))?'flex':'none';
-  const waLegTl = document.getElementById('exec-waLegTl');
-  if(waLegTl) waLegTl.style.display = EXEC_WHATSAPP.some(t=>days.includes(t.day26))?'flex':'none';
-  const virLegTl = document.getElementById('exec-virLegTl');
-  if(virLegTl) virLegTl.style.display = EXEC_VIRADA.some(t=>days.includes(t.day26))?'flex':'none';
-  const radLegTl = document.getElementById('exec-radLegTl');
-  if(radLegTl) radLegTl.style.display = EXEC_RADIO.some(t=>days.includes(t.day26))?'flex':'none';
-  const progLegTl = document.getElementById('exec-progLegTl');
-  if(progLegTl) progLegTl.style.display = EXEC_PROG.some(t=>days.includes(t.day26))?'flex':'none';
-  const oohLegTl = document.getElementById('exec-oohLegTl');
-  if(oohLegTl) oohLegTl.style.display = EXEC_OOH.some(t=>days.includes(t.day26))?'flex':'none';
-  const meliLegTl = document.getElementById('exec-meliLegTl');
-  if(meliLegTl) meliLegTl.style.display = EXEC_MELI.some(t=>days.includes(t.day26))?'flex':'none';
+  // Mostra legendas das ações que caem no range, já com o estado ligado/desligado.
+  // display = existe ação desse tipo no período; inactive = está desligado agora.
+  const mostraTl = (id, tipo, temNoPeriodo) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.style.display = temNoPeriodo ? 'flex' : 'none';
+    el.classList.toggle('inactive', !execAcoesVisiveis[tipo]);
+  };
+  mostraTl('exec-tvLegTl',   'tv',         EXEC_TV_GLOBO.some(t=>days.includes(t.day26)));
+  mostraTl('exec-inflLegTl', 'influencer', EXEC_INFLUENCER_DIAS.some(t=>days.includes(t.day26)));
+  mostraTl('exec-divLegTl',  'divulgacao', EXEC_DIVULGACAO.some(t=>days.includes(t.day26)));
+  mostraTl('exec-spotLegTl', 'spotify',    EXEC_SPOTIFY.some(t=>days.includes(t.day26)));
+  mostraTl('exec-waLegTl',   'whatsapp',   EXEC_WHATSAPP.some(t=>days.includes(t.day26)));
+  mostraTl('exec-virLegTl',  'virada',     EXEC_VIRADA.some(t=>days.includes(t.day26)));
+  mostraTl('exec-radLegTl',  'radio',      EXEC_RADIO.some(t=>days.includes(t.day26)));
+  mostraTl('exec-progLegTl', 'prog',       EXEC_PROG.some(t=>days.includes(t.day26)));
+  mostraTl('exec-oohLegTl',  'ooh',        EXEC_OOH.some(t=>days.includes(t.day26)));
+  mostraTl('exec-meliLegTl', 'meli',       EXEC_MELI.some(t=>days.includes(t.day26)));
 }
 
 let execTMView = 'receita'; // 'receita' | 'ingressos'
