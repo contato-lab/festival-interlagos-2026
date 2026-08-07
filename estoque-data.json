@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-07 17:19",
+  "updated_at": "2026-08-07 18:20",
   "source": "Base da planilha (24/06) menos vendas ao vivo da API do sistema proprio",
   "edicoes": {
     "moto": {
@@ -11,12 +11,12 @@
         "15/08",
         "16/08"
       ],
-      "total_disponivel": 3786,
-      "marcas_com_vaga": 18,
+      "total_disponivel": 3848,
+      "marcas_com_vaga": 17,
       "passes": [
         {
           "nome": "Ride Pass",
-          "total": 3384,
+          "total": 3446,
           "marcas": [
             {
               "marca": "Bajaj",
@@ -25,31 +25,31 @@
                 23,
                 54,
                 51,
-                54
+                53
               ],
-              "total": 182
+              "total": 181
             },
             {
               "marca": "BMW",
               "modelos": 6,
               "dias": [
-                8,
-                25,
+                9,
+                24,
                 5,
-                35
+                33
               ],
-              "total": 73
+              "total": 71
             },
             {
               "marca": "CF MOTO",
               "modelos": 6,
               "dias": [
                 23,
-                60,
-                12,
-                70
+                62,
+                11,
+                73
               ],
-              "total": 165
+              "total": 169
             },
             {
               "marca": "Dafra",
@@ -57,10 +57,10 @@
               "dias": [
                 42,
                 105,
-                92,
+                95,
                 104
               ],
-              "total": 343
+              "total": 346
             },
             {
               "marca": "Harley-Davidson",
@@ -77,34 +77,34 @@
               "marca": "Honda",
               "modelos": 8,
               "dias": [
-                44,
-                123,
-                62,
-                124
+                46,
+                129,
+                75,
+                129
               ],
-              "total": 353
+              "total": 379
             },
             {
               "marca": "Kawasaki",
               "modelos": 2,
               "dias": [
                 1,
-                1,
+                0,
                 0,
                 0
               ],
-              "total": 2
+              "total": 1
             },
             {
               "marca": "MOTO MORINI",
               "modelos": 5,
               "dias": [
                 31,
-                70,
-                35,
-                93
+                74,
+                36,
+                92
               ],
-              "total": 229
+              "total": 233
             },
             {
               "marca": "PIAGGIO",
@@ -122,11 +122,11 @@
               "modelos": 5,
               "dias": [
                 49,
-                120,
-                106,
-                126
+                124,
+                107,
+                127
               ],
-              "total": 401
+              "total": 407
             },
             {
               "marca": "SHINERAY",
@@ -135,31 +135,31 @@
                 68,
                 180,
                 131,
-                167
+                170
               ],
-              "total": 546
+              "total": 549
             },
             {
               "marca": "Suzuki",
               "modelos": 7,
               "dias": [
-                3,
-                32,
+                7,
+                33,
                 0,
-                67
+                68
               ],
-              "total": 102
+              "total": 108
             },
             {
               "marca": "Triumph",
               "modelos": 4,
               "dias": [
                 0,
-                2,
+                0,
                 0,
                 0
               ],
-              "total": 2
+              "total": 0
             },
             {
               "marca": "VESPA",
@@ -167,32 +167,32 @@
               "dias": [
                 12,
                 27,
-                24,
+                25,
                 26
               ],
-              "total": 89
+              "total": 90
             },
             {
               "marca": "VOGE",
               "modelos": 5,
               "dias": [
                 40,
-                102,
-                86,
-                121
+                105,
+                88,
+                123
               ],
-              "total": 349
+              "total": 356
             },
             {
               "marca": "Yamaha",
               "modelos": 5,
               "dias": [
-                32,
-                91,
-                48,
+                34,
+                90,
+                53,
                 93
               ],
-              "total": 264
+              "total": 270
             },
             {
               "marca": "Zontes",
@@ -200,64 +200,64 @@
               "dias": [
                 24,
                 57,
-                38,
+                40,
                 70
               ],
-              "total": 189
+              "total": 191
             }
           ]
         },
         {
           "nome": "Ducati Pass",
-          "total": 181,
+          "total": 184,
           "marcas": [
             {
               "marca": "Ducati",
               "modelos": 6,
               "dias": [
-                41,
-                71,
-                0,
-                69
+                38,
+                73,
+                2,
+                71
               ],
-              "total": 181
+              "total": 184
             }
           ]
         },
         {
           "nome": "Sport Pass",
-          "total": 221,
+          "total": 218,
           "marcas": [
             {
               "marca": "BMW",
               "modelos": 1,
               "dias": [
-                6,
-                15,
+                4,
+                14,
                 0,
                 17
               ],
-              "total": 38
+              "total": 35
             },
             {
               "marca": "Ducati",
               "modelos": 2,
               "dias": [
-                19,
-                45,
-                9,
-                43
+                13,
+                42,
+                15,
+                44
               ],
-              "total": 116
+              "total": 114
             },
             {
               "marca": "Honda",
               "modelos": 1,
               "dias": [
-                6,
-                7,
+                4,
+                8,
                 0,
-                16
+                17
               ],
               "total": 29
             },
@@ -265,24 +265,24 @@
               "marca": "Suzuki",
               "modelos": 2,
               "dias": [
-                4,
+                5,
                 4,
                 0,
-                30
+                31
               ],
-              "total": 38
+              "total": 40
             }
           ]
         }
       ],
       "quase_esgotando": [
         {
-          "marca": "Kawasaki",
-          "total": 2
+          "marca": "Triumph",
+          "total": 0
         },
         {
-          "marca": "Triumph",
-          "total": 2
+          "marca": "Kawasaki",
+          "total": 1
         },
         {
           "marca": "Harley-Davidson",
@@ -296,19 +296,19 @@
       "mais_folga": [
         {
           "marca": "SHINERAY",
-          "total": 546
-        },
-        {
-          "marca": "Royal Enfield",
-          "total": 401
+          "total": 549
         },
         {
           "marca": "Honda",
-          "total": 382
+          "total": 408
+        },
+        {
+          "marca": "Royal Enfield",
+          "total": 407
         },
         {
           "marca": "VOGE",
-          "total": 349
+          "total": 356
         }
       ],
       "ao_vivo": true
@@ -357,41 +357,41 @@
               "dias": [
                 64,
                 98,
-                35,
+                36,
                 96
               ],
-              "total": 293
+              "total": 294
             },
             {
               "marca": "GEELY",
               "modelos": 1,
               "dias": [
                 15,
-                26,
+                25,
                 2,
                 28
               ],
-              "total": 71
+              "total": 70
             },
             {
               "marca": "GWM",
               "modelos": 2,
               "dias": [
-                5,
-                15,
+                4,
+                14,
                 0,
                 9
               ],
-              "total": 29
+              "total": 27
             },
             {
               "marca": "HONDA",
               "modelos": 3,
               "dias": [
-                18,
+                17,
                 26,
                 0,
-                20
+                21
               ],
               "total": 64
             },
@@ -413,9 +413,9 @@
                 46,
                 65,
                 1,
-                51
+                52
               ],
-              "total": 163
+              "total": 164
             },
             {
               "marca": "JETOUR",
@@ -423,10 +423,10 @@
               "dias": [
                 38,
                 69,
-                16,
+                17,
                 73
               ],
-              "total": 196
+              "total": 197
             },
             {
               "marca": "LEAPMOTOR",
@@ -446,9 +446,9 @@
                 43,
                 55,
                 0,
-                31
+                32
               ],
-              "total": 129
+              "total": 130
             },
             {
               "marca": "OMODA",
@@ -477,11 +477,11 @@
               "modelos": 2,
               "dias": [
                 12,
-                2,
+                1,
                 0,
                 0
               ],
-              "total": 14
+              "total": 13
             },
             {
               "marca": "RENAULT",
@@ -489,10 +489,10 @@
               "dias": [
                 16,
                 27,
-                13,
+                14,
                 22
               ],
-              "total": 78
+              "total": 79
             },
             {
               "marca": "TOYOTA",
@@ -509,12 +509,12 @@
               "marca": "VOLVO",
               "modelos": 3,
               "dias": [
-                10,
+                9,
                 1,
                 0,
                 0
               ],
-              "total": 11
+              "total": 10
             }
           ]
         },
@@ -568,9 +568,9 @@
                 14,
                 28,
                 0,
-                31
+                32
               ],
-              "total": 73
+              "total": 74
             },
             {
               "marca": "FERRARI",
@@ -623,9 +623,9 @@
                 10,
                 14,
                 0,
-                16
+                15
               ],
-              "total": 40
+              "total": 39
             },
             {
               "marca": "TOYOTA",
@@ -648,11 +648,11 @@
         },
         {
           "marca": "VOLVO",
-          "total": 11
+          "total": 10
         },
         {
           "marca": "RAM",
-          "total": 14
+          "total": 13
         },
         {
           "marca": "ABARTH",
@@ -662,7 +662,7 @@
       "mais_folga": [
         {
           "marca": "GAC",
-          "total": 293
+          "total": 294
         },
         {
           "marca": "FERRARI",
@@ -670,7 +670,7 @@
         },
         {
           "marca": "JETOUR",
-          "total": 196
+          "total": 197
         },
         {
           "marca": "TOYOTA",
