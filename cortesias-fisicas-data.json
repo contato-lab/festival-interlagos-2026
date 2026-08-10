@@ -1,17 +1,17 @@
 {
-  "updated_at": "2026-08-06",
+  "updated_at": "2026-08-10",
   "obs": "Cortesias com ingresso FISICO (Street Pass de patrocinador/cliente, aba 'Quantidades' > 'Ingressos Impressos' das planilhas 'Ingressos Festival 2026 - Moto/Auto.xlsx'). Preenchido manualmente. A cortesia DIGITAL vem automatica do Ticketmaster. Um numero por evento.",
   "fonte": "Ingressos Festival 2026 - Auto.xlsx / Moto.xlsx, aba Quantidades, bloco 'Ingressos Impressos > TOTAL' (Auto: R72-78, Moto: R88-94)",
   "moto": 26310,
   "auto": 17715,
-  "extra_obs": "Lote adicional de ingresso FISICO, quebrado por dia de evento. SOMA ao numero da planilha acima: o painel exibe o total somado no campo Fisico e o detalhe por dia embaixo. Origem diferente da aba Quantidades, por isso fica em bloco separado e rastreavel.",
-  "extra_fonte": "Informado pela coordenacao de midia em 06/08/2026.",
+  "extra_obs": "Lotes adicionais de ingresso FISICO, quebrados por dia de evento. SOMAM ao numero da planilha acima: o painel exibe o total somado no campo Fisico e o detalhe por dia embaixo. Cada qtd abaixo ja e a SOMA dos lotes daquele dia; a composicao esta em extra_fonte.",
+  "extra_fonte": "Lote 1 (coordenacao, 06/08/2026): qui 500, sex 500, sab 1000, dom 1000. Lote 2 (coordenacao, 10/08/2026): 50 por dia nos 4 dias.",
   "extra_dias": {
     "moto": [
-      { "dia": "13/08", "semana": "qui", "qtd": 500 },
-      { "dia": "14/08", "semana": "sex", "qtd": 500 },
-      { "dia": "15/08", "semana": "sab", "qtd": 1000 },
-      { "dia": "16/08", "semana": "dom", "qtd": 1000 }
+      { "dia": "13/08", "semana": "qui", "qtd": 550 },
+      { "dia": "14/08", "semana": "sex", "qtd": 550 },
+      { "dia": "15/08", "semana": "sab", "qtd": 1050 },
+      { "dia": "16/08", "semana": "dom", "qtd": 1050 }
     ],
     "auto": []
   }

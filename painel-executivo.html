@@ -394,7 +394,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
             <div><span style="font-size:.58rem;color:#777;text-transform:uppercase;letter-spacing:.06em">Digital</span><div id="exec-cortesias-moto-dig" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;color:#ccc">&mdash;</div></div>
             <div style="border-left:1px solid #2a2a2a;padding-left:14px"><span style="font-size:.58rem;color:#777;text-transform:uppercase;letter-spacing:.06em">Físico</span><div id="exec-cortesias-moto-fis" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;color:#ccc">&mdash;</div></div>
           </div>
-          <div id="exec-cortesias-moto-dias" style="display:none;margin-top:9px;padding-top:9px;border-top:1px solid #2a2a2a"></div>
           <div id="exec-cortesias-moto-meta" style="font-size:.65rem;color:#888;margin-top:8px">&mdash;</div>
         </div>
         <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:14px 16px">
@@ -404,7 +403,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
             <div><span style="font-size:.58rem;color:#777;text-transform:uppercase;letter-spacing:.06em">Digital</span><div id="exec-cortesias-auto-dig" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;color:#ccc">&mdash;</div></div>
             <div style="border-left:1px solid #2a2a2a;padding-left:14px"><span style="font-size:.58rem;color:#777;text-transform:uppercase;letter-spacing:.06em">Físico</span><div id="exec-cortesias-auto-fis" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.05rem;color:#ccc">&mdash;</div></div>
           </div>
-          <div id="exec-cortesias-auto-dias" style="display:none;margin-top:9px;padding-top:9px;border-top:1px solid #2a2a2a"></div>
           <div id="exec-cortesias-auto-meta" style="font-size:.65rem;color:#888;margin-top:8px">&mdash;</div>
         </div>
       </div>
@@ -936,28 +934,10 @@ function renderCortesiasCard() {
   setTxt('exec-cortesias-moto-dig', motoDig); setTxt('exec-cortesias-moto-fis', motoFis);
   setTxt('exec-cortesias-auto-dig', autoDig); setTxt('exec-cortesias-auto-fis', autoFis);
 
-  // Detalhe por dia do lote adicional de fisico (some quando nao ha lote).
-  const setDias = (id, dias) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (!dias.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
-    el.style.display = 'block';
-    const tot = dias.reduce((a, x) => a + (+x.qtd || 0), 0);
-    // JSON fica sem acento (encoding); o acento entra so na exibicao
-    const DIA_LBL = { seg:'seg', ter:'ter', qua:'qua', qui:'qui', sex:'sex', sab:'sáb', dom:'dom' };
-    el.innerHTML =
-      '<div style="font-size:.55rem;color:#777;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">' +
-        'Físico por dia &middot; ' + fmt(tot) + ' no lote</div>' +
-      '<div style="display:flex;flex-wrap:wrap;gap:4px">' +
-        dias.map(d =>
-          '<span style="font-size:.58rem;background:#141414;border:1px solid #2a2a2a;border-radius:4px;padding:2px 7px;color:#999">' +
-            (DIA_LBL[d.semana] || d.semana || '') + ' ' + (d.dia || '') +
-            ' <b style="color:#ff9d00">' + fmt(+d.qtd || 0) + '</b>' +
-          '</span>').join('') +
-      '</div>';
-  };
-  setDias('exec-cortesias-moto-dias', CORTESIAS_FISICAS.motoDias);
-  setDias('exec-cortesias-auto-dias', CORTESIAS_FISICAS.autoDias);
+  // O detalhe "Fisico por dia" foi REMOVIDO da tela a pedido do usuario
+  // (10/08): os lotes por dia continuam somando no numero Fisico acima (via
+  // fetchCortesiasFisicas), so nao aparecem quebrados no card. A composicao
+  // dos lotes fica registrada no cortesias-fisicas-data.json.
 
   // % do total emitido = cortesias (digital+fisica) / (cortesias + vendas).
   const motoTotalEmitido = motoTot + TM_CORTESIAS.motoVendas;
