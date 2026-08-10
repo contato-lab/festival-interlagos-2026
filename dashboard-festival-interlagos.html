@@ -456,12 +456,50 @@ tr:hover td{background:rgba(255,255,255,.018)}
     <div class="kpi-value" id="kpiMotos">—</div>
     <div class="kpi-delta" id="kpiMotosDelta"></div>
     <div class="kpi-sub">TKT Médio: <strong id="kpiTktMotos">—</strong></div>
+    <div class="kpi-sub" id="kpiMotos2025">Total 2025: —</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">🚗 Receita Autos</div>
     <div class="kpi-value" id="kpiAutos">—</div>
     <div class="kpi-delta" id="kpiAutosDelta"></div>
     <div class="kpi-sub">TKT Médio: <strong id="kpiTktAutos">—</strong></div>
+    <div class="kpi-sub" id="kpiAutos2025">Total 2025: —</div>
+  </div>
+</div>
+
+<!-- ══ MESMOS CAMPOS DO PAINEL EXECUTIVO ══
+     Receita acumulada da campanha, investimento em ADS com comparativo 2025 e
+     os 3 cards de visitantes (pagos + cortesias). Ficam numa segunda faixa pra
+     nao espremer os 5 cards originais no celular. -->
+<div class="kpi-strip" style="margin-top:14px">
+  <div class="kpi-card">
+    <div class="kpi-label">Receita Acumulada</div>
+    <div class="kpi-value" id="kpiAcum">—</div>
+    <div class="kpi-sub" id="kpiAcumIngressos">—</div>
+    <div class="kpi-delta" id="kpiAcumDelta"></div>
+    <div class="kpi-sub" id="kpiAcum2025">Total 2025: —</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">💸 Investimento ADS</div>
+    <div class="kpi-value" id="kpiInvest">—</div>
+    <div class="kpi-delta" id="kpiInvestDelta"></div>
+    <div class="kpi-sub" id="kpiInvest2025">—</div>
+  </div>
+  <div class="kpi-card accent">
+    <div class="kpi-label">👥 Total de Visitantes</div>
+    <div class="kpi-value lime" id="kpiVisitTotal">—</div>
+    <div class="kpi-sub" id="kpiVisitTotalSub">—</div>
+    <div class="kpi-sub">pagos + cortesias</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">🏍️ Visitantes Motos</div>
+    <div class="kpi-value" id="kpiVisitMoto">—</div>
+    <div class="kpi-sub" id="kpiVisitMotoSub">—</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">🚗 Visitantes Autos</div>
+    <div class="kpi-value" id="kpiVisitAuto">—</div>
+    <div class="kpi-sub" id="kpiVisitAutoSub">—</div>
   </div>
 </div>
 
@@ -1487,6 +1525,38 @@ let GA4_DATA  = null; // ga4-data.json
 let GADS_DATA = null; // google-ads-data.json
 let META_DATA = null; // meta-data.json (quando conectado)
 
+// ── Cortesias (mesma base do painel executivo) ──────────────────────────────
+// DIGITAL vem do Ticketmaster (preenchido em fetchTicketmaster).
+// FISICA vem de cortesias-fisicas-data.json, preenchido a mao pela producao.
+// Cortesia NAO e venda: nao entra em receita nem em ingressos vendidos, so
+// no card de Visitantes.
+const TM_CORTESIAS       = { moto: 0, auto: 0 };
+const CORTESIAS_FISICAS  = { moto: 0, auto: 0 };
+
+async function fetchCortesiasFisicas() {
+  try {
+    const res = await fetch('cortesias-fisicas-data.json?t=' + Date.now(), {cache: 'no-store'});
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const d = await res.json();
+    const ex = d.extra_dias || {};
+    const soma = arr => (Array.isArray(arr) ? arr : []).reduce((a, x) => a + (+x.qtd || 0), 0);
+    // planilha + lotes avulsos por dia, igual ao painel executivo
+    CORTESIAS_FISICAS.moto = (+d.moto || 0) + soma(ex.moto);
+    CORTESIAS_FISICAS.auto = (+d.auto || 0) + soma(ex.auto);
+  } catch (e) {
+    console.warn('[CortesiasFisicas] erro:', e.message);
+  }
+  try { calcKPIs(); } catch(e) {}
+}
+
+// Totais REAIS de 2025 (planilha corrigida, soma das semanas 0-13).
+// Mesmos numeros do painel executivo — se mudar la, mudar aqui.
+const REAL_2025 = {
+  moto:  { rec: 4413344.66, ing: 28045 },
+  auto:  { rec: 2778409.26, ing: 15878 },
+  total: { rec: 7191753.92, ing: 43923 }
+};
+
 // ═══════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════
@@ -1741,6 +1811,84 @@ function buildProjecao(){
 }
 
 // ═══════════════════════════════════════════════
+// KPIs "do executivo" no dashboard geral
+// Receita acumulada, Investimento ADS vs 2025 e Visitantes.
+//
+// Duas regras que valem pra sempre aqui:
+//   1. ACUMULADO usa D26_FULL (campanha inteira), NAO D26. O D26 e a versao
+//      recortada pelo filtro de data da tela; se usasse ele, o card mudaria
+//      de valor ao trocar o filtro e deixaria de ser acumulado.
+//   2. Cortesia NAO entra em receita nem em ingressos vendidos. So no card
+//      de Visitantes, que e publico presente, nao venda.
+// ═══════════════════════════════════════════════
+function calcKPIsExecutivo() {
+  const set  = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  const setH = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+  const fmtBR = v => Math.round(v).toLocaleString('pt-BR');
+  const base  = Array.isArray(D26_FULL) && D26_FULL.length ? D26_FULL : D26;
+
+  // ── Receita acumulada (campanha inteira) ────────────────────────────────
+  const recAcum = base.reduce((s,r) => s + (r.mv||0) + (r.av||0), 0);
+  const ingAcum = base.reduce((s,r) => s + (r.mq||0) + (r.aq||0), 0);
+  set('kpiAcum', fmtK(recAcum));
+  set('kpiAcumIngressos', ingAcum > 0 ? fmtN(ingAcum) + ' ingressos' : '—');
+  set('kpiAcum2025', 'Total 2025: ' + fmtK(REAL_2025.total.rec) + ' · ' + fmtBR(REAL_2025.total.ing) + ' ingressos');
+
+  // delta do acumulado contra os MESMOS dias de campanha de 2025
+  if (base.length) {
+    const dMin = base[0].d, dMax = base[base.length-1].d;
+    const p25 = D25_CAMPAIGN.filter(r => r.d>=dMin && r.d<=dMax)
+      .reduce((a,r) => ({rec:a.rec+(r.mv||0)+(r.av||0), ing:a.ing+(r.mq||0)+(r.aq||0)}), {rec:0,ing:0});
+    setDelta2('kpiAcumDelta', recAcum, p25.rec, ingAcum, p25.ing);
+  }
+
+  // Total 2025 por edicao
+  set('kpiMotos2025', 'Total 2025: ' + fmtK(REAL_2025.moto.rec) + ' · ' + fmtBR(REAL_2025.moto.ing) + ' ingressos');
+  set('kpiAutos2025', 'Total 2025: ' + fmtK(REAL_2025.auto.rec) + ' · ' + fmtBR(REAL_2025.auto.ing) + ' ingressos');
+
+  // ── Investimento ADS ────────────────────────────────────────────────────
+  // Soma os canais que o dashboard ja carrega. Sem filtro de data aqui: o card
+  // e da campanha inteira, igual ao acumulado logo ao lado.
+  const somaCusto = arr => (Array.isArray(arr) ? arr : []).reduce((s,d) => s + (d.cost || d.gasto || 0), 0);
+  const inv26 =
+      somaCusto(META_DATA?.daily_series)
+    + somaCusto(META_DATA?.accounts?.nova_motos?.daily_series)
+    + somaCusto(GADS_DATA?.daily_series)
+    + somaCusto(TIKTOK_DATA?.daily_series);
+
+  // 2025: com a campanha inteira usa o total dos 4 canais (inclui TikTok e
+  // Spotify, que so existem como total). Enquanto o arquivo real nao carrega,
+  // cai no diario Meta + Google e o card diz isso, pra ninguem comparar
+  // numero de 4 canais com numero de 2.
+  const temTotal4 = D25_INVEST_TOTAL4 > 0;
+  const inv25 = temTotal4 ? D25_INVEST_TOTAL4 : D25_INVEST.reduce((s,r) => s + (r.v||0), 0);
+  set('kpiInvest', inv26 > 0 ? fmtK(inv26) : '—');
+  if (inv26 > 0 && inv25 > 0) {
+    const pct = (inv26 - inv25) / inv25 * 100;
+    setH('kpiInvestDelta',
+      '<span class="' + (pct>=0 ? 'up' : 'down') + '">' + (pct>=0?'▲':'▼') + Math.abs(pct).toFixed(1) + '% vs 2025</span>');
+    set('kpiInvest2025', '2025: ' + fmtK(inv25) + ' · ' + (temTotal4 ? '4 canais' : 'só Meta + Google'));
+  } else {
+    setH('kpiInvestDelta', '');
+    set('kpiInvest2025', 'vs 2025: aguardando');
+  }
+
+  // ── Visitantes (pagos + cortesias) ──────────────────────────────────────
+  const pagoMoto = base.reduce((s,r) => s + (r.mq||0), 0);
+  const pagoAuto = base.reduce((s,r) => s + (r.aq||0), 0);
+  const cortMoto = (TM_CORTESIAS.moto||0) + (CORTESIAS_FISICAS.moto||0);
+  const cortAuto = (TM_CORTESIAS.auto||0) + (CORTESIAS_FISICAS.auto||0);
+  const visMoto = pagoMoto + cortMoto, visAuto = pagoAuto + cortAuto;
+
+  set('kpiVisitTotal', fmtN(visMoto + visAuto));
+  set('kpiVisitTotalSub', fmtN(pagoMoto + pagoAuto) + ' pagos · ' + fmtN(cortMoto + cortAuto) + ' cortesias');
+  set('kpiVisitMoto', fmtN(visMoto));
+  set('kpiVisitMotoSub', fmtN(pagoMoto) + ' pagos · ' + fmtN(cortMoto) + ' cortesias');
+  set('kpiVisitAuto', fmtN(visAuto));
+  set('kpiVisitAutoSub', fmtN(pagoAuto) + ' pagos · ' + fmtN(cortAuto) + ' cortesias');
+}
+
+// ═══════════════════════════════════════════════
 // KPIs
 // ═══════════════════════════════════════════════
 function calcKPIs() {
@@ -1782,6 +1930,7 @@ function calcKPIs() {
   document.getElementById('motosTMTkt').textContent      = tktFmt(s26.mt, s26.mtQ);
   document.getElementById('autosProprioTkt').textContent = tktFmt(s26.ap, s26.apQ);
   document.getElementById('autosTMTkt').textContent      = tktFmt(s26.at, s26.atQ);
+  calcKPIsExecutivo();
   updateLastSaleBadges();
 }
 
@@ -3618,6 +3767,12 @@ async function fetchTicketmaster() {
     if (data.last_sale_moto_at) __lastSale.tm.moto = data.last_sale_moto_at;
     if (data.last_sale_auto_at) __lastSale.tm.auto = data.last_sale_auto_at;
 
+    // Cortesias DIGITAIS (Ticketmaster). Alimentam o card de Visitantes, junto
+    // com a cortesia FISICA que vem de cortesias-fisicas-data.json.
+    // NAO entram em receita nem em ingressos vendidos: cortesia nao e venda.
+    TM_CORTESIAS.moto = data.totals?.moto_cortesias || 0;
+    TM_CORTESIAS.auto = data.totals?.auto_cortesias || 0;
+
     const tmByDay = {};
     data.daily.forEach(row => {
       const d = Math.floor((new Date(row.date + 'T00:00:00') - DATA_INICIO) / 86400000) + 1;
@@ -3827,7 +3982,8 @@ function initDashboard(){
     fetchMetaData(),
     fetchEstoque(),
     fetchTipos(),
-    fetchInvestimento2025()
+    fetchInvestimento2025(),
+    fetchCortesiasFisicas()
   ]).then(() => applyFiltro());
 
   // Vendas própria + TM: refresh a cada 15s com guard de "uma rodada por vez"
