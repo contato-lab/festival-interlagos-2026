@@ -1850,9 +1850,16 @@ function calcKPIsExecutivo() {
   // Soma os canais que o dashboard ja carrega. Sem filtro de data aqui: o card
   // e da campanha inteira, igual ao acumulado logo ao lado.
   const somaCusto = arr => (Array.isArray(arr) ? arr : []).reduce((s,d) => s + (d.cost || d.gasto || 0), 0);
+  // ATENCAO: aqui META_DATA.daily_series JA E A SOMA das duas contas Meta
+  // (principal + nova_motos). Quem faz isso e o merge multi-conta do proprio
+  // dashboard (ver "Merge multi-conta Meta Ads"). Somar accounts.nova_motos
+  // por cima DUPLICA o gasto dela: peguei isso comparando com o executivo,
+  // dava R$ 589 mil aqui contra R$ 510 mil la, e a diferenca era exatamente
+  // o valor da Nova Motos. No executivo o daily_series e so a principal, por
+  // isso LA ele soma nova_motos separado. Mesmo arquivo, tratamentos
+  // diferentes: nao copiar a linha de la pra ca.
   const inv26 =
       somaCusto(META_DATA?.daily_series)
-    + somaCusto(META_DATA?.accounts?.nova_motos?.daily_series)
     + somaCusto(GADS_DATA?.daily_series)
     + somaCusto(TIKTOK_DATA?.daily_series);
 
