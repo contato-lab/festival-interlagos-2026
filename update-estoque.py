@@ -28,7 +28,7 @@ BASES = {
 # sistema proprio. A baseline antiga era de 24/06 e ja nao batia com a realidade.
 SNAPSHOT_TS = {
     'moto': '2026-08-13 10:54:05',
-    'auto': '2026-08-13 10:58:01',
+    'auto': '2026-08-13 11:11:08',
 }
 # data_inicio da busca de vendas, POR EDICAO. Era um valor unico e global, o que
 # virou armadilha quando so a moto foi rebaselinada: com um valor so, mudar pra
