@@ -191,15 +191,21 @@ def main():
     with open(STATE_FILE, 'w', encoding='utf-8') as f:
         json.dump(novo_state, f, ensure_ascii=False, indent=2, sort_keys=True)
 
+    # O teste vem ANTES da saida da primeira execucao de proposito: na estreia
+    # o script so grava o marco e nao alerta nada, e quem acabou de configurar
+    # ficaria sem nenhum sinal de que o canal funciona. Sem confirmacao, a
+    # pessoa fica sem saber se o silencio e "nao ha novidade" ou "esta quebrado".
+    if teste:
+        send_telegram('🔧 <b>Teste do alerta da Central</b>\n\nO robô está de pé e '
+                      'ligado neste grupo. Quando entrar publicação nova na Central '
+                      'ou no módulo de Conteúdo, o aviso chega aqui.')
+
     if primeira_vez:
         print('primeira execucao: marco gravado, nada enviado')
         return
 
     if not linhas:
         print('nada novo')
-        if teste:
-            send_telegram('🔧 Teste do alerta da Central: o robô está de pé e não '
-                          'encontrou publicação nova agora.')
         return
 
     agora = datetime.now(BRT).strftime('%H:%M')
