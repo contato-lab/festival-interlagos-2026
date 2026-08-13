@@ -1,6 +1,6 @@
 {
-    "updated_at":  "2026-08-13 11:27",
-    "source":  "Planilhas de 13/08 (moto 11:25, auto 11:11). Conta TODOS os registros, igual a tela do sistema.",
+    "updated_at":  "2026-08-13 17:25",
+    "source":  "Planilhas completas de 13/08 (moto 17:12, auto 17:13). Conta HORARIOS SEM NENHUMA VENDA, mesma regra do filtro \u0027Vendas: sem vendas\u0027 do sistema.",
     "edicoes":  {
                     "moto":  {
                                  "label":  "Edicao Moto",
@@ -16,7 +16,7 @@
                                  "passes":  [
                                                 {
                                                     "nome":  "Ride Pass",
-                                                    "total":  2660,
+                                                    "total":  2653,
                                                     "marcas":  [
                                                                    {
                                                                        "marca":  "Bajaj",
@@ -34,11 +34,11 @@
                                                                        "modelos":  6,
                                                                        "dias":  [
                                                                                     10,
-                                                                                    24,
+                                                                                    22,
                                                                                     6,
                                                                                     27
                                                                                 ],
-                                                                       "total":  67
+                                                                       "total":  65
                                                                    },
                                                                    {
                                                                        "marca":  "CF MOTO",
@@ -78,11 +78,11 @@
                                                                        "modelos":  6,
                                                                        "dias":  [
                                                                                     15,
-                                                                                    47,
+                                                                                    43,
                                                                                     1,
                                                                                     38
                                                                                 ],
-                                                                       "total":  101
+                                                                       "total":  97
                                                                    },
                                                                    {
                                                                        "marca":  "MOTO MORINI",
@@ -166,11 +166,11 @@
                                                                        "modelos":  4,
                                                                        "dias":  [
                                                                                     14,
-                                                                                    33,
+                                                                                    32,
                                                                                     6,
                                                                                     42
                                                                                 ],
-                                                                       "total":  95
+                                                                       "total":  94
                                                                    },
                                                                    {
                                                                        "marca":  "Zontes",
@@ -187,24 +187,24 @@
                                                 },
                                                 {
                                                     "nome":  "Ducati Pass",
-                                                    "total":  159,
+                                                    "total":  158,
                                                     "marcas":  [
                                                                    {
                                                                        "marca":  "Ducati",
                                                                        "modelos":  7,
                                                                        "dias":  [
                                                                                     50,
-                                                                                    49,
+                                                                                    48,
                                                                                     2,
                                                                                     58
                                                                                 ],
-                                                                       "total":  159
+                                                                       "total":  158
                                                                    }
                                                                ]
                                                 },
                                                 {
                                                     "nome":  "Sport Pass",
-                                                    "total":  59,
+                                                    "total":  58,
                                                     "marcas":  [
                                                                    {
                                                                        "marca":  "BMW",
@@ -222,11 +222,11 @@
                                                                        "modelos":  2,
                                                                        "dias":  [
                                                                                     13,
-                                                                                    4,
+                                                                                    3,
                                                                                     0,
                                                                                     9
                                                                                 ],
-                                                                       "total":  26
+                                                                       "total":  25
                                                                    },
                                                                    {
                                                                        "marca":  "Kawasaki",
@@ -289,8 +289,7 @@
                                                         "total":  454
                                                     }
                                                 ],
-                                 "desligados":  81,
-                                 "vendaveis_no_snapshot":  2792
+                                 "cadastrados":  10590
                              },
                     "auto":  {
                                  "label":  "Edicao Auto",
@@ -306,7 +305,7 @@
                                  "passes":  [
                                                 {
                                                     "nome":  "Drive Pass",
-                                                    "total":  1816,
+                                                    "total":  1810,
                                                     "marcas":  [
                                                                    {
                                                                        "marca":  "ABARTH",
@@ -346,11 +345,11 @@
                                                                        "modelos":  4,
                                                                        "dias":  [
                                                                                     63,
-                                                                                    106,
+                                                                                    105,
                                                                                     37,
                                                                                     106
                                                                                 ],
-                                                                       "total":  312
+                                                                       "total":  311
                                                                    },
                                                                    {
                                                                        "marca":  "GEELY",
@@ -390,44 +389,44 @@
                                                                        "modelos":  1,
                                                                        "dias":  [
                                                                                     12,
-                                                                                    22,
+                                                                                    21,
                                                                                     4,
                                                                                     20
                                                                                 ],
-                                                                       "total":  58
+                                                                       "total":  57
                                                                    },
                                                                    {
                                                                        "marca":  "JEEP",
                                                                        "modelos":  3,
                                                                        "dias":  [
                                                                                     44,
-                                                                                    63,
+                                                                                    61,
                                                                                     13,
                                                                                     55
                                                                                 ],
-                                                                       "total":  175
+                                                                       "total":  173
                                                                    },
                                                                    {
                                                                        "marca":  "JETOUR",
                                                                        "modelos":  3,
                                                                        "dias":  [
                                                                                     38,
-                                                                                    77,
+                                                                                    76,
                                                                                     21,
                                                                                     81
                                                                                 ],
-                                                                       "total":  217
+                                                                       "total":  216
                                                                    },
                                                                    {
                                                                        "marca":  "LEAPMOTOR",
                                                                        "modelos":  2,
                                                                        "dias":  [
                                                                                     33,
-                                                                                    57,
+                                                                                    56,
                                                                                     29,
                                                                                     56
                                                                                 ],
-                                                                       "total":  175
+                                                                       "total":  174
                                                                    },
                                                                    {
                                                                        "marca":  "MITSUBISHI",
@@ -549,7 +548,7 @@
                                                 },
                                                 {
                                                     "nome":  "Super Sport Pass",
-                                                    "total":  1202,
+                                                    "total":  1200,
                                                     "marcas":  [
                                                                    {
                                                                        "marca":  "BMW",
@@ -557,10 +556,10 @@
                                                                        "dias":  [
                                                                                     22,
                                                                                     41,
-                                                                                    36,
+                                                                                    34,
                                                                                     39
                                                                                 ],
-                                                                       "total":  138
+                                                                       "total":  136
                                                                    },
                                                                    {
                                                                        "marca":  "CHEVROLET",
@@ -678,8 +677,7 @@
                                                         "total":  212
                                                     }
                                                 ],
-                                 "desligados":  750,
-                                 "vendaveis_no_snapshot":  2278
+                                 "cadastrados":  6552
                              }
                 }
 }
