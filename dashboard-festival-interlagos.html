@@ -1015,6 +1015,9 @@ Google Ads
   #estoqueCard .estq-edh{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.95rem;color:var(--text);letter-spacing:.02em}
   #estoqueCard .estq-big{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.9rem;color:var(--lime);line-height:1.05;margin:6px 0}
   #estoqueCard .estq-big span{font-family:'Inter',sans-serif;font-weight:600;font-size:.6rem;color:#888;text-transform:uppercase;letter-spacing:.08em}
+  /* segunda linha de contagem: fica discreta de proposito, o numero que manda
+     e o grande, que bate com a tela do sistema proprio */
+  #estoqueCard .estq-sub2{font-size:.68rem;color:#8a8a8a;line-height:1.5;margin:-2px 0 4px}
   #estoqueCard .estq-chip{display:block;font-size:.72rem;line-height:1.5;margin-top:6px;padding:5px 10px;border-radius:6px}
   #estoqueCard .estq-chip.red{background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.25);color:#ff8a8a}
   #estoqueCard .estq-chip.green{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);color:#7dffb2}
@@ -4353,6 +4356,14 @@ function renderEstoque(){
     }
     html+='<div class="estq-ed"><div class="estq-edh">'+ic+' '+esc(ed.label)+' · '+esc(ed.periodo)+'</div>'
       +'<div class="estq-big">'+nf(ed.total_disponivel)+' <span>horários disponíveis · '+esc(ed.marcas_com_vaga)+' marcas</span></div>'
+      // Segunda contagem, pedida pelo Eric. O numero grande conta TODO registro,
+      // pra bater com a tela do sistema proprio. Mas parte deles esta DESLIGADA
+      // no sistema (status inativo, nunca vendida), entao nao da pra vender hoje.
+      // Mostrar so o total esconderia isso; mostrar so o vendavel nao bateria
+      // com o sistema. Os dois juntos resolvem, e o "no snapshot" avisa que esse
+      // segundo numero e da ultima planilha, nao desce com as vendas do dia.
+      +(ed.desligados ? '<div class="estq-sub2">'+nf(ed.desligados)+' desligados no sistema · '
+        +nf(ed.vendaveis_no_snapshot)+' vendáveis no snapshot da planilha</div>' : '')
       +(low?'<span class="estq-chip red">Quase esgotando: '+low+'</span>':'')
       +(hi?'<span class="estq-chip green">Mais folga: '+hi+'</span>':'')
       +'<details class="estq-more"><summary>Ver todas as marcas</summary>'+tables+'</details></div>';

@@ -40,6 +40,13 @@ SNAPSHOT_DATE = {
 BRT = timezone(timedelta(hours=-3))
 
 
+def _snap_lbl():
+    """Rotulo da origem, derivado do SNAPSHOT_TS. Era texto fixo '24/06' no codigo
+    e continuava dizendo junho depois do rebaseline de agosto: a tela mostrava
+    uma data que nao existia mais."""
+    return 'moto %s / auto %s' % (SNAPSHOT_TS['moto'][:10], SNAPSHOT_TS['auto'][:10])
+
+
 def _headers(base, token=None):
     h = {'Accept': 'application/json', 'Origin': base, 'Referer': base + '/',
          'X-Requested-With': 'XMLHttpRequest',
@@ -189,11 +196,11 @@ def main():
 
     data['updated_at'] = datetime.now(BRT).strftime('%Y-%m-%d %H:%M')
     if falhou:
-        data['source'] = ('Base da planilha (24/06) — API do sistema proprio indisponivel para '
+        data['source'] = ('Base das planilhas de ' + _snap_lbl() + ' — API do sistema proprio indisponivel para '
                           + '/'.join(falhou) + ', numeros dessas edicoes sao do snapshot, nao ao vivo')
         data['api_indisponivel'] = falhou
     else:
-        data['source'] = 'Base da planilha (24/06) menos vendas ao vivo da API do sistema proprio'
+        data['source'] = ('Base das planilhas de ' + _snap_lbl() + ' menos vendas ao vivo da API do sistema proprio')
         data.pop('api_indisponivel', None)
 
     tmp = OUT_FILE + '.tmp'
