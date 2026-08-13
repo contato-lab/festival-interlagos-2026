@@ -23,11 +23,20 @@ BASES = {
     'auto': 'https://ingressosauto.festivalinterlagos.com.br',
 }
 # Momento de cada exportacao: a base reflete as vendas ate aqui. So descontamos o que veio depois.
+# Momento da exportacao que virou baseline, POR EDICAO.
+# As duas edicoes foram rebaselinadas em 13/08 com planilha nova exportada do
+# sistema proprio. A baseline antiga era de 24/06 e ja nao batia com a realidade.
 SNAPSHOT_TS = {
-    'moto': '2026-06-24 10:22:34',
-    'auto': '2026-06-24 10:43:43',
+    'moto': '2026-08-13 10:54:05',
+    'auto': '2026-08-13 10:58:01',
 }
-SNAPSHOT_DATE = '2026-06-24'   # data_inicio na busca de vendas
+# data_inicio da busca de vendas, POR EDICAO. Era um valor unico e global, o que
+# virou armadilha quando so a moto foi rebaselinada: com um valor so, mudar pra
+# agosto faria o AUTO parar de descontar 7 semanas de venda e inflar a oferta.
+SNAPSHOT_DATE = {
+    'moto': '2026-08-13',
+    'auto': '2026-08-13',
+}
 BRT = timezone(timedelta(hours=-3))
 
 
@@ -76,11 +85,11 @@ def norm_pass(nome):
     return 'Super Sport Pass' if n.lower().startswith('super sport pass') else n
 
 
-def fetch_vendas(base, token):
+def fetch_vendas(base, token, desde):
     fim = datetime.now(BRT).strftime('%Y-%m-%d')
     out, page = [], 1
     while True:
-        url = (f"{base}/apis/vendas?data_inicio={SNAPSHOT_DATE}&data_fim={fim}"
+        url = (f"{base}/apis/vendas?data_inicio={desde}&data_fim={fim}"
                f"&page_size=100&page={page}")
         d = _get(url, base, token)
         if d.get('status') != 'success' or not d.get('data'):
@@ -98,7 +107,7 @@ def vendas_pos_snapshot(ed_key):
     token = get_token(base)
     sales = {}
     total_q = 0
-    _vendas = fetch_vendas(base, token)
+    _vendas = fetch_vendas(base, token, SNAPSHOT_DATE[ed_key])
     n_s3 = n_post = 0
     for v in _vendas:
         if str(v.get('venda_status')) != '3':
