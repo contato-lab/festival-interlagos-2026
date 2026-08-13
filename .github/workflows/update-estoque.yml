@@ -2,7 +2,10 @@ name: Update Estoque Test Ride
 
 on:
   schedule:
-    - cron: '9,39 * * * *'   # 2x por hora (offset pra nao colidir com os outros)
+    - cron: '4,19,34,49 * * * *'  # 4x por hora durante o festival. O agendador do
+  # GitHub atrasa e PULA rodadas nos horarios de pico (na pratica vinha rodando a
+  # cada 60-95 min, nao 30). Mais entradas nao garantem pontualidade, mas dobram
+  # as chances de uma rodada pegar. Depois do festival, voltar pra 2x/hora.
   workflow_dispatch:
 
 jobs:
