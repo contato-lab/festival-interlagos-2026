@@ -1038,7 +1038,10 @@ Google Ads
   </div>
   <div id="estoqueWrap"><div style="color:#666;padding:20px;text-align:center">Carregando disponibilidade…</div></div>
   <div class="note" style="margin-top:14px">
-    <strong style="color:var(--lime)">Fonte:</strong> base da planilha de estoque (24/06) menos as vendas ao vivo da API do sistema próprio · atualizado em <span id="estoqueDate">—</span>. Mostra só horários ainda disponíveis; o que não aparece está esgotado.
+    <!-- NAO escrever data fixa aqui. Este texto dizia "(24/06)" e continuou
+         dizendo junho depois de a base ser refeita em agosto, anunciando na tela
+         uma data que nao existia mais. O "de" vem do proprio JSON agora. -->
+    <strong style="color:var(--lime)">Fonte:</strong> <span id="estoqueFonte">—</span> · atualizado em <span id="estoqueDate">—</span>. Mostra só horários ainda disponíveis; o que não aparece está esgotado.
   </div>
 </div>
 
@@ -4322,6 +4325,9 @@ async function fetchEstoque(){
     ESTOQUE_DATA = await res.json();
     const b=document.getElementById('estoqueStatus'); if(b) b.textContent='✓ atualizado';
     const d=document.getElementById('estoqueDate'); if(d) d.textContent=ESTOQUE_DATA.updated_at||'—';
+    // a origem vem do JSON, que por sua vez deriva da data do snapshot: assim o
+    // rodape nunca mais anuncia uma data de base que ja foi trocada
+    const fo=document.getElementById('estoqueFonte'); if(fo) fo.textContent=ESTOQUE_DATA.source||'—';
     renderEstoque();
   }catch(e){
     const w=document.getElementById('estoqueWrap'); if(w) w.innerHTML='<div style="color:#666;padding:20px;text-align:center">Sem dados de estoque ainda.</div>';
