@@ -1,0 +1,20 @@
+name = "push-central-conteudo"
+main = "worker-push.js"
+compatibility_date = "2026-04-23"
+
+[observability]
+enabled = true
+
+# De minuto em minuto. E o menor intervalo que a Cloudflare aceita, e aqui isso
+# importa: o alerta que roda por GitHub Actions neste mesmo repo pede 10 minutos
+# e chega a demorar de 60 a 95, o que num festival de quatro dias e o mesmo que
+# nao avisar. O ciclo e barato: quando nao ha novidade sao duas leituras curtas
+# no Firestore e o Worker encerra.
+[triggers]
+crons = ["* * * * *"]
+
+# O secret VAPID_PRIVATE_PKCS8 NAO fica aqui. Este repositorio e publico, e essa
+# chave e a que assina os envios: com ela na mao, qualquer um manda notificacao
+# pro celular do time. Ela e cadastrada por `wrangler secret put` no deploy
+# (vem do secret VAPID_PRIVATE_PKCS8 do GitHub) ou a mao em
+# Workers & Pages > push-central-conteudo > Settings > Variables and Secrets.

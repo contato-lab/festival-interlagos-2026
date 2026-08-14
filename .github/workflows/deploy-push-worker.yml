@@ -1,0 +1,58 @@
+name: Deploy Push Worker
+
+# Worker que manda a notificacao de peca nova pro celular do time de conteudo
+# (Central instalada na tela de inicio). Mesmo caminho dos outros workers.
+#
+# Secrets exigidos no repositorio:
+#   - CLOUDFLARE_API_TOKEN   (ja existe, os outros workers usam)
+#   - VAPID_PRIVATE_PKCS8    chave privada P-256 em PKCS8/base64.
+#     Nao pode ficar em arquivo: este repositorio e publico, e quem tiver essa
+#     chave manda notificacao pro celular da equipe inteira.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare-worker/worker-push.js'
+      - 'cloudflare-worker/wrangler-push.toml'
+      - '.github/workflows/deploy-push-worker.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # No nivel do job de proposito: assim o "if" do passo consegue enxergar se a
+    # chave existe. O contexto secrets nao e visivel dentro do if de um passo.
+    env:
+      VAPID_PRIVATE_PKCS8: ${{ secrets.VAPID_PRIVATE_PKCS8 }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: cloudflare-worker
+          wranglerVersion: '3'
+          command: deploy --config wrangler-push.toml
+
+      # Depois do deploy, senao o Worker ainda nao existe pra receber o secret.
+      # O --config e obrigatorio aqui: sem ele o wrangler procura wrangler.toml,
+      # que nao existe nesta pasta, e cadastraria a chave no Worker errado.
+      - name: Cadastrar a chave de assinatura
+        if: env.VAPID_PRIVATE_PKCS8 != ''
+        working-directory: cloudflare-worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          printf '%s' "$VAPID_PRIVATE_PKCS8" | npx --yes wrangler@3 secret put VAPID_PRIVATE_PKCS8 --config wrangler-push.toml
+
+      - name: Avisar se a chave nao foi cadastrada
+        if: env.VAPID_PRIVATE_PKCS8 == ''
+        run: |
+          echo "::warning::VAPID_PRIVATE_PKCS8 nao esta nos secrets do repositorio."
+          echo "::warning::O Worker subiu, mas nao consegue assinar envio nenhum ate a chave ser cadastrada."
