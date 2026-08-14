@@ -95,6 +95,16 @@ async function apagarInscricao(id) {
 }
 
 async function chavePrivada(env) {
+  // Mensagem clara em vez de "Cannot read properties of undefined". Sem isto o
+  // sintoma de "faltou cadastrar o secret" e um erro de JavaScript que nao diz
+  // nada, e a causa comum e chata: cadastrar o secret no GitHub NAO dispara
+  // deploy, entao o Worker segue no ar sem a chave ate alguem publicar de novo.
+  if (!env.VAPID_PRIVATE_PKCS8) {
+    throw new Error(
+      "VAPID_PRIVATE_PKCS8 nao esta cadastrado neste Worker. " +
+      "Rode o workflow Deploy Push Worker de novo (o secret sozinho nao dispara deploy)."
+    );
+  }
   return crypto.subtle.importKey(
     "pkcs8", deB64(env.VAPID_PRIVATE_PKCS8),
     { name: "ECDSA", namedCurve: "P-256" }, false, ["sign"]
