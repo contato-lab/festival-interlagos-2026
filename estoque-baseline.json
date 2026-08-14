@@ -1,6 +1,6 @@
 {
-    "updated_at":  "2026-08-13 17:25",
-    "source":  "Planilhas completas de 13/08 (moto 17:12, auto 17:13). Conta HORARIOS SEM NENHUMA VENDA, mesma regra do filtro \u0027Vendas: sem vendas\u0027 do sistema.",
+    "updated_at":  "2026-08-14 09:24",
+    "source":  "Planilhas completas de 14/08 (moto 09:23, auto 09:24). Conta REGISTROS com a coluna Vendas = 0, mesma regra do filtro \u0027Vendas: sem vendas\u0027 do sistema.",
     "edicoes":  {
                     "moto":  {
                                  "label":  "Edicao Moto",
@@ -11,183 +11,343 @@
                                               "15/08",
                                               "16/08"
                                           ],
-                                 "total_disponivel":  5067,
-                                 "marcas_com_vaga":  18,
+                                 "total_disponivel":  2829,
+                                 "marcas_com_vaga":  16,
                                  "passes":  [
                                                 {
+                                                    "nome":  "Race Pass",
+                                                    "total":  2230,
+                                                    "marcas":  [
+                                                                   {
+                                                                       "marca":  "Bajaj",
+                                                                       "modelos":  2,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    53,
+                                                                                    36,
+                                                                                    47
+                                                                                ],
+                                                                       "total":  136
+                                                                   },
+                                                                   {
+                                                                       "marca":  "BMW",
+                                                                       "modelos":  3,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    18,
+                                                                                    5,
+                                                                                    26
+                                                                                ],
+                                                                       "total":  49
+                                                                   },
+                                                                   {
+                                                                       "marca":  "CF MOTO",
+                                                                       "modelos":  4,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    57,
+                                                                                    3,
+                                                                                    68
+                                                                                ],
+                                                                       "total":  128
+                                                                   },
+                                                                   {
+                                                                       "marca":  "Dafra",
+                                                                       "modelos":  4,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    104,
+                                                                                    92,
+                                                                                    104
+                                                                                ],
+                                                                       "total":  300
+                                                                   },
+                                                                   {
+                                                                       "marca":  "Honda",
+                                                                       "modelos":  5,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    41,
+                                                                                    0,
+                                                                                    35
+                                                                                ],
+                                                                       "total":  76
+                                                                   },
+                                                                   {
+                                                                       "marca":  "MOTO MORINI",
+                                                                       "modelos":  5,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    64,
+                                                                                    23,
+                                                                                    83
+                                                                                ],
+                                                                       "total":  170
+                                                                   },
+                                                                   {
+                                                                       "marca":  "PIAGGIO",
+                                                                       "modelos":  1,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    25,
+                                                                                    24,
+                                                                                    27
+                                                                                ],
+                                                                       "total":  76
+                                                                   },
+                                                                   {
+                                                                       "marca":  "Royal Enfield",
+                                                                       "modelos":  5,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    101,
+                                                                                    53,
+                                                                                    89
+                                                                                ],
+                                                                       "total":  243
+                                                                   },
+                                                                   {
+                                                                       "marca":  "SHINERAY",
+                                                                       "modelos":  8,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    170,
+                                                                                    120,
+                                                                                    163
+                                                                                ],
+                                                                       "total":  453
+                                                                   },
+                                                                   {
+                                                                       "marca":  "Suzuki",
+                                                                       "modelos":  5,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    9,
+                                                                                    0,
+                                                                                    47
+                                                                                ],
+                                                                       "total":  56
+                                                                   },
+                                                                   {
+                                                                       "marca":  "VESPA",
+                                                                       "modelos":  1,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    25,
+                                                                                    19,
+                                                                                    19
+                                                                                ],
+                                                                       "total":  63
+                                                                   },
+                                                                   {
+                                                                       "marca":  "VOGE",
+                                                                       "modelos":  5,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    81,
+                                                                                    68,
+                                                                                    93
+                                                                                ],
+                                                                       "total":  242
+                                                                   },
+                                                                   {
+                                                                       "marca":  "Yamaha",
+                                                                       "modelos":  3,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    31,
+                                                                                    5,
+                                                                                    40
+                                                                                ],
+                                                                       "total":  76
+                                                                   },
+                                                                   {
+                                                                       "marca":  "Zontes",
+                                                                       "modelos":  2,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    52,
+                                                                                    39,
+                                                                                    71
+                                                                                ],
+                                                                       "total":  162
+                                                                   }
+                                                               ]
+                                                },
+                                                {
                                                     "nome":  "Ride Pass",
-                                                    "total":  2653,
+                                                    "total":  394,
                                                     "marcas":  [
                                                                    {
                                                                        "marca":  "Bajaj",
                                                                        "modelos":  2,
                                                                        "dias":  [
                                                                                     28,
-                                                                                    53,
-                                                                                    37,
-                                                                                    47
+                                                                                    0,
+                                                                                    1,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  165
+                                                                       "total":  29
                                                                    },
                                                                    {
                                                                        "marca":  "BMW",
-                                                                       "modelos":  6,
+                                                                       "modelos":  3,
                                                                        "dias":  [
                                                                                     10,
-                                                                                    22,
-                                                                                    6,
-                                                                                    27
+                                                                                    0,
+                                                                                    0,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  65
+                                                                       "total":  10
                                                                    },
                                                                    {
                                                                        "marca":  "CF MOTO",
                                                                        "modelos":  4,
                                                                        "dias":  [
                                                                                     20,
-                                                                                    58,
-                                                                                    3,
-                                                                                    69
+                                                                                    0,
+                                                                                    0,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  150
+                                                                       "total":  20
                                                                    },
                                                                    {
                                                                        "marca":  "Dafra",
                                                                        "modelos":  4,
                                                                        "dias":  [
                                                                                     54,
-                                                                                    104,
-                                                                                    92,
-                                                                                    104
+                                                                                    0,
+                                                                                    0,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  354
+                                                                       "total":  54
                                                                    },
                                                                    {
                                                                        "marca":  "Harley-Davidson",
                                                                        "modelos":  7,
                                                                        "dias":  [
                                                                                     21,
-                                                                                    1,
+                                                                                    0,
                                                                                     0,
                                                                                     0
                                                                                 ],
-                                                                       "total":  22
+                                                                       "total":  21
                                                                    },
                                                                    {
                                                                        "marca":  "Honda",
-                                                                       "modelos":  6,
+                                                                       "modelos":  5,
                                                                        "dias":  [
                                                                                     15,
-                                                                                    43,
+                                                                                    0,
                                                                                     1,
-                                                                                    38
+                                                                                    0
                                                                                 ],
-                                                                       "total":  97
+                                                                       "total":  16
                                                                    },
                                                                    {
                                                                        "marca":  "MOTO MORINI",
                                                                        "modelos":  5,
                                                                        "dias":  [
                                                                                     44,
-                                                                                    66,
-                                                                                    23,
-                                                                                    83
+                                                                                    0,
+                                                                                    0,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  216
+                                                                       "total":  44
                                                                    },
                                                                    {
                                                                        "marca":  "PIAGGIO",
                                                                        "modelos":  1,
                                                                        "dias":  [
                                                                                     12,
-                                                                                    26,
-                                                                                    24,
-                                                                                    27
+                                                                                    1,
+                                                                                    0,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  89
+                                                                       "total":  13
                                                                    },
                                                                    {
                                                                        "marca":  "Royal Enfield",
                                                                        "modelos":  5,
                                                                        "dias":  [
                                                                                     41,
-                                                                                    102,
-                                                                                    55,
-                                                                                    89
+                                                                                    0,
+                                                                                    1,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  287
+                                                                       "total":  42
                                                                    },
                                                                    {
                                                                        "marca":  "SHINERAY",
                                                                        "modelos":  8,
                                                                        "dias":  [
                                                                                     65,
-                                                                                    171,
-                                                                                    120,
-                                                                                    165
+                                                                                    0,
+                                                                                    0,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  521
+                                                                       "total":  65
                                                                    },
                                                                    {
                                                                        "marca":  "Suzuki",
-                                                                       "modelos":  5,
+                                                                       "modelos":  1,
                                                                        "dias":  [
                                                                                     5,
-                                                                                    10,
                                                                                     0,
-                                                                                    48
+                                                                                    0,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  63
+                                                                       "total":  5
                                                                    },
                                                                    {
                                                                        "marca":  "VESPA",
                                                                        "modelos":  1,
                                                                        "dias":  [
                                                                                     11,
-                                                                                    25,
-                                                                                    20,
-                                                                                    19
+                                                                                    0,
+                                                                                    1,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  75
+                                                                       "total":  12
                                                                    },
                                                                    {
                                                                        "marca":  "VOGE",
-                                                                       "modelos":  5,
+                                                                       "modelos":  4,
                                                                        "dias":  [
                                                                                     28,
-                                                                                    81,
-                                                                                    69,
-                                                                                    93
+                                                                                    0,
+                                                                                    0,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  271
+                                                                       "total":  28
                                                                    },
                                                                    {
                                                                        "marca":  "Yamaha",
                                                                        "modelos":  4,
                                                                        "dias":  [
                                                                                     14,
-                                                                                    32,
-                                                                                    6,
-                                                                                    42
+                                                                                    0,
+                                                                                    0,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  94
+                                                                       "total":  14
                                                                    },
                                                                    {
                                                                        "marca":  "Zontes",
                                                                        "modelos":  2,
                                                                        "dias":  [
                                                                                     21,
-                                                                                    53,
-                                                                                    39,
-                                                                                    71
+                                                                                    0,
+                                                                                    0,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  184
+                                                                       "total":  21
                                                                    }
                                                                ]
                                                 },
                                                 {
                                                     "nome":  "Ducati Pass",
-                                                    "total":  158,
+                                                    "total":  152,
                                                     "marcas":  [
                                                                    {
                                                                        "marca":  "Ducati",
@@ -195,76 +355,82 @@
                                                                        "dias":  [
                                                                                     50,
                                                                                     48,
-                                                                                    2,
-                                                                                    58
+                                                                                    1,
+                                                                                    53
                                                                                 ],
-                                                                       "total":  158
+                                                                       "total":  152
+                                                                   }
+                                                               ]
+                                                },
+                                                {
+                                                    "nome":  "Sport Experience",
+                                                    "total":  35,
+                                                    "marcas":  [
+                                                                   {
+                                                                       "marca":  "Ducati",
+                                                                       "modelos":  1,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    1,
+                                                                                    0,
+                                                                                    8
+                                                                                ],
+                                                                       "total":  9
+                                                                   },
+                                                                   {
+                                                                       "marca":  "Suzuki",
+                                                                       "modelos":  2,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    1,
+                                                                                    0,
+                                                                                    25
+                                                                                ],
+                                                                       "total":  26
                                                                    }
                                                                ]
                                                 },
                                                 {
                                                     "nome":  "Sport Pass",
-                                                    "total":  58,
+                                                    "total":  18,
                                                     "marcas":  [
-                                                                   {
-                                                                       "marca":  "BMW",
-                                                                       "modelos":  1,
-                                                                       "dias":  [
-                                                                                    0,
-                                                                                    0,
-                                                                                    0,
-                                                                                    1
-                                                                                ],
-                                                                       "total":  1
-                                                                   },
                                                                    {
                                                                        "marca":  "Ducati",
                                                                        "modelos":  2,
                                                                        "dias":  [
                                                                                     13,
-                                                                                    3,
                                                                                     0,
-                                                                                    9
+                                                                                    0,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  25
-                                                                   },
-                                                                   {
-                                                                       "marca":  "Kawasaki",
-                                                                       "modelos":  1,
-                                                                       "dias":  [
-                                                                                    0,
-                                                                                    0,
-                                                                                    0,
-                                                                                    1
-                                                                                ],
-                                                                       "total":  1
+                                                                       "total":  13
                                                                    },
                                                                    {
                                                                        "marca":  "Suzuki",
                                                                        "modelos":  2,
                                                                        "dias":  [
                                                                                     5,
-                                                                                    1,
                                                                                     0,
-                                                                                    25
+                                                                                    0,
+                                                                                    0
                                                                                 ],
-                                                                       "total":  31
+                                                                       "total":  5
                                                                    }
                                                                ]
                                                 }
                                             ],
                                  "quase_esgotando":  [
                                                          {
-                                                             "marca":  "Kawasaki",
-                                                             "total":  14
-                                                         },
-                                                         {
-                                                             "marca":  "Triumph",
-                                                             "total":  22
-                                                         },
-                                                         {
                                                              "marca":  "Harley-Davidson",
-                                                             "total":  46
+                                                             "total":  21
+                                                         },
+                                                         {
+                                                             "marca":  "BMW",
+                                                             "total":  59
+                                                         },
+                                                         {
+                                                             "marca":  "VESPA",
+                                                             "total":  75
                                                          },
                                                          {
                                                              "marca":  "PIAGGIO",
@@ -273,20 +439,20 @@
                                                      ],
                                  "mais_folga":  [
                                                     {
-                                                        "marca":  "Honda",
-                                                        "total":  675
-                                                    },
-                                                    {
                                                         "marca":  "SHINERAY",
-                                                        "total":  592
+                                                        "total":  518
                                                     },
                                                     {
-                                                        "marca":  "Ducati",
-                                                        "total":  586
+                                                        "marca":  "Dafra",
+                                                        "total":  354
                                                     },
                                                     {
                                                         "marca":  "Royal Enfield",
-                                                        "total":  454
+                                                        "total":  285
+                                                    },
+                                                    {
+                                                        "marca":  "VOGE",
+                                                        "total":  270
                                                     }
                                                 ],
                                  "cadastrados":  10590
@@ -300,12 +466,12 @@
                                               "29/08",
                                               "30/08"
                                           ],
-                                 "total_disponivel":  3138,
-                                 "marcas_com_vaga":  25,
+                                 "total_disponivel":  3049,
+                                 "marcas_com_vaga":  26,
                                  "passes":  [
                                                 {
                                                     "nome":  "Drive Pass",
-                                                    "total":  1810,
+                                                    "total":  1800,
                                                     "marcas":  [
                                                                    {
                                                                        "marca":  "ABARTH",
@@ -346,10 +512,10 @@
                                                                        "dias":  [
                                                                                     63,
                                                                                     105,
-                                                                                    37,
+                                                                                    36,
                                                                                     106
                                                                                 ],
-                                                                       "total":  311
+                                                                       "total":  310
                                                                    },
                                                                    {
                                                                        "marca":  "GEELY",
@@ -367,11 +533,11 @@
                                                                        "modelos":  2,
                                                                        "dias":  [
                                                                                     4,
-                                                                                    17,
+                                                                                    15,
                                                                                     8,
                                                                                     12
                                                                                 ],
-                                                                       "total":  41
+                                                                       "total":  39
                                                                    },
                                                                    {
                                                                        "marca":  "HONDA",
@@ -411,11 +577,11 @@
                                                                        "modelos":  3,
                                                                        "dias":  [
                                                                                     38,
-                                                                                    76,
-                                                                                    21,
+                                                                                    75,
+                                                                                    20,
                                                                                     81
                                                                                 ],
-                                                                       "total":  216
+                                                                       "total":  214
                                                                    },
                                                                    {
                                                                        "marca":  "LEAPMOTOR",
@@ -423,43 +589,43 @@
                                                                        "dias":  [
                                                                                     33,
                                                                                     56,
-                                                                                    29,
+                                                                                    28,
                                                                                     56
                                                                                 ],
-                                                                       "total":  174
+                                                                       "total":  173
                                                                    },
                                                                    {
                                                                        "marca":  "MITSUBISHI",
                                                                        "modelos":  3,
                                                                        "dias":  [
                                                                                     41,
-                                                                                    59,
+                                                                                    57,
                                                                                     12,
                                                                                     41
                                                                                 ],
-                                                                       "total":  153
+                                                                       "total":  151
                                                                    },
                                                                    {
                                                                        "marca":  "OMODA",
                                                                        "modelos":  1,
                                                                        "dias":  [
                                                                                     14,
-                                                                                    25,
+                                                                                    24,
                                                                                     4,
                                                                                     16
                                                                                 ],
-                                                                       "total":  59
+                                                                       "total":  58
                                                                    },
                                                                    {
                                                                        "marca":  "PEUGEOT",
                                                                        "modelos":  2,
                                                                        "dias":  [
                                                                                     28,
-                                                                                    50,
+                                                                                    49,
                                                                                     24,
                                                                                     38
                                                                                 ],
-                                                                       "total":  140
+                                                                       "total":  139
                                                                    },
                                                                    {
                                                                        "marca":  "RAM",
@@ -508,47 +674,8 @@
                                                                ]
                                                 },
                                                 {
-                                                    "nome":  "Sport Pass",
-                                                    "total":  50,
-                                                    "marcas":  [
-                                                                   {
-                                                                       "marca":  "BMW",
-                                                                       "modelos":  2,
-                                                                       "dias":  [
-                                                                                    1,
-                                                                                    8,
-                                                                                    8,
-                                                                                    9
-                                                                                ],
-                                                                       "total":  26
-                                                                   },
-                                                                   {
-                                                                       "marca":  "FORD",
-                                                                       "modelos":  1,
-                                                                       "dias":  [
-                                                                                    0,
-                                                                                    4,
-                                                                                    4,
-                                                                                    4
-                                                                                ],
-                                                                       "total":  12
-                                                                   },
-                                                                   {
-                                                                       "marca":  "HONDA",
-                                                                       "modelos":  1,
-                                                                       "dias":  [
-                                                                                    0,
-                                                                                    4,
-                                                                                    4,
-                                                                                    4
-                                                                                ],
-                                                                       "total":  12
-                                                                   }
-                                                               ]
-                                                },
-                                                {
                                                     "nome":  "Super Sport Pass",
-                                                    "total":  1200,
+                                                    "total":  1199,
                                                     "marcas":  [
                                                                    {
                                                                        "marca":  "BMW",
@@ -623,9 +750,9 @@
                                                                                     16,
                                                                                     25,
                                                                                     4,
-                                                                                    18
+                                                                                    17
                                                                                 ],
-                                                                       "total":  63
+                                                                       "total":  62
                                                                    },
                                                                    {
                                                                        "marca":  "TOYOTA",
@@ -639,42 +766,81 @@
                                                                        "total":  156
                                                                    }
                                                                ]
+                                                },
+                                                {
+                                                    "nome":  "Sport Pass",
+                                                    "total":  50,
+                                                    "marcas":  [
+                                                                   {
+                                                                       "marca":  "BMW",
+                                                                       "modelos":  2,
+                                                                       "dias":  [
+                                                                                    1,
+                                                                                    8,
+                                                                                    8,
+                                                                                    9
+                                                                                ],
+                                                                       "total":  26
+                                                                   },
+                                                                   {
+                                                                       "marca":  "FORD",
+                                                                       "modelos":  1,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    4,
+                                                                                    4,
+                                                                                    4
+                                                                                ],
+                                                                       "total":  12
+                                                                   },
+                                                                   {
+                                                                       "marca":  "HONDA",
+                                                                       "modelos":  1,
+                                                                       "dias":  [
+                                                                                    0,
+                                                                                    4,
+                                                                                    4,
+                                                                                    4
+                                                                                ],
+                                                                       "total":  12
+                                                                   }
+                                                               ]
                                                 }
                                             ],
                                  "quase_esgotando":  [
                                                          {
-                                                             "marca":  "FORD",
-                                                             "total":  1
+                                                             "marca":  "DENZA",
+                                                             "total":  12
                                                          },
                                                          {
-                                                             "marca":  "VOLVO",
-                                                             "total":  20
+                                                             "marca":  "FORD",
+                                                             "total":  12
                                                          },
                                                          {
                                                              "marca":  "RAM",
-                                                             "total":  23
+                                                             "total":  32
                                                          },
                                                          {
-                                                             "marca":  "ABARTH",
-                                                             "total":  58
+                                                             "marca":  "GWM",
+                                                             "total":  39
                                                          }
                                                      ],
                                  "mais_folga":  [
                                                     {
                                                         "marca":  "GAC",
-                                                        "total":  343
+                                                        "total":  310
                                                     },
                                                     {
                                                         "marca":  "FERRARI",
-                                                        "total":  273
+                                                        "total":  302
                                                     },
                                                     {
                                                         "marca":  "JETOUR",
-                                                        "total":  251
+                                                        "total":  214
                                                     },
                                                     {
-                                                        "marca":  "JEEP",
-                                                        "total":  212
+                                                        "marca":  "TOYOTA",
+                                                        "total":  199
                                                     }
                                                 ],
                                  "cadastrados":  6552

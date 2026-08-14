@@ -24,18 +24,21 @@ BASES = {
 }
 # Momento de cada exportacao: a base reflete as vendas ate aqui. So descontamos o que veio depois.
 # Momento da exportacao que virou baseline, POR EDICAO.
-# As duas edicoes foram rebaselinadas em 13/08 com planilha nova exportada do
-# sistema proprio. A baseline antiga era de 24/06 e ja nao batia com a realidade.
+# Rebaseline diario enquanto o festival roda: o cadastro de horarios muda sozinho
+# (marca liga e desliga slot, e o sistema renomeia passe), e o robo so sabe
+# descontar venda. Sem refazer a base de manha, ela envelhece mesmo sem venda.
 SNAPSHOT_TS = {
-    'moto': '2026-08-13 17:12:34',
-    'auto': '2026-08-13 17:13:27',
+    'moto': '2026-08-14 09:23:27',
+    'auto': '2026-08-14 09:24:38',
 }
 # data_inicio da busca de vendas, POR EDICAO. Era um valor unico e global, o que
 # virou armadilha quando so a moto foi rebaselinada: com um valor so, mudar pra
 # agosto faria o AUTO parar de descontar 7 semanas de venda e inflar a oferta.
+# Continua por edicao: as duas foram refeitas juntas hoje, mas se um dia so uma
+# for, a outra nao pode perder o ponto de partida dela.
 SNAPSHOT_DATE = {
-    'moto': '2026-08-13',
-    'auto': '2026-08-13',
+    'moto': '2026-08-14',
+    'auto': '2026-08-14',
 }
 BRT = timezone(timedelta(hours=-3))
 
@@ -151,8 +154,10 @@ def main():
         try:
             sales, nq = vendas_pos_snapshot(ed_key)
         except Exception as e:
-            # Sem a API, o que sobra e o baseline de 24/06. Marca a edicao como
-            # nao-ao-vivo em vez de entregar numero velho com cara de fresco.
+            # Sem a API, o que sobra e a planilha do SNAPSHOT_TS desta edicao, ou
+            # seja um numero da manha. Marca a edicao como nao-ao-vivo em vez de
+            # entregar numero velho com cara de fresco. Nao escrever data fixa
+            # aqui: quem diz de quando e a base e o _snap_lbl().
             print(f'[warn] {ed_key}: {e}', file=sys.stderr)
             falhou.append(ed_key)
             ed['ao_vivo'] = False
