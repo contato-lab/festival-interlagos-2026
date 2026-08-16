@@ -178,6 +178,33 @@ def _paginar_vendas(base, token, dt_inicio, dt_fim):
         page += 1
 
 
+def diagnostico_recentes(sales, rotulo):
+    """Conta o que a API devolveu nos ultimos dias, POR STATUS.
+
+    Existe porque em 16/08/2026 o admin mostrava 6 vendas aprovadas no dia e o
+    dia nao aparecia no painel. Sem ver status e data crus nao da pra saber se
+    a venda nao vem, se vem com outro status, ou se vem com outra data. Deduzir
+    isso de fora ja custou uma manha.
+    """
+    corte = (date.today() - timedelta(days=3)).isoformat()
+    por_dia = {}
+    maior = ''
+    for v in sales:
+        ds = (v.get('created_at') or '')[:10]
+        if ds > maior:
+            maior = ds
+        if ds >= corte:
+            st = str(v.get('venda_status'))
+            por_dia.setdefault(ds, {}).setdefault(st, 0)
+            por_dia[ds][st] += 1
+    print(f'  [diag {rotulo}] created_at mais recente que a API devolveu: {maior or "nenhum"}')
+    for ds in sorted(por_dia):
+        detalhe = ', '.join(f'status {k}: {n}' for k, n in sorted(por_dia[ds].items()))
+        print(f'  [diag {rotulo}] {ds} -> {detalhe}')
+    if not por_dia:
+        print(f'  [diag {rotulo}] NENHUMA venda nos ultimos 3 dias veio da API')
+
+
 def aggregate_proprio_totais(sales):
     """Agrega para vendas-data.json (totais diários: receita + qtd ingressos)."""
     by_day = {}
@@ -899,6 +926,8 @@ def main():
         print(f'  ⚠️  Sistema Próprio falhou: {proprio_error}', file=sys.stderr)
 
     if proprio_ok:
+        diagnostico_recentes(moto_sales, 'MOTO')
+        diagnostico_recentes(auto_sales, 'AUTO')
         moto_by_day  = aggregate_proprio_totais(moto_sales)
         auto_by_day  = aggregate_proprio_totais(auto_sales)
         proprio_moto = aggregate_proprio_tipos(moto_sales)
