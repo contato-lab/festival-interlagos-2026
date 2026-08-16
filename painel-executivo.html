@@ -822,6 +822,31 @@ let TIKTOK_DATA = { daily_series: [] }; // declarado cedo para evitar TDZ
 // conforme o painel evolui, e cache com formato velho quebra a tela. Texto
 // puro sempre volta pelo mesmo caminho de leitura do dado novo.
 // ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// PRAZO PARA OS WORKERS
+//
+// Sem prazo, uma chamada travada fica pendurada o tempo que o servidor quiser.
+// Em 16/08/2026 o Worker de vendas comecou a devolver 503 (erro 1102 da
+// Cloudflare, estouro de CPU) levando de 7 a 14 SEGUNDOS pra falhar. Como o
+// codigo tenta 3 vezes com pausa entre elas, a conta deu 49 segundos de tela
+// esperando algo que nao ia chegar, sendo que o arquivo de reserva estava
+// pronto e atualizado o tempo todo.
+//
+// Com prazo de 3s o pior caso vira ~5s e o painel cai pro arquivo de reserva
+// quase na hora. Worker saudavel responde em menos de 1s, entao 3s nao corta
+// nada que iria funcionar.
+const WORKER_PRAZO_MS = 3000;
+
+async function fetchComPrazo(url, opts, ms){
+  const ctrl = new AbortController();
+  const corta = setTimeout(() => ctrl.abort(), ms || WORKER_PRAZO_MS);
+  try {
+    return await fetch(url, Object.assign({}, opts, { signal: ctrl.signal }));
+  } finally {
+    clearTimeout(corta);
+  }
+}
+
 const PEX_CACHE = 'pex_v1_';
 let PEX_MODO_CACHE = false;     // true = primeira pintura, pode responder do guardado
 let PEX_TEM_CACHE  = false;
@@ -840,7 +865,7 @@ function _pexGravar(url, txt){
 
 // Substitui fetch nas cargas de dado. Na primeira pintura devolve o guardado
 // na hora; depois disso vai na rede e atualiza o guardado.
-async function fetchPex(url, opts){
+async function fetchPex(url, opts, prazoMs){
   if (PEX_MODO_CACHE) {
     const guardado = _pexLer(url);
     if (guardado) {
@@ -849,7 +874,7 @@ async function fetchPex(url, opts){
                text: async () => guardado };
     }
   }
-  const r = await fetch(url, opts);
+  const r = prazoMs ? await fetchComPrazo(url, opts, prazoMs) : await fetch(url, opts);
   if (r && r.ok) {
     try { _pexGravar(url, await r.clone().text()); } catch(e) {}
   }
@@ -1153,7 +1178,7 @@ async function fetchTicketmaster() {
     let workerErr = null;
     for (let i = 0; i < 3; i++) {
       try {
-        res = await fetchPex(TM_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
+        res = await fetchPex(TM_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'}, WORKER_PRAZO_MS);
         if (res.ok) { workerErr = null; break; }
         throw new Error('TM Worker HTTP ' + res.status);
       } catch(err) {
@@ -1228,7 +1253,7 @@ async function fetchVendasProprio() {
     let workerErr = null;
     for (let i = 0; i < 3; i++) {
       try {
-        res = await fetchPex(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
+        res = await fetchPex(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'}, WORKER_PRAZO_MS);
         if (res.ok) { workerErr = null; break; }
         throw new Error('Worker HTTP ' + res.status);
       } catch(err) {

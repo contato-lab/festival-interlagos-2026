@@ -3752,6 +3752,22 @@ function toggleAno(ano) {
 // TICKETMASTER — Cloudflare Worker (real-time, cache 30s)
 // Fallback: ticketmaster-data.json (GitHub Actions a cada 5 min)
 // ═══════════════════════════════════════════════
+// PRAZO PARA OS WORKERS.
+// Sem prazo, uma chamada travada fica pendurada o tempo que o servidor quiser.
+// Em 16/08/2026 o Worker de vendas passou a devolver 503 (erro 1102 da
+// Cloudflare, estouro de CPU) levando de 7 a 14 SEGUNDOS pra falhar. Com 3
+// tentativas e pausa entre elas, deu 49 segundos de tela esperando algo que
+// nao ia chegar, sendo que o arquivo de reserva estava pronto o tempo todo.
+// Worker saudavel responde em menos de 1s, entao 3s nao corta nada que iria
+// funcionar.
+const WORKER_PRAZO_MS = 3000;
+async function fetchComPrazo(url, opts, ms){
+  const ctrl = new AbortController();
+  const corta = setTimeout(() => ctrl.abort(), ms || WORKER_PRAZO_MS);
+  try { return await fetch(url, Object.assign({}, opts, { signal: ctrl.signal })); }
+  finally { clearTimeout(corta); }
+}
+
 const TM_WORKER_URL = 'https://ticketmaster-festival-interlagos.performance-ef2.workers.dev/';
 
 async function fetchTicketmaster() {
@@ -3760,7 +3776,7 @@ async function fetchTicketmaster() {
     let workerErr = null;
     for (let i = 0; i < 3; i++) {
       try {
-        res = await fetch(TM_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
+        res = await fetchComPrazo(TM_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'}, WORKER_PRAZO_MS);
         if (res.ok) { workerErr = null; break; }
         throw new Error('TM Worker HTTP ' + res.status);
       } catch(err) {
@@ -3837,7 +3853,7 @@ async function fetchVendasProprio() {
     let workerErr = null;
     for (let i = 0; i < 3; i++) {
       try {
-        res = await fetch(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
+        res = await fetchComPrazo(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'}, WORKER_PRAZO_MS);
         if (res.ok) { workerErr = null; break; }
         throw new Error('Worker HTTP ' + res.status);
       } catch(err) {
