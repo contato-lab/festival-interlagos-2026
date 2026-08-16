@@ -20,7 +20,14 @@ const API_MOTO        = 'https://ingressosmoto.festivalinterlagos.com.br';
 const API_AUTO        = 'https://ingressosauto.festivalinterlagos.com.br';
 const DATA_INICIO_STR = '2026-01-01';              // fetch completo: tudo desde jan/26
 const DATA_INICIO     = new Date('2026-03-31T00:00:00Z'); // D+1
-const PAGE_SIZE       = 100;
+// 500 e nao 100. Com 100, a varredura de moto precisava de ~141 paginas e
+// batia no teto de 150 (contando canceladas, passava). O Worker entao se
+// recusava a entregar lista parcial e estourava: era o erro 1101 que derrubou
+// as vendas em tempo real em 16/08/2026, no ultimo dia da edicao moto.
+// Com 500, os mesmos 14 mil registros cabem em 29 paginas.
+// So da pra fazer isso porque o plano pago tirou o teto de 10ms de CPU: com o
+// limite antigo, processar 500 registros de uma vez ja estourava sozinho.
+const PAGE_SIZE       = 500;
 const CACHE_TTL       = 30;        // segundos - cache normal
 const STALE_TTL       = 600;       // 10min - cache 'velho aceitavel' quando API falha
 const MAX_RETRIES     = 3;         // retry para chamadas individuais a API
@@ -49,11 +56,13 @@ const MAX_DELTA_DAYS = 45;   // janela maior que isso: nao compensa, vai de fetc
 // quando o teto e atingido a funcao LANCA em vez de devolver lista parcial
 // (ver getAllVendas). Devolver metade do faturamento com HTTP 200 seria pior
 // que falhar: o dashboard so cai no vendas-data.json correto quando da erro.
-const MAX_PAGES      = 150;
+// Com pagina de 500, isto e um teto de 200 mil registros: folga de sobra pra
+// campanha inteira e ainda longe de virar loop infinito.
+const MAX_PAGES      = 400;
 // Versao da chave de cache. A logica de agregacao mudou, entao a chave muda
 // junto: senao um corpo gravado pela versao antiga continua sendo servido do
 // edge por ate STALE_TTL depois do deploy.
-const CACHE_VER      = 'inc-v2';
+const CACHE_VER      = 'inc-v3';   // subiu junto com o page_size 500
 
 // ─── HEADERS para escapar do 403 ─────────────────────────
 function buildHeaders(base, token) {
