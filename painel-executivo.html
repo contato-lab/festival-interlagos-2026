@@ -810,6 +810,62 @@ let D26_FULL = [];
 let TIKTOK_DATA = { daily_series: [] }; // declarado cedo para evitar TDZ
 
 // ═══════════════════════════════════════════════
+// ABERTURA INSTANTANEA (guarda a ultima visao no aparelho)
+//
+// O painel baixava ~900 KB e so desenhava quando o ULTIMO arquivo chegava.
+// Na rede do autodromo, lotada, isso deu quase 1 minuto de tela parada.
+//
+// Agora a resposta crua de cada arquivo fica guardada aqui. Na abertura o
+// painel pinta na hora com a ultima visao e sai buscando o dado novo por
+// baixo; quando chega, ele redesenha. Guardo a RESPOSTA CRUA e nao as
+// variaveis ja processadas de proposito: as variaveis mudam de formato
+// conforme o painel evolui, e cache com formato velho quebra a tela. Texto
+// puro sempre volta pelo mesmo caminho de leitura do dado novo.
+// ═══════════════════════════════════════════════
+const PEX_CACHE = 'pex_v1_';
+let PEX_MODO_CACHE = false;     // true = primeira pintura, pode responder do guardado
+let PEX_TEM_CACHE  = false;
+
+function _pexChave(url){ return PEX_CACHE + String(url).split('?')[0]; }
+
+function _pexLer(url){
+  try { return localStorage.getItem(_pexChave(url)); } catch(e) { return null; }
+}
+function _pexGravar(url, txt){
+  // teto de 1 MB por arquivo: acima disso o localStorage estoura e derruba a
+  // gravacao dos outros. O pesado aqui (vendas-tipos, 537 KB) cabe.
+  try { if (txt && txt.length < 1048576) localStorage.setItem(_pexChave(url), txt); }
+  catch(e) { /* cota cheia ou navegacao privada: segue sem cache */ }
+}
+
+// Substitui fetch nas cargas de dado. Na primeira pintura devolve o guardado
+// na hora; depois disso vai na rede e atualiza o guardado.
+async function fetchPex(url, opts){
+  if (PEX_MODO_CACHE) {
+    const guardado = _pexLer(url);
+    if (guardado) {
+      return { ok:true, status:200, _doCache:true,
+               json: async () => JSON.parse(guardado),
+               text: async () => guardado };
+    }
+  }
+  const r = await fetch(url, opts);
+  if (r && r.ok) {
+    try { _pexGravar(url, await r.clone().text()); } catch(e) {}
+  }
+  return r;
+}
+
+function pexTemAlgoGuardado(){
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      if (String(localStorage.key(i)).indexOf(PEX_CACHE) === 0) return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+// ═══════════════════════════════════════════════
 // DADOS 2025 — reais (77 dias, 31/03 a 15/06/2025, alinhados com 2026)
 // ═══════════════════════════════════════════════
 const D25 = [
@@ -902,7 +958,7 @@ const CORTESIAS_FISICAS = { moto: 0, auto: 0, motoDias: [], autoDias: [] };
 
 async function fetchCortesiasFisicas() {
   try {
-    const res = await fetch('cortesias-fisicas-data.json?t=' + Date.now(), {cache: 'no-store'});
+    const res = await fetchPex('cortesias-fisicas-data.json?t=' + Date.now(), {cache: 'no-store'});
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const d = await res.json();
     const ex = d.extra_dias || {};
@@ -1092,7 +1148,7 @@ async function fetchTicketmaster() {
     let workerErr = null;
     for (let i = 0; i < 3; i++) {
       try {
-        res = await fetch(TM_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
+        res = await fetchPex(TM_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
         if (res.ok) { workerErr = null; break; }
         throw new Error('TM Worker HTTP ' + res.status);
       } catch(err) {
@@ -1104,7 +1160,7 @@ async function fetchTicketmaster() {
     if (!res) {
       console.warn('[TM Worker] Falhou apos 3 tentativas, usando fallback ticketmaster-data.json:', workerErr?.message);
       try {
-        res = await fetch('ticketmaster-data.json?t=' + Date.now(), {cache:'no-store'});
+        res = await fetchPex('ticketmaster-data.json?t=' + Date.now(), {cache:'no-store'});
         if (!res.ok) throw new Error('ticketmaster-data.json HTTP ' + res.status);
       } catch (fallbackErr) {
         console.warn('[TM fallback] tambem falhou, mantendo dados anteriores (se houver):', fallbackErr.message);
@@ -1167,7 +1223,7 @@ async function fetchVendasProprio() {
     let workerErr = null;
     for (let i = 0; i < 3; i++) {
       try {
-        res = await fetch(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
+        res = await fetchPex(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'});
         if (res.ok) { workerErr = null; break; }
         throw new Error('Worker HTTP ' + res.status);
       } catch(err) {
@@ -1183,7 +1239,7 @@ async function fetchVendasProprio() {
         return;
       }
       console.warn('[Vendas Worker] Falhou na primeira carga, usando fallback vendas-data.json:', workerErr?.message);
-      res = await fetch('vendas-data.json?t=' + Date.now(), {cache:'no-store'});
+      res = await fetchPex('vendas-data.json?t=' + Date.now(), {cache:'no-store'});
       if (!res.ok) throw new Error('vendas-data.json HTTP ' + res.status);
     }
     const data = await res.json();
@@ -1219,7 +1275,7 @@ async function fetchVendasProprio() {
 // ═══════════════════════════════════════════════
 async function fetchGAdsData() {
   try {
-    const res = await fetch('google-ads-data.json?t=' + Date.now());
+    const res = await fetchPex('google-ads-data.json?t=' + Date.now());
     if (!res.ok) return;
     const data = await res.json();
     if (!data.totals) return;
@@ -1234,7 +1290,7 @@ async function fetchGAdsData() {
 // ═══════════════════════════════════════════════
 async function fetchMetaData() {
   try {
-    const res = await fetch('meta-data.json?t=' + Date.now());
+    const res = await fetchPex('meta-data.json?t=' + Date.now());
     if (!res.ok) return;
     const data = await res.json();
     const arr = data.daily_series || data.data || [];
@@ -1251,7 +1307,7 @@ async function fetchMetaData() {
 // ═══════════════════════════════════════════════
 async function tiktokLoad() {
   try {
-    const res = await fetch('tiktok-data.json?t=' + Date.now(), {cache:'no-store'});
+    const res = await fetchPex('tiktok-data.json?t=' + Date.now(), {cache:'no-store'});
     if (!res.ok) throw new Error('not found');
     const data = await res.json();
     if (!data.daily_series?.length) throw new Error('empty');
@@ -1396,7 +1452,7 @@ let EXEC_D25_DIAS_TOTAIS   = 0;
 
 async function fetchInvestimento2025() {
   try {
-    const res = await fetch('investimento-2025.json?t=' + Date.now(), {cache:'no-store'});
+    const res = await fetchPex('investimento-2025.json?t=' + Date.now(), {cache:'no-store'});
     if (!res.ok) return;
     const data = await res.json();
     const diario = data?.diario_por_dia_campanha || [];
@@ -2370,7 +2426,7 @@ function _tiposKey(containerId, evento, nome) {
 
 async function fetchTipos() {
   try {
-    const res = await fetch('vendas-tipos-data.json?t=' + Date.now(), {cache: 'no-store'});
+    const res = await fetchPex('vendas-tipos-data.json?t=' + Date.now(), {cache: 'no-store'});
     if (!res.ok) throw new Error('Tipos HTTP ' + res.status);
     TIPOS_DATA = await res.json();
     renderTipos();
@@ -2735,7 +2791,7 @@ Chart.defaults.font.family="'Inter',sans-serif";
 let ESTOQUE_DATA = null;
 async function fetchEstoque(){
   try{
-    const res = await fetch('estoque-data.json?t='+Date.now(), {cache:'no-store'});
+    const res = await fetchPex('estoque-data.json?t='+Date.now(), {cache:'no-store'});
     if(!res.ok) throw new Error('nf');
     ESTOQUE_DATA = await res.json();
     const b=document.getElementById('estoqueStatus'); if(b) b.textContent='✓ atualizado';
@@ -2785,11 +2841,8 @@ function renderEstoque(){
   const w=document.getElementById('estoqueWrap'); if(w) w.innerHTML=html;
 }
 
-function initDashboard(){
-  updateLastRefreshTime();
-  // Carrega TUDO em paralelo e so renderiza quando ambos (vendas + TM) chegam
-  // -> evita flicker na abertura (showing only sistema proprio sem TM)
-  Promise.allSettled([
+function _pexCarregarTudo(){
+  return Promise.allSettled([
     fetchEstoque(),
     fetchVendasProprio(),
     fetchTicketmaster(),
@@ -2799,7 +2852,28 @@ function initDashboard(){
     fetchTipos(),
     fetchCortesiasFisicas(),
     fetchInvestimento2025()
-  ]).then(() => renderPainelExecutivo());
+  ]);
+}
+
+function initDashboard(){
+  updateLastRefreshTime();
+
+  // PINTA NA HORA COM A ULTIMA VISAO, se este aparelho ja abriu o painel antes.
+  // Roda pelo mesmo caminho de leitura do dado novo, so que respondendo do
+  // guardado, entao nao existe uma segunda versao do codigo pra manter.
+  PEX_TEM_CACHE = pexTemAlgoGuardado();
+  const abertura = PEX_TEM_CACHE
+    ? (function(){
+        PEX_MODO_CACHE = true;
+        return _pexCarregarTudo()
+          .then(() => { try { renderPainelExecutivo(); } catch(e) {} })
+          .finally(() => { PEX_MODO_CACHE = false; });
+      })()
+    : Promise.resolve();
+
+  // Depois da pintura instantanea vai buscar o dado de verdade e redesenha por
+  // cima. Se este for o primeiro acesso, isto e a unica carga que acontece.
+  abertura.then(() => _pexCarregarTudo().then(() => renderPainelExecutivo()));
 
   // Vendas própria + TM: refresh a cada 15s com guard de "uma rodada por vez"
   // (evita race condition quando TM Worker leva > 3s na cache MISS)
@@ -3272,7 +3346,7 @@ function buildExecDiaSemanaChart(){
 }
 (function(){
   async function load(){
-    try{ HORA_DATA = await (await fetch('vendas-por-hora.json?t='+Date.now(),{cache:'no-store'})).json(); }
+    try{ HORA_DATA = await (await fetchPex('vendas-por-hora.json?t='+Date.now(),{cache:'no-store'})).json(); }
     catch(e){ return; }
     buildExecDiaSemanaChart();
     buildExecHoraChart();
