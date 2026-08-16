@@ -4006,6 +4006,13 @@ function updateLastSaleBadges() {
 // Ticker: re-renderiza os badges a cada 30s (o "há X min" envelhece mesmo sem novos dados)
 setInterval(updateLastSaleBadges, 30000);
 
+// VERSAO VISIVEL NA TELA.
+// Em 16/08/2026 a gente perdeu horas discutindo se o dashboard estava lento ou
+// se o celular estava com a copia velha, e nao havia jeito de saber olhando.
+// Agora da: o numero aparece do lado do "Atualizado" e a tela avisa sozinha
+// quando existe versao mais nova publicada.
+const DASH_VERSAO = '2026-08-16.1';
+
 let __lastRefreshAt = null;
 function updateLastRefreshTime() { __lastRefreshAt = new Date(); renderLastRefreshLabel(); updateDiasBadge(); }
 function renderLastRefreshLabel() {
@@ -4029,12 +4036,47 @@ function renderLastRefreshLabel() {
   else if (diffSec < 600) color = 'var(--warn)';
   else color = 'var(--red)';
   el.innerHTML = '<span style="color:' + color + '">&#9679;</span> Atualizado ' + rel +
-                 ' <span style="color:#888;font-size:.92em">&middot; ' + h + 'h' + m + '</span>';
+                 ' <span style="color:#888;font-size:.92em">&middot; ' + h + 'h' + m +
+                 ' &middot; v' + DASH_VERSAO + '</span>';
 }
 setInterval(renderLastRefreshLabel, 1000);
+// Compara a versao que esta rodando com a publicada e oferece atualizar. Sem
+// isto, o navegador pode servir a copia guardada por muito tempo e a pessoa
+// jura que a correcao nao chegou. Ja aconteceu tres vezes hoje.
+function checarVersaoDash(){
+  if (navigator.onLine === false || !window.fetch) return;
+  fetch('dashboard-festival-interlagos.html?v=' + Date.now(), { cache:'no-store' })
+    .then(r => r.ok ? r.text() : null)
+    .then(txt => {
+      if (!txt) return;
+      const m = txt.match(/const DASH_VERSAO = '([^']+)'/);
+      if (!m || m[1] === DASH_VERSAO || document.getElementById('dashNovaVersao')) return;
+      const d = document.createElement('div');
+      d.id = 'dashNovaVersao';
+      d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;' +
+        'align-items:center;gap:10px;background:rgb(200,255,0);color:#0b0c0a;font-weight:700;' +
+        'font-size:.84rem;padding:12px 16px;font-family:inherit';
+      d.innerHTML = '<span style="flex:1">Saiu uma versão mais nova deste dashboard.</span>' +
+        '<button type="button" style="background:#0b0c0a;color:rgb(200,255,0);border:0;' +
+        'border-radius:9px;padding:9px 14px;font-weight:700;cursor:pointer">Atualizar</button>';
+      document.body.appendChild(d);
+      d.querySelector('button').addEventListener('click', function(){
+        location.replace(location.pathname + '?v=' + Date.now());
+      });
+    })
+    .catch(() => {});
+}
+
 function initDashboard(){
   fetchTikTokData();
   updateLastRefreshTime();
+  try {
+    checarVersaoDash();
+    setInterval(checarVersaoDash, 5*60*1000);
+    document.addEventListener('visibilitychange', function(){
+      if (!document.hidden) checarVersaoDash();
+    });
+  } catch(e) {}
   const ds=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
   document.getElementById('footerDate').textContent='Gerado em '+ds;
   
