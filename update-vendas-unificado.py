@@ -34,6 +34,9 @@ PAGE_SIZE       = 100
 # Dias rebuscados numa consulta curta e propria, pra o dia corrente nunca
 # depender de a varredura longa (50+ paginas) chegar ate o fim.
 RECENTE_DIAS    = 3
+# Pagina grande so nas consultas curtas (dia de hoje e vizinhanca). A varredura
+# longa continua em 100: pedir 500 nela aumenta a chance de a API engasgar.
+PAGE_SIZE_DIA   = 500
 
 # API v2.0 (a partir de 29/07/2026): o token deixou de ser publico.
 # Agora e POST /apis/token com a chave no header X-Api-Key, e o token vale 1 HORA.
@@ -154,11 +157,27 @@ def fetch_proprio_sales_resiliente(base, rotulo):
     """
     token = get_proprio_token(base)
     fim = datetime.now().strftime('%Y-%m-%d')
-    desde = (date.today() - timedelta(days=RECENTE_DIAS)).strftime('%Y-%m-%d')
 
-    # 1) JANELA RECENTE PRIMEIRO. E a que o time olha e a que nao pode faltar.
-    recentes = _paginar_vendas(base, token, desde, fim)
-    print(f'  [{rotulo}] janela recente ({desde}..{fim}): {len(recentes)} vendas')
+    # 1) O DIA DE HOJE, SOZINHO E EM PAGINA GRANDE.
+    #    Minha primeira tentativa usou janela de 3 dias, que durante o evento
+    #    cobre 13 a 16/08 e tem dezenas de paginas: quebrava igual a varredura
+    #    longa e trouxe 1 venda quando o admin mostrava 6. Um dia so, com
+    #    pagina de 500, cabe numa requisicao e nao depende de paginacao.
+    hoje = date.today().strftime('%Y-%m-%d')
+    recentes = _paginar_vendas(base, token, hoje, fim, page_size=PAGE_SIZE_DIA)
+    print(f'  [{rotulo}] hoje ({hoje}): {len(recentes)} vendas')
+
+    # 2) Os dias em volta, pra pegar venda que mudou de status depois.
+    #    Se falhar, o dia de hoje ja esta garantido acima.
+    try:
+        desde = (date.today() - timedelta(days=RECENTE_DIAS)).strftime('%Y-%m-%d')
+        vizinhos = _paginar_vendas(base, token, desde, fim, page_size=PAGE_SIZE_DIA)
+        vistos_h = {_chave_venda(v) for v in recentes}
+        recentes += [v for v in vizinhos if _chave_venda(v) not in vistos_h]
+        print(f'  [{rotulo}] janela {desde}..{fim}: {len(recentes)} vendas no total')
+    except Exception as e:
+        print(f'  [{rotulo}] janela de {RECENTE_DIAS} dias falhou ({e}). '
+              f'Hoje segue garantido.', file=sys.stderr)
 
     # 2) HISTORICO. Se falhar, nao derruba a rodada: o dia de hoje ja esta salvo.
     historico_ok = True
@@ -218,14 +237,15 @@ def _chave_venda(v):
     return (str(v.get('created_at') or ''), str(v.get('venda_valor') or ''), marca)
 
 
-def _paginar_vendas(base, token, dt_inicio, dt_fim):
+def _paginar_vendas(base, token, dt_inicio, dt_fim, page_size=None):
     """Percorre as paginas de /apis/vendas. LANCA se a paginacao morrer no meio:
     devolver lista parcial como se fosse completa e o que fez o dashboard
     mostrar zero num dia com venda."""
     out, page, renovou = [], 1, False
+    ps = page_size or PAGE_SIZE
     while True:
         url = (f'{base}/apis/vendas?data_inicio={dt_inicio}&data_fim={dt_fim}'
-               f'&page_size={PAGE_SIZE}&page={page}')
+               f'&page_size={ps}&page={page}')
         r = requests.get(url, headers=_proprio_headers(base, token), timeout=30)
         # token de 1h pode vencer no meio da paginacao: renova uma vez e repete a pagina
         if r.status_code == 401 and not renovou:
