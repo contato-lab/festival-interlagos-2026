@@ -31,6 +31,9 @@ API_AUTO_BASE   = 'https://ingressosauto.festivalinterlagos.com.br'
 DATA_INICIO     = date(2026, 3, 31)
 DATA_INICIO_STR = '2026-01-01'
 PAGE_SIZE       = 100
+# Dias rebuscados numa consulta curta e propria, pra o dia corrente nunca
+# depender de a varredura longa (50+ paginas) chegar ate o fim.
+RECENTE_DIAS    = 3
 
 # API v2.0 (a partir de 29/07/2026): o token deixou de ser publico.
 # Agora e POST /apis/token com a chave no header X-Api-Key, e o token vale 1 HORA.
@@ -103,9 +106,53 @@ def fetch_proprio_sales(base):
     token = get_proprio_token(base)
 
     fim = datetime.now().strftime('%Y-%m-%d')
-    sales, page, renovou = [], 1, False
+    sales = _paginar_vendas(base, token, DATA_INICIO_STR, fim)
+
+    # ── REBUSCA DOS ULTIMOS DIAS, SEPARADO ──────────────────────────
+    # A consulta longa varre desde 01/01 em paginas de 100, o que hoje passa de
+    # 50 paginas. Se UMA pagina falhar no meio, a paginacao para e a lista
+    # parcial passa por completa. Como a API devolve da mais antiga pra mais
+    # nova, o que se perde e sempre o FINAL: o dia corrente.
+    #
+    # Foi exatamente o que aconteceu em 16/08/2026: o admin mostrava 6 vendas
+    # aprovadas no dia e o painel mostrava zero, porque o dia nunca chegava.
+    #
+    # Esta segunda consulta cobre so os ultimos dias. Cabe numa pagina ou duas,
+    # entao nao depende de paginacao longa dar certo. O merge por chave da
+    # venda evita contar duas vezes quando as duas consultas trazem o mesmo
+    # registro.
+    try:
+        desde = (date.today() - timedelta(days=RECENTE_DIAS)).strftime('%Y-%m-%d')
+        recentes = _paginar_vendas(base, token, desde, fim)
+        if recentes:
+            vistos = {_chave_venda(v) for v in sales}
+            novas = [v for v in recentes if _chave_venda(v) not in vistos]
+            if novas:
+                print(f'  + {len(novas)} vendas recentes que a varredura longa nao trouxe')
+            sales.extend(novas)
+    except Exception as e:
+        # a rebusca e reforco: se falhar, segue com o que a varredura longa deu
+        print(f'  aviso: rebusca dos ultimos dias falhou ({e})', file=sys.stderr)
+
+    return sales
+
+
+def _chave_venda(v):
+    """Identidade da venda pro merge. Nao existe campo de id exposto, entao uso
+    a combinacao que nao se repete na pratica: momento da compra, valor e os
+    proprios qrcodes."""
+    qr = v.get('qrcodes') or []
+    marca = ','.join(sorted(str(q.get('codigo') or q.get('id') or q) for q in qr)) if qr else ''
+    return (str(v.get('created_at') or ''), str(v.get('venda_valor') or ''), marca)
+
+
+def _paginar_vendas(base, token, dt_inicio, dt_fim):
+    """Percorre as paginas de /apis/vendas. LANCA se a paginacao morrer no meio:
+    devolver lista parcial como se fosse completa e o que fez o dashboard
+    mostrar zero num dia com venda."""
+    out, page, renovou = [], 1, False
     while True:
-        url = (f'{base}/apis/vendas?data_inicio={DATA_INICIO_STR}&data_fim={fim}'
+        url = (f'{base}/apis/vendas?data_inicio={dt_inicio}&data_fim={dt_fim}'
                f'&page_size={PAGE_SIZE}&page={page}')
         r = requests.get(url, headers=_proprio_headers(base, token), timeout=30)
         # token de 1h pode vencer no meio da paginacao: renova uma vez e repete a pagina
@@ -116,13 +163,19 @@ def fetch_proprio_sales(base):
         r.raise_for_status()
         renovou = False
         d = r.json()
-        if d.get('status') != 'success' or not d.get('data'):
-            break
-        sales.extend(d['data'])
+        if d.get('status') != 'success':
+            # pagina 1 sem sucesso = janela vazia de verdade. Da pagina 2 em
+            # diante e falha no meio, e ai nao da pra fingir que acabou.
+            if page == 1:
+                return out
+            raise RuntimeError(f'paginacao interrompida na pagina {page} '
+                               f'({dt_inicio}..{dt_fim}): status={d.get("status")}')
+        if not d.get('data'):
+            return out
+        out.extend(d['data'])
         if d.get('pagination', {}).get('isNextPage') != 'Y':
-            break
+            return out
         page += 1
-    return sales
 
 
 def aggregate_proprio_totais(sales):
