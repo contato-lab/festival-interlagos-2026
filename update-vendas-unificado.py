@@ -137,6 +137,78 @@ def fetch_proprio_sales(base):
     return sales
 
 
+def fetch_proprio_sales_resiliente(base, rotulo):
+    """Busca as vendas SEM depender da varredura longa dar certo.
+
+    A varredura desde 01/01 tem mais de 50 paginas e a API interrompe no meio
+    (comprovado em 16/08/2026: a protecao nova derrubou a rodada #1477). Como a
+    resposta vem da venda mais antiga pra mais nova, quando ela quebra o que se
+    perde e sempre o FINAL, ou seja, o dia corrente. Era por isso que o painel
+    mostrava zero num dia com venda no admin.
+
+    Agora a janela recente e buscada SOZINHA, numa consulta curta de uma ou
+    duas paginas que nao depende da longa. Se a longa falhar, o historico e
+    reaproveitado do arquivo anterior, que foi montado quando ela deu certo.
+
+    Devolve (vendas, historico_confiavel).
+    """
+    token = get_proprio_token(base)
+    fim = datetime.now().strftime('%Y-%m-%d')
+    desde = (date.today() - timedelta(days=RECENTE_DIAS)).strftime('%Y-%m-%d')
+
+    # 1) JANELA RECENTE PRIMEIRO. E a que o time olha e a que nao pode faltar.
+    recentes = _paginar_vendas(base, token, desde, fim)
+    print(f'  [{rotulo}] janela recente ({desde}..{fim}): {len(recentes)} vendas')
+
+    # 2) HISTORICO. Se falhar, nao derruba a rodada: o dia de hoje ja esta salvo.
+    historico_ok = True
+    try:
+        historico = _paginar_vendas(base, token, DATA_INICIO_STR, fim)
+        print(f'  [{rotulo}] varredura longa: {len(historico)} vendas')
+    except Exception as e:
+        historico, historico_ok = [], False
+        print(f'  [{rotulo}] varredura longa FALHOU ({e}). '
+              f'Historico vem do arquivo anterior.', file=sys.stderr)
+
+    vistos = {_chave_venda(v) for v in recentes}
+    todas = recentes + [v for v in historico if _chave_venda(v) not in vistos]
+    return todas, historico_ok
+
+
+def _dia_de_corte():
+    """Primeiro dia (numero D+) que a janela recente cobre."""
+    return (date.today() - timedelta(days=RECENTE_DIAS) - DATA_INICIO).days + 1
+
+
+def _historico_do_arquivo(campo_receita, campo_qtd):
+    """Dias antigos vindos do vendas-data.json anterior, pra quando a varredura
+    longa falha. Melhor um historico de minutos atras que um zero inventado."""
+    prev = _load_existing(OUT_VENDAS) or {}
+    out = {}
+    for row in (prev.get('daily') or []):
+        d = row.get('d')
+        if isinstance(d, int):
+            out[d] = {'receita': float(row.get(campo_receita) or 0),
+                      'qtd': int(row.get(campo_qtd) or 0)}
+    return out
+
+
+def mesclar_historico(by_day, historico_ok, campo_receita, campo_qtd, rotulo):
+    """Quando a varredura longa falha, os dias ANTIGOS vem do arquivo anterior e
+    os dias da janela recente vem da API. Assim uma falha no historico nunca
+    apaga o dia de hoje, nem o dia de hoje zera o historico."""
+    if historico_ok:
+        return by_day
+    corte = _dia_de_corte()
+    base = _historico_do_arquivo(campo_receita, campo_qtd)
+    juntos = {d: v for d, v in base.items() if d < corte}
+    for d, v in by_day.items():
+        juntos[d] = v
+    print(f'  [{rotulo}] historico reaproveitado do arquivo ate D+{corte - 1}, '
+          f'janela recente da API a partir de D+{corte}')
+    return juntos
+
+
 def _chave_venda(v):
     """Identidade da venda pro merge. Nao existe campo de id exposto, entao uso
     a combinacao que nao se repete na pratica: momento da compra, valor e os
@@ -912,13 +984,14 @@ def main():
     # levando o Ticketmaster junto — 21h de dado parado no dashboard.)
     proprio_ok, proprio_error = True, None
     moto_sales, auto_sales = [], []
+    moto_hist_ok = auto_hist_ok = True
     try:
         print('\n[1/4] Buscando vendas Próprio MOTO...')
-        moto_sales = fetch_proprio_sales(API_MOTO_BASE)
+        moto_sales, moto_hist_ok = fetch_proprio_sales_resiliente(API_MOTO_BASE, 'MOTO')
         print(f'  {len(moto_sales)} vendas')
 
         print('[2/4] Buscando vendas Próprio AUTO...')
-        auto_sales = fetch_proprio_sales(API_AUTO_BASE)
+        auto_sales, auto_hist_ok = fetch_proprio_sales_resiliente(API_AUTO_BASE, 'AUTO')
         print(f'  {len(auto_sales)} vendas')
     except Exception as e:
         proprio_ok, proprio_error = False, str(e)
@@ -930,6 +1003,11 @@ def main():
         diagnostico_recentes(auto_sales, 'AUTO')
         moto_by_day  = aggregate_proprio_totais(moto_sales)
         auto_by_day  = aggregate_proprio_totais(auto_sales)
+        # varredura longa quebrada nao pode apagar o historico nem o dia de hoje
+        moto_by_day  = mesclar_historico(moto_by_day, moto_hist_ok,
+                                         'moto_receita', 'moto_ingressos', 'MOTO')
+        auto_by_day  = mesclar_historico(auto_by_day, auto_hist_ok,
+                                         'auto_receita', 'auto_ingressos', 'AUTO')
         proprio_moto = aggregate_proprio_tipos(moto_sales)
         proprio_auto = aggregate_proprio_tipos(auto_sales)
     else:
