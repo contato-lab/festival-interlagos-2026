@@ -33,6 +33,16 @@ DATA_INICIO_STR = '2026-01-01'
 PAGE_SIZE       = 100
 # Dias rebuscados numa consulta curta e propria, pra o dia corrente nunca
 # depender de a varredura longa (50+ paginas) chegar ate o fim.
+# ─── O QUE CONTA COMO VENDA ────────────────────────────────
+# O log de 16/08/2026 mostrou tres status vindos da API do proprio:
+#   3                 -> venda paga
+#   finalizado-manual -> venda fechada na mao (bilheteria, ajuste). E VENDA.
+#   cupom             -> cortesia de valor zero. NAO e venda.
+# O robo so contava '3', entao jogava fora as finalizadas manualmente: 15 hoje,
+# 15 ontem, 8 no dia 14. Cupom fica de fora de proposito, senao o faturamento
+# do painel passa a contar 1.186 entradas gratuitas de hoje como se fossem
+# venda.
+STATUS_VENDA = ('3', 'finalizado-manual')
 RECENTE_DIAS    = 3
 # Pagina grande so nas consultas curtas (dia de hoje e vizinhanca). A varredura
 # longa continua em 100: pedir 500 nela aumenta a chance de a API engasgar.
@@ -301,7 +311,7 @@ def aggregate_proprio_totais(sales):
     """Agrega para vendas-data.json (totais diários: receita + qtd ingressos)."""
     by_day = {}
     for v in sales:
-        if str(v.get('venda_status')) != '3':
+        if str(v.get('venda_status')) not in STATUS_VENDA:
             continue
         ds = (v.get('created_at') or '').split(' ')[0]
         if not ds or len(ds) < 10:
@@ -333,7 +343,7 @@ def aggregate_proprio_tipos(sales):
         }
     agg = defaultdict(make)
     for v in sales:
-        if str(v.get('venda_status')) != '3':
+        if str(v.get('venda_status')) not in STATUS_VENDA:
             continue
         ds = (v.get('created_at') or '').split(' ')[0]
         if not ds or len(ds) < 10:
@@ -976,7 +986,7 @@ def aggregate_por_hora(tm_movs, moto_sales, auto_sales):
 
     for lista, edi in ((moto_sales, 'moto'), (auto_sales, 'auto')):
         for v in (lista or []):
-            if str(v.get('venda_status')) != '3':
+            if str(v.get('venda_status')) not in STATUS_VENDA:
                 continue
             r = _proprio_brt(v.get('created_at'))
             if r:
