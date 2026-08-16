@@ -439,6 +439,12 @@ def aggregate_tm_totais(movements):
             if pid is not None and float(m.get('amount', 0)) == 0 and int(m.get('ticketCount', 0)) > 0:
                 cortesia_purchase.add(pid)
 
+    # publico_evento['moto']['15/08/2026'] = {'pago': N, 'cortesia': N}
+    publico_evento = {
+        'moto': defaultdict(lambda: {'pago': 0, 'cortesia': 0}),
+        'auto': defaultdict(lambda: {'pago': 0, 'cortesia': 0}),
+    }
+
     daily = defaultdict(lambda: {
         'moto_receita': 0.0, 'auto_receita': 0.0,
         'moto_ingressos': 0,  'auto_ingressos': 0,
@@ -480,6 +486,24 @@ def aggregate_tm_totais(movements):
             is_cortesia = pid in cortesia_purchase
         else:
             is_cortesia = False
+
+        # PUBLICO POR DIA DE EVENTO.
+        # O resto deste bloco conta por DIA DA COMPRA, que responde "quanto
+        # vendemos hoje". Nao responde "quanta gente entra no sabado", que e
+        # outra pergunta e a que a producao faz.
+        # Cada ingresso carrega o show_id, e cada show_id e um dia do evento.
+        # Aqui somo pago e cortesia SEPARADOS, porque cortesia em moto e mais
+        # que o dobro do pago (55.904 contra 26.934): juntar os dois num numero
+        # so esconderia justamente o que distingue publico de faturamento.
+        _dia_ev = None
+        for _t in (m.get('tickets') or []):
+            _sid = (_t.get('show') or {}).get('id')
+            if _sid in SHOW_TO_DATE:
+                _dia_ev = SHOW_TO_DATE[_sid]
+                break
+        if _dia_ev:
+            _b = publico_evento[edi][_dia_ev]
+            _b['cortesia' if is_cortesia else 'pago'] += tc
 
         if edi == 'moto':
             if is_cortesia:
@@ -523,7 +547,20 @@ def aggregate_tm_totais(movements):
         'auto_cortesias': d['auto_cortesias'],
     } for ds, d in sorted(daily.items())]
 
-    return totals, daily_list, last_sale_moto_at, last_sale_auto_at
+    # publico por dia de evento, ordenado por data real e nao alfabeticamente
+    def _chave(dstr):
+        p = dstr.split('/')
+        return (p[2], p[1], p[0]) if len(p) == 3 else ('', '', dstr)
+    publico = {}
+    for edi in ('moto', 'auto'):
+        publico[edi] = [{
+            'dia': d,
+            'pago': v['pago'],
+            'cortesia': v['cortesia'],
+            'total': v['pago'] + v['cortesia'],
+        } for d, v in sorted(publico_evento[edi].items(), key=lambda kv: _chave(kv[0]))]
+
+    return totals, daily_list, last_sale_moto_at, last_sale_auto_at, publico
 
 
 def aggregate_tm_tipos(movements):
@@ -693,7 +730,8 @@ def build_vendas_data(moto_by_day, auto_by_day):
 
 
 def build_ticketmaster_data(totals, daily, source='api', last_sale_moto_at=None, last_sale_auto_at=None,
-                            tm_cursor_last_update=None, tm_cursor_last_movement_id=None):
+                            tm_cursor_last_update=None, tm_cursor_last_movement_id=None,
+                            publico_evento=None):
     source_label = {
         'api':      'Ticketmaster API via getcrowder.com',
         'planilha': 'Planilha Linha do Tempo (fallback enquanto API TM está fora)',
@@ -714,6 +752,10 @@ def build_ticketmaster_data(totals, daily, source='api', last_sale_moto_at=None,
         # reprocessar o historico inteiro a cada 5 min).
         'tm_cursor_last_update':     tm_cursor_last_update,
         'tm_cursor_last_movement_id': tm_cursor_last_movement_id,
+        # PUBLICO POR DIA DE EVENTO (quem tem ingresso pra AQUELE dia), separado
+        # em pago e cortesia. O resto do arquivo conta por dia da COMPRA, que
+        # responde outra pergunta.
+        'publico_por_dia_evento': publico_evento or {},
     }
 
 
@@ -1051,6 +1093,7 @@ def main():
     # ── Ticketmaster ─ tenta API; se falhar, tenta planilha; senão, mantém antigo ──
     print('\n[3/4] Buscando movimentos Ticketmaster (API)...')
     tm_movs = None
+    tm_publico = {}   # so a API traz dia do evento; a planilha nao tem isso
     tm_error = None
     tm_source = None
     tm_cursor_update = None
@@ -1064,7 +1107,7 @@ def main():
         print(f'  ⚠️  TM API falhou: {tm_error}', file=sys.stderr)
 
     if tm_movs is not None:
-        tm_totals, tm_daily, tm_last_moto, tm_last_auto = aggregate_tm_totais(tm_movs)
+        tm_totals, tm_daily, tm_last_moto, tm_last_auto, tm_publico = aggregate_tm_totais(tm_movs)
         tm_moto, tm_auto    = aggregate_tm_tipos(tm_movs)
     else:
         # Carrega dados anteriores como baseline (último snapshot bom da API)
@@ -1141,7 +1184,8 @@ def main():
                                                     last_sale_moto_at=tm_last_moto,
                                                     last_sale_auto_at=tm_last_auto,
                                                     tm_cursor_last_update=tm_cursor_update,
-                                                    tm_cursor_last_movement_id=tm_cursor_mov_id))
+                                                    tm_cursor_last_movement_id=tm_cursor_mov_id,
+                                                    publico_evento=tm_publico))
     else:
         # NÃO sobrescreve OUT_TM: timestamp ficaria mentiroso. Deixa o arquivo
         # antigo no lugar pra dashboard mostrar 'stale' via updated_at antigo.
