@@ -2861,6 +2861,23 @@ function _pexCarregarTudo(){
 }
 function _pexDesenha(){ try { renderPainelExecutivo(); } catch(e) { console.warn('[exec] render', e); } }
 
+// DESENHO LEVE: so os numeros, sem tocar nos graficos.
+//
+// renderPainelExecutivo() DESTROI E RECRIA OS 10 GRAFICOS a cada chamada. Isso
+// custa caro no celular. Ao dividir a carga em ondas eu acabei triplicando esse
+// custo (pintura do cache + onda 1 + onda 2), e no celular a conta ficou pior
+// do que o tempo de rede que eu tinha economizado.
+//
+// Agora as ondas iniciais chamam so os paineis de numero, que e o que o Eric
+// precisa ver rapido, e os graficos sao montados UMA vez, quando todo o dado
+// chegou. Fica melhor que o original nos dois lados: numero antes e mesma
+// quantidade de trabalho de grafico.
+function _pexDesenhaNumeros(){
+  try { renderExecHojeOntem(); } catch(e) {}
+  try { renderExecKPIs(); }     catch(e) {}
+  try { updateLastRefreshTime(); } catch(e) {}
+}
+
 function initDashboard(){
   updateLastRefreshTime();
 
@@ -2871,7 +2888,7 @@ function initDashboard(){
     ? (function(){
         PEX_MODO_CACHE = true;
         return _pexCarregarTudo()
-          .then(_pexDesenha)
+          .then(_pexDesenhaNumeros)
           .finally(() => { PEX_MODO_CACHE = false; });
       })()
     : Promise.resolve();
@@ -2889,7 +2906,7 @@ function initDashboard(){
       fetchVendasProprio(),
       fetchTicketmaster(),
       fetchEstoque()
-    ]).then(_pexDesenha);
+    ]).then(_pexDesenhaNumeros);
 
     Promise.allSettled([
       fetchTipos(),
