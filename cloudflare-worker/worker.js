@@ -62,7 +62,16 @@ const MAX_PAGES      = 400;
 // Versao da chave de cache. A logica de agregacao mudou, entao a chave muda
 // junto: senao um corpo gravado pela versao antiga continua sendo servido do
 // edge por ate STALE_TTL depois do deploy.
-const CACHE_VER      = 'inc-v3';   // subiu junto com o page_size 500
+const CACHE_VER      = 'inc-v4';   // subiu com o page_size 500 e o status finalizado-manual
+
+// ─── O QUE CONTA COMO VENDA ─────────────────────────────
+// Mesma regra do robo Python, e tem que continuar igual: se os dois contarem
+// diferente, o numero em tempo real briga com o do arquivo e ninguem sabe em
+// qual acreditar.
+//   3                 venda paga
+//   finalizado-manual venda fechada na mao (bilheteria, ajuste). E VENDA.
+//   cupom             cortesia de valor zero. NAO e venda.
+const STATUS_VENDA = ['3', 'finalizado-manual'];
 
 // ─── HEADERS para escapar do 403 ─────────────────────────
 function buildHeaders(base, token) {
@@ -155,7 +164,7 @@ async function getAllVendas(base, token, dataInicio) {
 function aggregateByDay(sales) {
   const byDay = {};
   for (const v of sales) {
-    if (String(v.venda_status) !== '3') continue;
+    if (!STATUS_VENDA.includes(String(v.venda_status))) continue;
     const ds = (v.created_at || '').split(' ')[0];
     if (!ds || ds.length < 10) continue;
     const dt = new Date(ds + 'T00:00:00Z');
@@ -172,7 +181,7 @@ function aggregateByDay(sales) {
 function lastSaleAt(sales) {
   let latest = null;
   for (const v of sales) {
-    if (String(v.venda_status) !== '3') continue;
+    if (!STATUS_VENDA.includes(String(v.venda_status))) continue;
     const ts = (v.created_at || '').trim();
     if (!ts) continue;
     if (!latest || ts > latest) latest = ts;
