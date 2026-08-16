@@ -14,6 +14,22 @@ on:
     - cron: '*/2 * * * *'  # a cada 2 minutos
   workflow_dispatch:
 
+# UMA RODADA POR VEZ.
+#
+# Cada rodada leva de 8 a 9 minutos e o agendamento pede de 2 em 2, entao
+# chegavam a existir quatro rodadas ao mesmo tempo. Todas geram os MESMOS
+# arquivos JSON e todas tentam commitar; a que termina depois nao consegue
+# rebasear em cima da que terminou antes e morre no push. Em 16/08/2026 foram
+# 19 rodadas falhando assim em poucas horas, e cada falha e um intervalo em que
+# o dashboard fica com numero velho.
+#
+# cancel-in-progress: false de proposito. Cancelar a rodada em andamento
+# jogaria fora ate 9 minutos de leitura de API ja paga; melhor deixar terminar
+# e a proxima espera.
+concurrency:
+  group: update-vendas-unificado
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
