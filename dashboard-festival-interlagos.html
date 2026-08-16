@@ -1541,7 +1541,7 @@ const CORTESIAS_FISICAS  = { moto: 0, auto: 0 };
 
 async function fetchCortesiasFisicas() {
   try {
-    const res = await fetch('cortesias-fisicas-data.json?t=' + Date.now(), {cache: 'no-store'});
+    const res = await fetchDg('cortesias-fisicas-data.json?t=' + Date.now(), {cache: 'no-store'});
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const d = await res.json();
     const ex = d.extra_dias || {};
@@ -3300,7 +3300,7 @@ function getMetaSpend(dateStr) {
 // ═══════════════════════════════════════════════
 async function fetchGA4Data() {
   try {
-    const res = await fetch('ga4-data.json?t=' + Date.now(), {cache:'no-store'});
+    const res = await fetchDg('ga4-data.json?t=' + Date.now(), {cache:'no-store'});
     if (!res.ok) return;
     const data = await res.json();
     GA4_DATA = data;
@@ -3351,7 +3351,7 @@ function getActiveDates() {
 
 async function fetchGAdsData() {
   try {
-    const res = await fetch('google-ads-data.json?t=' + Date.now());
+    const res = await fetchDg('google-ads-data.json?t=' + Date.now());
     if (!res.ok) return;
     const data = await res.json();
     if (!data.totals) return;
@@ -3425,7 +3425,7 @@ let D25_DIAS_TOTAIS   = 0;
 
 async function fetchInvestimento2025() {
   try {
-    const res = await fetch('investimento-2025.json?t=' + Date.now(), {cache:'no-store'});
+    const res = await fetchDg('investimento-2025.json?t=' + Date.now(), {cache:'no-store'});
     if (!res.ok) return;
     const data = await res.json();
     const diario = data?.diario_por_dia_campanha || [];
@@ -3553,7 +3553,7 @@ function _mergeMetaAccounts(data) {
 
 async function fetchMetaData() {
   try {
-    const res = await fetch('meta-data.json?t=' + Date.now());
+    const res = await fetchDg('meta-data.json?t=' + Date.now());
     if (!res.ok) return;
     const raw = await res.json();
     const data = _mergeMetaAccounts(raw);
@@ -3768,6 +3768,53 @@ async function fetchComPrazo(url, opts, ms){
   finally { clearTimeout(corta); }
 }
 
+// ═══════════════════════════════════════════════
+// ABERTURA INSTANTANEA (mesma solucao ja rodando no painel executivo)
+//
+// Este dashboard baixa quase 1 MB, com o ga4-data.json sozinho em 1,78 MB, e so
+// desenhava quando o ULTIMO arquivo chegava. Na rede do autodromo isso e tela
+// parada por dezenas de segundos.
+//
+// CHAVE PROPRIA (dg_v1_) de proposito: o executivo usa pex_v1_. Se os dois
+// dividissem a chave, um leria o guardado do outro, que tem formato diferente,
+// e a tela quebraria em vez de acelerar.
+// ═══════════════════════════════════════════════
+const DG_CACHE = 'dg_v1_';
+let DG_MODO_CACHE = false;
+
+function _dgChave(url){ return DG_CACHE + String(url).split('?')[0]; }
+function _dgLer(url){ try { return localStorage.getItem(_dgChave(url)); } catch(e) { return null; } }
+function _dgGravar(url, txt){
+  // teto de 1 MB por arquivo. O ga4-data.json passa disso, entao ele NAO e
+  // guardado: melhor abrir sem o painel de GA4 preenchido do que estourar a
+  // cota e derrubar a gravacao de todos os outros.
+  try { if (txt && txt.length < 1048576) localStorage.setItem(_dgChave(url), txt); }
+  catch(e) { /* cota cheia ou navegacao privada: segue sem cache */ }
+}
+
+async function fetchDg(url, opts, prazoMs){
+  if (DG_MODO_CACHE) {
+    const guardado = _dgLer(url);
+    if (guardado) {
+      return { ok:true, status:200,
+               json: async () => JSON.parse(guardado),
+               text: async () => guardado };
+    }
+  }
+  const r = prazoMs ? await fetchComPrazo(url, opts, prazoMs) : await fetch(url, opts);
+  if (r && r.ok) { try { _dgGravar(url, await r.clone().text()); } catch(e) {} }
+  return r;
+}
+
+// So vale pintar do guardado se o essencial estiver guardado. Com cache pela
+// metade, o que falta cai na rede no meio da pintura instantanea e segura ela,
+// que e exatamente o que estamos tirando.
+const DG_ESSENCIAIS = ['vendas-data.json', 'ticketmaster-data.json', 'estoque-data.json'];
+function dgCacheCompleto(){
+  try { return DG_ESSENCIAIS.every(a => localStorage.getItem(DG_CACHE + a) !== null); }
+  catch(e) { return false; }
+}
+
 const TM_WORKER_URL = 'https://ticketmaster-festival-interlagos.performance-ef2.workers.dev/';
 
 async function fetchTicketmaster() {
@@ -3776,7 +3823,7 @@ async function fetchTicketmaster() {
     let workerErr = null;
     for (let i = 0; i < 3; i++) {
       try {
-        res = await fetchComPrazo(TM_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'}, WORKER_PRAZO_MS);
+        res = await fetchDg(TM_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'}, WORKER_PRAZO_MS);
         if (res.ok) { workerErr = null; break; }
         throw new Error('TM Worker HTTP ' + res.status);
       } catch(err) {
@@ -3853,7 +3900,7 @@ async function fetchVendasProprio() {
     let workerErr = null;
     for (let i = 0; i < 3; i++) {
       try {
-        res = await fetchComPrazo(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'}, WORKER_PRAZO_MS);
+        res = await fetchDg(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'}, WORKER_PRAZO_MS);
         if (res.ok) { workerErr = null; break; }
         throw new Error('Worker HTTP ' + res.status);
       } catch(err) {
@@ -3869,7 +3916,7 @@ async function fetchVendasProprio() {
         return;
       }
       console.warn('[Vendas Worker] Falhou na primeira carga, usando fallback vendas-data.json:', workerErr?.message);
-      res = await fetch('vendas-data.json?t=' + Date.now(), {cache:'no-store'});
+      res = await fetchDg('vendas-data.json?t=' + Date.now(), {cache:'no-store'});
       if (!res.ok) throw new Error('vendas-data.json HTTP ' + res.status);
     }
     const data = await res.json();
@@ -4003,17 +4050,43 @@ function initDashboard(){
   _upd2026Lbl();
   // Carrega TUDO em paralelo e so renderiza quando vendas + TM chegam
   // -> evita flicker na abertura (showing only sistema proprio sem TM)
-  Promise.allSettled([
-    fetchVendasProprio(),
-    fetchTicketmaster(),
-    fetchGA4Data(),
-    fetchGAdsData(),
-    fetchMetaData(),
-    fetchEstoque(),
-    fetchTipos(),
-    fetchInvestimento2025(),
-    fetchCortesiasFisicas()
-  ]).then(() => applyFiltro());
+  const _dgDesenhaNumeros = () => { try { calcKPIs(); } catch(e) { console.warn('[dg] kpis', e); } };
+  const _dgDesenhaTudo    = () => { try { applyFiltro(); } catch(e) { console.warn('[dg] applyFiltro', e); } };
+
+  // 1) PINTA NA HORA COM A ULTIMA VISAO, se este aparelho ja abriu antes.
+  //    So os numeros, sem tocar nos graficos: applyFiltro DESTROI E RECRIA os 7
+  //    graficos a cada chamada, e no celular repetir isso custa mais do que o
+  //    tempo de rede economizado. Foi o erro que eu cometi no executivo e
+  //    corrigi la; aqui ja nasce certo.
+  const _dgAbertura = dgCacheCompleto()
+    ? (function(){
+        DG_MODO_CACHE = true;
+        return Promise.allSettled([fetchVendasProprio(), fetchTicketmaster(), fetchEstoque()])
+          .then(_dgDesenhaNumeros)
+          .finally(() => { DG_MODO_CACHE = false; });
+      })()
+    : Promise.resolve();
+
+  // 2) DADO FRESCO EM DUAS ONDAS.
+  //    Onda 1: vendas, Ticketmaster e estoque, que sao os numeros que o painel
+  //    existe pra mostrar. Onda 2: o resto, incluindo o ga4-data.json de 1,78 MB,
+  //    que antes segurava a tela inteira sozinho.
+  _dgAbertura.then(() => {
+    Promise.allSettled([
+      fetchVendasProprio(),
+      fetchTicketmaster(),
+      fetchEstoque()
+    ]).then(_dgDesenhaNumeros);
+
+    Promise.allSettled([
+      fetchGA4Data(),
+      fetchGAdsData(),
+      fetchMetaData(),
+      fetchTipos(),
+      fetchInvestimento2025(),
+      fetchCortesiasFisicas()
+    ]).then(_dgDesenhaTudo);
+  });
 
   // Vendas própria + TM: refresh a cada 15s com guard de "uma rodada por vez"
   // (evita race condition quando TM Worker leva > 3s na cache MISS)
@@ -4058,7 +4131,7 @@ function _tiposKey(containerId, evento, nome) {
 
 async function fetchTipos() {
   try {
-    const res = await fetch('vendas-tipos-data.json?t=' + Date.now(), {cache: 'no-store'});
+    const res = await fetchDg('vendas-tipos-data.json?t=' + Date.now(), {cache: 'no-store'});
     if (!res.ok) throw new Error('Tipos HTTP ' + res.status);
     TIPOS_DATA = await res.json();
     renderTipos();
@@ -4336,7 +4409,7 @@ function renderTipos() {
 let ESTOQUE_DATA = null;
 async function fetchEstoque(){
   try{
-    const res = await fetch('estoque-data.json?t='+Date.now(), {cache:'no-store'});
+    const res = await fetchDg('estoque-data.json?t='+Date.now(), {cache:'no-store'});
     if(!res.ok) throw new Error('nf');
     ESTOQUE_DATA = await res.json();
     const b=document.getElementById('estoqueStatus'); if(b) b.textContent='✓ atualizado';
@@ -4398,7 +4471,7 @@ let META_CREATIVES_DATA = null;
 
 async function fetchMetaCreatives() {
   try {
-    const res = await fetch('meta-creatives-data.json?t=' + Date.now(), {cache:'no-store'});
+    const res = await fetchDg('meta-creatives-data.json?t=' + Date.now(), {cache:'no-store'});
     if (!res.ok) throw new Error('not found');
     const data = await res.json();
     if (!data.creatives?.length) throw new Error('empty');
@@ -4538,7 +4611,7 @@ let _tiktokFromAPI = false;
 
 async function fetchTikTokData() {
   try {
-    const res = await fetch('tiktok-data.json?t=' + Date.now(), {cache:'no-store'});
+    const res = await fetchDg('tiktok-data.json?t=' + Date.now(), {cache:'no-store'});
     if (!res.ok) throw new Error('not found');
     const data = await res.json();
     if (!data.daily_series?.length) throw new Error('empty');
