@@ -856,13 +856,18 @@ async function fetchPex(url, opts){
   return r;
 }
 
-function pexTemAlgoGuardado(){
-  try {
-    for (let i = 0; i < localStorage.length; i++) {
-      if (String(localStorage.key(i)).indexOf(PEX_CACHE) === 0) return true;
-    }
-  } catch(e) {}
-  return false;
+// So vale pintar do guardado se TUDO que a abertura pede estiver guardado.
+// Com cache pela metade, o arquivo que falta cairia na rede no meio da pintura
+// instantanea e seguraria ela ate responder, que e exatamente o que estamos
+// tentando evitar.
+const PEX_ARQUIVOS = [
+  'vendas-data.json', 'ticketmaster-data.json', 'estoque-data.json',
+  'vendas-tipos-data.json', 'meta-data.json', 'google-ads-data.json',
+  'tiktok-data.json', 'investimento-2025.json', 'cortesias-fisicas-data.json'
+];
+function pexCacheCompleto(){
+  try { return PEX_ARQUIVOS.every(a => localStorage.getItem(PEX_CACHE + a) !== null); }
+  catch(e) { return false; }
 }
 
 // ═══════════════════════════════════════════════
@@ -2854,26 +2859,47 @@ function _pexCarregarTudo(){
     fetchInvestimento2025()
   ]);
 }
+function _pexDesenha(){ try { renderPainelExecutivo(); } catch(e) { console.warn('[exec] render', e); } }
 
 function initDashboard(){
   updateLastRefreshTime();
 
-  // PINTA NA HORA COM A ULTIMA VISAO, se este aparelho ja abriu o painel antes.
-  // Roda pelo mesmo caminho de leitura do dado novo, so que respondendo do
-  // guardado, entao nao existe uma segunda versao do codigo pra manter.
-  PEX_TEM_CACHE = pexTemAlgoGuardado();
+  // 1) PINTA NA HORA COM A ULTIMA VISAO, se este aparelho ja abriu antes.
+  //    Sao leituras de armazenamento local, terminam em milissegundos.
+  PEX_TEM_CACHE = pexCacheCompleto();
   const abertura = PEX_TEM_CACHE
     ? (function(){
         PEX_MODO_CACHE = true;
         return _pexCarregarTudo()
-          .then(() => { try { renderPainelExecutivo(); } catch(e) {} })
+          .then(_pexDesenha)
           .finally(() => { PEX_MODO_CACHE = false; });
       })()
     : Promise.resolve();
 
-  // Depois da pintura instantanea vai buscar o dado de verdade e redesenha por
-  // cima. Se este for o primeiro acesso, isto e a unica carga que acontece.
-  abertura.then(() => _pexCarregarTudo().then(() => renderPainelExecutivo()));
+  // 2) DADO FRESCO EM DUAS ONDAS.
+  //    Antes o painel so desenhava quando os NOVE arquivos chegavam, ou seja,
+  //    tudo esperava o mais pesado (vendas-tipos, 537 KB). Na rede do
+  //    autodromo isso virou quase um minuto de tela parada mesmo com vendas e
+  //    Ticketmaster ja respondidos em segundos.
+  //
+  //    Onda 1: os numeros que o painel existe pra mostrar, 65 KB no total.
+  //    Onda 2: o resto, que redesenha por cima quando chegar.
+  abertura.then(() => {
+    Promise.allSettled([
+      fetchVendasProprio(),
+      fetchTicketmaster(),
+      fetchEstoque()
+    ]).then(_pexDesenha);
+
+    Promise.allSettled([
+      fetchTipos(),
+      fetchGAdsData(),
+      fetchMetaData(),
+      tiktokLoad(),
+      fetchCortesiasFisicas(),
+      fetchInvestimento2025()
+    ]).then(_pexDesenha);
+  });
 
   // Vendas própria + TM: refresh a cada 15s com guard de "uma rodada por vez"
   // (evita race condition quando TM Worker leva > 3s na cache MISS)
