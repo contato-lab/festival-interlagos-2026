@@ -1247,54 +1247,69 @@ async function fetchTicketmaster() {
 // ═══════════════════════════════════════════════
 const VENDAS_WORKER_URL = 'https://vendas-festival-interlagos.performance-ef2.workers.dev/';
 
+// Aplica o formato de vendas proprias vindo de qualquer origem (Worker ou
+// arquivo). Separado da busca de proposito: assim a tela pode ser preenchida
+// pelo arquivo, que e rapido, e depois corrigida pelo Worker, que e mais fresco
+// porem instavel.
+function _aplicarVendas(data){
+  if (!data || !data.daily || !data.daily.length) return false;
+  if (data.last_sale_moto_at) __lastSale.proprio.moto = data.last_sale_moto_at;
+  if (data.last_sale_auto_at) __lastSale.proprio.auto = data.last_sale_auto_at;
+  data.daily.forEach(row => {
+    const d = row.d;
+    let r = D26_FULL.find(x => x.d === d);
+    if (!r) {
+      r = {d, mp:0, mt:0, ap:0, at:0, mv:0, mq:0, av:0, aq:0, mpQ:0, mtQ:0, apQ:0, atQ:0};
+      D26_FULL.push(r);
+    }
+    r.mp  = row.moto_receita   || 0;
+    r.mpQ = row.moto_ingressos || 0;
+    r.ap  = row.auto_receita   || 0;
+    r.apQ = row.auto_ingressos || 0;
+    r.mv  = r.mp  + (r.mt  || 0);
+    r.mq  = r.mpQ + (r.mtQ || 0);
+    r.av  = r.ap  + (r.at  || 0);
+    r.aq  = r.apQ + (r.atQ || 0);
+  });
+  D26_FULL.sort((a, b) => a.d - b.d);
+  updateLastRefreshTime();
+  return true;
+}
+
+// ARQUIVO PRIMEIRO, WORKER DEPOIS.
+//
+// O Worker de vendas e a origem mais fresca, mas depende de API externa e cai.
+// Em 16/08/2026 ele passou a devolver 503 levando de 7 a 14 SEGUNDOS por
+// tentativa, e a tela ficava esperando por ele antes de mostrar qualquer
+// numero, mesmo com o arquivo de reserva pronto e atualizado a cada 2 minutos
+// pelo GitHub Actions.
+//
+// Invertido: le o arquivo (23 KB, responde em milissegundos), pinta, e so
+// entao tenta o Worker por baixo. Se ele responder, os numeros sao corrigidos
+// para o dado mais fresco. Se nao responder, ninguem fica esperando.
 async function fetchVendasProprio() {
   try {
-    let res;
-    let workerErr = null;
-    for (let i = 0; i < 3; i++) {
-      try {
-        res = await fetchPex(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'}, WORKER_PRAZO_MS);
-        if (res.ok) { workerErr = null; break; }
-        throw new Error('Worker HTTP ' + res.status);
-      } catch(err) {
-        workerErr = err;
-        res = null;
-        if (i < 2) await new Promise(r => setTimeout(r, 800 * (i+1)));
-      }
-    }
-    if (!res) {
-      const jaTemDadosProprio = D26_FULL.some(r => (r.mpQ||0) > 0 || (r.apQ||0) > 0);
-      if (jaTemDadosProprio) {
-        console.warn('[Vendas Worker] Falhou, mantendo dados anteriores (sem flicker):', workerErr?.message);
-        return;
-      }
-      console.warn('[Vendas Worker] Falhou na primeira carga, usando fallback vendas-data.json:', workerErr?.message);
-      res = await fetchPex('vendas-data.json?t=' + Date.now(), {cache:'no-store'});
-      if (!res.ok) throw new Error('vendas-data.json HTTP ' + res.status);
-    }
-    const data = await res.json();
-    if (!data.daily || !data.daily.length) return;
-    if (data.last_sale_moto_at) __lastSale.proprio.moto = data.last_sale_moto_at;
-    if (data.last_sale_auto_at) __lastSale.proprio.auto = data.last_sale_auto_at;
-    data.daily.forEach(row => {
-      const d = row.d;
-      let r = D26_FULL.find(x => x.d === d);
-      if (!r) {
-        r = {d, mp:0, mt:0, ap:0, at:0, mv:0, mq:0, av:0, aq:0, mpQ:0, mtQ:0, apQ:0, atQ:0};
-        D26_FULL.push(r);
-      }
-      r.mp  = row.moto_receita   || 0;
-      r.mpQ = row.moto_ingressos || 0;
-      r.ap  = row.auto_receita   || 0;
-      r.apQ = row.auto_ingressos || 0;
-      r.mv  = r.mp  + (r.mt  || 0);
-      r.mq  = r.mpQ + (r.mtQ || 0);
-      r.av  = r.ap  + (r.at  || 0);
-      r.aq  = r.apQ + (r.atQ || 0);
-    });
-    D26_FULL.sort((a, b) => a.d - b.d);
-    updateLastRefreshTime();
-    console.log('[vendas-data.json] Moto:', data.totals.moto_ingressos, '| Auto:', data.totals.auto_ingressos, 'ingressos | atualizado:', data.updated_at);
+    // 1) arquivo: rapido e confiavel
+    try {
+      const rf = await fetchPex('vendas-data.json?t=' + Date.now(), {cache:'no-store'});
+      if (rf.ok) _aplicarVendas(await rf.json());
+    } catch(e) { console.warn('[vendas-data.json] falhou:', e && e.message); }
+
+    // 2) Worker EM SEGUNDO PLANO. Nao levo await aqui de proposito: quem chamou
+    //    ja pode desenhar com o numero do arquivo. Se o Worker responder, ele
+    //    corrige os numeros e manda redesenhar sozinho; se nao responder,
+    //    ninguem ficou esperando.
+    //    Uma tentativa so: contra um servidor devolvendo 503 insistir tres
+    //    vezes nao muda o resultado, so custa segundos.
+    fetchPex(VENDAS_WORKER_URL + '?t=' + Date.now(), {cache:'no-store'}, WORKER_PRAZO_MS)
+      .then(r => (r && r.ok) ? r.json() : null)
+      .then(data => {
+        if (data && _aplicarVendas(data)) {
+          console.log('[Vendas Worker] dado fresco aplicado por cima do arquivo | atualizado:', data.updated_at);
+          try { _pexDesenhaNumeros(); } catch(e) {}
+        }
+      })
+      .catch(() => console.warn('[Vendas Worker] fora do ar, seguindo com o arquivo'));
   } catch(e) {
     console.warn('[Vendas Próprias] erro:', e.message);
   }
