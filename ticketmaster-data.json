@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-17T16:53:53Z",
+  "updated_at": "2026-08-17T17:12:46Z",
   "source": "Ticketmaster API via getcrowder.com",
   "source_type": "api",
   "campaign_start": "2026-03-25",
@@ -17,13 +17,13 @@
   ],
   "totals": {
     "moto_receita": 3443936.55,
-    "auto_receita": 1316458.35,
+    "auto_receita": 1316724.35,
     "moto_ingressos": 27009,
-    "auto_ingressos": 11381,
+    "auto_ingressos": 11383,
     "moto_cortesias": 56018,
     "auto_cortesias": 39593,
-    "total_receita": 4760394.9,
-    "total_ingressos": 38390
+    "total_receita": 4760660.9,
+    "total_ingressos": 38392
   },
   "daily": [
     {
@@ -1280,17 +1280,17 @@
     {
       "date": "2026-08-17",
       "moto_receita": 0.0,
-      "auto_receita": 10281.2,
+      "auto_receita": 10547.2,
       "moto_ingressos": 0,
-      "auto_ingressos": 58,
+      "auto_ingressos": 60,
       "moto_cortesias": 0,
       "auto_cortesias": 0
     }
   ],
   "last_sale_moto_at": "2026-08-16T21:42:26",
-  "last_sale_auto_at": "2026-08-17T13:53:12",
-  "tm_cursor_last_update": 1786985591725,
-  "tm_cursor_last_movement_id": 97835155,
+  "last_sale_auto_at": "2026-08-17T13:54:18",
+  "tm_cursor_last_update": 1786985657598,
+  "tm_cursor_last_movement_id": 97835237,
   "publico_por_dia_evento": {
     "moto": [
       {
@@ -1339,9 +1339,9 @@
       },
       {
         "dia": "30/08/2026",
-        "pago": 1842,
+        "pago": 1844,
         "cortesia": 10061,
-        "total": 11903
+        "total": 11905
       }
     ]
   }
