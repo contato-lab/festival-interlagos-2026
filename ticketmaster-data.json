@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-18T02:12:41Z",
+  "updated_at": "2026-08-18T03:10:02Z",
   "source": "Ticketmaster API via getcrowder.com",
   "source_type": "api",
   "campaign_start": "2026-03-25",
@@ -17,13 +17,13 @@
   ],
   "totals": {
     "moto_receita": 3443936.55,
-    "auto_receita": 1335421.95,
+    "auto_receita": 1336843.15,
     "moto_ingressos": 27009,
-    "auto_ingressos": 11496,
+    "auto_ingressos": 11506,
     "moto_cortesias": 56018,
     "auto_cortesias": 39593,
-    "total_receita": 4779358.5,
-    "total_ingressos": 38505
+    "total_receita": 4780779.7,
+    "total_ingressos": 38515
   },
   "daily": [
     {
@@ -1280,17 +1280,26 @@
     {
       "date": "2026-08-17",
       "moto_receita": 0.0,
-      "auto_receita": 29700.8,
+      "auto_receita": 30818.0,
       "moto_ingressos": 0,
-      "auto_ingressos": 176,
+      "auto_ingressos": 184,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
+    },
+    {
+      "date": "2026-08-18",
+      "moto_receita": 0.0,
+      "auto_receita": 304.0,
+      "moto_ingressos": 0,
+      "auto_ingressos": 2,
       "moto_cortesias": 0,
       "auto_cortesias": 0
     }
   ],
   "last_sale_moto_at": "2026-08-16T21:42:26",
-  "last_sale_auto_at": "2026-08-17T23:07:01",
-  "tm_cursor_last_update": 1787018820566,
-  "tm_cursor_last_movement_id": 97880172,
+  "last_sale_auto_at": "2026-08-18T00:07:04",
+  "tm_cursor_last_update": 1787022424378,
+  "tm_cursor_last_movement_id": 97882575,
   "publico_por_dia_evento": {
     "moto": [
       {
@@ -1321,27 +1330,27 @@
     "auto": [
       {
         "dia": "27/08/2026",
-        "pago": 221,
+        "pago": 222,
         "cortesia": 9488,
-        "total": 9709
+        "total": 9710
       },
       {
         "dia": "28/08/2026",
-        "pago": 3059,
+        "pago": 3064,
         "cortesia": 10033,
-        "total": 13092
+        "total": 13097
       },
       {
         "dia": "29/08/2026",
-        "pago": 6358,
+        "pago": 6361,
         "cortesia": 10011,
-        "total": 16369
+        "total": 16372
       },
       {
         "dia": "30/08/2026",
-        "pago": 1858,
+        "pago": 1859,
         "cortesia": 10061,
-        "total": 11919
+        "total": 11920
       }
     ]
   }
