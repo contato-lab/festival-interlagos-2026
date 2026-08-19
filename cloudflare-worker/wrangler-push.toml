@@ -8,8 +8,20 @@ enabled = true
 # De minuto em minuto. E o menor intervalo que a Cloudflare aceita, e aqui isso
 # importa: o alerta que roda por GitHub Actions neste mesmo repo pede 10 minutos
 # e chega a demorar de 60 a 95, o que num festival de quatro dias e o mesmo que
-# nao avisar. O ciclo e barato: quando nao ha novidade sao duas leituras curtas
-# no Firestore e o Worker encerra.
+# nao avisar.
+#
+# QUANTO CUSTA UMA RODADA, agora conferido e nao estimado: 6 leituras no
+# Firestore quando nao ha novidade (2 estados, 2 consultas de limit 1, avisos e
+# mural), divididas entre dois projetos. Dao cerca de 8.640 por dia contra um
+# teto de 50 mil por projeto.
+#
+# ATE 19/08/2026 ESTE COMENTARIO DIZIA "duas leituras curtas" E ESTAVA ERRADO.
+# Eram 148 por minuto, 213 mil por dia, porque o worker listava cont_pecas e
+# cont_story inteiras a cada rodada e listagem custa uma leitura por documento.
+# O robo sozinho matava a cota do dia em cerca de 5h30, e como transacao le
+# antes de gravar, a Central parava de aceitar escrita. Foi esta frase aqui que
+# fez todo mundo procurar no lugar errado, entao ela fica registrada: se algum
+# dia a cota estourar de novo, o primeiro suspeito e o que roda sozinho.
 [triggers]
 crons = ["* * * * *"]
 
