@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-08-19T19:44:32.080217+00:00",
+  "updated_at": "2026-08-19T20:00:06.700514+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-08-19"
   },
   "totals": {
-    "sessions": 1589762,
-    "users": 1379421,
-    "new_users": 1068584,
-    "pageviews": 3716084,
-    "events": 8960294,
+    "sessions": 1589775,
+    "users": 1379432,
+    "new_users": 1068593,
+    "pageviews": 3716114,
+    "events": 8960368,
     "conversions": 17825.0,
     "pages_per_session": 2.34,
     "avg_bounce_rate": 50.46
@@ -1580,14 +1580,14 @@
     },
     {
       "date": "2026-08-19",
-      "sessions": 3123,
-      "users": 2946,
-      "new_users": 1805,
-      "pageviews": 5785,
-      "events": 14722,
+      "sessions": 3136,
+      "users": 2957,
+      "new_users": 1814,
+      "pageviews": 5815,
+      "events": 14796,
       "conversions": 21.0,
-      "bounce_rate": 51.07,
-      "avg_session_s": 135.1
+      "bounce_rate": 51.05,
+      "avg_session_s": 134.9
     }
   ],
   "traffic_sources": [
@@ -1603,7 +1603,7 @@
     },
     {
       "channel": "Direct",
-      "sessions": 248853,
+      "sessions": 248928,
       "conversions": 3717.0
     },
     {
@@ -1665,12 +1665,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 1894840,
-      "sessions": 1070620
+      "pageviews": 1894848,
+      "sessions": 1071268
     },
     {
       "page": "/ingressos/",
-      "pageviews": 386572,
+      "pageviews": 386577,
       "sessions": 257468
     },
     {
@@ -1680,17 +1680,17 @@
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-auto",
-      "pageviews": 204312,
+      "pageviews": 204315,
       "sessions": 148913
     },
     {
       "page": "/shows/",
-      "pageviews": 103962,
+      "pageviews": 103963,
       "sessions": 82473
     },
     {
       "page": "/login",
-      "pageviews": 93266,
+      "pageviews": 93267,
       "sessions": 48350
     },
     {
@@ -1705,12 +1705,12 @@
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 70420,
+      "pageviews": 70424,
       "sessions": 44670
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026",
-      "pageviews": 52766,
+      "pageviews": 52767,
       "sessions": 48480
     }
   ],
@@ -4080,32 +4080,32 @@
     {
       "source": "google",
       "medium": "cpc",
-      "new_users": 195925,
+      "new_users": 195926,
       "sessions": 328535,
-      "pageviews": 1007350,
+      "pageviews": 1007353,
       "avg_session_s": 207.8,
       "engagement_rate": 65.33,
-      "event_count": 2323247
+      "event_count": 2323255
     },
     {
       "source": "ig",
       "medium": "paid",
       "new_users": 181619,
       "sessions": 266338,
-      "pageviews": 493005,
+      "pageviews": 493007,
       "avg_session_s": 70.5,
       "engagement_rate": 32.52,
-      "event_count": 1172780
+      "event_count": 1172784
     },
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 190132,
-      "sessions": 248853,
-      "pageviews": 579686,
-      "avg_session_s": 156.7,
-      "engagement_rate": 49.14,
-      "event_count": 1461211
+      "new_users": 190138,
+      "sessions": 248928,
+      "pageviews": 579704,
+      "avg_session_s": 156.6,
+      "engagement_rate": 49.13,
+      "event_count": 1461255
     },
     {
       "source": "organico",
@@ -4212,10 +4212,10 @@
       "medium": "referral",
       "new_users": 16428,
       "sessions": 30578,
-      "pageviews": 44347,
+      "pageviews": 44348,
       "avg_session_s": 227.5,
       "engagement_rate": 63.39,
-      "event_count": 146307
+      "event_count": 146309
     },
     {
       "source": "ingressosauto.festivalinterlagos.com.br",
@@ -4660,12 +4660,12 @@
     {
       "source": "th",
       "medium": "paid",
-      "new_users": 265,
-      "sessions": 288,
-      "pageviews": 423,
-      "avg_session_s": 44.8,
-      "engagement_rate": 27.78,
-      "event_count": 1159
+      "new_users": 266,
+      "sessions": 289,
+      "pageviews": 425,
+      "avg_session_s": 45.0,
+      "engagement_rate": 28.03,
+      "event_count": 1164
     },
     {
       "source": "chatgpt.com",
@@ -8016,6 +8016,17 @@
       "event_count": 5516
     },
     {
+      "date": "2026-08-19",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 1267,
+      "sessions": 1586,
+      "pageviews": 3085,
+      "eng_dur_s": 65582.0,
+      "eng_sessions": 804,
+      "event_count": 7945
+    },
+    {
       "date": "2026-07-20",
       "source": "tiktok",
       "medium": "paid",
@@ -8058,17 +8069,6 @@
       "eng_dur_s": 44676.0,
       "eng_sessions": 783,
       "event_count": 9752
-    },
-    {
-      "date": "2026-08-19",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 1261,
-      "sessions": 1578,
-      "pageviews": 3067,
-      "eng_dur_s": 65316.0,
-      "eng_sessions": 800,
-      "event_count": 7901
     },
     {
       "date": "2026-08-15",
@@ -17700,11 +17700,11 @@
       "source": "ig",
       "medium": "paid",
       "new_users": 159,
-      "sessions": 392,
-      "pageviews": 590,
-      "eng_dur_s": 8816.0,
-      "eng_sessions": 132,
-      "event_count": 1430
+      "sessions": 393,
+      "pageviews": 592,
+      "eng_dur_s": 8821.0,
+      "eng_sessions": 133,
+      "event_count": 1434
     },
     {
       "date": "2026-04-03",
@@ -25345,11 +25345,11 @@
       "source": "auto.festivalinterlagos.com.br",
       "medium": "referral",
       "new_users": 65,
-      "sessions": 144,
-      "pageviews": 191,
+      "sessions": 145,
+      "pageviews": 192,
       "eng_dur_s": 9476.0,
       "eng_sessions": 72,
-      "event_count": 640
+      "event_count": 642
     },
     {
       "date": "2026-04-02",
@@ -29191,6 +29191,17 @@
       "event_count": 240
     },
     {
+      "date": "2026-08-19",
+      "source": "google",
+      "medium": "cpc",
+      "new_users": 43,
+      "sessions": 366,
+      "pageviews": 807,
+      "eng_dur_s": 15864.0,
+      "eng_sessions": 188,
+      "event_count": 1780
+    },
+    {
       "date": "2026-04-03",
       "source": "instagram.com",
       "medium": "referral",
@@ -29420,17 +29431,6 @@
       "eng_dur_s": 817.0,
       "eng_sessions": 25,
       "event_count": 213
-    },
-    {
-      "date": "2026-08-19",
-      "source": "google",
-      "medium": "cpc",
-      "new_users": 42,
-      "sessions": 363,
-      "pageviews": 804,
-      "eng_dur_s": 15864.0,
-      "eng_sessions": 188,
-      "event_count": 1772
     },
     {
       "date": "2026-05-04",
@@ -73838,6 +73838,17 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 1,
       "event_count": 8
+    },
+    {
+      "date": "2026-08-19",
+      "source": "th",
+      "medium": "paid",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 2,
+      "eng_dur_s": 3.0,
+      "eng_sessions": 1,
+      "event_count": 5
     },
     {
       "date": "2026-08-19",
