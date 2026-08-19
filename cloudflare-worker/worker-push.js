@@ -20,12 +20,52 @@
  * repositorio publico):
  *   VAPID_PRIVATE_PKCS8 = chave privada P-256 em PKCS8, base64
  */
-const PROJETO = "central-evento-fi";
-const API_KEY = "AIzaSyD1spoy847dEtccSGJflKtG4-EYZMe23OQ";
-const BASE = `https://firestore.googleapis.com/v1/projects/${PROJETO}/databases/(default)/documents`;
+// DOIS PROJETOS FIREBASE, e isso importa aqui.
+// Em 19/08/2026 a Central de conteudo saiu de dentro do central-evento-fi e
+// ganhou projeto proprio (conteudo-fi), porque a cota gratis de leitura e de 50
+// mil por DIA e por PROJETO, e os dois juntos estouravam o mesmo balde. As
+// pecas e o checklist agora nascem no conteudo-fi. Avisos e mural continuam no
+// central-evento-fi, que e onde a Central das marcas mora.
+//
+// Se este arquivo apontar pro projeto errado, o sintoma NAO e erro: o Worker le
+// a copia velha, nunca ve novidade, ninguem recebe notificacao e nada aparece
+// quebrado em lugar nenhum. Por isso o projeto vem por canal, e nao global.
+const PROJETOS = {
+  conteudo: { id: "conteudo-fi",       key: "AIzaSyBUWmUynV6U0mqHZoNDm-2KPb3wh4Z9NuY" },
+  central:  { id: "central-evento-fi", key: "AIzaSyD1spoy847dEtccSGJflKtG4-EYZMe23OQ" },
+};
+const base = (p) => `https://firestore.googleapis.com/v1/projects/${PROJETOS[p].id}/databases/(default)/documents`;
+const apiKey = (p) => PROJETOS[p].key;
 const VAPID_PUB = "BGpVLKMV09mK8-elVjc7xgDKZVvwZAgZc1t_fVDGtNIHks_dE6On1zvRELrAlXaykrJnLD4qJrsH26IUjr8q73Q";
 const CONTATO = "mailto:contato@agenciaunderclick.net";
-const VIGIADAS = ["cont_pecas", "cont_story"];
+
+// DOIS PUBLICOS, DUAS LISTAS, DOIS MARCOS.
+// O time de conteudo e a imprensa credenciada usam telas diferentes e nao podem
+// receber o aviso um do outro: peca nova nao interessa a jornalista nenhum, e
+// aviso de credenciamento nao interessa a quem esta editando video.
+//
+// "colecoes" = um documento por item (as pecas e o checklist).
+// "docs"     = um documento so guardando uma lista em items (avisos e mural).
+// O mural interno e a fila do locutor ficam DE FORA de proposito: interno e so
+// da producao, e a fila muda o tempo todo, viraria celular apitando sem parar.
+const CANAIS = [
+  {
+    nome: "conteudo",
+    projeto: "conteudo",
+    colecoes: ["cont_pecas", "cont_story"],
+    docs: [],
+    inscritos: "cont_push",
+    estado: "board/push_state",
+  },
+  {
+    nome: "credenciados",
+    projeto: "central",
+    colecoes: [],
+    docs: ["board/avisos", "board/mural"],
+    inscritos: "cred_push",
+    estado: "board/push_state_cred",
+  },
+];
 
 const b64url = (buf) =>
   btoa(String.fromCharCode(...new Uint8Array(buf)))
@@ -56,33 +96,72 @@ function carimbo(f) {
   return typeof e === "number" ? e : 0;
 }
 
-async function maiorCarimbo(colecao) {
-  const r = await fetch(`${BASE}/${colecao}?key=${API_KEY}&pageSize=300`);
+// PERGUNTA SO O ULTIMO, NAO A COLECAO INTEIRA.
+//
+// Aqui morava o bug que estourou a cota. A versao antiga listava a colecao toda
+// (?pageSize=300) uma vez por minuto so pra achar o carimbo mais alto. No
+// Firestore, listagem custa UMA LEITURA POR DOCUMENTO. Com cont_story em 121
+// documentos e cont_pecas em 23, davam 144 leituras por minuto, 207 mil por
+// dia, contra um teto de 50 mil. A cota morria umas 5 horas depois de zerar, e
+// como toda gravacao da Central passa por transacao (que le antes de escrever),
+// o efeito visivel era a producao clicando pra apagar um aviso e nada acontecer.
+// Ninguem ligou uma coisa na outra porque o robo nao aparece em lugar nenhum.
+//
+// Ordenar por criadoEm e pegar 1 custa 1 leitura, e nao cresce quando a colecao
+// cresce. De 144 por minuto para 2. Quem nao tem criadoEm fica de fora da
+// ordenacao, e tudo bem: sao documentos antigos, nunca seriam "novidade".
+async function maiorCarimbo(projeto, colecao) {
+  const r = await fetch(`${base(projeto)}:runQuery?key=${apiKey(projeto)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      structuredQuery: {
+        from: [{ collectionId: colecao }],
+        orderBy: [{ field: { fieldPath: "criadoEm" }, direction: "DESCENDING" }],
+        limit: 1,
+      },
+    }),
+  });
+  if (!r.ok) throw new Error(`consulta em ${colecao} falhou: HTTP ${r.status}`);
+  const d = await r.json();
+  const achado = (Array.isArray(d) ? d : []).find((x) => x && x.document);
+  return achado ? carimbo(achado.document.fields || {}) : 0;
+}
+
+// Avisos e mural guardam TUDO num documento so, numa lista em "items". Aqui o
+// carimbo que interessa e o de cada item, nao o do documento.
+async function maiorCarimboDoc(projeto, caminho) {
+  const r = await fetch(`${base(projeto)}/${caminho}?key=${apiKey(projeto)}`);
   if (!r.ok) return 0;
   const d = await r.json();
+  const lista = ((d.fields || {}).items || {}).arrayValue?.values || [];
   let t = 0;
-  for (const doc of d.documents || []) t = Math.max(t, carimbo(doc.fields || {}));
+  for (const it of lista) {
+    const f = (it.mapValue || {}).fields || {};
+    const ts = val(f.ts) ?? val(f.criadoEm) ?? val(f.em);
+    if (typeof ts === "number" && ts > t) t = ts;
+  }
   return t;
 }
 
-async function lerEstado() {
-  const r = await fetch(`${BASE}/board/push_state?key=${API_KEY}`);
+async function lerEstado(projeto, caminho) {
+  const r = await fetch(`${base(projeto)}/${caminho}?key=${apiKey(projeto)}`);
   if (!r.ok) return 0;
   const d = await r.json();
   const v = val((d.fields || {}).ate);
   return typeof v === "number" ? v : 0;
 }
 
-async function gravarEstado(ate) {
-  await fetch(`${BASE}/board/push_state?key=${API_KEY}&updateMask.fieldPaths=ate&updateMask.fieldPaths=em`, {
+async function gravarEstado(projeto, caminho, ate) {
+  await fetch(`${base(projeto)}/${caminho}?key=${apiKey(projeto)}&updateMask.fieldPaths=ate&updateMask.fieldPaths=em`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ fields: { ate: { integerValue: String(ate) }, em: { integerValue: String(Date.now()) } } }),
   });
 }
 
-async function lerInscricoes() {
-  const r = await fetch(`${BASE}/cont_push?key=${API_KEY}&pageSize=300`);
+async function lerInscricoes(projeto, colecao) {
+  const r = await fetch(`${base(projeto)}/${colecao}?key=${apiKey(projeto)}&pageSize=300`);
   if (!r.ok) return [];
   const d = await r.json();
   return (d.documents || [])
@@ -90,8 +169,8 @@ async function lerInscricoes() {
     .filter((s) => !!s.endpoint);
 }
 
-async function apagarInscricao(id) {
-  await fetch(`${BASE}/cont_push/${id}?key=${API_KEY}`, { method: "DELETE" });
+async function apagarInscricao(projeto, colecao, id) {
+  await fetch(`${base(projeto)}/${colecao}/${id}?key=${apiKey(projeto)}`, { method: "DELETE" });
 }
 
 async function chavePrivada(env) {
@@ -126,18 +205,28 @@ async function autorizacao(endpoint, chave) {
   return `vapid t=${cab}.${cor}.${b64url(assinatura)}, k=${VAPID_PUB}`;
 }
 
-async function avisar(env) {
-  const [estado, ...topos] = await Promise.all([lerEstado(), ...VIGIADAS.map(maiorCarimbo)]);
-  const topo = Math.max(...topos);
+async function avisarCanal(env, canal) {
+  const [estado, ...topos] = await Promise.all([
+    lerEstado(canal.projeto, canal.estado),
+    ...canal.colecoes.map((c) => maiorCarimbo(canal.projeto, c)),
+    ...canal.docs.map((c) => maiorCarimboDoc(canal.projeto, c)),
+  ]);
+  const topo = topos.length ? Math.max(...topos) : 0;
 
   // Primeira execucao: so grava o marco. Sem isto o primeiro disparo avisaria
-  // sobre o historico inteiro, e todo mundo receberia notificacao de peca de
-  // ontem no primeiro minuto.
-  if (!estado) { await gravarEstado(topo || Date.now()); return "primeira vez: marco gravado"; }
-  if (topo <= estado) return "nada novo";
+  // sobre o historico inteiro, e todo mundo receberia aviso de ontem no
+  // primeiro minuto.
+  if (!estado) {
+    await gravarEstado(canal.projeto, canal.estado, topo || Date.now());
+    return `${canal.nome}: primeira vez, marco gravado`;
+  }
+  if (topo <= estado) return `${canal.nome}: nada novo`;
 
-  const inscritos = await lerInscricoes();
-  if (!inscritos.length) { await gravarEstado(topo); return "novidade, mas ninguem inscrito"; }
+  const inscritos = await lerInscricoes(canal.projeto, canal.inscritos);
+  if (!inscritos.length) {
+    await gravarEstado(canal.projeto, canal.estado, topo);
+    return `${canal.nome}: novidade, mas ninguem inscrito`;
+  }
 
   const chave = await chavePrivada(env);
   let ok = 0, mortas = 0;
@@ -155,12 +244,23 @@ async function avisar(env) {
       if (r.ok) ok++;
       // 404/410 = a pessoa desinstalou ou o navegador trocou a inscricao.
       // Sem essa limpeza a lista so cresce e o Worker fica batendo em porta morta.
-      else if (r.status === 404 || r.status === 410) { await apagarInscricao(s.id); mortas++; }
+      else if (r.status === 404 || r.status === 410) {
+        await apagarInscricao(canal.projeto, canal.inscritos, s.id); mortas++;
+      }
     } catch (e) { /* uma inscricao ruim nao pode derrubar as outras */ }
   }
 
-  await gravarEstado(topo);
-  return `enviados ${ok}, removidos ${mortas}, de ${inscritos.length}`;
+  await gravarEstado(canal.projeto, canal.estado, topo);
+  return `${canal.nome}: enviados ${ok}, removidos ${mortas}, de ${inscritos.length}`;
+}
+
+async function avisar(env) {
+  // Um canal quebrado nao pode calar o outro: se o Firestore recusar a leitura
+  // de avisos, o time de conteudo continua recebendo peca nova normalmente.
+  const r = await Promise.allSettled(CANAIS.map((c) => avisarCanal(env, c)));
+  return r
+    .map((x, i) => (x.status === "fulfilled" ? x.value : `${CANAIS[i].nome}: erro ${x.reason?.message || x.reason}`))
+    .join(" | ");
 }
 
 export default {
@@ -174,9 +274,12 @@ export default {
       catch (e) { return new Response("erro: " + e.message, { status: 500 }); }
     }
     if (u.pathname === "/estado") {
-      const [ate, insc] = await Promise.all([lerEstado(), lerInscricoes()]);
-      return Response.json({ ate, inscritos: insc.length });
+      const linhas = await Promise.all(CANAIS.map(async (c) => {
+        const [ate, insc] = await Promise.all([lerEstado(c.projeto, c.estado), lerInscricoes(c.projeto, c.inscritos)]);
+        return [c.nome, { ate, inscritos: insc.length }];
+      }));
+      return Response.json(Object.fromEntries(linhas));
     }
-    return new Response("push da central de conteudo", { status: 200 });
+    return new Response("push das centrais do evento", { status: 200 });
   },
 };
