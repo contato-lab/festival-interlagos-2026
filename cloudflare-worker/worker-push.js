@@ -20,19 +20,22 @@
  * repositorio publico):
  *   VAPID_PRIVATE_PKCS8 = chave privada P-256 em PKCS8, base64
  */
-// DOIS PROJETOS FIREBASE, e isso importa aqui.
-// Em 19/08/2026 a Central de conteudo saiu de dentro do central-evento-fi e
-// ganhou projeto proprio (conteudo-fi), porque a cota gratis de leitura e de 50
-// mil por DIA e por PROJETO, e os dois juntos estouravam o mesmo balde. As
-// pecas e o checklist agora nascem no conteudo-fi. Avisos e mural continuam no
-// central-evento-fi, que e onde a Central das marcas mora.
+// ONDE OS DADOS MORAM. Em 19/08/2026 tudo foi reunido no projeto
+// festival-interlagos-2026, numa conta Google com o teste sem custo do Google
+// Cloud (R$1.745 de credito ate 18/11/2026). Antes disso foram dois projetos
+// (central-evento-fi e conteudo-fi), separados pra dobrar a cota gratis.
+//
+// O mapa por canal FICA, mesmo com os dois apontando pro mesmo lugar hoje. E
+// ele que permitiu descobrir o erro da vez passada em uma linha, e e ele que
+// permite separar de novo sem reescrever funcao nenhuma se um dia precisar.
 //
 // Se este arquivo apontar pro projeto errado, o sintoma NAO e erro: o Worker le
 // a copia velha, nunca ve novidade, ninguem recebe notificacao e nada aparece
-// quebrado em lugar nenhum. Por isso o projeto vem por canal, e nao global.
+// quebrado em lugar nenhum.
+const FI_2026 = { id: "festival-interlagos-2026", key: "AIzaSyBMY82Mcp1rhNXHt6gQhTvyV4VAjIkU0bI" };
 const PROJETOS = {
-  conteudo: { id: "conteudo-fi",       key: "AIzaSyBUWmUynV6U0mqHZoNDm-2KPb3wh4Z9NuY" },
-  central:  { id: "central-evento-fi", key: "AIzaSyD1spoy847dEtccSGJflKtG4-EYZMe23OQ" },
+  conteudo: FI_2026,   // cont_pecas, cont_story, cont_push, board/push_state
+  central:  FI_2026,   // board/avisos, board/mural, cred_push, board/push_state_cred
 };
 const base = (p) => `https://firestore.googleapis.com/v1/projects/${PROJETOS[p].id}/databases/(default)/documents`;
 const apiKey = (p) => PROJETOS[p].key;
