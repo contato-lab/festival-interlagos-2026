@@ -773,6 +773,44 @@ def write_json(path, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+def quedas_no_acumulado(path, novos_totais, rotulo):
+    """Trava de publicação: faturamento ACUMULADO não encolhe.
+
+    Por que ela existe, medido em 18/08/2026: às 19h32 e às 20h08 (BRT) a API
+    do próprio respondeu com cara de sucesso trazendo só um terço das vendas de
+    moto (1.257 de 3.715 ingressos, R$ 739.957 de R$ 2.212.092 — o MESMO
+    subconjunto nas duas vezes). Como não houve exceção, historico_ok seguiu
+    True, a blindagem de erro não disparou e o robô publicou o arquivo
+    encolhido. O dashboard mostrou R$ 6,9 mi de total (em vez de R$ 8,4 mi)
+    por 21 e depois 26 minutos, até uma rodada sadia corrigir.
+
+    Acumulado só cai por estorno (pequeno) ou por dado incompleto (grande).
+    Acima da tolerância é dado incompleto: melhor manter o arquivo anterior,
+    cujo updated_at antigo já avisa o dashboard de que o dado parou.
+
+    Devolve lista de reclamações; vazia = pode publicar. Se a queda for
+    proposital (estorno em massa, recontagem), rode com PERMITIR_QUEDA=1.
+    """
+    try:
+        antigos = ((_load_existing(path) or {}).get('totals')) or {}
+        queixas = []
+        regras = (('moto_receita', 20000.0), ('auto_receita', 20000.0),
+                  ('moto_ingressos', 30), ('auto_ingressos', 30))
+        for campo, piso in regras:
+            o, n = antigos.get(campo), novos_totais.get(campo)
+            if not isinstance(o, (int, float)) or not isinstance(n, (int, float)):
+                continue
+            queda = o - n
+            if queda > max(o * 0.01, piso):
+                queixas.append(f'[{rotulo}] {campo} cairia de {o:,.0f} para {n:,.0f} '
+                               f'(queda de {queda:,.0f})')
+        return queixas
+    except Exception as e:
+        # A trava nunca pode ser, ela mesma, um motivo de não publicar.
+        print(f'  (trava de queda não conseguiu comparar {path}: {e})', file=sys.stderr)
+        return []
+
+
 # ╔══════════════════════════════════════════════════════════╗
 # ║  PLANILHA (fallback quando API TM cai)                  ║
 # ╚══════════════════════════════════════════════════════════╝
@@ -1080,6 +1118,25 @@ def main():
                                          'moto_receita', 'moto_ingressos', 'MOTO')
         auto_by_day  = mesclar_historico(auto_by_day, auto_hist_ok,
                                          'auto_receita', 'auto_ingressos', 'AUTO')
+
+        # Trava de queda (ver quedas_no_acumulado): resposta 200 com um TERÇO
+        # das vendas passa por todas as blindagens de erro, porque erro não há.
+        # Aqui o acumulado novo é comparado com o publicado; encolheu além da
+        # tolerância, a rodada é tratada como falha do próprio e TODO o caminho
+        # já existente de preservação (vendas, tipos, por-hora, ::warning)
+        # entra em ação sozinho.
+        quedas = quedas_no_acumulado(
+            OUT_VENDAS, build_vendas_data(moto_by_day, auto_by_day).get('totals') or {},
+            'PROPRIO')
+        if quedas and not os.environ.get('PERMITIR_QUEDA'):
+            proprio_ok = False
+            proprio_error = 'trava de queda: ' + '; '.join(quedas)
+            for q in quedas:
+                print(f'  🛑 {q}', file=sys.stderr)
+            print('  🛑 Dado incompleto retido; arquivo anterior mantido. '
+                  'Queda proposital? Rode com PERMITIR_QUEDA=1.', file=sys.stderr)
+
+    if proprio_ok:
         proprio_moto = aggregate_proprio_tipos(moto_sales)
         proprio_auto = aggregate_proprio_tipos(auto_sales)
     else:
@@ -1172,6 +1229,25 @@ def main():
 
     tm_ok = tm_source in ('api', 'planilha')
 
+    # Trava de queda do lado TM, mesma régua do próprio. Só faz sentido no
+    # caminho 'api': o da planilha parte do arquivo anterior e não tem como
+    # encolher. Disparou, o snapshot anterior fica no lugar e o breakdown por
+    # tipo volta pro publicado junto — senão o vendas-tipos misturaria dois
+    # instantes diferentes.
+    if tm_ok and tm_source == 'api':
+        quedas_tm = quedas_no_acumulado(OUT_TM, tm_totals, 'TM')
+        if quedas_tm and not os.environ.get('PERMITIR_QUEDA'):
+            for q in quedas_tm:
+                print(f'  🛑 {q}', file=sys.stderr)
+            print('  🛑 TM incompleto retido; snapshot anterior mantido. '
+                  'Queda proposital? Rode com PERMITIR_QUEDA=1.', file=sys.stderr)
+            print('::warning title=Ticketmaster sem atualizar::trava de queda segurou dado incompleto')
+            tm_ok, tm_source = False, 'stale'
+            tm_error = 'trava de queda: acumulado encolheu'
+            prev_t = (_load_existing(OUT_TIPOS) or {}).get('ticketmaster') or {}
+            tm_moto = prev_t.get('moto') or {}
+            tm_auto = prev_t.get('auto') or {}
+
     # ── Escrita dos JSONs ──
     print('\n[4/4] Escrevendo JSONs...')
     if proprio_ok:
@@ -1194,7 +1270,7 @@ def main():
     # Vendas por hora do dia (so quando a API TM respondeu, pra nao perder ~80% do volume)
     # Exige os dois lados: com um deles vazio o gráfico por hora ficaria com
     # buraco silencioso (não dá pra distinguir 'não vendeu' de 'não consultei').
-    if tm_movs is not None and proprio_ok:
+    if tm_movs is not None and proprio_ok and tm_ok:
         write_json(OUT_HORA, aggregate_por_hora(tm_movs, moto_sales, auto_sales))
         print(f'  {OUT_HORA} atualizado (vendas por hora do dia)')
 
