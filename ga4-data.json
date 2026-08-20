@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-08-20T08:59:37.346598+00:00",
+  "updated_at": "2026-08-20T09:36:24.329775+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-08-20"
   },
   "totals": {
-    "sessions": 1598319,
-    "users": 1386835,
-    "new_users": 1073774,
-    "pageviews": 3732397,
-    "events": 9002571,
+    "sessions": 1598328,
+    "users": 1386843,
+    "new_users": 1073777,
+    "pageviews": 3732408,
+    "events": 9002598,
     "conversions": 17885.0,
     "pages_per_session": 2.34,
     "avg_bounce_rate": 50.53
@@ -1591,14 +1591,14 @@
     },
     {
       "date": "2026-08-20",
-      "sessions": 385,
-      "users": 371,
-      "new_users": 222,
-      "pageviews": 604,
-      "events": 1613,
+      "sessions": 394,
+      "users": 379,
+      "new_users": 225,
+      "pageviews": 615,
+      "events": 1640,
       "conversions": 2.0,
-      "bounce_rate": 60.0,
-      "avg_session_s": 105.0
+      "bounce_rate": 60.15,
+      "avg_session_s": 104.2
     }
   ],
   "traffic_sources": [
@@ -1649,7 +1649,7 @@
     },
     {
       "channel": "Email",
-      "sessions": 18848,
+      "sessions": 18852,
       "conversions": 17.0
     },
     {
@@ -1676,12 +1676,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 1901327,
+      "pageviews": 1901333,
       "sessions": 1076995
     },
     {
       "page": "/ingressos/",
-      "pageviews": 389412,
+      "pageviews": 389415,
       "sessions": 258476
     },
     {
@@ -4123,30 +4123,30 @@
       "medium": "cpc",
       "new_users": 196094,
       "sessions": 329200,
-      "pageviews": 1009635,
+      "pageviews": 1009642,
       "avg_session_s": 207.9,
       "engagement_rate": 65.38,
-      "event_count": 2328409
+      "event_count": 2328423
     },
     {
       "source": "ig",
       "medium": "paid",
-      "new_users": 181963,
+      "new_users": 181964,
       "sessions": 266653,
-      "pageviews": 494440,
+      "pageviews": 494441,
       "avg_session_s": 70.7,
       "engagement_rate": 32.57,
-      "event_count": 1176218
+      "event_count": 1176222
     },
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 193510,
+      "new_users": 193511,
       "sessions": 252184,
-      "pageviews": 587998,
+      "pageviews": 587999,
       "avg_session_s": 157.1,
       "engagement_rate": 49.14,
-      "event_count": 1482821
+      "event_count": 1482825
     },
     {
       "source": "organico",
@@ -5011,12 +5011,12 @@
     {
       "source": "emBlue",
       "medium": "email",
-      "new_users": 78,
-      "sessions": 76,
-      "pageviews": 93,
-      "avg_session_s": 60.4,
-      "engagement_rate": 30.26,
-      "event_count": 293
+      "new_users": 79,
+      "sessions": 77,
+      "pageviews": 94,
+      "avg_session_s": 59.6,
+      "engagement_rate": 29.87,
+      "event_count": 296
     },
     {
       "source": "meta-ads",
@@ -18276,6 +18276,17 @@
       "event_count": 1751
     },
     {
+      "date": "2026-08-20",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 149,
+      "sessions": 197,
+      "pageviews": 338,
+      "eng_dur_s": 6148.0,
+      "eng_sessions": 84,
+      "event_count": 892
+    },
+    {
       "date": "2026-05-20",
       "source": "fb",
       "medium": "paid",
@@ -18329,17 +18340,6 @@
       "eng_dur_s": 32720.0,
       "eng_sessions": 191,
       "event_count": 1462
-    },
-    {
-      "date": "2026-08-20",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 148,
-      "sessions": 196,
-      "pageviews": 337,
-      "eng_dur_s": 5667.0,
-      "eng_sessions": 84,
-      "event_count": 888
     },
     {
       "date": "2026-07-01",
@@ -38648,6 +38648,17 @@
       "event_count": 71
     },
     {
+      "date": "2026-08-20",
+      "source": "ig",
+      "medium": "paid",
+      "new_users": 14,
+      "sessions": 41,
+      "pageviews": 51,
+      "eng_dur_s": 425.0,
+      "eng_sessions": 12,
+      "event_count": 121
+    },
+    {
       "date": "2026-03-30",
       "source": "bing",
       "medium": "organic",
@@ -39405,17 +39416,6 @@
       "eng_dur_s": 1150.0,
       "eng_sessions": 12,
       "event_count": 97
-    },
-    {
-      "date": "2026-08-20",
-      "source": "ig",
-      "medium": "paid",
-      "new_users": 13,
-      "sessions": 40,
-      "pageviews": 50,
-      "eng_dur_s": 342.0,
-      "eng_sessions": 11,
-      "event_count": 117
     },
     {
       "date": "2026-04-01",
@@ -45054,11 +45054,11 @@
       "source": "google",
       "medium": "cpc",
       "new_users": 7,
-      "sessions": 35,
-      "pageviews": 63,
-      "eng_dur_s": 1038.0,
-      "eng_sessions": 11,
-      "event_count": 134
+      "sessions": 40,
+      "pageviews": 70,
+      "eng_dur_s": 1041.0,
+      "eng_sessions": 13,
+      "event_count": 148
     },
     {
       "date": "2026-08-20",
@@ -74234,6 +74234,17 @@
     },
     {
       "date": "2026-08-20",
+      "source": "emBlue",
+      "medium": "email",
+      "new_users": 1,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 5
+    },
+    {
+      "date": "2026-08-20",
       "source": "meta-ads",
       "medium": "cpm",
       "new_users": 1,
@@ -86738,17 +86749,6 @@
       "eng_dur_s": 253.0,
       "eng_sessions": 1,
       "event_count": 3
-    },
-    {
-      "date": "2026-08-20",
-      "source": "emBlue",
-      "medium": "email",
-      "new_users": 0,
-      "sessions": 1,
-      "pageviews": 1,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 2
     },
     {
       "date": "2026-08-20",
