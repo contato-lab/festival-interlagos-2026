@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-21T15:03:23Z",
+  "updated_at": "2026-08-21T15:36:58Z",
   "source": "Ticketmaster API via getcrowder.com",
   "source_type": "api",
   "campaign_start": "2026-03-25",
@@ -17,13 +17,13 @@
   ],
   "totals": {
     "moto_receita": 3443561.55,
-    "auto_receita": 1494775.35,
+    "auto_receita": 1496223.35,
     "moto_ingressos": 27006,
-    "auto_ingressos": 12320,
+    "auto_ingressos": 12328,
     "moto_cortesias": 56018,
-    "auto_cortesias": 56478,
-    "total_receita": 4938336.9,
-    "total_ingressos": 39326
+    "auto_cortesias": 56600,
+    "total_receita": 4939784.9,
+    "total_ingressos": 39334
   },
   "daily": [
     {
@@ -1316,17 +1316,17 @@
     {
       "date": "2026-08-21",
       "moto_receita": 0.0,
-      "auto_receita": 18030.0,
+      "auto_receita": 19478.0,
       "moto_ingressos": 0,
-      "auto_ingressos": 64,
+      "auto_ingressos": 72,
       "moto_cortesias": 0,
-      "auto_cortesias": 110
+      "auto_cortesias": 232
     }
   ],
   "last_sale_moto_at": "2026-08-16T21:42:26",
-  "last_sale_auto_at": "2026-08-21T11:53:52",
-  "tm_cursor_last_update": 1787324362198,
-  "tm_cursor_last_movement_id": 98303634,
+  "last_sale_auto_at": "2026-08-21T12:32:19",
+  "tm_cursor_last_update": 1787326339313,
+  "tm_cursor_last_movement_id": 98309544,
   "publico_por_dia_evento": {
     "moto": [
       {
@@ -1357,27 +1357,27 @@
     "auto": [
       {
         "dia": "27/08/2026",
-        "pago": 287,
+        "pago": 289,
         "cortesia": 10772,
-        "total": 11059
+        "total": 11061
       },
       {
         "dia": "28/08/2026",
-        "pago": 3300,
+        "pago": 3301,
         "cortesia": 14491,
-        "total": 17791
+        "total": 17792
       },
       {
         "dia": "29/08/2026",
-        "pago": 6739,
-        "cortesia": 15224,
-        "total": 21963
+        "pago": 6744,
+        "cortesia": 15285,
+        "total": 22029
       },
       {
         "dia": "30/08/2026",
         "pago": 1994,
-        "cortesia": 15991,
-        "total": 17985
+        "cortesia": 16052,
+        "total": 18046
       }
     ]
   }
