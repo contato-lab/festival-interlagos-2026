@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-08-22T10:51:36.161918+00:00",
+  "updated_at": "2026-08-22T11:06:33.984209+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-08-22"
   },
   "totals": {
-    "sessions": 1622820,
-    "users": 1407057,
-    "new_users": 1087791,
-    "pageviews": 3776892,
-    "events": 9117066,
+    "sessions": 1622824,
+    "users": 1407060,
+    "new_users": 1087794,
+    "pageviews": 3776904,
+    "events": 9117095,
     "conversions": 18006.0,
     "pages_per_session": 2.33,
     "avg_bounce_rate": 50.43
@@ -1613,14 +1613,14 @@
     },
     {
       "date": "2026-08-22",
-      "sessions": 456,
-      "users": 442,
-      "new_users": 240,
-      "pageviews": 825,
-      "events": 2037,
+      "sessions": 460,
+      "users": 445,
+      "new_users": 243,
+      "pageviews": 837,
+      "events": 2066,
       "conversions": 1.0,
-      "bounce_rate": 51.1,
-      "avg_session_s": 142.1
+      "bounce_rate": 51.09,
+      "avg_session_s": 141.9
     }
   ],
   "traffic_sources": [
@@ -1698,12 +1698,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 1918597,
+      "pageviews": 1918606,
       "sessions": 1094936
     },
     {
       "page": "/ingressos/",
-      "pageviews": 397304,
+      "pageviews": 397305,
       "sessions": 264180
     },
     {
@@ -1718,7 +1718,7 @@
     },
     {
       "page": "/shows/",
-      "pageviews": 107873,
+      "pageviews": 107874,
       "sessions": 85984
     },
     {
@@ -4208,22 +4208,22 @@
     {
       "source": "ig",
       "medium": "paid",
-      "new_users": 182765,
+      "new_users": 182766,
       "sessions": 270460,
-      "pageviews": 497558,
+      "pageviews": 497559,
       "avg_session_s": 70.8,
       "engagement_rate": 32.47,
-      "event_count": 1183585
+      "event_count": 1183588
     },
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 202596,
+      "new_users": 202598,
       "sessions": 260712,
-      "pageviews": 612089,
+      "pageviews": 612099,
       "avg_session_s": 159.2,
       "engagement_rate": 49.67,
-      "event_count": 1544925
+      "event_count": 1544949
     },
     {
       "source": "organico",
@@ -4869,11 +4869,11 @@
       "source": "linktr.ee",
       "medium": "referral",
       "new_users": 185,
-      "sessions": 211,
-      "pageviews": 281,
-      "avg_session_s": 46.0,
-      "engagement_rate": 39.34,
-      "event_count": 874
+      "sessions": 212,
+      "pageviews": 282,
+      "avg_session_s": 45.8,
+      "engagement_rate": 39.15,
+      "event_count": 876
     },
     {
       "source": "eml-tm_nl07_26-08-14_news-geral_ptbr",
@@ -18562,6 +18562,17 @@
       "event_count": 1358
     },
     {
+      "date": "2026-08-22",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 147,
+      "sessions": 216,
+      "pageviews": 419,
+      "eng_dur_s": 9036.0,
+      "eng_sessions": 124,
+      "event_count": 1045
+    },
+    {
       "date": "2026-05-21",
       "source": "fb",
       "medium": "paid",
@@ -18659,17 +18670,6 @@
       "eng_dur_s": 9279.0,
       "eng_sessions": 134,
       "event_count": 1550
-    },
-    {
-      "date": "2026-08-22",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 145,
-      "sessions": 214,
-      "pageviews": 409,
-      "eng_dur_s": 8912.0,
-      "eng_sessions": 122,
-      "event_count": 1021
     },
     {
       "date": "2026-04-12",
@@ -34699,6 +34699,17 @@
       "event_count": 125
     },
     {
+      "date": "2026-08-22",
+      "source": "ig",
+      "medium": "paid",
+      "new_users": 23,
+      "sessions": 61,
+      "pageviews": 77,
+      "eng_dur_s": 699.0,
+      "eng_sessions": 16,
+      "event_count": 183
+    },
+    {
       "date": "2026-03-31",
       "source": "motoo.com.br",
       "medium": "referral",
@@ -35159,17 +35170,6 @@
       "eng_dur_s": 777.0,
       "eng_sessions": 18,
       "event_count": 116
-    },
-    {
-      "date": "2026-08-22",
-      "source": "ig",
-      "medium": "paid",
-      "new_users": 22,
-      "sessions": 60,
-      "pageviews": 76,
-      "eng_dur_s": 699.0,
-      "eng_sessions": 16,
-      "event_count": 180
     },
     {
       "date": "2026-04-01",
@@ -88282,6 +88282,17 @@
     {
       "date": "2026-08-22",
       "source": "instagram.com",
+      "medium": "referral",
+      "new_users": 0,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 2
+    },
+    {
+      "date": "2026-08-22",
+      "source": "linktr.ee",
       "medium": "referral",
       "new_users": 0,
       "sessions": 1,
