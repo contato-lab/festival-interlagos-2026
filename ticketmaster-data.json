@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-22T13:24:56Z",
+  "updated_at": "2026-08-22T13:53:30Z",
   "source": "Ticketmaster API via getcrowder.com",
   "source_type": "api",
   "campaign_start": "2026-03-25",
@@ -17,13 +17,13 @@
   ],
   "totals": {
     "moto_receita": 3443561.55,
-    "auto_receita": 1532440.95,
+    "auto_receita": 1533160.95,
     "moto_ingressos": 27006,
-    "auto_ingressos": 12509,
+    "auto_ingressos": 12513,
     "moto_cortesias": 56018,
-    "auto_cortesias": 57185,
-    "total_receita": 4976002.5,
-    "total_ingressos": 39515
+    "auto_cortesias": 57590,
+    "total_receita": 4976722.5,
+    "total_ingressos": 39519
   },
   "daily": [
     {
@@ -1325,17 +1325,17 @@
     {
       "date": "2026-08-22",
       "moto_receita": 0.0,
-      "auto_receita": 8376.0,
+      "auto_receita": 9096.0,
       "moto_ingressos": 0,
-      "auto_ingressos": 45,
+      "auto_ingressos": 49,
       "moto_cortesias": 0,
-      "auto_cortesias": 0
+      "auto_cortesias": 405
     }
   ],
   "last_sale_moto_at": "2026-08-16T21:42:26",
-  "last_sale_auto_at": "2026-08-22T10:21:49",
-  "tm_cursor_last_update": 1787404908993,
-  "tm_cursor_last_movement_id": 98395134,
+  "last_sale_auto_at": "2026-08-22T10:50:49",
+  "tm_cursor_last_update": 1787406674979,
+  "tm_cursor_last_movement_id": 98396907,
   "publico_por_dia_evento": {
     "moto": [
       {
@@ -1367,26 +1367,26 @@
       {
         "dia": "27/08/2026",
         "pago": 297,
-        "cortesia": 10887,
-        "total": 11184
+        "cortesia": 10987,
+        "total": 11284
       },
       {
         "dia": "28/08/2026",
-        "pago": 3348,
-        "cortesia": 14646,
-        "total": 17994
+        "pago": 3351,
+        "cortesia": 14746,
+        "total": 18097
       },
       {
         "dia": "29/08/2026",
         "pago": 6836,
-        "cortesia": 15445,
-        "total": 22281
+        "cortesia": 15545,
+        "total": 22381
       },
       {
         "dia": "30/08/2026",
-        "pago": 2028,
-        "cortesia": 16207,
-        "total": 18235
+        "pago": 2029,
+        "cortesia": 16312,
+        "total": 18341
       }
     ]
   }
