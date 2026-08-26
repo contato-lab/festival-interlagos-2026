@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26T02:21:23Z",
+  "updated_at": "2026-08-26T03:26:42Z",
   "source": "Ticketmaster API via getcrowder.com",
   "source_type": "api",
   "campaign_start": "2026-03-25",
@@ -17,13 +17,13 @@
   ],
   "totals": {
     "moto_receita": 3443561.55,
-    "auto_receita": 1768125.95,
+    "auto_receita": 1771185.95,
     "moto_ingressos": 27006,
-    "auto_ingressos": 13677,
+    "auto_ingressos": 13695,
     "moto_cortesias": 56018,
     "auto_cortesias": 59804,
-    "total_receita": 5211687.5,
-    "total_ingressos": 40683
+    "total_receita": 5214747.5,
+    "total_ingressos": 40701
   },
   "daily": [
     {
@@ -1352,17 +1352,26 @@
     {
       "date": "2026-08-25",
       "moto_receita": 0.0,
-      "auto_receita": 80131.2,
+      "auto_receita": 82471.2,
       "moto_ingressos": 0,
-      "auto_ingressos": 419,
+      "auto_ingressos": 432,
       "moto_cortesias": 0,
       "auto_cortesias": 1364
+    },
+    {
+      "date": "2026-08-26",
+      "moto_receita": 0.0,
+      "auto_receita": 720.0,
+      "moto_ingressos": 0,
+      "auto_ingressos": 5,
+      "moto_cortesias": 0,
+      "auto_cortesias": 0
     }
   ],
   "last_sale_moto_at": "2026-08-16T21:42:26",
-  "last_sale_auto_at": "2026-08-25T23:20:31",
-  "tm_cursor_last_update": 1787710831070,
-  "tm_cursor_last_movement_id": 98761154,
+  "last_sale_auto_at": "2026-08-26T00:19:02",
+  "tm_cursor_last_update": 1787714341998,
+  "tm_cursor_last_movement_id": 98763549,
   "publico_por_dia_evento": {
     "moto": [
       {
@@ -1399,21 +1408,21 @@
       },
       {
         "dia": "28/08/2026",
-        "pago": 3681,
+        "pago": 3685,
         "cortesia": 15523,
-        "total": 19204
+        "total": 19208
       },
       {
         "dia": "29/08/2026",
-        "pago": 7377,
+        "pago": 7387,
         "cortesia": 16260,
-        "total": 23637
+        "total": 23647
       },
       {
         "dia": "30/08/2026",
-        "pago": 2227,
+        "pago": 2231,
         "cortesia": 16806,
-        "total": 19033
+        "total": 19037
       }
     ]
   }
