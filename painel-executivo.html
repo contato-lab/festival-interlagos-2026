@@ -1209,8 +1209,28 @@ async function fetchTicketmaster() {
 
     // CORTESIAS — guardadas em estado totalmente separado de vendas.
     // Nunca somar cortesias em ingressos/receita. So aparecem no card proprio.
-    TM_CORTESIAS.moto       = (data.totals && data.totals.moto_cortesias) || 0;
-    TM_CORTESIAS.auto       = (data.totals && data.totals.auto_cortesias) || 0;
+    // SOMA A SERIE DIARIA, NAO O CAMPO DE TOTAL.
+    //
+    // Em 26/08/2026 o card de visitantes mostrava 47.946 cortesias quando o
+    // proprio arquivo somava 116.543. Motivo: totals.moto_cortesias e
+    // auto_cortesias chegavam trazendo SO O DIA CORRENTE (0 e 721 na hora do
+    // diagnostico, batendo exatamente com a linha daquele dia no daily),
+    // enquanto totals.*_ingressos chegavam acumulados. Nao e erro da API nem
+    // falta de dado: o daily esta completo desde 22/04.
+    //
+    // A serie diaria e a fonte que ja bate 1 pra 1 com ingressos e receita
+    // (27.642 = 27.642), entao cortesia passa a sair da mesma origem. O campo
+    // totals so entra se o daily nao trouxer cortesia nenhuma, para arquivo
+    // antigo nao quebrar.
+    var _somaCort = function(campo){
+      var t = 0, tem = false, i;
+      for(i = 0; i < data.daily.length; i++){
+        if(data.daily[i][campo] != null){ tem = true; t += (+data.daily[i][campo] || 0); }
+      }
+      return tem ? t : ((data.totals && data.totals[campo]) || 0);
+    };
+    TM_CORTESIAS.moto       = _somaCort('moto_cortesias');
+    TM_CORTESIAS.auto       = _somaCort('auto_cortesias');
     TM_CORTESIAS.motoVendas = (data.totals && data.totals.moto_ingressos) || 0;
     TM_CORTESIAS.autoVendas = (data.totals && data.totals.auto_ingressos) || 0;
     // Cortesias de hoje (UTC, igual o agregado do worker)
