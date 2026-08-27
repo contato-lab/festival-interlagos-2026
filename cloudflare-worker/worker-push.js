@@ -36,6 +36,7 @@ const FI_2026 = { id: "festival-interlagos-2026", key: "AIzaSyBMY82Mcp1rhNXHt6gQ
 const PROJETOS = {
   conteudo: FI_2026,   // cont_pecas, cont_story, cont_push, board/push_state
   central:  FI_2026,   // board/avisos, board/mural, cred_push, board/push_state_cred
+  mobilidade: FI_2026, // mob_chamados, mob_push, board/push_state_mob
 };
 const base = (p) => `https://firestore.googleapis.com/v1/projects/${PROJETOS[p].id}/databases/(default)/documents`;
 const apiKey = (p) => PROJETOS[p].key;
@@ -67,6 +68,28 @@ const CANAIS = [
     docs: ["board/avisos", "board/mural"],
     inscritos: "cred_push",
     estado: "board/push_state_cred",
+  },
+  // APOIO A MOBILIDADE, entrou em 27/08/2026.
+  //
+  // TERCEIRO PUBLICO, e o mais sensivel dos tres: do outro lado tem alguem com
+  // dificuldade de locomocao esperando. Por isso a lista e separada das outras
+  // duas. Pedido de ajuda nao pode chegar no celular de jornalista, e aviso de
+  // credenciamento nao pode ocupar a tela de quem esta atendendo.
+  //
+  // O texto da notificacao NAO e montado aqui: quem monta e o sw.js de
+  // /mobilidade/, que le mob_chamados na hora de acordar e mostra o LUGAR do
+  // pedido. Saber que e no Boulevard resolve metade do problema antes de a
+  // pessoa tirar o celular do bolso.
+  //
+  // Custo: mais 2 leituras por minuto (1 do estado, 1 da consulta de limit 1),
+  // cerca de 2.880 por dia, contra um teto de 50 mil.
+  {
+    nome: "mobilidade",
+    projeto: "mobilidade",
+    colecoes: ["mob_chamados"],
+    docs: [],
+    inscritos: "mob_push",
+    estado: "board/push_state_mob",
   },
 ];
 
