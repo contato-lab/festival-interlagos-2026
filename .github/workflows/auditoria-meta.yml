@@ -1,0 +1,54 @@
+name: Auditoria Meta Ads
+
+# SO NA MAO (workflow_dispatch), sem cron de proposito: isto e uma consulta de
+# conferencia de verba, nao um coletor. Rodar sozinho a cada poucos minutos
+# gastaria chamada de API sem ninguem estar olhando o resultado.
+#
+# NAO TOCA em meta-data.json. Grava auditoria-meta.json, um relatorio a parte,
+# pra conferir o gasto REAL da conta sem mudar a base historica do painel no
+# meio do evento.
+on:
+  workflow_dispatch:
+    inputs:
+      since:
+        description: 'Data inicial da varredura (AAAA-MM-DD)'
+        required: false
+        default: '2026-01-01'
+
+jobs:
+  auditar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Rodar auditoria
+        env:
+          META_TOKEN:      ${{ secrets.META_TOKEN }}
+          META_ACCT:       'act_2044706169171045'
+          META_ACCT_MOTOS: 'act_1326431289216611'
+          AUDIT_SINCE:     ${{ github.event.inputs.since }}
+        run: python auditoria-meta.py
+
+      - name: Commit do relatorio
+        run: |
+          git config user.name  "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add auditoria-meta.json
+          if git diff --staged --quiet; then
+            echo "Sem mudancas"; exit 0
+          fi
+          git commit -m "chore: auditoria de gasto do Meta [skip ci]"
+          for t in 1 2 3 4 5; do
+            git pull --rebase origin main || git rebase --abort || true
+            git push && exit 0
+            sleep $((RANDOM % 10 + 5))
+          done
+          exit 1
