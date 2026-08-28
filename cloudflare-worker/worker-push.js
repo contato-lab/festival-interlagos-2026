@@ -264,6 +264,20 @@ async function avisarCanal(env, canal) {
         headers: {
           Authorization: await autorizacao(s.endpoint, chave),
           TTL: "3600",                 // se o celular estiver desligado, guarda 1h
+          // PRIORIDADE ALTA. Sem este cabecalho o padrao e "normal", e no
+          // Android normal significa que o sistema PODE SEGURAR o aviso ate o
+          // aparelho acordar sozinho (modo Doze), juntando varios de uma vez.
+          //
+          // Foi medido no evento em 27/08/2026, primeiro atendimento real: o
+          // chamado nasceu 19:18:00, o Worker processou e marcou 19:18:00, o
+          // iPhone (que estava com o app aberto e recebeu pelo aviso local)
+          // viu na hora, e o Android da coordenacao so mostrou 19:24. Seis
+          // minutos com uma pessoa esperando no estacionamento.
+          //
+          // "high" pede entrega imediata mesmo com o aparelho parado. E o
+          // unico nivel que faz sentido aqui: todo aviso deste canal e alguem
+          // com dificuldade de locomocao pedindo ajuda agora.
+          Urgency: "high",
           "Content-Length": "0",
         },
       });
@@ -295,6 +309,15 @@ export default {
   // Rota manual pra testar sem esperar o minuto virar.
   async fetch(req, env) {
     const u = new URL(req.url);
+    // DISPARO IMEDIATO. O cron de 1 minuto e o piso da Cloudflare, mas
+    // esperar ate 60s com alguem parado no sol e tempo demais. A propria
+    // pagina chama esta rota assim que grava o chamado, entao o aviso sai no
+    // mesmo segundo. Se a chamada falhar, o cron pega na rodada seguinte:
+    // isto ACELERA, nao substitui.
+    if (u.pathname === "/agora") {
+      try { await avisar(env); return new Response("ok", { status: 200 }); }
+      catch (e) { return new Response("erro: " + e.message, { status: 500 }); }
+    }
     if (u.pathname === "/testar") {
       try { return new Response(await avisar(env), { status: 200 }); }
       catch (e) { return new Response("erro: " + e.message, { status: 500 }); }
