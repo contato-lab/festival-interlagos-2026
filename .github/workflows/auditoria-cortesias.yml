@@ -1,0 +1,35 @@
+name: Auditoria Cortesias por Tipo
+
+# SO NA MAO. E consulta de conferencia, nao coletor: rodar sozinho a cada
+# poucos minutos gastaria chamada de API sem ninguem lendo o resultado.
+# NAO TOCA em vendas-tipos-data.json nem em ticketmaster-data.json.
+on:
+  workflow_dispatch:
+
+jobs:
+  auditar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Rodar auditoria
+        env:
+          TM_API_KEY: ${{ secrets.TM_API_KEY }}
+        run: python auditoria-cortesias-tipo.py
+      - name: Commit do relatorio
+        run: |
+          git config user.name  "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add auditoria-cortesias.json
+          if git diff --staged --quiet; then echo "Sem mudancas"; exit 0; fi
+          git commit -m "chore: auditoria de cortesias por tipo [skip ci]"
+          for t in 1 2 3 4 5; do
+            git pull --rebase origin main || git rebase --abort || true
+            git push && exit 0
+            sleep $((RANDOM % 10 + 5))
+          done
+          exit 1
