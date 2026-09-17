@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-09-17T05:20:32.462149+00:00",
+  "updated_at": "2026-09-17T10:05:57.370397+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-09-17"
   },
   "totals": {
-    "sessions": 1912251,
-    "users": 1658468,
-    "new_users": 1287102,
-    "pageviews": 4322038,
-    "events": 10505500,
+    "sessions": 1912265,
+    "users": 1658482,
+    "new_users": 1287116,
+    "pageviews": 4322054,
+    "events": 10505551,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 52.83
+    "avg_bounce_rate": 52.71
   },
   "daily_series": [
     {
@@ -1888,14 +1888,25 @@
     },
     {
       "date": "2026-09-16",
-      "sessions": 300,
-      "users": 288,
-      "new_users": 217,
-      "pageviews": 379,
-      "events": 1044,
+      "sessions": 305,
+      "users": 293,
+      "new_users": 221,
+      "pageviews": 385,
+      "events": 1060,
       "conversions": 0.0,
-      "bounce_rate": 76.67,
-      "avg_session_s": 70.6
+      "bounce_rate": 76.39,
+      "avg_session_s": 69.6
+    },
+    {
+      "date": "2026-09-17",
+      "sessions": 9,
+      "users": 9,
+      "new_users": 10,
+      "pageviews": 10,
+      "events": 35,
+      "conversions": 0.0,
+      "bounce_rate": 33.33,
+      "avg_session_s": 39.6
     }
   ],
   "traffic_sources": [
@@ -1978,7 +1989,7 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2066199,
+      "pageviews": 2066213,
       "sessions": 1226795
     },
     {
@@ -2252,7 +2263,7 @@
       "Social Orgânico": 8
     },
     "2026-09-16": {
-      "Direto pelo Link": 146,
+      "Direto pelo Link": 148,
       "Busca Orgânica": 73,
       "Social Orgânico": 14
     }
@@ -2313,7 +2324,7 @@
         "2026-09-10": 29,
         "2026-09-14": 25,
         "2026-09-15": 15,
-        "2026-09-16": 10
+        "2026-09-16": 13
       }
     },
     {
@@ -5066,22 +5077,22 @@
     {
       "source": "google",
       "medium": "cpc",
-      "new_users": 202824,
+      "new_users": 202825,
       "sessions": 345244,
-      "pageviews": 1051523,
+      "pageviews": 1051524,
       "avg_session_s": 207.6,
       "engagement_rate": 64.87,
-      "event_count": 2425504
+      "event_count": 2425507
     },
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 251615,
+      "new_users": 251623,
       "sessions": 341717,
-      "pageviews": 773944,
+      "pageviews": 773953,
       "avg_session_s": 150.7,
       "engagement_rate": 49.28,
-      "event_count": 1936563
+      "event_count": 1936594
     },
     {
       "source": "ig",
@@ -5096,22 +5107,22 @@
     {
       "source": "organico",
       "medium": "instagram",
-      "new_users": 94027,
+      "new_users": 94031,
       "sessions": 133616,
-      "pageviews": 468742,
+      "pageviews": 468747,
       "avg_session_s": 167.1,
       "engagement_rate": 76.1,
-      "event_count": 1018297
+      "event_count": 1018310
     },
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 67649,
+      "new_users": 67650,
       "sessions": 131142,
-      "pageviews": 407439,
+      "pageviews": 407440,
       "avg_session_s": 233.8,
       "engagement_rate": 63.74,
-      "event_count": 933682
+      "event_count": 933686
     },
     {
       "source": "tiktok",
@@ -23269,6 +23280,17 @@
       "event_count": 840
     },
     {
+      "date": "2026-09-16",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 110,
+      "sessions": 135,
+      "pageviews": 159,
+      "eng_dur_s": 261.0,
+      "eng_sessions": 20,
+      "event_count": 446
+    },
+    {
       "date": "2026-05-28",
       "source": "tiktok",
       "medium": "paid",
@@ -23311,17 +23333,6 @@
       "eng_dur_s": 181.0,
       "eng_sessions": 16,
       "event_count": 481
-    },
-    {
-      "date": "2026-09-16",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 109,
-      "sessions": 133,
-      "pageviews": 157,
-      "eng_dur_s": 249.0,
-      "eng_sessions": 19,
-      "event_count": 440
     },
     {
       "date": "2026-04-24",
@@ -45105,6 +45116,17 @@
     },
     {
       "date": "2026-09-16",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 12,
+      "sessions": 13,
+      "pageviews": 18,
+      "eng_dur_s": 24.0,
+      "eng_sessions": 6,
+      "event_count": 48
+    },
+    {
+      "date": "2026-09-16",
       "source": "salesforce",
       "medium": "email",
       "new_users": 12,
@@ -47929,17 +47951,6 @@
       "eng_dur_s": 4.0,
       "eng_sessions": 0,
       "event_count": 30
-    },
-    {
-      "date": "2026-09-16",
-      "source": "organico",
-      "medium": "instagram",
-      "new_users": 9,
-      "sessions": 10,
-      "pageviews": 14,
-      "eng_dur_s": 24.0,
-      "eng_sessions": 5,
-      "event_count": 38
     },
     {
       "date": "2026-04-01",
@@ -50866,6 +50877,17 @@
       "eng_dur_s": 27.0,
       "eng_sessions": 3,
       "event_count": 40
+    },
+    {
+      "date": "2026-09-17",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 7,
+      "sessions": 6,
+      "pageviews": 7,
+      "eng_dur_s": 49.0,
+      "eng_sessions": 5,
+      "event_count": 25
     },
     {
       "date": "2026-03-31",
@@ -86671,6 +86693,39 @@
       "eng_dur_s": 15.0,
       "eng_sessions": 1,
       "event_count": 4
+    },
+    {
+      "date": "2026-09-17",
+      "source": "google",
+      "medium": "cpc",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
+    },
+    {
+      "date": "2026-09-17",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 2.0,
+      "eng_sessions": 1,
+      "event_count": 4
+    },
+    {
+      "date": "2026-09-17",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
     },
     {
       "date": "2026-03-30",
