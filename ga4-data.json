@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-09-19T13:26:15.101630+00:00",
+  "updated_at": "2026-09-19T16:37:52.872395+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-09-19"
   },
   "totals": {
-    "sessions": 1912480,
-    "users": 1658686,
-    "new_users": 1287271,
-    "pageviews": 4322280,
-    "events": 10506254,
+    "sessions": 1912491,
+    "users": 1658697,
+    "new_users": 1287280,
+    "pageviews": 4322294,
+    "events": 10506296,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 53.03
+    "avg_bounce_rate": 53.0
   },
   "daily_series": [
     {
@@ -1921,14 +1921,14 @@
     },
     {
       "date": "2026-09-19",
-      "sessions": 14,
-      "users": 14,
-      "new_users": 12,
-      "pageviews": 14,
-      "events": 48,
+      "sessions": 25,
+      "users": 25,
+      "new_users": 21,
+      "pageviews": 28,
+      "events": 90,
       "conversions": 0.0,
-      "bounce_rate": 57.14,
-      "avg_session_s": 7.0
+      "bounce_rate": 52.0,
+      "avg_session_s": 8.2
     }
   ],
   "traffic_sources": [
@@ -1979,7 +1979,7 @@
     },
     {
       "channel": "Email",
-      "sessions": 27799,
+      "sessions": 27815,
       "conversions": 17.0
     },
     {
@@ -2011,7 +2011,7 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2066404,
+      "pageviews": 2066414,
       "sessions": 1226279
     },
     {
@@ -2021,7 +2021,7 @@
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-auto",
-      "pageviews": 257013,
+      "pageviews": 257015,
       "sessions": 190308
     },
     {
@@ -5063,22 +5063,22 @@
     {
       "source": "google",
       "medium": "cpc",
-      "new_users": 202835,
+      "new_users": 202836,
       "sessions": 345244,
-      "pageviews": 1051539,
+      "pageviews": 1051541,
       "avg_session_s": 207.6,
       "engagement_rate": 64.87,
-      "event_count": 2425550
+      "event_count": 2425554
     },
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 251655,
+      "new_users": 251656,
       "sessions": 341677,
-      "pageviews": 773999,
+      "pageviews": 774001,
       "avg_session_s": 150.7,
       "engagement_rate": 49.31,
-      "event_count": 1936739
+      "event_count": 1936744
     },
     {
       "source": "ig",
@@ -5103,12 +5103,12 @@
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 67685,
+      "new_users": 67689,
       "sessions": 131320,
-      "pageviews": 407498,
+      "pageviews": 407504,
       "avg_session_s": 233.5,
       "engagement_rate": 63.68,
-      "event_count": 933881
+      "event_count": 933901
     },
     {
       "source": "tiktok",
@@ -5215,10 +5215,10 @@
       "medium": "paid",
       "new_users": 23234,
       "sessions": 32938,
-      "pageviews": 60230,
+      "pageviews": 60231,
       "avg_session_s": 68.1,
       "engagement_rate": 32.09,
-      "event_count": 148056
+      "event_count": 148058
     },
     {
       "source": "tiktok",
@@ -5273,12 +5273,12 @@
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 8675,
-      "sessions": 11094,
-      "pageviews": 20755,
-      "avg_session_s": 96.9,
-      "engagement_rate": 55.24,
-      "event_count": 54482
+      "new_users": 8678,
+      "sessions": 11100,
+      "pageviews": 20758,
+      "avg_session_s": 96.8,
+      "engagement_rate": 55.22,
+      "event_count": 54493
     },
     {
       "source": "sfmc",
@@ -50953,6 +50953,28 @@
       "event_count": 40
     },
     {
+      "date": "2026-09-19",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 7,
+      "sessions": 9,
+      "pageviews": 9,
+      "eng_dur_s": 63.0,
+      "eng_sessions": 5,
+      "event_count": 30
+    },
+    {
+      "date": "2026-09-19",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 7,
+      "sessions": 8,
+      "pageviews": 10,
+      "eng_dur_s": 61.0,
+      "eng_sessions": 4,
+      "event_count": 33
+    },
+    {
       "date": "2026-03-31",
       "source": "auto.festivalinterlagos.com.br",
       "medium": "referral",
@@ -52975,17 +52997,6 @@
       "eng_dur_s": 12.0,
       "eng_sessions": 1,
       "event_count": 27
-    },
-    {
-      "date": "2026-09-19",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 6,
-      "sessions": 7,
-      "pageviews": 7,
-      "eng_dur_s": 63.0,
-      "eng_sessions": 5,
-      "event_count": 25
     },
     {
       "date": "2026-03-30",
@@ -58576,6 +58587,17 @@
       "event_count": 12
     },
     {
+      "date": "2026-09-19",
+      "source": "salesforce",
+      "medium": "email",
+      "new_users": 4,
+      "sessions": 4,
+      "pageviews": 4,
+      "eng_dur_s": 28.0,
+      "eng_sessions": 2,
+      "event_count": 15
+    },
+    {
       "date": "2026-03-30",
       "source": "engage.cloud.microsoft",
       "medium": "referral",
@@ -62952,17 +62974,6 @@
       "eng_dur_s": 4.0,
       "eng_sessions": 0,
       "event_count": 12
-    },
-    {
-      "date": "2026-09-19",
-      "source": "google",
-      "medium": "organic",
-      "new_users": 3,
-      "sessions": 4,
-      "pageviews": 4,
-      "eng_dur_s": 15.0,
-      "eng_sessions": 0,
-      "event_count": 13
     },
     {
       "date": "2026-03-30",
@@ -86935,6 +86946,17 @@
     },
     {
       "date": "2026-09-19",
+      "source": "google",
+      "medium": "cpc",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 2,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 1,
+      "event_count": 4
+    },
+    {
+      "date": "2026-09-19",
       "source": "ig",
       "medium": "paid",
       "new_users": 1,
@@ -86943,17 +86965,6 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 3
-    },
-    {
-      "date": "2026-09-19",
-      "source": "salesforce",
-      "medium": "email",
-      "new_users": 1,
-      "sessions": 1,
-      "pageviews": 1,
-      "eng_dur_s": 15.0,
-      "eng_sessions": 1,
-      "event_count": 4
     },
     {
       "date": "2026-03-30",
@@ -103228,6 +103239,17 @@
       "date": "2026-09-18",
       "source": "my-ichery.feishu.cn",
       "medium": "referral",
+      "new_users": 0,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 2
+    },
+    {
+      "date": "2026-09-19",
+      "source": "fb",
+      "medium": "paid",
       "new_users": 0,
       "sessions": 1,
       "pageviews": 1,
