@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-09-19T16:37:52.872395+00:00",
+  "updated_at": "2026-09-19T18:51:10.054034+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-09-19"
   },
   "totals": {
-    "sessions": 1912491,
-    "users": 1658697,
-    "new_users": 1287280,
-    "pageviews": 4322294,
-    "events": 10506296,
+    "sessions": 1912498,
+    "users": 1658704,
+    "new_users": 1287288,
+    "pageviews": 4322302,
+    "events": 10506322,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 53.0
+    "avg_bounce_rate": 53.02
   },
   "daily_series": [
     {
@@ -1921,14 +1921,14 @@
     },
     {
       "date": "2026-09-19",
-      "sessions": 25,
-      "users": 25,
-      "new_users": 21,
-      "pageviews": 28,
-      "events": 90,
+      "sessions": 32,
+      "users": 32,
+      "new_users": 29,
+      "pageviews": 36,
+      "events": 116,
       "conversions": 0.0,
-      "bounce_rate": 52.0,
-      "avg_session_s": 8.2
+      "bounce_rate": 56.25,
+      "avg_session_s": 8.0
     }
   ],
   "traffic_sources": [
@@ -2011,7 +2011,7 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2066414,
+      "pageviews": 2066421,
       "sessions": 1226279
     },
     {
@@ -2021,7 +2021,7 @@
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-auto",
-      "pageviews": 257015,
+      "pageviews": 257016,
       "sessions": 190308
     },
     {
@@ -5073,12 +5073,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 251656,
+      "new_users": 251659,
       "sessions": 341677,
-      "pageviews": 774001,
+      "pageviews": 774004,
       "avg_session_s": 150.7,
       "engagement_rate": 49.31,
-      "event_count": 1936744
+      "event_count": 1936753
     },
     {
       "source": "ig",
@@ -5093,22 +5093,22 @@
     {
       "source": "organico",
       "medium": "instagram",
-      "new_users": 94059,
+      "new_users": 94060,
       "sessions": 133639,
-      "pageviews": 468785,
+      "pageviews": 468786,
       "avg_session_s": 167.1,
       "engagement_rate": 76.08,
-      "event_count": 1018420
+      "event_count": 1018423
     },
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 67689,
+      "new_users": 67690,
       "sessions": 131320,
-      "pageviews": 407504,
+      "pageviews": 407505,
       "avg_session_s": 233.5,
       "engagement_rate": 63.68,
-      "event_count": 933901
+      "event_count": 933905
     },
     {
       "source": "tiktok",
@@ -5273,12 +5273,12 @@
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 8678,
-      "sessions": 11100,
-      "pageviews": 20758,
-      "avg_session_s": 96.8,
-      "engagement_rate": 55.22,
-      "event_count": 54493
+      "new_users": 8681,
+      "sessions": 11112,
+      "pageviews": 20761,
+      "avg_session_s": 96.7,
+      "engagement_rate": 55.16,
+      "event_count": 54503
     },
     {
       "source": "sfmc",
@@ -47004,6 +47004,17 @@
       "event_count": 49
     },
     {
+      "date": "2026-09-19",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 10,
+      "sessions": 11,
+      "pageviews": 12,
+      "eng_dur_s": 63.0,
+      "eng_sessions": 6,
+      "event_count": 39
+    },
+    {
       "date": "2026-04-03",
       "source": "l.instagram.com",
       "medium": "referral",
@@ -49391,6 +49402,17 @@
       "event_count": 46
     },
     {
+      "date": "2026-09-19",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 8,
+      "sessions": 9,
+      "pageviews": 11,
+      "eng_dur_s": 75.0,
+      "eng_sessions": 5,
+      "event_count": 37
+    },
+    {
       "date": "2026-04-01",
       "source": "m.facebook.com",
       "medium": "referral",
@@ -50954,25 +50976,14 @@
     },
     {
       "date": "2026-09-19",
-      "source": "(direct)",
-      "medium": "(none)",
+      "source": "salesforce",
+      "medium": "email",
       "new_users": 7,
-      "sessions": 9,
-      "pageviews": 9,
-      "eng_dur_s": 63.0,
-      "eng_sessions": 5,
-      "event_count": 30
-    },
-    {
-      "date": "2026-09-19",
-      "source": "google",
-      "medium": "organic",
-      "new_users": 7,
-      "sessions": 8,
-      "pageviews": 10,
-      "eng_dur_s": 61.0,
-      "eng_sessions": 4,
-      "event_count": 33
+      "sessions": 7,
+      "pageviews": 7,
+      "eng_dur_s": 33.0,
+      "eng_sessions": 2,
+      "event_count": 25
     },
     {
       "date": "2026-03-31",
@@ -58585,17 +58596,6 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 12
-    },
-    {
-      "date": "2026-09-19",
-      "source": "salesforce",
-      "medium": "email",
-      "new_users": 4,
-      "sessions": 4,
-      "pageviews": 4,
-      "eng_dur_s": 28.0,
-      "eng_sessions": 2,
-      "event_count": 15
     },
     {
       "date": "2026-03-30",
@@ -86959,6 +86959,17 @@
       "date": "2026-09-19",
       "source": "ig",
       "medium": "paid",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
+    },
+    {
+      "date": "2026-09-19",
+      "source": "organico",
+      "medium": "instagram",
       "new_users": 1,
       "sessions": 1,
       "pageviews": 1,
