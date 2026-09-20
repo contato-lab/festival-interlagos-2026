@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-09-20T19:18:03.666187+00:00",
+  "updated_at": "2026-09-20T21:36:53.706839+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-09-20"
   },
   "totals": {
-    "sessions": 1912593,
-    "users": 1658798,
-    "new_users": 1287359,
-    "pageviews": 4322406,
-    "events": 10506641,
+    "sessions": 1912601,
+    "users": 1658805,
+    "new_users": 1287366,
+    "pageviews": 4322416,
+    "events": 10506670,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 53.16
+    "avg_bounce_rate": 53.15
   },
   "daily_series": [
     {
@@ -1932,14 +1932,14 @@
     },
     {
       "date": "2026-09-20",
-      "sessions": 41,
-      "users": 41,
-      "new_users": 38,
-      "pageviews": 45,
-      "events": 143,
+      "sessions": 49,
+      "users": 48,
+      "new_users": 45,
+      "pageviews": 55,
+      "events": 172,
       "conversions": 0.0,
-      "bounce_rate": 65.85,
-      "avg_session_s": 31.7
+      "bounce_rate": 65.31,
+      "avg_session_s": 28.5
     }
   ],
   "traffic_sources": [
@@ -2022,7 +2022,7 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2066503,
+      "pageviews": 2066510,
       "sessions": 1226765
     },
     {
@@ -2032,12 +2032,12 @@
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-auto",
-      "pageviews": 257021,
+      "pageviews": 257023,
       "sessions": 190308
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-moto",
-      "pageviews": 235529,
+      "pageviews": 235530,
       "sessions": 165505
     },
     {
@@ -5058,22 +5058,22 @@
     {
       "source": "organico",
       "medium": "instagram",
-      "new_users": 94073,
+      "new_users": 94075,
       "sessions": 133639,
-      "pageviews": 468806,
+      "pageviews": 468809,
       "avg_session_s": 167.1,
       "engagement_rate": 76.08,
-      "event_count": 1018480
+      "event_count": 1018487
     },
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 67706,
+      "new_users": 67710,
       "sessions": 131381,
-      "pageviews": 407534,
+      "pageviews": 407540,
       "avg_session_s": 233.4,
       "engagement_rate": 63.67,
-      "event_count": 933995
+      "event_count": 934013
     },
     {
       "source": "tiktok",
@@ -5238,12 +5238,12 @@
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 8690,
+      "new_users": 8691,
       "sessions": 11110,
-      "pageviews": 20772,
+      "pageviews": 20773,
       "avg_session_s": 96.8,
       "engagement_rate": 55.19,
-      "event_count": 54541
+      "event_count": 54545
     },
     {
       "source": "sfmc",
@@ -49411,6 +49411,28 @@
       "event_count": 35
     },
     {
+      "date": "2026-09-20",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 8,
+      "sessions": 9,
+      "pageviews": 11,
+      "eng_dur_s": 63.0,
+      "eng_sessions": 3,
+      "event_count": 33
+    },
+    {
+      "date": "2026-09-20",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 8,
+      "sessions": 9,
+      "pageviews": 12,
+      "eng_dur_s": 63.0,
+      "eng_sessions": 4,
+      "event_count": 32
+    },
+    {
       "date": "2026-04-01",
       "source": "m.facebook.com",
       "medium": "referral",
@@ -53006,17 +53028,6 @@
       "eng_dur_s": 12.0,
       "eng_sessions": 1,
       "event_count": 27
-    },
-    {
-      "date": "2026-09-20",
-      "source": "organico",
-      "medium": "instagram",
-      "new_users": 6,
-      "sessions": 7,
-      "pageviews": 9,
-      "eng_dur_s": 63.0,
-      "eng_sessions": 3,
-      "event_count": 25
     },
     {
       "date": "2026-03-30",
@@ -58608,14 +58619,14 @@
     },
     {
       "date": "2026-09-20",
-      "source": "google",
-      "medium": "organic",
+      "source": "salesforce",
+      "medium": "email",
       "new_users": 4,
       "sessions": 4,
       "pageviews": 5,
-      "eng_dur_s": 7.0,
-      "eng_sessions": 1,
-      "event_count": 15
+      "eng_dur_s": 47.0,
+      "eng_sessions": 2,
+      "event_count": 18
     },
     {
       "date": "2026-03-30",
@@ -62994,17 +63005,6 @@
       "eng_dur_s": 4.0,
       "eng_sessions": 0,
       "event_count": 12
-    },
-    {
-      "date": "2026-09-20",
-      "source": "salesforce",
-      "medium": "email",
-      "new_users": 3,
-      "sessions": 3,
-      "pageviews": 4,
-      "eng_dur_s": 43.0,
-      "eng_sessions": 2,
-      "event_count": 14
     },
     {
       "date": "2026-03-30",
