@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-09-21T06:33:23.013669+00:00",
+  "updated_at": "2026-09-21T13:15:26.513140+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-09-21"
   },
   "totals": {
-    "sessions": 1912647,
-    "users": 1658847,
-    "new_users": 1287401,
-    "pageviews": 4322471,
-    "events": 10506831,
+    "sessions": 1912650,
+    "users": 1658850,
+    "new_users": 1287404,
+    "pageviews": 4322474,
+    "events": 10506841,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 53.14
+    "avg_bounce_rate": 53.16
   },
   "daily_series": [
     {
@@ -1943,14 +1943,14 @@
     },
     {
       "date": "2026-09-21",
-      "sessions": 8,
-      "users": 8,
-      "new_users": 8,
-      "pageviews": 8,
-      "events": 28,
+      "sessions": 11,
+      "users": 11,
+      "new_users": 11,
+      "pageviews": 11,
+      "events": 38,
       "conversions": 0.0,
-      "bounce_rate": 50.0,
-      "avg_session_s": 6.6
+      "bounce_rate": 54.55,
+      "avg_session_s": 6.0
     }
   ],
   "traffic_sources": [
@@ -1971,7 +1971,7 @@
     },
     {
       "channel": "Unassigned",
-      "sessions": 180348,
+      "sessions": 180274,
       "conversions": 64.0
     },
     {
@@ -1986,7 +1986,7 @@
     },
     {
       "channel": "Organic Search",
-      "sessions": 142188,
+      "sessions": 142220,
       "conversions": 580.0
     },
     {
@@ -2001,7 +2001,7 @@
     },
     {
       "channel": "Email",
-      "sessions": 27814,
+      "sessions": 27799,
       "conversions": 17.0
     },
     {
@@ -2033,8 +2033,8 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2066555,
-      "sessions": 1226765
+      "pageviews": 2066558,
+      "sessions": 1226279
     },
     {
       "page": "/ingressos/",
@@ -2315,7 +2315,7 @@
   "influencer_breakdown": [
     {
       "source": "perfilfestival",
-      "sessions": 32509,
+      "sessions": 32499,
       "conversions": 0,
       "tickets": {
         "Drive Pass": 908,
@@ -2457,7 +2457,7 @@
     },
     {
       "source": "email_broad_marketing_suhaifestivalinterlagos_clientes_20260807_ip96",
-      "sessions": 4194,
+      "sessions": 4193,
       "conversions": 0,
       "tickets": {
         "Drive Pass": 45,
@@ -5014,12 +5014,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 251684,
+      "new_users": 251685,
       "sessions": 341677,
-      "pageviews": 774035,
+      "pageviews": 774036,
       "avg_session_s": 150.8,
       "engagement_rate": 49.31,
-      "event_count": 1936853
+      "event_count": 1936856
     },
     {
       "source": "ig",
@@ -5035,21 +5035,21 @@
       "source": "organico",
       "medium": "instagram",
       "new_users": 94085,
-      "sessions": 133680,
+      "sessions": 133639,
       "pageviews": 468822,
-      "avg_session_s": 167.0,
-      "engagement_rate": 76.06,
+      "avg_session_s": 167.1,
+      "engagement_rate": 76.08,
       "event_count": 1018528
     },
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 67716,
-      "sessions": 131381,
-      "pageviews": 407554,
+      "new_users": 67717,
+      "sessions": 131409,
+      "pageviews": 407555,
       "avg_session_s": 233.4,
-      "engagement_rate": 63.67,
-      "event_count": 934053
+      "engagement_rate": 63.66,
+      "event_count": 934057
     },
     {
       "source": "tiktok",
@@ -5214,12 +5214,12 @@
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 8699,
-      "sessions": 11125,
-      "pageviews": 20789,
-      "avg_session_s": 96.7,
-      "engagement_rate": 55.14,
-      "event_count": 54585
+      "new_users": 8700,
+      "sessions": 11110,
+      "pageviews": 20790,
+      "avg_session_s": 96.9,
+      "engagement_rate": 55.2,
+      "event_count": 54588
     },
     {
       "source": "sfmc",
@@ -5375,10 +5375,10 @@
       "source": "m.facebook.com",
       "medium": "referral",
       "new_users": 1208,
-      "sessions": 1400,
+      "sessions": 1401,
       "pageviews": 2271,
       "avg_session_s": 34.0,
-      "engagement_rate": 26.79,
+      "engagement_rate": 26.77,
       "event_count": 5864
     },
     {
@@ -55668,6 +55668,17 @@
       "event_count": 15
     },
     {
+      "date": "2026-09-21",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 5,
+      "sessions": 5,
+      "pageviews": 5,
+      "eng_dur_s": 50.0,
+      "eng_sessions": 4,
+      "event_count": 19
+    },
+    {
       "date": "2026-03-30",
       "source": "an",
       "medium": "paid",
@@ -58603,17 +58614,6 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 12
-    },
-    {
-      "date": "2026-09-21",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 4,
-      "sessions": 4,
-      "pageviews": 4,
-      "eng_dur_s": 50.0,
-      "eng_sessions": 4,
-      "event_count": 16
     },
     {
       "date": "2026-03-30",
@@ -69784,6 +69784,17 @@
       "date": "2026-09-20",
       "source": "Tiktok",
       "medium": "Tiktok Ads",
+      "new_users": 2,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 6
+    },
+    {
+      "date": "2026-09-21",
+      "source": "salesforce",
+      "medium": "email",
       "new_users": 2,
       "sessions": 2,
       "pageviews": 2,
@@ -87074,14 +87085,14 @@
     },
     {
       "date": "2026-09-21",
-      "source": "salesforce",
-      "medium": "email",
+      "source": "google",
+      "medium": "organic",
       "new_users": 1,
       "sessions": 1,
       "pageviews": 1,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 3
+      "eng_dur_s": 13.0,
+      "eng_sessions": 1,
+      "event_count": 4
     },
     {
       "date": "2026-03-30",
