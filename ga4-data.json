@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-09-24T05:51:41.235669+00:00",
+  "updated_at": "2026-09-24T10:32:38.710136+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-09-24"
   },
   "totals": {
-    "sessions": 1913144,
-    "users": 1659323,
-    "new_users": 1287736,
-    "pageviews": 4323090,
-    "events": 10508536,
+    "sessions": 1913149,
+    "users": 1659328,
+    "new_users": 1287740,
+    "pageviews": 4323095,
+    "events": 10508551,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 53.74
+    "avg_bounce_rate": 53.66
   },
   "daily_series": [
     {
@@ -1976,14 +1976,14 @@
     },
     {
       "date": "2026-09-24",
-      "sessions": 2,
-      "users": 2,
-      "new_users": 1,
-      "pageviews": 2,
-      "events": 6,
+      "sessions": 7,
+      "users": 7,
+      "new_users": 5,
+      "pageviews": 7,
+      "events": 21,
       "conversions": 0.0,
-      "bounce_rate": 100.0,
-      "avg_session_s": 3.5
+      "bounce_rate": 85.71,
+      "avg_session_s": 5.0
     }
   ],
   "traffic_sources": [
@@ -2066,12 +2066,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2067046,
+      "pageviews": 2067050,
       "sessions": 1226765
     },
     {
       "page": "/ingressos/",
-      "pageviews": 539668,
+      "pageviews": 539669,
       "sessions": 380630
     },
     {
@@ -4931,12 +4931,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 251819,
+      "new_users": 251823,
       "sessions": 342149,
-      "pageviews": 774207,
+      "pageviews": 774211,
       "avg_session_s": 150.5,
       "engagement_rate": 49.25,
-      "event_count": 1937359
+      "event_count": 1937372
     },
     {
       "source": "ig",
@@ -4963,10 +4963,10 @@
       "medium": "organic",
       "new_users": 67794,
       "sessions": 131489,
-      "pageviews": 407787,
+      "pageviews": 407788,
       "avg_session_s": 233.3,
       "engagement_rate": 63.66,
-      "event_count": 934661
+      "event_count": 934663
     },
     {
       "source": "tiktok",
@@ -55750,6 +55750,17 @@
       "event_count": 15
     },
     {
+      "date": "2026-09-24",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 5,
+      "sessions": 6,
+      "pageviews": 6,
+      "eng_dur_s": 34.0,
+      "eng_sessions": 1,
+      "event_count": 19
+    },
+    {
       "date": "2026-03-30",
       "source": "an",
       "medium": "paid",
@@ -87397,17 +87408,6 @@
       "event_count": 6
     },
     {
-      "date": "2026-09-24",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 1,
-      "sessions": 2,
-      "pageviews": 2,
-      "eng_dur_s": 6.0,
-      "eng_sessions": 0,
-      "event_count": 6
-    },
-    {
       "date": "2026-03-30",
       "source": "(not set)",
       "medium": "(not set)",
@@ -103955,6 +103955,17 @@
       "date": "2026-09-23",
       "source": "meta",
       "medium": "social_media_paid",
+      "new_users": 0,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 2
+    },
+    {
+      "date": "2026-09-24",
+      "source": "google",
+      "medium": "organic",
       "new_users": 0,
       "sessions": 1,
       "pageviews": 1,
