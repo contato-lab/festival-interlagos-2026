@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-05T17:27:29.294068+00:00",
+  "updated_at": "2026-10-05T23:15:25.647426+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-05"
   },
   "totals": {
-    "sessions": 1918174,
-    "users": 1664148,
-    "new_users": 1292070,
-    "pageviews": 4329995,
-    "events": 10528287,
+    "sessions": 1918232,
+    "users": 1664202,
+    "new_users": 1292115,
+    "pageviews": 4330060,
+    "events": 10528485,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 53.97
+    "avg_bounce_rate": 53.94
   },
   "daily_series": [
     {
@@ -2097,14 +2097,14 @@
     },
     {
       "date": "2026-10-05",
-      "sessions": 21,
-      "users": 21,
-      "new_users": 15,
-      "pageviews": 23,
-      "events": 66,
+      "sessions": 79,
+      "users": 75,
+      "new_users": 60,
+      "pageviews": 88,
+      "events": 264,
       "conversions": 0.0,
-      "bounce_rate": 80.95,
-      "avg_session_s": 10.8
+      "bounce_rate": 74.68,
+      "avg_session_s": 50.0
     }
   ],
   "traffic_sources": [
@@ -2155,7 +2155,7 @@
     },
     {
       "channel": "Email",
-      "sessions": 27951,
+      "sessions": 27972,
       "conversions": 17.0
     },
     {
@@ -2187,17 +2187,17 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2070980,
+      "pageviews": 2071027,
       "sessions": 1229306
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541244,
+      "pageviews": 541251,
       "sessions": 381697
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-auto",
-      "pageviews": 257867,
+      "pageviews": 257869,
       "sessions": 190695
     },
     {
@@ -2217,7 +2217,7 @@
     },
     {
       "page": "/login",
-      "pageviews": 112117,
+      "pageviews": 112120,
       "sessions": 58559
     },
     {
@@ -4509,22 +4509,22 @@
     {
       "source": "google",
       "medium": "cpc",
-      "new_users": 202890,
+      "new_users": 202891,
       "sessions": 345244,
-      "pageviews": 1051660,
+      "pageviews": 1051661,
       "avg_session_s": 207.6,
       "engagement_rate": 64.87,
-      "event_count": 2425867
+      "event_count": 2425870
     },
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 252530,
+      "new_users": 252546,
       "sessions": 341978,
-      "pageviews": 775171,
+      "pageviews": 775188,
       "avg_session_s": 150.7,
       "engagement_rate": 49.27,
-      "event_count": 1940196
+      "event_count": 1940248
     },
     {
       "source": "ig",
@@ -4539,22 +4539,22 @@
     {
       "source": "organico",
       "medium": "instagram",
-      "new_users": 95448,
+      "new_users": 95454,
       "sessions": 135044,
-      "pageviews": 470786,
+      "pageviews": 470793,
       "avg_session_s": 165.8,
       "engagement_rate": 75.98,
-      "event_count": 1023985
+      "event_count": 1024008
     },
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 69696,
+      "new_users": 69709,
       "sessions": 133134,
-      "pageviews": 411113,
+      "pageviews": 411142,
       "avg_session_s": 231.5,
       "engagement_rate": 63.82,
-      "event_count": 944276
+      "event_count": 944360
     },
     {
       "source": "tiktok",
@@ -4651,10 +4651,10 @@
       "medium": "referral",
       "new_users": 18805,
       "sessions": 33547,
-      "pageviews": 48967,
+      "pageviews": 48968,
       "avg_session_s": 249.1,
       "engagement_rate": 61.77,
-      "event_count": 162973
+      "event_count": 162975
     },
     {
       "source": "fb",
@@ -4709,12 +4709,12 @@
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 8811,
-      "sessions": 11219,
-      "pageviews": 20930,
+      "new_users": 8819,
+      "sessions": 11226,
+      "pageviews": 20939,
       "avg_session_s": 96.4,
-      "engagement_rate": 55.01,
-      "event_count": 55036
+      "engagement_rate": 55.0,
+      "event_count": 55066
     },
     {
       "source": "instagram.com",
@@ -5489,12 +5489,12 @@
     {
       "source": "motorshow.com.br",
       "medium": "referral",
-      "new_users": 65,
-      "sessions": 86,
-      "pageviews": 260,
-      "avg_session_s": 175.6,
-      "engagement_rate": 70.93,
-      "event_count": 631
+      "new_users": 66,
+      "sessions": 87,
+      "pageviews": 261,
+      "avg_session_s": 173.7,
+      "engagement_rate": 70.11,
+      "event_count": 635
     },
     {
       "source": "RD Station",
@@ -37672,6 +37672,17 @@
       "event_count": 152
     },
     {
+      "date": "2026-10-05",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 25,
+      "sessions": 28,
+      "pageviews": 28,
+      "eng_dur_s": 192.0,
+      "eng_sessions": 5,
+      "event_count": 87
+    },
+    {
       "date": "2026-03-31",
       "source": "instagram.com",
       "medium": "referral",
@@ -41993,6 +42004,17 @@
       "eng_dur_s": 67.0,
       "eng_sessions": 8,
       "event_count": 59
+    },
+    {
+      "date": "2026-10-05",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 16,
+      "sessions": 29,
+      "pageviews": 36,
+      "eng_dur_s": 390.0,
+      "eng_sessions": 10,
+      "event_count": 100
     },
     {
       "date": "2026-03-31",
@@ -48133,17 +48155,6 @@
       "event_count": 36
     },
     {
-      "date": "2026-10-05",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 9,
-      "sessions": 11,
-      "pageviews": 11,
-      "eng_dur_s": 99.0,
-      "eng_sessions": 3,
-      "event_count": 35
-    },
-    {
       "date": "2026-04-01",
       "source": "autodromodeinterlagos.prefeitura.sp.gov.br",
       "medium": "referral",
@@ -49572,6 +49583,28 @@
       "eng_dur_s": 131.0,
       "eng_sessions": 6,
       "event_count": 46
+    },
+    {
+      "date": "2026-10-05",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 8,
+      "sessions": 8,
+      "pageviews": 9,
+      "eng_dur_s": 48.0,
+      "eng_sessions": 3,
+      "event_count": 29
+    },
+    {
+      "date": "2026-10-05",
+      "source": "salesforce",
+      "medium": "email",
+      "new_users": 8,
+      "sessions": 8,
+      "pageviews": 9,
+      "eng_dur_s": 41.0,
+      "eng_sessions": 2,
+      "event_count": 30
     },
     {
       "date": "2026-04-01",
@@ -63456,17 +63489,6 @@
       "event_count": 9
     },
     {
-      "date": "2026-10-05",
-      "source": "google",
-      "medium": "organic",
-      "new_users": 3,
-      "sessions": 5,
-      "pageviews": 7,
-      "eng_dur_s": 7.0,
-      "eng_sessions": 1,
-      "event_count": 16
-    },
-    {
       "date": "2026-03-30",
       "source": "chatgpt.com",
       "medium": "(not set)",
@@ -70560,17 +70582,6 @@
       "eng_dur_s": 1.0,
       "eng_sessions": 1,
       "event_count": 9
-    },
-    {
-      "date": "2026-10-05",
-      "source": "organico",
-      "medium": "instagram",
-      "new_users": 2,
-      "sessions": 2,
-      "pageviews": 2,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 6
     },
     {
       "date": "2026-03-30",
@@ -88822,6 +88833,28 @@
       "event_count": 3
     },
     {
+      "date": "2026-10-05",
+      "source": "google",
+      "medium": "cpc",
+      "new_users": 1,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 3.0,
+      "eng_sessions": 0,
+      "event_count": 6
+    },
+    {
+      "date": "2026-10-05",
+      "source": "motorshow.com.br",
+      "medium": "referral",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 8.0,
+      "eng_sessions": 0,
+      "event_count": 4
+    },
+    {
       "date": "2026-03-30",
       "source": "(not set)",
       "medium": "(not set)",
@@ -105719,14 +105752,14 @@
     },
     {
       "date": "2026-10-05",
-      "source": "google",
-      "medium": "cpc",
+      "source": "ingressosauto.festivalinterlagos.com.br",
+      "medium": "referral",
       "new_users": 0,
       "sessions": 1,
       "pageviews": 1,
-      "eng_dur_s": 3.0,
+      "eng_dur_s": 0.0,
       "eng_sessions": 0,
-      "event_count": 3
+      "event_count": 2
     },
     {
       "date": "2026-10-05",
