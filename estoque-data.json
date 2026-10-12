@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-10-11 21:46",
-  "source": "Base das planilhas de moto 2026-08-14 / auto 2026-08-14 — API do sistema proprio indisponivel para auto, numeros dessas edicoes sao do snapshot, nao ao vivo",
+  "updated_at": "2026-10-12 03:38",
+  "source": "Base das planilhas de moto 2026-08-14 / auto 2026-08-14 menos vendas ao vivo da API do sistema proprio",
   "edicoes": {
     "moto": {
       "label": "Edicao Moto",
@@ -467,34 +467,34 @@
         "29/08",
         "30/08"
       ],
-      "total_disponivel": 3049,
+      "total_disponivel": 2339,
       "marcas_com_vaga": 26,
       "passes": [
         {
           "nome": "Drive Pass",
-          "total": 1800,
+          "total": 1177,
           "marcas": [
             {
               "marca": "ABARTH",
               "modelos": 2,
               "dias": [
-                9,
-                16,
+                2,
+                10,
                 8,
                 8
               ],
-              "total": 41
+              "total": 28
             },
             {
               "marca": "BYD",
               "modelos": 4,
               "dias": [
+                7,
+                20,
                 16,
-                29,
-                16,
-                36
+                17
               ],
-              "total": 97
+              "total": 60
             },
             {
               "marca": "DENZA",
@@ -511,133 +511,133 @@
               "marca": "GAC",
               "modelos": 4,
               "dias": [
-                63,
-                105,
-                36,
-                106
+                59,
+                82,
+                17,
+                62
               ],
-              "total": 310
+              "total": 220
             },
             {
               "marca": "GEELY",
               "modelos": 1,
               "dias": [
-                15,
-                28,
-                5,
-                32
+                12,
+                19,
+                4,
+                11
               ],
-              "total": 80
+              "total": 46
             },
             {
               "marca": "GWM",
               "modelos": 2,
               "dias": [
-                4,
-                15,
+                0,
                 8,
-                12
+                8,
+                8
               ],
-              "total": 39
+              "total": 24
             },
             {
               "marca": "HONDA",
               "modelos": 3,
               "dias": [
-                8,
-                15,
+                2,
+                3,
                 12,
-                19
+                0
               ],
-              "total": 54
+              "total": 17
             },
             {
               "marca": "JAECOO",
               "modelos": 1,
               "dias": [
+                10,
                 12,
-                21,
                 4,
-                20
+                5
               ],
-              "total": 57
+              "total": 31
             },
             {
               "marca": "JEEP",
               "modelos": 3,
               "dias": [
-                44,
-                61,
-                13,
-                55
+                31,
+                40,
+                12,
+                21
               ],
-              "total": 173
+              "total": 104
             },
             {
               "marca": "JETOUR",
               "modelos": 3,
               "dias": [
-                38,
-                75,
-                20,
-                81
+                33,
+                47,
+                12,
+                34
               ],
-              "total": 214
+              "total": 126
             },
             {
               "marca": "LEAPMOTOR",
               "modelos": 2,
               "dias": [
-                33,
-                56,
-                28,
-                56
+                29,
+                42,
+                10,
+                26
               ],
-              "total": 173
+              "total": 107
             },
             {
               "marca": "MITSUBISHI",
               "modelos": 3,
               "dias": [
-                41,
-                57,
+                33,
+                31,
                 12,
-                41
+                17
               ],
-              "total": 151
+              "total": 93
             },
             {
               "marca": "OMODA",
               "modelos": 1,
               "dias": [
-                14,
-                24,
+                12,
+                15,
                 4,
-                16
+                8
               ],
-              "total": 58
+              "total": 39
             },
             {
               "marca": "PEUGEOT",
               "modelos": 2,
               "dias": [
-                28,
-                49,
-                24,
-                38
+                26,
+                37,
+                12,
+                29
               ],
-              "total": 139
+              "total": 104
             },
             {
               "marca": "RAM",
               "modelos": 2,
               "dias": [
-                7,
-                9,
+                1,
+                8,
                 8,
                 8
               ],
-              "total": 32
+              "total": 25
             },
             {
               "marca": "RENAULT",
@@ -645,71 +645,71 @@
               "dias": [
                 16,
                 31,
-                14,
-                25
+                4,
+                20
               ],
-              "total": 86
+              "total": 71
             },
             {
               "marca": "TOYOTA",
               "modelos": 2,
               "dias": [
-                5,
-                20,
+                3,
+                14,
                 8,
-                10
+                8
               ],
-              "total": 43
+              "total": 33
             },
             {
               "marca": "VOLVO",
               "modelos": 3,
               "dias": [
-                5,
+                1,
                 12,
                 12,
                 12
               ],
-              "total": 41
+              "total": 37
             }
           ]
         },
         {
           "nome": "Super Sport Pass",
-          "total": 1199,
+          "total": 1112,
           "marcas": [
             {
               "marca": "BMW",
               "modelos": 1,
               "dias": [
                 22,
-                41,
-                34,
-                39
+                37,
+                24,
+                37
               ],
-              "total": 136
+              "total": 120
             },
             {
               "marca": "CHEVROLET",
               "modelos": 1,
               "dias": [
-                21,
-                41,
+                20,
+                31,
                 4,
-                34
+                18
               ],
-              "total": 100
+              "total": 73
             },
             {
               "marca": "FERRARI",
               "modelos": 2,
               "dias": [
-                46,
-                85,
+                45,
                 84,
-                87
+                82,
+                82
               ],
-              "total": 302
+              "total": 293
             },
             {
               "marca": "LAMBORGHINI",
@@ -717,43 +717,43 @@
               "dias": [
                 24,
                 41,
-                39,
-                43
+                38,
+                42
               ],
-              "total": 147
+              "total": 145
             },
             {
               "marca": "MCLAREN",
               "modelos": 1,
               "dias": [
-                19,
+                18,
                 40,
-                39,
+                38,
                 42
               ],
-              "total": 140
+              "total": 138
             },
             {
               "marca": "NISSAN",
               "modelos": 1,
               "dias": [
-                24,
-                44,
-                44,
+                23,
+                43,
+                42,
                 44
               ],
-              "total": 156
+              "total": 152
             },
             {
               "marca": "PORSCHE",
               "modelos": 1,
               "dias": [
-                16,
-                25,
+                13,
+                14,
                 4,
-                17
+                4
               ],
-              "total": 62
+              "total": 35
             },
             {
               "marca": "TOYOTA",
@@ -818,38 +818,34 @@
           "total": 12
         },
         {
-          "marca": "RAM",
-          "total": 32
+          "marca": "GWM",
+          "total": 24
         },
         {
-          "marca": "GWM",
-          "total": 39
+          "marca": "RAM",
+          "total": 25
         }
       ],
       "mais_folga": [
         {
-          "marca": "GAC",
-          "total": 310
-        },
-        {
           "marca": "FERRARI",
-          "total": 302
+          "total": 293
         },
         {
-          "marca": "JETOUR",
-          "total": 214
+          "marca": "GAC",
+          "total": 220
         },
         {
           "marca": "TOYOTA",
-          "total": 199
+          "total": 189
+        },
+        {
+          "marca": "NISSAN",
+          "total": 152
         }
       ],
       "cadastrados": 6552,
-      "ao_vivo": false,
-      "erro_api": "The read operation timed out"
+      "ao_vivo": true
     }
-  },
-  "api_indisponivel": [
-    "auto"
-  ]
+  }
 }
