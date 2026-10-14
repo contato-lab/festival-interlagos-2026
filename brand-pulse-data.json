@@ -3228,11 +3228,11 @@
    "sentimento": "neutro"
   }
  ],
- "feed_auto_updated_at": "2026-10-13T17:57:23Z",
+ "feed_auto_updated_at": "2026-10-14T00:09:29Z",
  "feed_auto_total": 300,
  "feed_auto_negativas": 0,
  "busca": {
-  "updated_at": "2026-10-13",
+  "updated_at": "2026-10-14",
   "sugestoes": {
    "festival interlagos": [
     "festival interlagos 2026",
@@ -3263,11 +3263,6 @@
   "nota": "Percentual das sugestões do Google que mostram intenção de compra (ingressos, datas, valores)."
  },
  "historico_busca": [
-  {
-   "data": "2026-06-15",
-   "share_transacional": 55,
-   "total_sugestoes": 20
-  },
   {
    "data": "2026-06-16",
    "share_transacional": 55,
@@ -3862,6 +3857,11 @@
    "data": "2026-10-13",
    "share_transacional": 50,
    "total_sugestoes": 20
+  },
+  {
+   "data": "2026-10-14",
+   "share_transacional": 50,
+   "total_sugestoes": 20
   }
  ],
  "integracoes": {
@@ -3873,7 +3873,7 @@
   "apify_social": true
  },
  "serp": {
-  "updated_at": "2026-10-13",
+  "updated_at": "2026-10-14",
   "fonte": "Brave Search",
   "top": [
    {
@@ -4002,12 +4002,6 @@
   "riscos": []
  },
  "historico_serp": [
-  {
-   "data": "2026-06-15",
-   "health": 100,
-   "owned": 13,
-   "riscos": 0
-  },
   {
    "data": "2026-06-16",
    "health": 100,
@@ -4721,25 +4715,26 @@
    "health": 100,
    "owned": 11,
    "riscos": 0
+  },
+  {
+   "data": "2026-10-14",
+   "health": 100,
+   "owned": 11,
+   "riscos": 0
   }
  ],
  "social_proprio": {
   "instagram": {
-   "followers": 208144,
+   "followers": 208131,
    "posts": 1331,
-   "updated_at": "2026-10-13"
+   "updated_at": "2026-10-14"
   },
   "tiktok": {
-   "followers": 4426,
-   "updated_at": "2026-10-13"
+   "followers": 4425,
+   "updated_at": "2026-10-14"
   }
  },
  "historico_social": [
-  {
-   "data": "2026-06-15",
-   "ig": 161350,
-   "tt": 3044
-  },
   {
    "data": "2026-06-16",
    "ig": 161718,
@@ -5334,6 +5329,11 @@
    "data": "2026-10-13",
    "ig": 208144,
    "tt": 4426
+  },
+  {
+   "data": "2026-10-14",
+   "ig": 208131,
+   "tt": 4425
   }
  ],
  "videos_monitorados": [
@@ -5344,31 +5344,31 @@
   "plataformas": {
    "instagram": {
     "coletados": 30,
-    "positivos": 18,
+    "positivos": 17,
     "negativos": 0,
     "comentarios": [
      {
-      "texto": "Vai ser lindo reviver esse espetáculo 😍",
-      "autor": "amooo_ferrugem",
-      "likes": 2,
+      "texto": "Ué e o Matue ???",
+      "autor": "ijullycruz_",
+      "likes": 1,
+      "data": "2026-10-02",
+      "sentimento": "neutro",
+      "url": "https://www.instagram.com/p/DeADsbqPcRz/",
+      "origem": "post oficial"
+     },
+     {
+      "texto": "@yaasrodriigues bora reviver aquele dia 😍",
+      "autor": "daiana.aragao",
+      "likes": 1,
       "data": "2026-10-02",
       "sentimento": "positivo",
       "url": "https://www.instagram.com/p/DeADsbqPcRz/",
       "origem": "post oficial"
      },
      {
-      "texto": "Que tudooo ❤️",
-      "autor": "fcapagueipratodos",
-      "likes": 0,
-      "data": "2026-10-02",
-      "sentimento": "positivo",
-      "url": "https://www.instagram.com/p/DeADsbqPcRz/",
-      "origem": "post oficial"
-     },
-     {
-      "texto": "Foi 🔝 evento, ano que vem marcaremos novamente presença. 👨🏻‍🔧😃 @festival.interlagos",
-      "autor": "daniel_henrique_pereira",
-      "likes": 0,
+      "texto": "Cade o @hungria_oficial",
+      "autor": "ewerton.souza.9",
+      "likes": 1,
       "data": "2026-10-02",
       "sentimento": "neutro",
       "url": "https://www.instagram.com/p/DeADsbqPcRz/",
@@ -5618,7 +5618,7 @@
       "origem": "post oficial"
      }
     ],
-    "updated_at": "2026-10-13"
+    "updated_at": "2026-10-14"
    },
    "tiktok": {
     "coletados": 30,
@@ -5896,7 +5896,7 @@
       "origem": "vídeo oficial"
      }
     ],
-    "updated_at": "2026-10-13"
+    "updated_at": "2026-10-14"
    },
    "youtube": {
     "coletados": 24,
@@ -6092,10 +6092,10 @@
       "origem": "vídeo de criador"
      }
     ],
-    "updated_at": "2026-10-13"
+    "updated_at": "2026-10-14"
    }
   },
-  "updated_at": "2026-10-13",
+  "updated_at": "2026-10-14",
   "resumo": {
    "instagram": "O festival gera grande interesse de público com muita procura e revenda de ingressos para os diferentes dias e categorias, além de dúvidas sobre regulamentações dos test rides na pista. Há reclamações sobre preços elevados dos ingressos e organização deficiente dos estacionamentos durante os shows.",
    "tiktok": "Há grande interesse e empolgação dos participantes em relação aos ingressos do festival, com muitas dúvidas sobre onde comprá-los. O evento também gera curiosidade sobre as motos disponíveis para test rides e o lineup de apresentações.",
