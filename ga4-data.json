@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-15T06:21:34.607430+00:00",
+  "updated_at": "2026-10-15T11:43:41.622497+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-15"
   },
   "totals": {
-    "sessions": 1919463,
-    "users": 1665377,
-    "new_users": 1293147,
-    "pageviews": 4331481,
-    "events": 10532763,
+    "sessions": 1919467,
+    "users": 1665381,
+    "new_users": 1293150,
+    "pageviews": 4331495,
+    "events": 10532795,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 54.75
+    "avg_bounce_rate": 54.6
   },
   "daily_series": [
     {
@@ -2204,6 +2204,17 @@
       "conversions": 0.0,
       "bounce_rate": 73.55,
       "avg_session_s": 34.9
+    },
+    {
+      "date": "2026-10-15",
+      "sessions": 4,
+      "users": 4,
+      "new_users": 3,
+      "pageviews": 14,
+      "events": 32,
+      "conversions": 0.0,
+      "bounce_rate": 25.0,
+      "avg_session_s": 120.9
     }
   ],
   "traffic_sources": [
@@ -2286,17 +2297,17 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2072005,
+      "pageviews": 2072006,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541438,
+      "pageviews": 541443,
       "sessions": 381792
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-auto",
-      "pageviews": 257926,
+      "pageviews": 257931,
       "sessions": 190695
     },
     {
@@ -3938,10 +3949,10 @@
       "medium": "(none)",
       "new_users": 253026,
       "sessions": 342479,
-      "pageviews": 775744,
+      "pageviews": 775745,
       "avg_session_s": 150.5,
       "engagement_rate": 49.23,
-      "event_count": 1941937
+      "event_count": 1941940
     },
     {
       "source": "ig",
@@ -3966,12 +3977,12 @@
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 69936,
+      "new_users": 69939,
       "sessions": 133496,
-      "pageviews": 411556,
+      "pageviews": 411569,
       "avg_session_s": 231.1,
       "engagement_rate": 63.76,
-      "event_count": 945606
+      "event_count": 945635
     },
     {
       "source": "tiktok",
@@ -63456,6 +63467,17 @@
       "event_count": 15
     },
     {
+      "date": "2026-10-15",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 3,
+      "sessions": 3,
+      "pageviews": 13,
+      "eng_dur_s": 89.0,
+      "eng_sessions": 2,
+      "event_count": 29
+    },
+    {
       "date": "2026-03-30",
       "source": "chatgpt.com",
       "medium": "(not set)",
@@ -106673,6 +106695,17 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 4
+    },
+    {
+      "date": "2026-10-15",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 0,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 13.0,
+      "eng_sessions": 1,
+      "event_count": 3
     }
   ]
 }
