@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-15T15:44:17.367088+00:00",
+  "updated_at": "2026-10-15T19:23:22.901108+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-15"
   },
   "totals": {
-    "sessions": 1919472,
-    "users": 1665386,
-    "new_users": 1293155,
-    "pageviews": 4331500,
-    "events": 10532811,
+    "sessions": 1919480,
+    "users": 1665394,
+    "new_users": 1293161,
+    "pageviews": 4331508,
+    "events": 10532834,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 54.8
+    "avg_bounce_rate": 54.85
   },
   "daily_series": [
     {
@@ -2207,14 +2207,14 @@
     },
     {
       "date": "2026-10-15",
-      "sessions": 9,
-      "users": 9,
-      "new_users": 8,
-      "pageviews": 19,
-      "events": 48,
+      "sessions": 17,
+      "users": 17,
+      "new_users": 14,
+      "pageviews": 27,
+      "events": 71,
       "conversions": 0.0,
-      "bounce_rate": 66.67,
-      "avg_session_s": 54.5
+      "bounce_rate": 76.47,
+      "avg_session_s": 30.4
     }
   ],
   "traffic_sources": [
@@ -2297,12 +2297,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2072011,
+      "pageviews": 2072014,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541443,
+      "pageviews": 541445,
       "sessions": 381792
     },
     {
@@ -3947,12 +3947,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 253029,
+      "new_users": 253034,
       "sessions": 342782,
-      "pageviews": 775748,
+      "pageviews": 775754,
       "avg_session_s": 150.4,
       "engagement_rate": 49.21,
-      "event_count": 1941949
+      "event_count": 1941966
     },
     {
       "source": "ig",
@@ -3967,22 +3967,22 @@
     {
       "source": "organico",
       "medium": "instagram",
-      "new_users": 95598,
+      "new_users": 95599,
       "sessions": 135102,
-      "pageviews": 470997,
+      "pageviews": 470998,
       "avg_session_s": 165.8,
       "engagement_rate": 75.98,
-      "event_count": 1024588
+      "event_count": 1024592
     },
     {
       "source": "google",
       "medium": "organic",
       "new_users": 69939,
       "sessions": 133450,
-      "pageviews": 411569,
+      "pageviews": 411570,
       "avg_session_s": 231.2,
       "engagement_rate": 63.76,
-      "event_count": 945635
+      "event_count": 945637
     },
     {
       "source": "tiktok",
@@ -49354,6 +49354,17 @@
       "event_count": 33
     },
     {
+      "date": "2026-10-15",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 8,
+      "sessions": 10,
+      "pageviews": 10,
+      "eng_dur_s": 13.0,
+      "eng_sessions": 1,
+      "event_count": 29
+    },
+    {
       "date": "2026-04-01",
       "source": "m.facebook.com",
       "medium": "referral",
@@ -63468,25 +63479,14 @@
     },
     {
       "date": "2026-10-15",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 3,
-      "sessions": 4,
-      "pageviews": 4,
-      "eng_dur_s": 13.0,
-      "eng_sessions": 1,
-      "event_count": 12
-    },
-    {
-      "date": "2026-10-15",
       "source": "google",
       "medium": "organic",
       "new_users": 3,
-      "sessions": 3,
-      "pageviews": 13,
+      "sessions": 4,
+      "pageviews": 14,
       "eng_dur_s": 89.0,
       "eng_sessions": 2,
-      "event_count": 29
+      "event_count": 31
     },
     {
       "date": "2026-03-30",
@@ -70659,6 +70659,17 @@
       "eng_dur_s": 49.0,
       "eng_sessions": 1,
       "event_count": 8
+    },
+    {
+      "date": "2026-10-15",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 2,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 8.0,
+      "eng_sessions": 1,
+      "event_count": 7
     },
     {
       "date": "2026-03-30",
@@ -89496,17 +89507,6 @@
       "date": "2026-10-14",
       "source": "uolads",
       "medium": "awareness",
-      "new_users": 1,
-      "sessions": 1,
-      "pageviews": 1,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 3
-    },
-    {
-      "date": "2026-10-15",
-      "source": "organico",
-      "medium": "instagram",
       "new_users": 1,
       "sessions": 1,
       "pageviews": 1,
