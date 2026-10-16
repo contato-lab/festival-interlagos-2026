@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-16T14:04:25.867319+00:00",
+  "updated_at": "2026-10-16T17:57:18.985596+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-16"
   },
   "totals": {
-    "sessions": 1919602,
-    "users": 1665513,
-    "new_users": 1293266,
-    "pageviews": 4331647,
-    "events": 10533255,
+    "sessions": 1919611,
+    "users": 1665521,
+    "new_users": 1293274,
+    "pageviews": 4331660,
+    "events": 10533293,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 55.0
+    "avg_bounce_rate": 54.98
   },
   "daily_series": [
     {
@@ -2218,14 +2218,14 @@
     },
     {
       "date": "2026-10-16",
-      "sessions": 10,
-      "users": 10,
-      "new_users": 8,
-      "pageviews": 10,
-      "events": 30,
+      "sessions": 19,
+      "users": 18,
+      "new_users": 16,
+      "pageviews": 23,
+      "events": 68,
       "conversions": 0.0,
-      "bounce_rate": 90.0,
-      "avg_session_s": 2.0
+      "bounce_rate": 84.21,
+      "avg_session_s": 8.0
     }
   ],
   "traffic_sources": [
@@ -2276,7 +2276,7 @@
     },
     {
       "channel": "Email",
-      "sessions": 28068,
+      "sessions": 28070,
       "conversions": 17.0
     },
     {
@@ -2308,12 +2308,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2072117,
+      "pageviews": 2072124,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541462,
+      "pageviews": 541466,
       "sessions": 381792
     },
     {
@@ -3863,12 +3863,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 253082,
+      "new_users": 253086,
       "sessions": 342782,
-      "pageviews": 775808,
+      "pageviews": 775812,
       "avg_session_s": 150.4,
       "engagement_rate": 49.21,
-      "event_count": 1942133
+      "event_count": 1942146
     },
     {
       "source": "ig",
@@ -3893,12 +3893,12 @@
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 69959,
+      "new_users": 69960,
       "sessions": 133473,
-      "pageviews": 411608,
+      "pageviews": 411613,
       "avg_session_s": 231.2,
       "engagement_rate": 63.79,
-      "event_count": 945747
+      "event_count": 945759
     },
     {
       "source": "tiktok",
@@ -3978,7 +3978,7 @@
       "pageviews": 49880,
       "avg_session_s": 109.4,
       "engagement_rate": 43.7,
-      "event_count": 141896
+      "event_count": 141898
     },
     {
       "source": "ingressosmoto.festivalinterlagos.com.br",
@@ -4363,12 +4363,12 @@
     {
       "source": "venda",
       "medium": "email",
-      "new_users": 252,
-      "sessions": 514,
-      "pageviews": 2000,
-      "avg_session_s": 212.9,
-      "engagement_rate": 63.62,
-      "event_count": 4335
+      "new_users": 253,
+      "sessions": 515,
+      "pageviews": 2002,
+      "avg_session_s": 212.5,
+      "engagement_rate": 63.69,
+      "event_count": 4340
     },
     {
       "source": "eml-tm_nl07_26-05-22_news-geral_ptbr",
@@ -4423,12 +4423,12 @@
     {
       "source": "dinamize",
       "medium": "emailmarketing",
-      "new_users": 201,
-      "sessions": 394,
-      "pageviews": 1149,
-      "avg_session_s": 165.7,
-      "engagement_rate": 60.91,
-      "event_count": 2597
+      "new_users": 202,
+      "sessions": 395,
+      "pageviews": 1150,
+      "avg_session_s": 165.3,
+      "engagement_rate": 60.76,
+      "event_count": 2600
     },
     {
       "source": "Instagram",
@@ -4663,12 +4663,12 @@
     {
       "source": "dinamize",
       "medium": "email",
-      "new_users": 50,
-      "sessions": 182,
-      "pageviews": 1010,
-      "avg_session_s": 237.5,
-      "engagement_rate": 68.13,
-      "event_count": 1967
+      "new_users": 51,
+      "sessions": 183,
+      "pageviews": 1011,
+      "avg_session_s": 236.2,
+      "engagement_rate": 67.76,
+      "event_count": 1970
     },
     {
       "source": "eml-tm_nl07_26-07-10_news-ferias-geral-2_ptbr",
@@ -49314,6 +49314,17 @@
       "event_count": 33
     },
     {
+      "date": "2026-10-16",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 8,
+      "sessions": 8,
+      "pageviews": 8,
+      "eng_dur_s": 12.0,
+      "eng_sessions": 1,
+      "event_count": 26
+    },
+    {
       "date": "2026-04-01",
       "source": "m.facebook.com",
       "medium": "referral",
@@ -58805,17 +58816,6 @@
       "eng_dur_s": 9.0,
       "eng_sessions": 0,
       "event_count": 15
-    },
-    {
-      "date": "2026-10-16",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 4,
-      "sessions": 4,
-      "pageviews": 4,
-      "eng_dur_s": 11.0,
-      "eng_sessions": 1,
-      "event_count": 13
     },
     {
       "date": "2026-03-30",
@@ -70630,6 +70630,17 @@
       "eng_dur_s": 6.0,
       "eng_sessions": 1,
       "event_count": 11
+    },
+    {
+      "date": "2026-10-16",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 2,
+      "sessions": 3,
+      "pageviews": 7,
+      "eng_dur_s": 133.0,
+      "eng_sessions": 1,
+      "event_count": 18
     },
     {
       "date": "2026-03-30",
@@ -89564,14 +89575,25 @@
     },
     {
       "date": "2026-10-16",
-      "source": "google",
-      "medium": "organic",
+      "source": "dinamize",
+      "medium": "email",
       "new_users": 1,
-      "sessions": 2,
-      "pageviews": 2,
-      "eng_dur_s": 7.0,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
       "eng_sessions": 0,
-      "event_count": 6
+      "event_count": 3
+    },
+    {
+      "date": "2026-10-16",
+      "source": "dinamize",
+      "medium": "emailmarketing",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
     },
     {
       "date": "2026-10-16",
@@ -89594,6 +89616,17 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 3
+    },
+    {
+      "date": "2026-10-16",
+      "source": "venda",
+      "medium": "email",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 2,
+      "eng_dur_s": 1.0,
+      "eng_sessions": 1,
+      "event_count": 5
     },
     {
       "date": "2026-03-30",
@@ -106804,11 +106837,11 @@
       "source": "296934-Spotify",
       "medium": "affiliate",
       "new_users": 0,
-      "sessions": 1,
+      "sessions": 2,
       "pageviews": 1,
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
-      "event_count": 2
+      "event_count": 4
     }
   ]
 }
