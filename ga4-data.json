@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-19T17:43:00.232145+00:00",
+  "updated_at": "2026-10-19T21:44:53.363415+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-19"
   },
   "totals": {
-    "sessions": 1919922,
-    "users": 1665827,
-    "new_users": 1293547,
-    "pageviews": 4332075,
-    "events": 10534474,
+    "sessions": 1919924,
+    "users": 1665829,
+    "new_users": 1293549,
+    "pageviews": 4332077,
+    "events": 10534481,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 55.06
+    "avg_bounce_rate": 55.05
   },
   "daily_series": [
     {
@@ -2251,14 +2251,14 @@
     },
     {
       "date": "2026-10-19",
-      "sessions": 5,
-      "users": 5,
-      "new_users": 3,
-      "pageviews": 7,
-      "events": 19,
+      "sessions": 7,
+      "users": 7,
+      "new_users": 5,
+      "pageviews": 9,
+      "events": 26,
       "conversions": 0.0,
-      "bounce_rate": 60.0,
-      "avg_session_s": 33.8
+      "bounce_rate": 57.14,
+      "avg_session_s": 96.4
     }
   ],
   "traffic_sources": [
@@ -2341,7 +2341,7 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2072359,
+      "pageviews": 2072361,
       "sessions": 1230940
     },
     {
@@ -3756,12 +3756,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 253211,
+      "new_users": 253213,
       "sessions": 343010,
-      "pageviews": 775958,
+      "pageviews": 775960,
       "avg_session_s": 150.3,
       "engagement_rate": 49.17,
-      "event_count": 1942569
+      "event_count": 1942576
     },
     {
       "source": "ig",
@@ -70735,6 +70735,17 @@
     },
     {
       "date": "2026-10-19",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 2,
+      "sessions": 4,
+      "pageviews": 4,
+      "eng_dur_s": 33.0,
+      "eng_sessions": 1,
+      "event_count": 11
+    },
+    {
+      "date": "2026-10-19",
       "source": "google",
       "medium": "organic",
       "new_users": 2,
@@ -107142,17 +107153,6 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 2
-    },
-    {
-      "date": "2026-10-19",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 0,
-      "sessions": 2,
-      "pageviews": 2,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 4
     }
   ]
 }
