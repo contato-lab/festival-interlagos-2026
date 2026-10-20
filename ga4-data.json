@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-20T05:16:28.626493+00:00",
+  "updated_at": "2026-10-20T10:06:55.600949+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-20"
   },
   "totals": {
-    "sessions": 1920000,
-    "users": 1665902,
-    "new_users": 1293613,
-    "pageviews": 4332168,
-    "events": 10534759,
+    "sessions": 1920039,
+    "users": 1665940,
+    "new_users": 1293647,
+    "pageviews": 4332218,
+    "events": 10534904,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 55.1
+    "avg_bounce_rate": 55.14
   },
   "daily_series": [
     {
@@ -2251,14 +2251,25 @@
     },
     {
       "date": "2026-10-19",
-      "sessions": 83,
-      "users": 80,
-      "new_users": 69,
-      "pageviews": 100,
-      "events": 304,
+      "sessions": 119,
+      "users": 115,
+      "new_users": 100,
+      "pageviews": 145,
+      "events": 435,
       "conversions": 0.0,
-      "bounce_rate": 67.47,
-      "avg_session_s": 101.5
+      "bounce_rate": 65.55,
+      "avg_session_s": 83.9
+    },
+    {
+      "date": "2026-10-20",
+      "sessions": 3,
+      "users": 3,
+      "new_users": 3,
+      "pageviews": 5,
+      "events": 14,
+      "conversions": 0.0,
+      "bounce_rate": 66.67,
+      "avg_session_s": 30.4
     }
   ],
   "traffic_sources": [
@@ -2341,12 +2352,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2072426,
+      "pageviews": 2072457,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541558,
+      "pageviews": 541569,
       "sessions": 381792
     },
     {
@@ -2356,7 +2367,7 @@
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-moto",
-      "pageviews": 235723,
+      "pageviews": 235725,
       "sessions": 165540
     },
     {
@@ -2381,7 +2392,7 @@
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 83720,
+      "pageviews": 83721,
       "sessions": 54364
     },
     {
@@ -2614,15 +2625,15 @@
       "Social Orgânico": 5
     },
     "2026-10-19": {
-      "Direto pelo Link": 42,
-      "Busca Orgânica": 22,
-      "Social Orgânico": 4
+      "Direto pelo Link": 54,
+      "Busca Orgânica": 35,
+      "Social Orgânico": 5
     }
   },
   "influencer_breakdown": [
     {
       "source": "perfilfestival",
-      "sessions": 2231,
+      "sessions": 2237,
       "conversions": 0,
       "tickets": {
         "Drive Pass": 2
@@ -2673,12 +2684,12 @@
         "2026-10-09": 12,
         "2026-09-19": 11,
         "2026-09-24": 10,
-        "2026-10-19": 3
+        "2026-10-19": 9
       }
     },
     {
       "source": "email_jornada_marketing_retencao-suhai_cliente_ip96",
-      "sessions": 276,
+      "sessions": 277,
       "conversions": 0,
       "tickets": {},
       "daily": {
@@ -2697,6 +2708,7 @@
         "2026-09-16": 7,
         "2026-10-02": 7,
         "2026-10-06": 7,
+        "2026-10-19": 7,
         "2026-09-08": 6,
         "2026-09-12": 6,
         "2026-09-14": 6,
@@ -2704,7 +2716,6 @@
         "2026-09-20": 6,
         "2026-10-14": 6,
         "2026-10-18": 6,
-        "2026-10-19": 6,
         "2026-09-05": 5,
         "2026-09-07": 5,
         "2026-09-11": 5,
@@ -2732,7 +2743,7 @@
     },
     {
       "source": "Tiktok+Ads",
-      "sessions": 116,
+      "sessions": 117,
       "conversions": 0,
       "tickets": {},
       "daily": {
@@ -2758,14 +2769,14 @@
         "2026-09-28": 2,
         "2026-10-02": 2,
         "2026-10-07": 2,
+        "2026-10-19": 2,
         "2026-09-19": 1,
         "2026-09-22": 1,
         "2026-09-25": 1,
         "2026-10-01": 1,
         "2026-10-08": 1,
         "2026-10-11": 1,
-        "2026-10-15": 1,
-        "2026-10-19": 1
+        "2026-10-15": 1
       }
     },
     {
@@ -3349,6 +3360,19 @@
       }
     },
     {
+      "source": "festival-interlagos-b2",
+      "sessions": 3,
+      "conversions": 0,
+      "tickets": {
+        "Drive Pass": 3
+      },
+      "daily": {
+        "2026-09-27": 1,
+        "2026-10-16": 1,
+        "2026-10-19": 1
+      }
+    },
+    {
       "source": "BR_ADH_CARS_EVEN_I4RD_EM_ENG_OWSP_OWNE_SVDT_REPQ",
       "sessions": 2,
       "conversions": 0,
@@ -3406,18 +3430,6 @@
       "daily": {
         "2026-09-06": 1,
         "2026-09-14": 1
-      }
-    },
-    {
-      "source": "festival-interlagos-b2",
-      "sessions": 2,
-      "conversions": 0,
-      "tickets": {
-        "Drive Pass": 2
-      },
-      "daily": {
-        "2026-09-27": 1,
-        "2026-10-16": 1
       }
     },
     {
@@ -3653,22 +3665,22 @@
     {
       "source": "google",
       "medium": "cpc",
-      "new_users": 202929,
+      "new_users": 202930,
       "sessions": 345321,
-      "pageviews": 1051720,
+      "pageviews": 1051721,
       "avg_session_s": 207.5,
       "engagement_rate": 64.85,
-      "event_count": 2426035
+      "event_count": 2426038
     },
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 253247,
+      "new_users": 253258,
       "sessions": 343086,
-      "pageviews": 776000,
+      "pageviews": 776013,
       "avg_session_s": 150.2,
       "engagement_rate": 49.16,
-      "event_count": 1942701
+      "event_count": 1942739
     },
     {
       "source": "ig",
@@ -3683,22 +3695,22 @@
     {
       "source": "organico",
       "medium": "instagram",
-      "new_users": 95651,
+      "new_users": 95658,
       "sessions": 135125,
-      "pageviews": 471075,
+      "pageviews": 471086,
       "avg_session_s": 165.8,
       "engagement_rate": 75.97,
-      "event_count": 1024808
+      "event_count": 1024838
     },
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 70034,
+      "new_users": 70044,
       "sessions": 133473,
-      "pageviews": 411793,
-      "avg_session_s": 231.2,
+      "pageviews": 411811,
+      "avg_session_s": 231.3,
       "engagement_rate": 63.79,
-      "event_count": 946257
+      "event_count": 946309
     },
     {
       "source": "tiktok",
@@ -3713,12 +3725,12 @@
     {
       "source": "Tiktok",
       "medium": "Tiktok+Ads",
-      "new_users": 48346,
+      "new_users": 48347,
       "sessions": 55628,
-      "pageviews": 102475,
+      "pageviews": 102476,
       "avg_session_s": 160.3,
       "engagement_rate": 28.35,
-      "event_count": 215347
+      "event_count": 215350
     },
     {
       "source": "programatica",
@@ -3785,10 +3797,10 @@
       "medium": "referral",
       "new_users": 19895,
       "sessions": 35157,
-      "pageviews": 53681,
+      "pageviews": 53682,
       "avg_session_s": 295.2,
       "engagement_rate": 64.89,
-      "event_count": 183927
+      "event_count": 183930
     },
     {
       "source": "ingressosauto.festivalinterlagos.com.br",
@@ -3833,12 +3845,12 @@
     {
       "source": "ticketmaster.com.br",
       "medium": "referral",
-      "new_users": 7832,
+      "new_users": 7833,
       "sessions": 12960,
-      "pageviews": 37974,
+      "pageviews": 37975,
       "avg_session_s": 172.7,
-      "engagement_rate": 69.46,
-      "event_count": 88301
+      "engagement_rate": 69.49,
+      "event_count": 88305
     },
     {
       "source": "Tiktok",
@@ -3853,12 +3865,12 @@
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 8914,
+      "new_users": 8915,
       "sessions": 11336,
-      "pageviews": 21047,
+      "pageviews": 21048,
       "avg_session_s": 95.8,
       "engagement_rate": 54.67,
-      "event_count": 55433
+      "event_count": 55437
     },
     {
       "source": "instagram.com",
@@ -3873,12 +3885,12 @@
     {
       "source": "sfmc",
       "medium": "email",
-      "new_users": 7940,
-      "sessions": 9684,
-      "pageviews": 14136,
+      "new_users": 7941,
+      "sessions": 9687,
+      "pageviews": 14137,
       "avg_session_s": 82.9,
-      "engagement_rate": 48.02,
-      "event_count": 40713
+      "engagement_rate": 48.0,
+      "event_count": 40716
     },
     {
       "source": "an",
@@ -4823,12 +4835,12 @@
     {
       "source": "eml-tm_nl07_26-08-07_pais_ptbr",
       "medium": "email",
-      "new_users": 31,
-      "sessions": 38,
-      "pageviews": 66,
-      "avg_session_s": 59.3,
-      "engagement_rate": 44.74,
-      "event_count": 191
+      "new_users": 32,
+      "sessions": 39,
+      "pageviews": 68,
+      "avg_session_s": 58.3,
+      "engagement_rate": 46.15,
+      "event_count": 196
     },
     {
       "source": "ecosia.org",
@@ -31657,6 +31669,17 @@
       "event_count": 154
     },
     {
+      "date": "2026-10-19",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 45,
+      "sessions": 52,
+      "pageviews": 55,
+      "eng_dur_s": 180.0,
+      "eng_sessions": 11,
+      "event_count": 168
+    },
+    {
       "date": "2026-04-10",
       "source": "ticketmaster.com.br",
       "medium": "referral",
@@ -33866,17 +33889,6 @@
       "eng_dur_s": 1195.0,
       "eng_sessions": 28,
       "event_count": 237
-    },
-    {
-      "date": "2026-10-19",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 36,
-      "sessions": 42,
-      "pageviews": 44,
-      "eng_dur_s": 170.0,
-      "eng_sessions": 9,
-      "event_count": 136
     },
     {
       "date": "2026-04-06",
@@ -36429,6 +36441,17 @@
       "eng_dur_s": 1138.0,
       "eng_sessions": 22,
       "event_count": 205
+    },
+    {
+      "date": "2026-10-19",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 27,
+      "sessions": 35,
+      "pageviews": 53,
+      "eng_dur_s": 2040.0,
+      "eng_sessions": 19,
+      "event_count": 159
     },
     {
       "date": "2026-04-14",
@@ -40796,17 +40819,6 @@
       "eng_dur_s": 92.0,
       "eng_sessions": 3,
       "event_count": 61
-    },
-    {
-      "date": "2026-10-19",
-      "source": "google",
-      "medium": "organic",
-      "new_users": 17,
-      "sessions": 22,
-      "pageviews": 35,
-      "eng_dur_s": 1716.0,
-      "eng_sessions": 13,
-      "event_count": 107
     },
     {
       "date": "2026-03-31",
@@ -49235,6 +49247,17 @@
       "event_count": 33
     },
     {
+      "date": "2026-10-19",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 8,
+      "sessions": 9,
+      "pageviews": 11,
+      "eng_dur_s": 28.0,
+      "eng_sessions": 4,
+      "event_count": 31
+    },
+    {
       "date": "2026-04-01",
       "source": "m.facebook.com",
       "medium": "referral",
@@ -50839,6 +50862,17 @@
       "eng_dur_s": 45.0,
       "eng_sessions": 2,
       "event_count": 28
+    },
+    {
+      "date": "2026-10-19",
+      "source": "salesforce",
+      "medium": "email",
+      "new_users": 7,
+      "sessions": 8,
+      "pageviews": 9,
+      "eng_dur_s": 11.0,
+      "eng_sessions": 1,
+      "event_count": 27
     },
     {
       "date": "2026-03-31",
@@ -52995,17 +53029,6 @@
       "eng_dur_s": 42.0,
       "eng_sessions": 3,
       "event_count": 25
-    },
-    {
-      "date": "2026-10-19",
-      "source": "salesforce",
-      "medium": "email",
-      "new_users": 6,
-      "sessions": 7,
-      "pageviews": 8,
-      "eng_dur_s": 10.0,
-      "eng_sessions": 1,
-      "event_count": 23
     },
     {
       "date": "2026-03-30",
@@ -58761,6 +58784,17 @@
       "event_count": 15
     },
     {
+      "date": "2026-10-19",
+      "source": "google",
+      "medium": "cpc",
+      "new_users": 4,
+      "sessions": 5,
+      "pageviews": 5,
+      "eng_dur_s": 25.0,
+      "eng_sessions": 1,
+      "event_count": 15
+    },
+    {
       "date": "2026-03-30",
       "source": "engage.cloud.microsoft",
       "medium": "referral",
@@ -63456,17 +63490,6 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 9
-    },
-    {
-      "date": "2026-10-19",
-      "source": "google",
-      "medium": "cpc",
-      "new_users": 3,
-      "sessions": 4,
-      "pageviews": 4,
-      "eng_dur_s": 25.0,
-      "eng_sessions": 1,
-      "event_count": 12
     },
     {
       "date": "2026-03-30",
@@ -70686,6 +70709,17 @@
     },
     {
       "date": "2026-10-19",
+      "source": "Tiktok",
+      "medium": "Tiktok+Ads",
+      "new_users": 2,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 6
+    },
+    {
+      "date": "2026-10-19",
       "source": "facebook.com",
       "medium": "referral",
       "new_users": 2,
@@ -70696,15 +70730,15 @@
       "event_count": 7
     },
     {
-      "date": "2026-10-19",
-      "source": "organico",
-      "medium": "instagram",
+      "date": "2026-10-20",
+      "source": "(direct)",
+      "medium": "(none)",
       "new_users": 2,
-      "sessions": 3,
-      "pageviews": 3,
-      "eng_dur_s": 5.0,
-      "eng_sessions": 1,
-      "event_count": 9
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 6
     },
     {
       "date": "2026-03-30",
@@ -89848,17 +89882,6 @@
     },
     {
       "date": "2026-10-19",
-      "source": "Tiktok",
-      "medium": "Tiktok+Ads",
-      "new_users": 1,
-      "sessions": 1,
-      "pageviews": 1,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 3
-    },
-    {
-      "date": "2026-10-19",
       "source": "dinamize",
       "medium": "emailmarketing",
       "new_users": 1,
@@ -89870,6 +89893,17 @@
     },
     {
       "date": "2026-10-19",
+      "source": "eml-tm_nl07_26-08-07_pais_ptbr",
+      "medium": "email",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 2,
+      "eng_dur_s": 11.0,
+      "eng_sessions": 1,
+      "event_count": 5
+    },
+    {
+      "date": "2026-10-19",
       "source": "l.facebook.com",
       "medium": "referral",
       "new_users": 1,
@@ -89878,6 +89912,39 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 3
+    },
+    {
+      "date": "2026-10-19",
+      "source": "sfmc",
+      "medium": "email",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
+    },
+    {
+      "date": "2026-10-19",
+      "source": "ticketmaster.com.br",
+      "medium": "referral",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 9.0,
+      "eng_sessions": 1,
+      "event_count": 4
+    },
+    {
+      "date": "2026-10-20",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 3,
+      "eng_dur_s": 20.0,
+      "eng_sessions": 1,
+      "event_count": 8
     },
     {
       "date": "2026-03-30",
@@ -107126,6 +107193,17 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 2
+    },
+    {
+      "date": "2026-10-19",
+      "source": "ingressosmoto.festivalinterlagos.com.br",
+      "medium": "referral",
+      "new_users": 0,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 10.0,
+      "eng_sessions": 1,
+      "event_count": 3
     }
   ]
 }
