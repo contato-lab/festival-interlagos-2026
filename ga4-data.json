@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-10-23T19:07:38.401550+00:00",
+  "updated_at": "2026-10-23T22:03:34.914298+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-23"
   },
   "totals": {
-    "sessions": 1920456,
-    "users": 1666337,
-    "new_users": 1294002,
-    "pageviews": 4332738,
-    "events": 10536418,
+    "sessions": 1920480,
+    "users": 1666360,
+    "new_users": 1294021,
+    "pageviews": 4332767,
+    "events": 10536499,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
     "avg_bounce_rate": 55.44
@@ -2295,14 +2295,14 @@
     },
     {
       "date": "2026-10-23",
-      "sessions": 46,
-      "users": 43,
-      "new_users": 38,
-      "pageviews": 62,
-      "events": 175,
+      "sessions": 70,
+      "users": 66,
+      "new_users": 57,
+      "pageviews": 91,
+      "events": 256,
       "conversions": 0.0,
-      "bounce_rate": 69.57,
-      "avg_session_s": 68.1
+      "bounce_rate": 70.0,
+      "avg_session_s": 63.2
     }
   ],
   "traffic_sources": [
@@ -2338,7 +2338,7 @@
     },
     {
       "channel": "Organic Search",
-      "sessions": 144604,
+      "sessions": 144658,
       "conversions": 580.0
     },
     {
@@ -2368,7 +2368,7 @@
     },
     {
       "channel": "AI Assistant",
-      "sessions": 2167,
+      "sessions": 2168,
       "conversions": 27.0
     },
     {
@@ -2385,12 +2385,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2072778,
+      "pageviews": 2072801,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541681,
+      "pageviews": 541685,
       "sessions": 382074
     },
     {
@@ -3646,12 +3646,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 253439,
+      "new_users": 253448,
       "sessions": 343381,
-      "pageviews": 776219,
+      "pageviews": 776229,
       "avg_session_s": 150.1,
       "engagement_rate": 49.12,
-      "event_count": 1943356
+      "event_count": 1943385
     },
     {
       "source": "ig",
@@ -3666,22 +3666,22 @@
     {
       "source": "organico",
       "medium": "instagram",
-      "new_users": 95684,
-      "sessions": 135214,
-      "pageviews": 471123,
-      "avg_session_s": 165.7,
-      "engagement_rate": 75.92,
-      "event_count": 1024944
+      "new_users": 95690,
+      "sessions": 135308,
+      "pageviews": 471131,
+      "avg_session_s": 165.6,
+      "engagement_rate": 75.87,
+      "event_count": 1024967
     },
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 70114,
-      "sessions": 133640,
-      "pageviews": 411995,
-      "avg_session_s": 231.1,
-      "engagement_rate": 63.87,
-      "event_count": 946810
+      "new_users": 70116,
+      "sessions": 133687,
+      "pageviews": 412004,
+      "avg_session_s": 231.0,
+      "engagement_rate": 63.86,
+      "event_count": 946832
     },
     {
       "source": "tiktok",
@@ -3836,12 +3836,12 @@
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 8933,
+      "new_users": 8934,
       "sessions": 11352,
-      "pageviews": 21072,
+      "pageviews": 21073,
       "avg_session_s": 95.7,
       "engagement_rate": 54.67,
-      "event_count": 55516
+      "event_count": 55520
     },
     {
       "source": "instagram.com",
@@ -3976,12 +3976,12 @@
     {
       "source": "chatgpt.com",
       "medium": "ai-assistant",
-      "new_users": 1456,
-      "sessions": 2118,
-      "pageviews": 4705,
-      "avg_session_s": 199.8,
-      "engagement_rate": 59.49,
-      "event_count": 12199
+      "new_users": 1457,
+      "sessions": 2119,
+      "pageviews": 4706,
+      "avg_session_s": 199.7,
+      "engagement_rate": 59.46,
+      "event_count": 12202
     },
     {
       "source": "direto",
@@ -34753,6 +34753,17 @@
       "event_count": 131
     },
     {
+      "date": "2026-10-23",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 33,
+      "sessions": 37,
+      "pageviews": 38,
+      "eng_dur_s": 22.0,
+      "eng_sessions": 2,
+      "event_count": 111
+    },
+    {
       "date": "2026-04-10",
       "source": "an",
       "medium": "paid",
@@ -37446,17 +37457,6 @@
       "eng_dur_s": 359.0,
       "eng_sessions": 20,
       "event_count": 193
-    },
-    {
-      "date": "2026-10-23",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 24,
-      "sessions": 27,
-      "pageviews": 28,
-      "eng_dur_s": 22.0,
-      "eng_sessions": 2,
-      "event_count": 82
     },
     {
       "date": "2026-05-01",
@@ -50945,6 +50945,28 @@
       "event_count": 27
     },
     {
+      "date": "2026-10-23",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 7,
+      "sessions": 13,
+      "pageviews": 30,
+      "eng_dur_s": 495.0,
+      "eng_sessions": 12,
+      "event_count": 75
+    },
+    {
+      "date": "2026-10-23",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 7,
+      "sessions": 8,
+      "pageviews": 9,
+      "eng_dur_s": 80.0,
+      "eng_sessions": 3,
+      "event_count": 27
+    },
+    {
       "date": "2026-03-31",
       "source": "auto.festivalinterlagos.com.br",
       "medium": "referral",
@@ -55882,17 +55904,6 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 1,
       "event_count": 17
-    },
-    {
-      "date": "2026-10-23",
-      "source": "google",
-      "medium": "organic",
-      "new_users": 5,
-      "sessions": 8,
-      "pageviews": 21,
-      "eng_dur_s": 451.0,
-      "eng_sessions": 7,
-      "event_count": 53
     },
     {
       "date": "2026-03-30",
@@ -63694,6 +63705,17 @@
       "event_count": 14
     },
     {
+      "date": "2026-10-23",
+      "source": "salesforce",
+      "medium": "email",
+      "new_users": 3,
+      "sessions": 3,
+      "pageviews": 4,
+      "eng_dur_s": 24.0,
+      "eng_sessions": 1,
+      "event_count": 14
+    },
+    {
       "date": "2026-03-30",
       "source": "chatgpt.com",
       "medium": "(not set)",
@@ -70985,17 +71007,6 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 6
-    },
-    {
-      "date": "2026-10-23",
-      "source": "salesforce",
-      "medium": "email",
-      "new_users": 2,
-      "sessions": 2,
-      "pageviews": 3,
-      "eng_dur_s": 21.0,
-      "eng_sessions": 1,
-      "event_count": 10
     },
     {
       "date": "2026-03-30",
@@ -90381,23 +90392,23 @@
     },
     {
       "date": "2026-10-23",
+      "source": "chatgpt.com",
+      "medium": "ai-assistant",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
+    },
+    {
+      "date": "2026-10-23",
       "source": "l.instagram.com",
       "medium": "referral",
       "new_users": 1,
       "sessions": 1,
       "pageviews": 1,
       "eng_dur_s": 8.0,
-      "eng_sessions": 1,
-      "event_count": 4
-    },
-    {
-      "date": "2026-10-23",
-      "source": "organico",
-      "medium": "instagram",
-      "new_users": 1,
-      "sessions": 1,
-      "pageviews": 1,
-      "eng_dur_s": 11.0,
       "eng_sessions": 1,
       "event_count": 4
     },
