@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-24T16:39:43.075214+00:00",
+  "updated_at": "2026-10-24T18:59:25.944433+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-24"
   },
   "totals": {
-    "sessions": 1920595,
-    "users": 1666472,
-    "new_users": 1294122,
-    "pageviews": 4332898,
-    "events": 10536890,
+    "sessions": 1920615,
+    "users": 1666492,
+    "new_users": 1294140,
+    "pageviews": 4332919,
+    "events": 10536956,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 55.62
+    "avg_bounce_rate": 55.6
   },
   "daily_series": [
     {
@@ -2306,14 +2306,14 @@
     },
     {
       "date": "2026-10-24",
-      "sessions": 27,
-      "users": 27,
-      "new_users": 27,
-      "pageviews": 28,
-      "events": 90,
+      "sessions": 47,
+      "users": 47,
+      "new_users": 45,
+      "pageviews": 49,
+      "events": 156,
       "conversions": 0.0,
-      "bounce_rate": 85.19,
-      "avg_session_s": 7.7
+      "bounce_rate": 80.85,
+      "avg_session_s": 30.7
     }
   ],
   "traffic_sources": [
@@ -2329,7 +2329,7 @@
     },
     {
       "channel": "Direct",
-      "sessions": 343685,
+      "sessions": 343762,
       "conversions": 3984.0
     },
     {
@@ -2396,12 +2396,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2072887,
+      "pageviews": 2072899,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541698,
+      "pageviews": 541702,
       "sessions": 382074
     },
     {
@@ -2426,7 +2426,7 @@
     },
     {
       "page": "/login",
-      "pageviews": 112238,
+      "pageviews": 112241,
       "sessions": 58666
     },
     {
@@ -3628,12 +3628,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 253501,
-      "sessions": 343685,
-      "pageviews": 776289,
+      "new_users": 253515,
+      "sessions": 343762,
+      "pageviews": 776305,
       "avg_session_s": 150.0,
-      "engagement_rate": 49.08,
-      "event_count": 1943565
+      "engagement_rate": 49.07,
+      "event_count": 1943612
     },
     {
       "source": "ig",
@@ -3648,22 +3648,22 @@
     {
       "source": "organico",
       "medium": "instagram",
-      "new_users": 95696,
+      "new_users": 95697,
       "sessions": 135214,
-      "pageviews": 471142,
+      "pageviews": 471143,
       "avg_session_s": 165.7,
       "engagement_rate": 75.92,
-      "event_count": 1024997
+      "event_count": 1025001
     },
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 70130,
+      "new_users": 70132,
       "sessions": 133640,
-      "pageviews": 412035,
+      "pageviews": 412038,
       "avg_session_s": 231.1,
       "engagement_rate": 63.87,
-      "event_count": 946922
+      "event_count": 946932
     },
     {
       "source": "tiktok",
@@ -3818,12 +3818,12 @@
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 8937,
-      "sessions": 11356,
-      "pageviews": 21076,
+      "new_users": 8938,
+      "sessions": 11357,
+      "pageviews": 21077,
       "avg_session_s": 95.6,
-      "engagement_rate": 54.67,
-      "event_count": 55531
+      "engagement_rate": 54.66,
+      "event_count": 55535
     },
     {
       "source": "instagram.com",
@@ -3943,7 +3943,7 @@
       "pageviews": 6446,
       "avg_session_s": 195.7,
       "engagement_rate": 0.07,
-      "event_count": 11049
+      "event_count": 11050
     },
     {
       "source": "display",
@@ -35692,6 +35692,17 @@
       "event_count": 179
     },
     {
+      "date": "2026-10-24",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 30,
+      "sessions": 30,
+      "pageviews": 32,
+      "eng_dur_s": 39.0,
+      "eng_sessions": 4,
+      "event_count": 98
+    },
+    {
       "date": "2026-03-31",
       "source": "l.instagram.com",
       "medium": "referral",
@@ -41564,17 +41575,6 @@
       "eng_dur_s": 230.0,
       "eng_sessions": 8,
       "event_count": 94
-    },
-    {
-      "date": "2026-10-24",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 16,
-      "sessions": 15,
-      "pageviews": 16,
-      "eng_dur_s": 22.0,
-      "eng_sessions": 2,
-      "event_count": 51
     },
     {
       "date": "2026-03-31",
@@ -55932,6 +55932,17 @@
       "event_count": 21
     },
     {
+      "date": "2026-10-24",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 5,
+      "sessions": 6,
+      "pageviews": 7,
+      "eng_dur_s": 60.0,
+      "eng_sessions": 3,
+      "event_count": 24
+    },
+    {
       "date": "2026-03-30",
       "source": "an",
       "medium": "paid",
@@ -63731,17 +63742,6 @@
       "event_count": 14
     },
     {
-      "date": "2026-10-24",
-      "source": "google",
-      "medium": "organic",
-      "new_users": 3,
-      "sessions": 4,
-      "pageviews": 4,
-      "eng_dur_s": 34.0,
-      "eng_sessions": 1,
-      "event_count": 14
-    },
-    {
       "date": "2026-03-30",
       "source": "chatgpt.com",
       "medium": "(not set)",
@@ -71055,6 +71055,17 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 6
+    },
+    {
+      "date": "2026-10-24",
+      "source": "salesforce",
+      "medium": "email",
+      "new_users": 2,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 40.0,
+      "eng_sessions": 1,
+      "event_count": 8
     },
     {
       "date": "2026-03-30",
@@ -90572,12 +90583,12 @@
     },
     {
       "date": "2026-10-24",
-      "source": "salesforce",
-      "medium": "email",
+      "source": "organico",
+      "medium": "instagram",
       "new_users": 1,
       "sessions": 1,
       "pageviews": 1,
-      "eng_dur_s": 33.0,
+      "eng_dur_s": 11.0,
       "eng_sessions": 1,
       "event_count": 4
     },
@@ -107861,6 +107872,17 @@
       "eng_dur_s": 2.0,
       "eng_sessions": 0,
       "event_count": 3
+    },
+    {
+      "date": "2026-10-24",
+      "source": "(not set)",
+      "medium": "(not set)",
+      "new_users": 0,
+      "sessions": 1,
+      "pageviews": 0,
+      "eng_dur_s": 4.0,
+      "eng_sessions": 0,
+      "event_count": 1
     }
   ]
 }
