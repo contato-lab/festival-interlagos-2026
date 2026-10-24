@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-24T13:17:52.861199+00:00",
+  "updated_at": "2026-10-24T16:39:43.075214+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-24"
   },
   "totals": {
-    "sessions": 1920585,
-    "users": 1666462,
-    "new_users": 1294113,
-    "pageviews": 4332888,
-    "events": 10536857,
+    "sessions": 1920595,
+    "users": 1666472,
+    "new_users": 1294122,
+    "pageviews": 4332898,
+    "events": 10536890,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 55.61
+    "avg_bounce_rate": 55.62
   },
   "daily_series": [
     {
@@ -2306,14 +2306,14 @@
     },
     {
       "date": "2026-10-24",
-      "sessions": 17,
-      "users": 17,
-      "new_users": 18,
-      "pageviews": 18,
-      "events": 57,
+      "sessions": 27,
+      "users": 27,
+      "new_users": 27,
+      "pageviews": 28,
+      "events": 90,
       "conversions": 0.0,
-      "bounce_rate": 82.35,
-      "avg_session_s": 8.8
+      "bounce_rate": 85.19,
+      "avg_session_s": 7.7
     }
   ],
   "traffic_sources": [
@@ -2364,7 +2364,7 @@
     },
     {
       "channel": "Email",
-      "sessions": 28140,
+      "sessions": 28157,
       "conversions": 17.0
     },
     {
@@ -2396,12 +2396,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2072882,
+      "pageviews": 2072887,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541696,
+      "pageviews": 541698,
       "sessions": 382074
     },
     {
@@ -2436,12 +2436,12 @@
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 83734,
+      "pageviews": 83735,
       "sessions": 54318
     },
     {
       "page": "/vendas/ingressos/ride-pass",
-      "pageviews": 80269,
+      "pageviews": 80270,
       "sessions": 38741
     }
   ],
@@ -3618,22 +3618,22 @@
     {
       "source": "google",
       "medium": "cpc",
-      "new_users": 202949,
+      "new_users": 202950,
       "sessions": 345321,
-      "pageviews": 1051744,
+      "pageviews": 1051745,
       "avg_session_s": 207.5,
       "engagement_rate": 64.85,
-      "event_count": 2426105
+      "event_count": 2426108
     },
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 253498,
+      "new_users": 253501,
       "sessions": 343685,
-      "pageviews": 776286,
+      "pageviews": 776289,
       "avg_session_s": 150.0,
       "engagement_rate": 49.08,
-      "event_count": 1943555
+      "event_count": 1943565
     },
     {
       "source": "ig",
@@ -3658,12 +3658,12 @@
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 70128,
+      "new_users": 70130,
       "sessions": 133640,
-      "pageviews": 412032,
+      "pageviews": 412035,
       "avg_session_s": 231.1,
       "engagement_rate": 63.87,
-      "event_count": 946912
+      "event_count": 946922
     },
     {
       "source": "tiktok",
@@ -3768,12 +3768,12 @@
     {
       "source": "fb",
       "medium": "paid",
-      "new_users": 23243,
+      "new_users": 23245,
       "sessions": 32938,
-      "pageviews": 60245,
+      "pageviews": 60247,
       "avg_session_s": 68.1,
       "engagement_rate": 32.11,
-      "event_count": 148095
+      "event_count": 148101
     },
     {
       "source": "tiktok",
@@ -3818,12 +3818,12 @@
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 8936,
-      "sessions": 11353,
-      "pageviews": 21075,
-      "avg_session_s": 95.7,
-      "engagement_rate": 54.66,
-      "event_count": 55527
+      "new_users": 8937,
+      "sessions": 11356,
+      "pageviews": 21076,
+      "avg_session_s": 95.6,
+      "engagement_rate": 54.67,
+      "event_count": 55531
     },
     {
       "source": "instagram.com",
@@ -41566,6 +41566,17 @@
       "event_count": 94
     },
     {
+      "date": "2026-10-24",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 16,
+      "sessions": 15,
+      "pageviews": 16,
+      "eng_dur_s": 22.0,
+      "eng_sessions": 2,
+      "event_count": 51
+    },
+    {
       "date": "2026-03-31",
       "source": "br.search.yahoo.com",
       "medium": "referral",
@@ -43962,17 +43973,6 @@
       "eng_dur_s": 149.0,
       "eng_sessions": 6,
       "event_count": 57
-    },
-    {
-      "date": "2026-10-24",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 13,
-      "sessions": 12,
-      "pageviews": 13,
-      "eng_dur_s": 16.0,
-      "eng_sessions": 2,
-      "event_count": 41
     },
     {
       "date": "2026-04-01",
@@ -63731,6 +63731,17 @@
       "event_count": 14
     },
     {
+      "date": "2026-10-24",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 3,
+      "sessions": 4,
+      "pageviews": 4,
+      "eng_dur_s": 34.0,
+      "eng_sessions": 1,
+      "event_count": 14
+    },
+    {
       "date": "2026-03-30",
       "source": "chatgpt.com",
       "medium": "(not set)",
@@ -71027,6 +71038,17 @@
       "date": "2026-10-24",
       "source": "Tiktok",
       "medium": "Tiktok+Ads",
+      "new_users": 2,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 6
+    },
+    {
+      "date": "2026-10-24",
+      "source": "fb",
+      "medium": "paid",
       "new_users": 2,
       "sessions": 2,
       "pageviews": 2,
@@ -90529,13 +90551,13 @@
     {
       "date": "2026-10-24",
       "source": "google",
-      "medium": "organic",
+      "medium": "cpc",
       "new_users": 1,
       "sessions": 1,
       "pageviews": 1,
-      "eng_dur_s": 20.0,
-      "eng_sessions": 1,
-      "event_count": 4
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
     },
     {
       "date": "2026-10-24",
@@ -90547,6 +90569,17 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 3
+    },
+    {
+      "date": "2026-10-24",
+      "source": "salesforce",
+      "medium": "email",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 33.0,
+      "eng_sessions": 1,
+      "event_count": 4
     },
     {
       "date": "2026-03-30",
