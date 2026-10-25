@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-25T11:52:24.744874+00:00",
+  "updated_at": "2026-10-25T15:04:22.903958+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-25"
   },
   "totals": {
-    "sessions": 1920696,
-    "users": 1666571,
-    "new_users": 1294214,
-    "pageviews": 4333007,
-    "events": 10537221,
+    "sessions": 1920698,
+    "users": 1666573,
+    "new_users": 1294216,
+    "pageviews": 4333009,
+    "events": 10537227,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 55.76
+    "avg_bounce_rate": 55.77
   },
   "daily_series": [
     {
@@ -2317,14 +2317,14 @@
     },
     {
       "date": "2026-10-25",
-      "sessions": 11,
-      "users": 11,
-      "new_users": 10,
-      "pageviews": 12,
-      "events": 33,
+      "sessions": 13,
+      "users": 13,
+      "new_users": 12,
+      "pageviews": 14,
+      "events": 39,
       "conversions": 0.0,
-      "bounce_rate": 90.91,
-      "avg_session_s": 2.0
+      "bounce_rate": 92.31,
+      "avg_session_s": 1.7
     }
   ],
   "traffic_sources": [
@@ -2407,12 +2407,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2072960,
+      "pageviews": 2072961,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541716,
+      "pageviews": 541717,
       "sessions": 382074
     },
     {
@@ -3586,12 +3586,12 @@
     {
       "source": "google",
       "medium": "cpc",
-      "new_users": 202952,
+      "new_users": 202953,
       "sessions": 345321,
-      "pageviews": 1051748,
+      "pageviews": 1051749,
       "avg_session_s": 207.5,
       "engagement_rate": 64.85,
-      "event_count": 2426116
+      "event_count": 2426119
     },
     {
       "source": "(direct)",
@@ -3646,12 +3646,12 @@
     {
       "source": "Tiktok",
       "medium": "Tiktok+Ads",
-      "new_users": 48372,
+      "new_users": 48373,
       "sessions": 55665,
-      "pageviews": 102501,
+      "pageviews": 102502,
       "avg_session_s": 160.2,
       "engagement_rate": 28.33,
-      "event_count": 215425
+      "event_count": 215428
     },
     {
       "source": "programatica",
@@ -71080,6 +71080,17 @@
       "event_count": 8
     },
     {
+      "date": "2026-10-25",
+      "source": "Tiktok",
+      "medium": "Tiktok+Ads",
+      "new_users": 2,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 6
+    },
+    {
       "date": "2026-03-30",
       "source": "br.search.yahoo.com",
       "medium": "referral",
@@ -90584,8 +90595,8 @@
     },
     {
       "date": "2026-10-25",
-      "source": "Tiktok",
-      "medium": "Tiktok+Ads",
+      "source": "google",
+      "medium": "cpc",
       "new_users": 1,
       "sessions": 1,
       "pageviews": 1,
