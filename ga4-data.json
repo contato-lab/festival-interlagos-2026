@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-25T15:04:22.903958+00:00",
+  "updated_at": "2026-10-25T18:21:02.645022+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-25"
   },
   "totals": {
-    "sessions": 1920698,
-    "users": 1666573,
-    "new_users": 1294216,
-    "pageviews": 4333009,
-    "events": 10537227,
+    "sessions": 1920717,
+    "users": 1666591,
+    "new_users": 1294230,
+    "pageviews": 4333028,
+    "events": 10537282,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 55.77
+    "avg_bounce_rate": 55.78
   },
   "daily_series": [
     {
@@ -2317,14 +2317,14 @@
     },
     {
       "date": "2026-10-25",
-      "sessions": 13,
-      "users": 13,
-      "new_users": 12,
-      "pageviews": 14,
-      "events": 39,
+      "sessions": 32,
+      "users": 31,
+      "new_users": 26,
+      "pageviews": 33,
+      "events": 94,
       "conversions": 0.0,
-      "bounce_rate": 92.31,
-      "avg_session_s": 1.7
+      "bounce_rate": 93.75,
+      "avg_session_s": 1.5
     }
   ],
   "traffic_sources": [
@@ -2407,12 +2407,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2072961,
+      "pageviews": 2072976,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541717,
+      "pageviews": 541719,
       "sessions": 382074
     },
     {
@@ -2437,7 +2437,7 @@
     },
     {
       "page": "/login",
-      "pageviews": 112245,
+      "pageviews": 112247,
       "sessions": 58666
     },
     {
@@ -3596,22 +3596,22 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 253554,
+      "new_users": 253565,
       "sessions": 343685,
-      "pageviews": 776347,
+      "pageviews": 776360,
       "avg_session_s": 150.0,
       "engagement_rate": 49.08,
-      "event_count": 1943737
+      "event_count": 1943774
     },
     {
       "source": "ig",
       "medium": "paid",
       "new_users": 188378,
       "sessions": 284255,
-      "pageviews": 515448,
+      "pageviews": 515450,
       "avg_session_s": 70.0,
       "engagement_rate": 32.14,
-      "event_count": 1226618
+      "event_count": 1226622
     },
     {
       "source": "organico",
@@ -3628,10 +3628,10 @@
       "medium": "organic",
       "new_users": 70141,
       "sessions": 133640,
-      "pageviews": 412051,
+      "pageviews": 412052,
       "avg_session_s": 231.1,
       "engagement_rate": 63.87,
-      "event_count": 946977
+      "event_count": 946980
     },
     {
       "source": "tiktok",
@@ -3786,12 +3786,12 @@
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 8944,
-      "sessions": 11364,
-      "pageviews": 21086,
+      "new_users": 8946,
+      "sessions": 11368,
+      "pageviews": 21088,
       "avg_session_s": 95.6,
-      "engagement_rate": 54.68,
-      "event_count": 55562
+      "engagement_rate": 54.66,
+      "event_count": 55570
     },
     {
       "source": "instagram.com",
@@ -3936,12 +3936,12 @@
     {
       "source": "direto",
       "medium": "emkt",
-      "new_users": 1693,
-      "sessions": 2047,
-      "pageviews": 2873,
-      "avg_session_s": 80.3,
-      "engagement_rate": 45.14,
-      "event_count": 8398
+      "new_users": 1694,
+      "sessions": 2048,
+      "pageviews": 2874,
+      "avg_session_s": 80.2,
+      "engagement_rate": 45.12,
+      "event_count": 8401
     },
     {
       "source": "l.facebook.com",
@@ -40841,6 +40841,17 @@
       "event_count": 118
     },
     {
+      "date": "2026-10-25",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 17,
+      "sessions": 19,
+      "pageviews": 20,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 1,
+      "event_count": 56
+    },
+    {
       "date": "2026-03-31",
       "source": "autodromodeinterlagos.prefeitura.sp.gov.br",
       "medium": "referral",
@@ -53159,17 +53170,6 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 18
-    },
-    {
-      "date": "2026-10-25",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 6,
-      "sessions": 6,
-      "pageviews": 7,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 1,
-      "event_count": 19
     },
     {
       "date": "2026-03-30",
@@ -71089,6 +71089,17 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 6
+    },
+    {
+      "date": "2026-10-25",
+      "source": "salesforce",
+      "medium": "email",
+      "new_users": 2,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 5.0,
+      "eng_sessions": 0,
+      "event_count": 8
     },
     {
       "date": "2026-03-30",
@@ -90595,6 +90606,17 @@
     },
     {
       "date": "2026-10-25",
+      "source": "direto",
+      "medium": "emkt",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
+    },
+    {
+      "date": "2026-10-25",
       "source": "google",
       "medium": "cpc",
       "new_users": 1,
@@ -107906,6 +107928,28 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 2
+    },
+    {
+      "date": "2026-10-25",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 0,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 7.0,
+      "eng_sessions": 1,
+      "event_count": 3
+    },
+    {
+      "date": "2026-10-25",
+      "source": "ig",
+      "medium": "paid",
+      "new_users": 0,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 4
     }
   ]
 }
