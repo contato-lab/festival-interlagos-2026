@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-28T07:08:36.742745+00:00",
+  "updated_at": "2026-10-28T13:58:58.409457+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-28"
   },
   "totals": {
-    "sessions": 1921055,
-    "users": 1666917,
-    "new_users": 1294526,
-    "pageviews": 4333444,
-    "events": 10538505,
+    "sessions": 1921057,
+    "users": 1666919,
+    "new_users": 1294528,
+    "pageviews": 4333446,
+    "events": 10538512,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 55.9
+    "avg_bounce_rate": 55.97
   },
   "daily_series": [
     {
@@ -2350,14 +2350,14 @@
     },
     {
       "date": "2026-10-28",
-      "sessions": 4,
-      "users": 4,
-      "new_users": 3,
-      "pageviews": 12,
-      "events": 26,
+      "sessions": 6,
+      "users": 6,
+      "new_users": 5,
+      "pageviews": 14,
+      "events": 33,
       "conversions": 0.0,
-      "bounce_rate": 50.0,
-      "avg_session_s": 347.8
+      "bounce_rate": 66.67,
+      "avg_session_s": 232.3
     }
   ],
   "traffic_sources": [
@@ -2408,7 +2408,7 @@
     },
     {
       "channel": "Email",
-      "sessions": 28150,
+      "sessions": 28166,
       "conversions": 17.0
     },
     {
@@ -2440,7 +2440,7 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2073235,
+      "pageviews": 2073236,
       "sessions": 1230695
     },
     {
@@ -2450,7 +2450,7 @@
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-auto",
-      "pageviews": 257967,
+      "pageviews": 257968,
       "sessions": 190748
     },
     {
@@ -3585,12 +3585,12 @@
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 70183,
+      "new_users": 70184,
       "sessions": 133721,
-      "pageviews": 412141,
+      "pageviews": 412142,
       "avg_session_s": 231.0,
       "engagement_rate": 63.86,
-      "event_count": 947238
+      "event_count": 947242
     },
     {
       "source": "tiktok",
@@ -3745,12 +3745,12 @@
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 8968,
-      "sessions": 11381,
-      "pageviews": 21113,
+      "new_users": 8969,
+      "sessions": 11384,
+      "pageviews": 21114,
       "avg_session_s": 95.5,
-      "engagement_rate": 54.66,
-      "event_count": 55658
+      "engagement_rate": 54.65,
+      "event_count": 55661
     },
     {
       "source": "instagram.com",
@@ -90897,6 +90897,28 @@
       "date": "2026-10-27",
       "source": "ig",
       "medium": "paid",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
+    },
+    {
+      "date": "2026-10-28",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 2.0,
+      "eng_sessions": 0,
+      "event_count": 4
+    },
+    {
+      "date": "2026-10-28",
+      "source": "salesforce",
+      "medium": "email",
       "new_users": 1,
       "sessions": 1,
       "pageviews": 1,
