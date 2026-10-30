@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-30T05:39:54.154807+00:00",
+  "updated_at": "2026-10-30T11:36:10.987421+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-30"
   },
   "totals": {
-    "sessions": 1921300,
-    "users": 1667153,
-    "new_users": 1294738,
-    "pageviews": 4333801,
-    "events": 10539494,
+    "sessions": 1921309,
+    "users": 1667162,
+    "new_users": 1294747,
+    "pageviews": 4333812,
+    "events": 10539530,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 56.05
+    "avg_bounce_rate": 56.02
   },
   "daily_series": [
     {
@@ -2361,14 +2361,25 @@
     },
     {
       "date": "2026-10-29",
-      "sessions": 129,
-      "users": 124,
-      "new_users": 110,
-      "pageviews": 187,
-      "events": 514,
+      "sessions": 136,
+      "users": 131,
+      "new_users": 117,
+      "pageviews": 195,
+      "events": 542,
       "conversions": 0.0,
-      "bounce_rate": 67.44,
-      "avg_session_s": 58.0
+      "bounce_rate": 65.44,
+      "avg_session_s": 56.2
+    },
+    {
+      "date": "2026-10-30",
+      "sessions": 2,
+      "users": 2,
+      "new_users": 2,
+      "pageviews": 3,
+      "events": 8,
+      "conversions": 0.0,
+      "bounce_rate": 50.0,
+      "avg_session_s": 24.6
     }
   ],
   "traffic_sources": [
@@ -2434,7 +2445,7 @@
     },
     {
       "channel": "AI Assistant",
-      "sessions": 2168,
+      "sessions": 2169,
       "conversions": 27.0
     },
     {
@@ -2451,12 +2462,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2073447,
+      "pageviews": 2073455,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541843,
+      "pageviews": 541845,
       "sessions": 382216
     },
     {
@@ -2726,15 +2737,15 @@
       "Social Orgânico": 4
     },
     "2026-10-29": {
-      "Direto pelo Link": 57,
-      "Busca Orgânica": 31,
+      "Direto pelo Link": 59,
+      "Busca Orgânica": 33,
       "Social Orgânico": 5
     }
   },
   "influencer_breakdown": [
     {
       "source": "perfilfestival",
-      "sessions": 1913,
+      "sessions": 1915,
       "conversions": 0,
       "tickets": {
         "Drive Pass": 1
@@ -2749,7 +2760,7 @@
         "2026-09-27": 82,
         "2026-09-28": 64,
         "2026-09-29": 46,
-        "2026-10-29": 26,
+        "2026-10-29": 28,
         "2026-09-14": 25,
         "2026-10-11": 24,
         "2026-10-05": 23,
@@ -3545,12 +3556,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 253840,
+      "new_users": 253842,
       "sessions": 343762,
-      "pageviews": 776749,
+      "pageviews": 776751,
       "avg_session_s": 150.0,
       "engagement_rate": 49.09,
-      "event_count": 1944867
+      "event_count": 1944875
     },
     {
       "source": "ig",
@@ -3565,22 +3576,22 @@
     {
       "source": "organico",
       "medium": "instagram",
-      "new_users": 95766,
+      "new_users": 95770,
       "sessions": 135356,
-      "pageviews": 471237,
+      "pageviews": 471243,
       "avg_session_s": 165.5,
       "engagement_rate": 75.91,
-      "event_count": 1025270
+      "event_count": 1025286
     },
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 70220,
+      "new_users": 70222,
       "sessions": 133704,
-      "pageviews": 412245,
+      "pageviews": 412247,
       "avg_session_s": 231.1,
       "engagement_rate": 63.85,
-      "event_count": 947513
+      "event_count": 947521
     },
     {
       "source": "tiktok",
@@ -3875,12 +3886,12 @@
     {
       "source": "chatgpt.com",
       "medium": "ai-assistant",
-      "new_users": 1457,
-      "sessions": 2119,
-      "pageviews": 4706,
+      "new_users": 1458,
+      "sessions": 2120,
+      "pageviews": 4707,
       "avg_session_s": 199.7,
-      "engagement_rate": 59.46,
-      "event_count": 12202
+      "engagement_rate": 59.48,
+      "event_count": 12206
     },
     {
       "source": "direto",
@@ -29878,6 +29889,17 @@
       "event_count": 195
     },
     {
+      "date": "2026-10-29",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 53,
+      "sessions": 56,
+      "pageviews": 88,
+      "eng_dur_s": 1044.0,
+      "eng_sessions": 12,
+      "event_count": 231
+    },
+    {
       "date": "2026-04-30",
       "source": "fb",
       "medium": "paid",
@@ -30294,17 +30316,6 @@
       "eng_dur_s": 225.0,
       "eng_sessions": 13,
       "event_count": 176
-    },
-    {
-      "date": "2026-10-29",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 51,
-      "sessions": 54,
-      "pageviews": 86,
-      "eng_dur_s": 1021.0,
-      "eng_sessions": 11,
-      "event_count": 223
     },
     {
       "date": "2026-04-18",
@@ -37061,6 +37072,17 @@
       "event_count": 152
     },
     {
+      "date": "2026-10-29",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 25,
+      "sessions": 28,
+      "pageviews": 30,
+      "eng_dur_s": 19.0,
+      "eng_sessions": 7,
+      "event_count": 89
+    },
+    {
       "date": "2026-03-31",
       "source": "instagram.com",
       "medium": "referral",
@@ -37763,17 +37785,6 @@
       "eng_dur_s": 1595.0,
       "eng_sessions": 25,
       "event_count": 215
-    },
-    {
-      "date": "2026-10-29",
-      "source": "organico",
-      "medium": "instagram",
-      "new_users": 23,
-      "sessions": 26,
-      "pageviews": 27,
-      "eng_dur_s": 15.0,
-      "eng_sessions": 5,
-      "event_count": 81
     },
     {
       "date": "2026-03-31",
@@ -38832,6 +38843,17 @@
       "event_count": 132
     },
     {
+      "date": "2026-10-29",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 21,
+      "sessions": 31,
+      "pageviews": 55,
+      "eng_dur_s": 1553.0,
+      "eng_sessions": 22,
+      "event_count": 152
+    },
+    {
       "date": "2026-04-07",
       "source": "ticketmaster.com.br",
       "medium": "referral",
@@ -39666,17 +39688,6 @@
       "eng_dur_s": 23.0,
       "eng_sessions": 8,
       "event_count": 70
-    },
-    {
-      "date": "2026-10-29",
-      "source": "google",
-      "medium": "organic",
-      "new_users": 19,
-      "sessions": 29,
-      "pageviews": 53,
-      "eng_dur_s": 1533.0,
-      "eng_sessions": 21,
-      "event_count": 144
     },
     {
       "date": "2026-03-30",
@@ -71370,6 +71381,17 @@
       "event_count": 6
     },
     {
+      "date": "2026-10-30",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 2,
+      "sessions": 2,
+      "pageviews": 3,
+      "eng_dur_s": 16.0,
+      "eng_sessions": 1,
+      "event_count": 8
+    },
+    {
       "date": "2026-03-30",
       "source": "br.search.yahoo.com",
       "medium": "referral",
@@ -91124,6 +91146,17 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 3
+    },
+    {
+      "date": "2026-10-29",
+      "source": "chatgpt.com",
+      "medium": "ai-assistant",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 16.0,
+      "eng_sessions": 1,
+      "event_count": 4
     },
     {
       "date": "2026-10-29",
