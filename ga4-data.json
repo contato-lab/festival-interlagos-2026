@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-31T12:56:55.413217+00:00",
+  "updated_at": "2026-10-31T17:28:58.493057+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-31"
   },
   "totals": {
-    "sessions": 1921413,
-    "users": 1667263,
-    "new_users": 1294836,
-    "pageviews": 4333976,
-    "events": 10539985,
+    "sessions": 1921425,
+    "users": 1667275,
+    "new_users": 1294847,
+    "pageviews": 4334004,
+    "events": 10540054,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 56.12
+    "avg_bounce_rate": 56.14
   },
   "daily_series": [
     {
@@ -2383,14 +2383,14 @@
     },
     {
       "date": "2026-10-31",
-      "sessions": 6,
-      "users": 6,
-      "new_users": 5,
-      "pageviews": 7,
-      "events": 20,
+      "sessions": 18,
+      "users": 18,
+      "new_users": 16,
+      "pageviews": 35,
+      "events": 89,
       "conversions": 0.0,
-      "bounce_rate": 66.67,
-      "avg_session_s": 122.8
+      "bounce_rate": 72.22,
+      "avg_session_s": 67.1
     }
   ],
   "traffic_sources": [
@@ -2473,12 +2473,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2073551,
+      "pageviews": 2073559,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541869,
+      "pageviews": 541871,
       "sessions": 382262
     },
     {
@@ -2488,7 +2488,7 @@
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-moto",
-      "pageviews": 235741,
+      "pageviews": 235742,
       "sessions": 165576
     },
     {
@@ -2498,27 +2498,27 @@
     },
     {
       "page": "/shows/",
-      "pageviews": 121587,
+      "pageviews": 121588,
       "sessions": 102346
     },
     {
       "page": "/login",
-      "pageviews": 112274,
+      "pageviews": 112276,
       "sessions": 58726
     },
     {
       "page": "/conta/informacoes/",
-      "pageviews": 92448,
+      "pageviews": 92450,
       "sessions": 45239
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 83757,
+      "pageviews": 83760,
       "sessions": 54318
     },
     {
       "page": "/vendas/ingressos/ride-pass",
-      "pageviews": 80275,
+      "pageviews": 80276,
       "sessions": 38741
     }
   ],
@@ -3514,12 +3514,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 253889,
+      "new_users": 253897,
       "sessions": 344067,
-      "pageviews": 776842,
+      "pageviews": 776850,
       "avg_session_s": 149.9,
       "engagement_rate": 49.04,
-      "event_count": 1945116
+      "event_count": 1945141
     },
     {
       "source": "ig",
@@ -3544,12 +3544,12 @@
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 70237,
+      "new_users": 70239,
       "sessions": 133727,
-      "pageviews": 412276,
+      "pageviews": 412295,
       "avg_session_s": 231.1,
       "engagement_rate": 63.84,
-      "event_count": 947609
+      "event_count": 947650
     },
     {
       "source": "tiktok",
@@ -3654,12 +3654,12 @@
     {
       "source": "fb",
       "medium": "paid",
-      "new_users": 23247,
+      "new_users": 23248,
       "sessions": 32938,
-      "pageviews": 60249,
+      "pageviews": 60250,
       "avg_session_s": 68.1,
       "engagement_rate": 32.11,
-      "event_count": 148107
+      "event_count": 148110
     },
     {
       "source": "tiktok",
@@ -46919,6 +46919,17 @@
       "event_count": 34
     },
     {
+      "date": "2026-10-31",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 10,
+      "sessions": 11,
+      "pageviews": 12,
+      "eng_dur_s": 10.0,
+      "eng_sessions": 2,
+      "event_count": 36
+    },
+    {
       "date": "2026-04-03",
       "source": "l.instagram.com",
       "medium": "referral",
@@ -56126,6 +56137,17 @@
       "event_count": 15
     },
     {
+      "date": "2026-10-31",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 5,
+      "sessions": 6,
+      "pageviews": 22,
+      "eng_dur_s": 98.0,
+      "eng_sessions": 3,
+      "event_count": 50
+    },
+    {
       "date": "2026-03-30",
       "source": "an",
       "medium": "paid",
@@ -64024,17 +64046,6 @@
       "event_count": 17
     },
     {
-      "date": "2026-10-31",
-      "source": "google",
-      "medium": "organic",
-      "new_users": 3,
-      "sessions": 3,
-      "pageviews": 3,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 9
-    },
-    {
       "date": "2026-03-30",
       "source": "chatgpt.com",
       "medium": "(not set)",
@@ -71447,17 +71458,6 @@
       "eng_dur_s": 15.0,
       "eng_sessions": 1,
       "event_count": 7
-    },
-    {
-      "date": "2026-10-31",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 2,
-      "sessions": 3,
-      "pageviews": 4,
-      "eng_dur_s": 6.0,
-      "eng_sessions": 2,
-      "event_count": 11
     },
     {
       "date": "2026-03-30",
@@ -91291,6 +91291,17 @@
       "eng_dur_s": 27.0,
       "eng_sessions": 1,
       "event_count": 4
+    },
+    {
+      "date": "2026-10-31",
+      "source": "fb",
+      "medium": "paid",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
     },
     {
       "date": "2026-03-30",
