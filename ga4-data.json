@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-31T17:28:58.493057+00:00",
+  "updated_at": "2026-10-31T20:34:54.441281+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-10-31"
   },
   "totals": {
-    "sessions": 1921425,
-    "users": 1667275,
-    "new_users": 1294847,
-    "pageviews": 4334004,
-    "events": 10540054,
+    "sessions": 1921439,
+    "users": 1667289,
+    "new_users": 1294860,
+    "pageviews": 4334022,
+    "events": 10540108,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 56.14
+    "avg_bounce_rate": 56.17
   },
   "daily_series": [
     {
@@ -2383,14 +2383,14 @@
     },
     {
       "date": "2026-10-31",
-      "sessions": 18,
-      "users": 18,
-      "new_users": 16,
-      "pageviews": 35,
-      "events": 89,
+      "sessions": 32,
+      "users": 32,
+      "new_users": 29,
+      "pageviews": 53,
+      "events": 143,
       "conversions": 0.0,
-      "bounce_rate": 72.22,
-      "avg_session_s": 67.1
+      "bounce_rate": 78.12,
+      "avg_session_s": 145.1
     }
   ],
   "traffic_sources": [
@@ -2473,12 +2473,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2073559,
+      "pageviews": 2073571,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541871,
+      "pageviews": 541876,
       "sessions": 382262
     },
     {
@@ -2513,8 +2513,8 @@
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 83760,
-      "sessions": 54318
+      "pageviews": 83761,
+      "sessions": 54349
     },
     {
       "page": "/vendas/ingressos/ride-pass",
@@ -3504,22 +3504,22 @@
     {
       "source": "google",
       "medium": "cpc",
-      "new_users": 202963,
+      "new_users": 202964,
       "sessions": 345321,
-      "pageviews": 1051764,
+      "pageviews": 1051765,
       "avg_session_s": 207.5,
       "engagement_rate": 64.85,
-      "event_count": 2426161
+      "event_count": 2426165
     },
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 253897,
+      "new_users": 253904,
       "sessions": 344067,
-      "pageviews": 776850,
+      "pageviews": 776857,
       "avg_session_s": 149.9,
       "engagement_rate": 49.04,
-      "event_count": 1945141
+      "event_count": 1945163
     },
     {
       "source": "ig",
@@ -3534,12 +3534,12 @@
     {
       "source": "organico",
       "medium": "instagram",
-      "new_users": 95777,
+      "new_users": 95779,
       "sessions": 135285,
-      "pageviews": 471252,
-      "avg_session_s": 165.6,
+      "pageviews": 471258,
+      "avg_session_s": 165.7,
       "engagement_rate": 75.95,
-      "event_count": 1025316
+      "event_count": 1025331
     },
     {
       "source": "google",
@@ -3549,7 +3549,7 @@
       "pageviews": 412295,
       "avg_session_s": 231.1,
       "engagement_rate": 63.84,
-      "event_count": 947650
+      "event_count": 947651
     },
     {
       "source": "tiktok",
@@ -3686,10 +3686,10 @@
       "medium": "referral",
       "new_users": 7834,
       "sessions": 12963,
-      "pageviews": 37977,
+      "pageviews": 37978,
       "avg_session_s": 172.7,
       "engagement_rate": 69.44,
-      "event_count": 88311
+      "event_count": 88314
     },
     {
       "source": "Tiktok",
@@ -3704,12 +3704,12 @@
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 8984,
+      "new_users": 8986,
       "sessions": 11385,
-      "pageviews": 21129,
+      "pageviews": 21131,
       "avg_session_s": 95.5,
       "engagement_rate": 54.69,
-      "event_count": 55713
+      "event_count": 55719
     },
     {
       "source": "instagram.com",
@@ -4464,12 +4464,12 @@
     {
       "source": "motorshow.com.br",
       "medium": "referral",
-      "new_users": 72,
-      "sessions": 93,
-      "pageviews": 267,
-      "avg_session_s": 164.8,
-      "engagement_rate": 70.97,
-      "event_count": 660
+      "new_users": 73,
+      "sessions": 94,
+      "pageviews": 268,
+      "avg_session_s": 163.0,
+      "engagement_rate": 70.21,
+      "event_count": 663
     },
     {
       "source": "duckduckgo",
@@ -40869,6 +40869,17 @@
       "event_count": 118
     },
     {
+      "date": "2026-10-31",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 17,
+      "sessions": 18,
+      "pageviews": 19,
+      "eng_dur_s": 13.0,
+      "eng_sessions": 2,
+      "event_count": 58
+    },
+    {
       "date": "2026-03-31",
       "source": "autodromodeinterlagos.prefeitura.sp.gov.br",
       "medium": "referral",
@@ -46917,17 +46928,6 @@
       "eng_dur_s": 30.0,
       "eng_sessions": 2,
       "event_count": 34
-    },
-    {
-      "date": "2026-10-31",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 10,
-      "sessions": 11,
-      "pageviews": 12,
-      "eng_dur_s": 10.0,
-      "eng_sessions": 2,
-      "event_count": 36
     },
     {
       "date": "2026-04-03",
@@ -56143,9 +56143,9 @@
       "new_users": 5,
       "sessions": 6,
       "pageviews": 22,
-      "eng_dur_s": 98.0,
+      "eng_dur_s": 163.0,
       "eng_sessions": 3,
-      "event_count": 50
+      "event_count": 51
     },
     {
       "date": "2026-03-30",
@@ -71458,6 +71458,28 @@
       "eng_dur_s": 15.0,
       "eng_sessions": 1,
       "event_count": 7
+    },
+    {
+      "date": "2026-10-31",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 2,
+      "sessions": 2,
+      "pageviews": 6,
+      "eng_dur_s": 274.0,
+      "eng_sessions": 1,
+      "event_count": 15
+    },
+    {
+      "date": "2026-10-31",
+      "source": "salesforce",
+      "medium": "email",
+      "new_users": 2,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 6
     },
     {
       "date": "2026-03-30",
@@ -91304,6 +91326,28 @@
       "event_count": 3
     },
     {
+      "date": "2026-10-31",
+      "source": "google",
+      "medium": "cpc",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 16.0,
+      "eng_sessions": 1,
+      "event_count": 4
+    },
+    {
+      "date": "2026-10-31",
+      "source": "motorshow.com.br",
+      "medium": "referral",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
+    },
+    {
       "date": "2026-03-30",
       "source": "(not set)",
       "medium": "(not set)",
@@ -108660,6 +108704,17 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 2
+    },
+    {
+      "date": "2026-10-31",
+      "source": "ticketmaster.com.br",
+      "medium": "referral",
+      "new_users": 0,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 9.0,
+      "eng_sessions": 0,
+      "event_count": 3
     }
   ]
 }
