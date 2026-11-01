@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-11-01T02:32:39.142676+00:00",
+  "updated_at": "2026-11-01T09:38:59.845946+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-11-01"
   },
   "totals": {
-    "sessions": 1921489,
-    "users": 1667336,
-    "new_users": 1294901,
-    "pageviews": 4334080,
-    "events": 10540269,
+    "sessions": 1921511,
+    "users": 1667358,
+    "new_users": 1294921,
+    "pageviews": 4334109,
+    "events": 10540351,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 56.2
+    "avg_bounce_rate": 56.4
   },
   "daily_series": [
     {
@@ -2383,14 +2383,25 @@
     },
     {
       "date": "2026-10-31",
-      "sessions": 82,
-      "users": 79,
-      "new_users": 70,
-      "pageviews": 111,
-      "events": 304,
+      "sessions": 100,
+      "users": 97,
+      "new_users": 87,
+      "pageviews": 136,
+      "events": 374,
       "conversions": 0.0,
-      "bounce_rate": 85.37,
-      "avg_session_s": 63.3
+      "bounce_rate": 85.0,
+      "avg_session_s": 62.7
+    },
+    {
+      "date": "2026-11-01",
+      "sessions": 4,
+      "users": 4,
+      "new_users": 3,
+      "pageviews": 4,
+      "events": 12,
+      "conversions": 0.0,
+      "bounce_rate": 100.0,
+      "avg_session_s": 1.4
     }
   ],
   "traffic_sources": [
@@ -2456,7 +2467,7 @@
     },
     {
       "channel": "AI Assistant",
-      "sessions": 2170,
+      "sessions": 2171,
       "conversions": 27.0
     },
     {
@@ -2473,22 +2484,22 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2073605,
+      "pageviews": 2073623,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541883,
+      "pageviews": 541887,
       "sessions": 382262
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-auto",
-      "pageviews": 257974,
+      "pageviews": 257976,
       "sessions": 190748
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-moto",
-      "pageviews": 235742,
+      "pageviews": 235743,
       "sessions": 165576
     },
     {
@@ -2748,9 +2759,9 @@
       "Social Orgânico": 3
     },
     "2026-10-31": {
-      "Direto pelo Link": 49,
-      "Busca Orgânica": 14,
-      "Social Orgânico": 2
+      "Direto pelo Link": 58,
+      "Busca Orgânica": 18,
+      "Social Orgânico": 3
     }
   },
   "influencer_breakdown": [
@@ -2966,7 +2977,7 @@
     },
     {
       "source": "emailremarketingvirada4ultimashoras",
-      "sessions": 20,
+      "sessions": 22,
       "conversions": 0,
       "tickets": {},
       "daily": {
@@ -2976,6 +2987,7 @@
         "2026-10-14": 2,
         "2026-10-16": 2,
         "2026-10-28": 2,
+        "2026-10-31": 2,
         "2026-09-25": 1,
         "2026-09-27": 1,
         "2026-10-19": 1,
@@ -3449,12 +3461,13 @@
     {
       "source": "Vídeo Open",
       "campaign": "festival-2026_adsplay_video",
-      "sessions": 2,
+      "sessions": 3,
       "conversions": 0,
       "tickets": {},
       "daily": {
         "2026-10-09": 1,
-        "2026-10-29": 1
+        "2026-10-29": 1,
+        "2026-10-31": 1
       }
     }
   ],
@@ -3472,12 +3485,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 253929,
+      "new_users": 253940,
       "sessions": 344067,
-      "pageviews": 776888,
+      "pageviews": 776899,
       "avg_session_s": 149.9,
       "engagement_rate": 49.04,
-      "event_count": 1945250
+      "event_count": 1945284
     },
     {
       "source": "ig",
@@ -3502,12 +3515,12 @@
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 70242,
+      "new_users": 70246,
       "sessions": 133727,
-      "pageviews": 412306,
+      "pageviews": 412317,
       "avg_session_s": 231.1,
       "engagement_rate": 63.84,
-      "event_count": 947678
+      "event_count": 947706
     },
     {
       "source": "tiktok",
@@ -3532,12 +3545,12 @@
     {
       "source": "programatica",
       "medium": "cpm",
-      "new_users": 41127,
+      "new_users": 41128,
       "sessions": 44465,
-      "pageviews": 55654,
+      "pageviews": 55655,
       "avg_session_s": 62.1,
       "engagement_rate": 26.0,
-      "event_count": 169145
+      "event_count": 169148
     },
     {
       "source": "moto.festivalinterlagos.com.br",
@@ -3592,12 +3605,12 @@
     {
       "source": "ingressosmoto.festivalinterlagos.com.br",
       "medium": "referral",
-      "new_users": 19895,
+      "new_users": 19896,
       "sessions": 35157,
-      "pageviews": 53682,
+      "pageviews": 53683,
       "avg_session_s": 295.2,
       "engagement_rate": 64.89,
-      "event_count": 183930
+      "event_count": 183933
     },
     {
       "source": "ingressosauto.festivalinterlagos.com.br",
@@ -3634,10 +3647,10 @@
       "medium": "referral",
       "new_users": 9459,
       "sessions": 13670,
-      "pageviews": 29112,
+      "pageviews": 29114,
       "avg_session_s": 138.2,
       "engagement_rate": 54.78,
-      "event_count": 70924
+      "event_count": 70928
     },
     {
       "source": "ticketmaster.com.br",
@@ -3802,12 +3815,12 @@
     {
       "source": "chatgpt.com",
       "medium": "ai-assistant",
-      "new_users": 1459,
-      "sessions": 2121,
-      "pageviews": 4708,
-      "avg_session_s": 199.6,
-      "engagement_rate": 59.5,
-      "event_count": 12210
+      "new_users": 1460,
+      "sessions": 2122,
+      "pageviews": 4709,
+      "avg_session_s": 199.5,
+      "engagement_rate": 59.47,
+      "event_count": 12214
     },
     {
       "source": "direto",
@@ -4032,12 +4045,12 @@
     {
       "source": "dinamize",
       "medium": "emailmarketing",
-      "new_users": 213,
-      "sessions": 406,
-      "pageviews": 1165,
-      "avg_session_s": 161.0,
-      "engagement_rate": 60.34,
-      "event_count": 2642
+      "new_users": 215,
+      "sessions": 408,
+      "pageviews": 1167,
+      "avg_session_s": 160.2,
+      "engagement_rate": 60.05,
+      "event_count": 2648
     },
     {
       "source": "Instagram",
@@ -30465,6 +30478,17 @@
       "event_count": 262
     },
     {
+      "date": "2026-10-31",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 50,
+      "sessions": 54,
+      "pageviews": 58,
+      "eng_dur_s": 32.0,
+      "eng_sessions": 4,
+      "event_count": 170
+    },
+    {
       "date": "2026-04-17",
       "source": "eml-tm_nl07_26-04-17_news-geral_ptbr",
       "medium": "email",
@@ -32223,17 +32247,6 @@
       "eng_dur_s": 190.0,
       "eng_sessions": 21,
       "event_count": 165
-    },
-    {
-      "date": "2026-10-31",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 42,
-      "sessions": 46,
-      "pageviews": 50,
-      "eng_dur_s": 21.0,
-      "eng_sessions": 3,
-      "event_count": 145
     },
     {
       "date": "2026-05-04",
@@ -44930,6 +44943,17 @@
       "event_count": 79
     },
     {
+      "date": "2026-10-31",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 12,
+      "sessions": 17,
+      "pageviews": 43,
+      "eng_dur_s": 433.0,
+      "eng_sessions": 6,
+      "event_count": 103
+    },
+    {
       "date": "2026-04-02",
       "source": "ticketmaster.com.br",
       "medium": "referral",
@@ -49438,17 +49462,6 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 1,
       "event_count": 29
-    },
-    {
-      "date": "2026-10-31",
-      "source": "google",
-      "medium": "organic",
-      "new_users": 8,
-      "sessions": 13,
-      "pageviews": 33,
-      "eng_dur_s": 285.0,
-      "eng_sessions": 5,
-      "event_count": 78
     },
     {
       "date": "2026-04-01",
@@ -64037,6 +64050,17 @@
       "event_count": 9
     },
     {
+      "date": "2026-11-01",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 3,
+      "sessions": 3,
+      "pageviews": 3,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 9
+    },
+    {
       "date": "2026-03-30",
       "source": "chatgpt.com",
       "medium": "(not set)",
@@ -71454,6 +71478,28 @@
       "date": "2026-10-31",
       "source": "Tiktok",
       "medium": "Tiktok+Ads",
+      "new_users": 2,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 6
+    },
+    {
+      "date": "2026-10-31",
+      "source": "chatgpt.com",
+      "medium": "ai-assistant",
+      "new_users": 2,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 15.0,
+      "eng_sessions": 1,
+      "event_count": 8
+    },
+    {
+      "date": "2026-10-31",
+      "source": "dinamize",
+      "medium": "emailmarketing",
       "new_users": 2,
       "sessions": 2,
       "pageviews": 2,
@@ -91296,17 +91342,6 @@
     },
     {
       "date": "2026-10-31",
-      "source": "chatgpt.com",
-      "medium": "ai-assistant",
-      "new_users": 1,
-      "sessions": 1,
-      "pageviews": 1,
-      "eng_dur_s": 11.0,
-      "eng_sessions": 1,
-      "event_count": 4
-    },
-    {
-      "date": "2026-10-31",
       "source": "duckduckgo",
       "medium": "organic",
       "new_users": 1,
@@ -91329,6 +91364,17 @@
     },
     {
       "date": "2026-10-31",
+      "source": "ingressosmoto.festivalinterlagos.com.br",
+      "medium": "referral",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
+    },
+    {
+      "date": "2026-10-31",
       "source": "motorshow.com.br",
       "medium": "referral",
       "new_users": 1,
@@ -91337,6 +91383,17 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 5
+    },
+    {
+      "date": "2026-10-31",
+      "source": "programatica",
+      "medium": "cpm",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
     },
     {
       "date": "2026-03-30",
@@ -108698,12 +108755,34 @@
     },
     {
       "date": "2026-10-31",
+      "source": "l.instagram.com",
+      "medium": "referral",
+      "new_users": 0,
+      "sessions": 1,
+      "pageviews": 2,
+      "eng_dur_s": 14.0,
+      "eng_sessions": 1,
+      "event_count": 4
+    },
+    {
+      "date": "2026-10-31",
       "source": "ticketmaster.com.br",
       "medium": "referral",
       "new_users": 0,
       "sessions": 1,
       "pageviews": 1,
       "eng_dur_s": 9.0,
+      "eng_sessions": 0,
+      "event_count": 3
+    },
+    {
+      "date": "2026-11-01",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 0,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 2.0,
       "eng_sessions": 0,
       "event_count": 3
     }
