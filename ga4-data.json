@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-11-01T09:38:59.845946+00:00",
+  "updated_at": "2026-11-01T16:19:12.081819+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-11-01"
   },
   "totals": {
-    "sessions": 1921511,
-    "users": 1667358,
-    "new_users": 1294921,
-    "pageviews": 4334109,
-    "events": 10540351,
+    "sessions": 1921515,
+    "users": 1667362,
+    "new_users": 1294924,
+    "pageviews": 4334117,
+    "events": 10540372,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 56.4
+    "avg_bounce_rate": 56.35
   },
   "daily_series": [
     {
@@ -2394,14 +2394,14 @@
     },
     {
       "date": "2026-11-01",
-      "sessions": 4,
-      "users": 4,
-      "new_users": 3,
-      "pageviews": 4,
-      "events": 12,
+      "sessions": 8,
+      "users": 8,
+      "new_users": 6,
+      "pageviews": 12,
+      "events": 33,
       "conversions": 0.0,
-      "bounce_rate": 100.0,
-      "avg_session_s": 1.4
+      "bounce_rate": 87.5,
+      "avg_session_s": 20.4
     }
   ],
   "traffic_sources": [
@@ -2484,12 +2484,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2073623,
+      "pageviews": 2073626,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541887,
+      "pageviews": 541890,
       "sessions": 382262
     },
     {
@@ -2515,7 +2515,7 @@
     {
       "page": "/login",
       "pageviews": 112282,
-      "sessions": 58726
+      "sessions": 58735
     },
     {
       "page": "/conta/informacoes/",
@@ -2524,8 +2524,8 @@
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 83762,
-      "sessions": 54349
+      "pageviews": 83763,
+      "sessions": 54318
     },
     {
       "page": "/vendas/ingressos/ride-pass",
@@ -2767,7 +2767,7 @@
   "influencer_breakdown": [
     {
       "source": "perfilfestival",
-      "sessions": 1894,
+      "sessions": 1893,
       "conversions": 0,
       "tickets": {
         "Drive Pass": 1
@@ -3485,12 +3485,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 253940,
+      "new_users": 253941,
       "sessions": 344067,
-      "pageviews": 776899,
+      "pageviews": 776900,
       "avg_session_s": 149.9,
       "engagement_rate": 49.04,
-      "event_count": 1945284
+      "event_count": 1945287
     },
     {
       "source": "ig",
@@ -3507,20 +3507,20 @@
       "medium": "instagram",
       "new_users": 95783,
       "sessions": 135285,
-      "pageviews": 471264,
+      "pageviews": 471265,
       "avg_session_s": 165.7,
       "engagement_rate": 75.95,
-      "event_count": 1025347
+      "event_count": 1025349
     },
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 70246,
+      "new_users": 70247,
       "sessions": 133727,
-      "pageviews": 412317,
+      "pageviews": 412322,
       "avg_session_s": 231.1,
       "engagement_rate": 63.84,
-      "event_count": 947706
+      "event_count": 947719
     },
     {
       "source": "tiktok",
@@ -3535,12 +3535,12 @@
     {
       "source": "Tiktok",
       "medium": "Tiktok+Ads",
-      "new_users": 48396,
+      "new_users": 48397,
       "sessions": 55707,
-      "pageviews": 102525,
+      "pageviews": 102526,
       "avg_session_s": 160.1,
       "engagement_rate": 28.31,
-      "event_count": 215497
+      "event_count": 215500
     },
     {
       "source": "programatica",
@@ -3646,9 +3646,9 @@
       "source": "l.instagram.com",
       "medium": "referral",
       "new_users": 9459,
-      "sessions": 13670,
+      "sessions": 13674,
       "pageviews": 29114,
-      "avg_session_s": 138.2,
+      "avg_session_s": 138.1,
       "engagement_rate": 54.78,
       "event_count": 70928
     },
@@ -59265,6 +59265,17 @@
       "event_count": 14
     },
     {
+      "date": "2026-11-01",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 4,
+      "sessions": 4,
+      "pageviews": 4,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 12
+    },
+    {
       "date": "2026-03-30",
       "source": "engage.cloud.microsoft",
       "medium": "referral",
@@ -64042,17 +64053,6 @@
       "date": "2026-10-31",
       "source": "salesforce",
       "medium": "email",
-      "new_users": 3,
-      "sessions": 3,
-      "pageviews": 3,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 9
-    },
-    {
-      "date": "2026-11-01",
-      "source": "(direct)",
-      "medium": "(none)",
       "new_users": 3,
       "sessions": 3,
       "pageviews": 3,
@@ -91396,6 +91396,28 @@
       "event_count": 3
     },
     {
+      "date": "2026-11-01",
+      "source": "Tiktok",
+      "medium": "Tiktok+Ads",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
+    },
+    {
+      "date": "2026-11-01",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 1,
+      "sessions": 2,
+      "pageviews": 6,
+      "eng_dur_s": 242.0,
+      "eng_sessions": 1,
+      "event_count": 16
+    },
+    {
       "date": "2026-03-30",
       "source": "(not set)",
       "medium": "(not set)",
@@ -108777,14 +108799,14 @@
     },
     {
       "date": "2026-11-01",
-      "source": "google",
-      "medium": "organic",
+      "source": "organico",
+      "medium": "instagram",
       "new_users": 0,
       "sessions": 1,
       "pageviews": 1,
-      "eng_dur_s": 2.0,
+      "eng_dur_s": 0.0,
       "eng_sessions": 0,
-      "event_count": 3
+      "event_count": 2
     }
   ]
 }
