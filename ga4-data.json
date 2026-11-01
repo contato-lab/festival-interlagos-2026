@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-11-01T20:34:13.353371+00:00",
+  "updated_at": "2026-11-01T23:51:28.880125+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-11-01"
   },
   "totals": {
-    "sessions": 1921533,
-    "users": 1667379,
-    "new_users": 1294940,
-    "pageviews": 4334159,
-    "events": 10540469,
+    "sessions": 1921554,
+    "users": 1667398,
+    "new_users": 1294959,
+    "pageviews": 4334184,
+    "events": 10540540,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 56.24
+    "avg_bounce_rate": 56.26
   },
   "daily_series": [
     {
@@ -2394,14 +2394,14 @@
     },
     {
       "date": "2026-11-01",
-      "sessions": 26,
-      "users": 25,
-      "new_users": 22,
-      "pageviews": 54,
-      "events": 130,
+      "sessions": 47,
+      "users": 44,
+      "new_users": 41,
+      "pageviews": 79,
+      "events": 201,
       "conversions": 0.0,
-      "bounce_rate": 65.38,
-      "avg_session_s": 248.6
+      "bounce_rate": 68.09,
+      "avg_session_s": 173.5
     }
   ],
   "traffic_sources": [
@@ -2484,12 +2484,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2073647,
+      "pageviews": 2073665,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 541903,
+      "pageviews": 541905,
       "sessions": 382262
     },
     {
@@ -2499,7 +2499,7 @@
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-moto",
-      "pageviews": 235745,
+      "pageviews": 235747,
       "sessions": 165647
     },
     {
@@ -3485,12 +3485,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 253946,
+      "new_users": 253955,
       "sessions": 344067,
-      "pageviews": 776907,
+      "pageviews": 776916,
       "avg_session_s": 149.9,
       "engagement_rate": 49.04,
-      "event_count": 1945306
+      "event_count": 1945334
     },
     {
       "source": "ig",
@@ -3505,22 +3505,22 @@
     {
       "source": "organico",
       "medium": "instagram",
-      "new_users": 95784,
+      "new_users": 95789,
       "sessions": 135285,
-      "pageviews": 471266,
+      "pageviews": 471271,
       "avg_session_s": 165.7,
       "engagement_rate": 75.95,
-      "event_count": 1025352
+      "event_count": 1025368
     },
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 70254,
+      "new_users": 70258,
       "sessions": 133727,
-      "pageviews": 412342,
+      "pageviews": 412346,
       "avg_session_s": 231.1,
       "engagement_rate": 63.84,
-      "event_count": 947774
+      "event_count": 947789
     },
     {
       "source": "tiktok",
@@ -3677,10 +3677,10 @@
       "medium": "email",
       "new_users": 8990,
       "sessions": 11385,
-      "pageviews": 21146,
+      "pageviews": 21152,
       "avg_session_s": 95.9,
-      "engagement_rate": 54.69,
-      "event_count": 55742
+      "engagement_rate": 54.7,
+      "event_count": 55750
     },
     {
       "source": "instagram.com",
@@ -4403,6 +4403,16 @@
       "event_count": 498
     },
     {
+      "source": "motorshow.com.br",
+      "medium": "referral",
+      "new_users": 74,
+      "sessions": 96,
+      "pageviews": 270,
+      "avg_session_s": 159.9,
+      "engagement_rate": 69.79,
+      "event_count": 669
+    },
+    {
       "source": "eml-tm_nl07_26-06-19_news-geral_ptbr",
       "medium": "email",
       "new_users": 67,
@@ -4421,16 +4431,6 @@
       "avg_session_s": 5.0,
       "engagement_rate": 7.37,
       "event_count": 299
-    },
-    {
-      "source": "motorshow.com.br",
-      "medium": "referral",
-      "new_users": 73,
-      "sessions": 95,
-      "pageviews": 269,
-      "avg_session_s": 161.3,
-      "engagement_rate": 69.47,
-      "event_count": 665
     },
     {
       "source": "4135324-Apple",
@@ -40301,6 +40301,17 @@
       "event_count": 131
     },
     {
+      "date": "2026-11-01",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 18,
+      "sessions": 19,
+      "pageviews": 20,
+      "eng_dur_s": 28.0,
+      "eng_sessions": 2,
+      "event_count": 59
+    },
+    {
       "date": "2026-03-30",
       "source": "instagram.com",
       "medium": "referral",
@@ -44954,6 +44965,17 @@
       "event_count": 103
     },
     {
+      "date": "2026-11-01",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 12,
+      "sessions": 14,
+      "pageviews": 30,
+      "eng_dur_s": 1056.0,
+      "eng_sessions": 9,
+      "event_count": 86
+    },
+    {
       "date": "2026-04-02",
       "source": "ticketmaster.com.br",
       "medium": "referral",
@@ -47990,17 +48012,6 @@
       "event_count": 38
     },
     {
-      "date": "2026-11-01",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 9,
-      "sessions": 10,
-      "pageviews": 11,
-      "eng_dur_s": 22.0,
-      "eng_sessions": 2,
-      "event_count": 31
-    },
-    {
       "date": "2026-04-01",
       "source": "autodromodeinterlagos.prefeitura.sp.gov.br",
       "medium": "referral",
@@ -49473,17 +49484,6 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 1,
       "event_count": 29
-    },
-    {
-      "date": "2026-11-01",
-      "source": "google",
-      "medium": "organic",
-      "new_users": 8,
-      "sessions": 10,
-      "pageviews": 26,
-      "eng_dur_s": 990.0,
-      "eng_sessions": 6,
-      "event_count": 71
     },
     {
       "date": "2026-04-01",
@@ -53345,6 +53345,17 @@
       "eng_dur_s": 275.0,
       "eng_sessions": 2,
       "event_count": 31
+    },
+    {
+      "date": "2026-11-01",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 6,
+      "sessions": 7,
+      "pageviews": 7,
+      "eng_dur_s": 4.0,
+      "eng_sessions": 0,
+      "event_count": 21
     },
     {
       "date": "2026-03-30",
@@ -64076,11 +64087,11 @@
       "source": "salesforce",
       "medium": "email",
       "new_users": 3,
-      "sessions": 3,
-      "pageviews": 14,
+      "sessions": 5,
+      "pageviews": 20,
       "eng_dur_s": 0.0,
-      "eng_sessions": 1,
-      "event_count": 20
+      "eng_sessions": 3,
+      "event_count": 28
     },
     {
       "date": "2026-03-30",
@@ -91430,14 +91441,14 @@
     },
     {
       "date": "2026-11-01",
-      "source": "organico",
-      "medium": "instagram",
+      "source": "motorshow.com.br",
+      "medium": "referral",
       "new_users": 1,
-      "sessions": 2,
-      "pageviews": 2,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 5
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 25.0,
+      "eng_sessions": 1,
+      "event_count": 4
     },
     {
       "date": "2026-03-30",
