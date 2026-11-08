@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-11-08T07:56:58.973361+00:00",
+  "updated_at": "2026-11-08T14:38:14.452284+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-11-08"
   },
   "totals": {
-    "sessions": 1922273,
-    "users": 1668089,
-    "new_users": 1295586,
-    "pageviews": 4335204,
-    "events": 10543361,
+    "sessions": 1922282,
+    "users": 1668097,
+    "new_users": 1295594,
+    "pageviews": 4335217,
+    "events": 10543397,
     "conversions": 19659.0,
     "pages_per_session": 2.26,
-    "avg_bounce_rate": 56.6
+    "avg_bounce_rate": 56.72
   },
   "daily_series": [
     {
@@ -2471,14 +2471,14 @@
     },
     {
       "date": "2026-11-08",
-      "sessions": 4,
-      "users": 4,
-      "new_users": 3,
-      "pageviews": 10,
-      "events": 25,
+      "sessions": 13,
+      "users": 12,
+      "new_users": 11,
+      "pageviews": 23,
+      "events": 61,
       "conversions": 0.0,
-      "bounce_rate": 50.0,
-      "avg_session_s": 122.6
+      "bounce_rate": 76.92,
+      "avg_session_s": 78.3
     }
   ],
   "traffic_sources": [
@@ -2561,12 +2561,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2074204,
+      "pageviews": 2074209,
       "sessions": 1230695
     },
     {
       "page": "/ingressos/",
-      "pageviews": 542191,
+      "pageviews": 542195,
       "sessions": 382522
     },
     {
@@ -3508,12 +3508,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 254177,
+      "new_users": 254184,
       "sessions": 344315,
-      "pageviews": 777190,
+      "pageviews": 777197,
       "avg_session_s": 149.8,
       "engagement_rate": 49.01,
-      "event_count": 1946153
+      "event_count": 1946174
     },
     {
       "source": "ig",
@@ -3540,10 +3540,10 @@
       "medium": "organic",
       "new_users": 70382,
       "sessions": 133762,
-      "pageviews": 412695,
+      "pageviews": 412700,
       "avg_session_s": 231.3,
       "engagement_rate": 63.9,
-      "event_count": 948667
+      "event_count": 948677
     },
     {
       "source": "tiktok",
@@ -4466,6 +4466,16 @@
       "event_count": 408
     },
     {
+      "source": "interlagoscircuitinn.com.br",
+      "medium": "referral",
+      "new_users": 70,
+      "sessions": 91,
+      "pageviews": 185,
+      "avg_session_s": 114.1,
+      "engagement_rate": 70.33,
+      "event_count": 492
+    },
+    {
       "source": "duckduckgo",
       "medium": "organic",
       "new_users": 51,
@@ -4474,16 +4484,6 @@
       "avg_session_s": 207.4,
       "engagement_rate": 52.75,
       "event_count": 545
-    },
-    {
-      "source": "interlagoscircuitinn.com.br",
-      "medium": "referral",
-      "new_users": 69,
-      "sessions": 90,
-      "pageviews": 184,
-      "avg_session_s": 115.2,
-      "engagement_rate": 70.0,
-      "event_count": 487
     },
     {
       "source": "hipervarejo",
@@ -49751,6 +49751,17 @@
       "event_count": 29
     },
     {
+      "date": "2026-11-08",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 8,
+      "sessions": 8,
+      "pageviews": 8,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 24
+    },
+    {
       "date": "2026-04-01",
       "source": "m.facebook.com",
       "medium": "referral",
@@ -72074,11 +72085,11 @@
       "source": "google",
       "medium": "organic",
       "new_users": 2,
-      "sessions": 3,
-      "pageviews": 9,
-      "eng_dur_s": 162.0,
+      "sessions": 4,
+      "pageviews": 14,
+      "eng_dur_s": 189.0,
       "eng_sessions": 2,
-      "event_count": 22
+      "event_count": 32
     },
     {
       "date": "2026-03-30",
@@ -92465,14 +92476,14 @@
     },
     {
       "date": "2026-11-08",
-      "source": "(direct)",
-      "medium": "(none)",
+      "source": "interlagoscircuitinn.com.br",
+      "medium": "referral",
       "new_users": 1,
       "sessions": 1,
       "pageviews": 1,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 3
+      "eng_dur_s": 32.0,
+      "eng_sessions": 1,
+      "event_count": 5
     },
     {
       "date": "2026-03-30",
