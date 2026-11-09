@@ -2,8 +2,8 @@ name: VOGE - Update Google Ads
 
 on:
   schedule:
-    # 3x ao dia (07h27, 13h27 e 19h27 em Brasília)
-    - cron: '27 10,16,22 * * *'
+    # De 20 em 20 minutos (:12, :32, :52)
+    - cron: '12,32,52 * * * *'
   workflow_dispatch:
 
 permissions:

@@ -2,8 +2,8 @@ name: VOGE - Update Meta Ads
 
 on:
   schedule:
-    # 3x ao dia (07h17, 13h17 e 19h17 em Brasília)
-    - cron: '17 10,16,22 * * *'
+    # De 20 em 20 minutos (:02, :22, :42)
+    - cron: '2,22,42 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -34,12 +34,12 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add voge/meta-data.json
+          git add voge/meta-data.json voge/meta-criativos.json 2>/dev/null || git add voge/meta-data.json
           if git diff --staged --quiet; then
-            echo "Sem mudancas em voge/meta-data.json"
+            echo "Sem mudancas nos dados da Meta"
             exit 0
           fi
-          git commit -m "chore: update voge/meta-data.json [skip ci]"
+          git commit -m "chore: update voge meta data [skip ci]"
           for attempt in 1 2 3 4 5 6 7 8 9 10; do
             git pull --rebase origin main 2>&1 || git rebase --abort 2>/dev/null || true
             if git push 2>&1; then
