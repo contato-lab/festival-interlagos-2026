@@ -1,0 +1,46 @@
+name: Deploy VOGE Worker
+
+# Worker que entrega os dados do dashboard de leads da VOGE Brasil.
+# Reaproveita secrets que ja existem neste repositorio, nenhuma chave nova.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare-worker/worker-voge.js'
+      - 'cloudflare-worker/wrangler-voge.toml'
+      - '.github/workflows/deploy-voge-worker.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: cloudflare-worker
+          wranglerVersion: '3'
+          command: deploy --config wrangler-voge.toml
+
+      # Depois do deploy, senao o Worker ainda nao existe pra receber os secrets.
+      - name: Cadastrar as chaves da Meta e do Google
+        working-directory: cloudflare-worker
+        env:
+          CLOUDFLARE_API_TOKEN:       ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          META_TOKEN:                 ${{ secrets.META_TOKEN }}
+          GOOGLE_ADS_DEVELOPER_TOKEN: ${{ secrets.GOOGLE_ADS_DEVELOPER_TOKEN }}
+          GOOGLE_ADS_CLIENT_ID:       ${{ secrets.GOOGLE_ADS_CLIENT_ID }}
+          GOOGLE_ADS_CLIENT_SECRET:   ${{ secrets.GOOGLE_ADS_CLIENT_SECRET }}
+          GOOGLE_ADS_REFRESH_TOKEN:   ${{ secrets.GOOGLE_ADS_REFRESH_TOKEN }}
+        run: |
+          for nome in META_TOKEN GOOGLE_ADS_DEVELOPER_TOKEN GOOGLE_ADS_CLIENT_ID GOOGLE_ADS_CLIENT_SECRET GOOGLE_ADS_REFRESH_TOKEN; do
+            printf '%s' "${!nome}" | npx --yes wrangler@3 secret put "$nome" --config wrangler-voge.toml
+          done
