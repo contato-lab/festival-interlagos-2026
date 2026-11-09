@@ -32,7 +32,7 @@ jobs:
           GOOGLE_ADS_CLIENT_ID:         ${{ secrets.GOOGLE_ADS_CLIENT_ID }}
           GOOGLE_ADS_CLIENT_SECRET:     ${{ secrets.GOOGLE_ADS_CLIENT_SECRET }}
           GOOGLE_ADS_REFRESH_TOKEN:     ${{ secrets.GOOGLE_ADS_REFRESH_TOKEN }}
-          GOOGLE_ADS_LOGIN_CUSTOMER_ID: ${{ secrets.GOOGLE_ADS_LOGIN_CUSTOMER_ID }}
+          GOOGLE_ADS_LOGIN_CUSTOMER_ID: '6244436447'
           VOGE_GOOGLE_CUSTOMER_ID:      '6244436447'
           GOOGLE_ADS_SINCE:             '2026-11-01'
         run: python update-google-ads.py
