@@ -1,0 +1,9 @@
+name = "voge-dados"
+main = "worker-voge.js"
+compatibility_date = "2026-04-23"
+
+[observability]
+enabled = true
+
+# As chaves da Meta e do Google NAO ficam aqui, este repositorio e publico.
+# Sao cadastradas pelo deploy-voge-worker.yml a partir dos secrets do GitHub.
