@@ -83,3 +83,58 @@ with open(OUT_FILE, 'w', encoding='utf-8') as f:
 
 print(f"OK: {len(parsed)} dias desde {since} | leads {sum(d['leads'] for d in parsed)} | gasto R$ {sum(d['gasto'] for d in parsed):,.2f}")
 print('Tipos de acao vistos:', sorted(t for t in tipos_vistos if t))
+
+
+# ── Criativos: resultado de cada anúncio por dia, com a imagem ──
+def api_get(path, params):
+    url = f'https://graph.facebook.com/v20.0/{path}?{urllib.parse.urlencode({**params, "access_token": TOKEN})}'
+    with urllib.request.urlopen(url) as resp:
+        return json.loads(resp.read())
+
+
+def gravar_criativos():
+    params = {
+        'fields':         'ad_id,ad_name,date_start,spend,impressions,clicks,actions',
+        'time_increment': '1',
+        'time_range':     json.dumps({'since': since, 'until': until}),
+        'level':          'ad',
+        'limit':          '500',
+    }
+    linhas, pagina = [], api_get(f'{ACCT}/insights', params)
+    while True:
+        linhas.extend(pagina.get('data', []))
+        proxima = pagina.get('paging', {}).get('next')
+        if not proxima:
+            break
+        with urllib.request.urlopen(proxima) as resp:
+            pagina = json.loads(resp.read())
+
+    ads = {}
+    for l in linhas:
+        ad = ads.setdefault(l['ad_id'], {'id': l['ad_id'], 'nome': l.get('ad_name', ''), 'status': '', 'thumb': '', 'dias': []})
+        ad['dias'].append({
+            'iso':        l['date_start'],
+            'gasto':      round(float(l.get('spend', 0)), 2),
+            'impressoes': int(l.get('impressions', 0)),
+            'cliques':    int(l.get('clicks', 0)),
+            'leads':      contar(l.get('actions'), TIPOS_LEAD) + contar(l.get('actions'), TIPOS_CONTATO),
+        })
+
+    for ad in ads.values():
+        try:
+            info = api_get(ad['id'], {'fields': 'effective_status,creative.thumbnail_width(600).thumbnail_height(600){thumbnail_url,image_url}'})
+            criativo = info.get('creative', {})
+            ad['status'] = info.get('effective_status', '')
+            ad['thumb']  = criativo.get('thumbnail_url') or criativo.get('image_url') or ''
+        except Exception as e:
+            print(f"AVISO: sem imagem do anuncio {ad['id']}: {getattr(e, 'code', type(e).__name__)}")
+
+    with open('meta-criativos.json', 'w', encoding='utf-8') as f:
+        json.dump({'updated': output['updated'], 'since': since, 'ads': list(ads.values())}, f, ensure_ascii=False, indent=2)
+    print(f'OK: {len(ads)} anuncios em meta-criativos.json')
+
+
+try:
+    gravar_criativos()
+except Exception as e:   # falha nos criativos não pode derrubar os números principais do painel
+    print('AVISO: criativos nao atualizados:', getattr(e, 'code', type(e).__name__))
