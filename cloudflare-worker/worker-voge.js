@@ -3,8 +3,8 @@
  *
  * Por que Worker e não robô do GitHub: o agendamento do GitHub Actions neste repositório
  * pede 5 minutos e chega a demorar de 3 a 10 horas (medido em 09/11/2026).
- * Aqui o painel pede o dado, o Worker busca na Meta e no Google e guarda por 15 minutos.
- * Como o painel recarrega a cada 5 minutos, o dado na tela nunca passa de 20 minutos.
+ * Aqui o painel pede o dado a cada 1 minuto, e o Worker busca na Meta e no Google e guarda por 45 segundos.
+ * Os 45 segundos protegem as APIs quando várias pessoas abrem o painel ao mesmo tempo.
  * Se uma API falhar, entrega a última resposta boa em vez de deixar o painel vazio.
  *
  * Lead Meta = envio de formulário (evento Lead) + contato e WhatsApp (evento Contact).
@@ -18,9 +18,9 @@ const SINCE       = '2026-11-01';   // início da campanha VOGE Sales Speed
 const GRAPH       = 'https://graph.facebook.com/v20.0';
 const GOOGLE_API  = 'https://googleads.googleapis.com/v26';
 
-const CACHE_TTL   = 15 * 60;            // 15 minutos
+const CACHE_TTL   = 45;                 // segundos, menor que o intervalo de 1 minuto do painel
 const STALE_TTL   = 7 * 24 * 60 * 60;   // 7 dias, reserva para quando a API falhar
-const CACHE_VER   = 'v1';
+const CACHE_VER   = 'v2';
 
 // O nome do evento muda conforme a origem. Vale o primeiro que existir, para não contar duas vezes.
 const TIPOS_LEAD    = ['lead', 'offsite_conversion.fb_pixel_lead'];
