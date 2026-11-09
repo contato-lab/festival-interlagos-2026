@@ -1,0 +1,60 @@
+name: VOGE - Update Google Ads
+
+on:
+  schedule:
+    # 3x ao dia (07h27, 13h27 e 19h27 em Brasília)
+    - cron: '27 10,16,22 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install google-ads
+
+      - name: Run update script
+        working-directory: voge
+        env:
+          GOOGLE_ADS_DEVELOPER_TOKEN:   ${{ secrets.GOOGLE_ADS_DEVELOPER_TOKEN }}
+          GOOGLE_ADS_CLIENT_ID:         ${{ secrets.GOOGLE_ADS_CLIENT_ID }}
+          GOOGLE_ADS_CLIENT_SECRET:     ${{ secrets.GOOGLE_ADS_CLIENT_SECRET }}
+          GOOGLE_ADS_REFRESH_TOKEN:     ${{ secrets.GOOGLE_ADS_REFRESH_TOKEN }}
+          GOOGLE_ADS_LOGIN_CUSTOMER_ID: ${{ secrets.GOOGLE_ADS_LOGIN_CUSTOMER_ID }}
+          VOGE_GOOGLE_CUSTOMER_ID:      '6244436447'
+          GOOGLE_ADS_SINCE:             '2026-11-01'
+        run: python update-google-ads.py
+
+      - name: Commit and push data (com retry loop)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add voge/google-ads-data.json
+          if git diff --staged --quiet; then
+            echo "Sem mudancas em voge/google-ads-data.json"
+            exit 0
+          fi
+          git commit -m "chore: update voge/google-ads-data.json [skip ci]"
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            git pull --rebase origin main 2>&1 || git rebase --abort 2>/dev/null || true
+            if git push 2>&1; then
+              echo "Push OK na tentativa $attempt"
+              exit 0
+            fi
+            echo "Push falhou na tentativa $attempt, aguardando..."
+            sleep $((RANDOM % 15 + 5))
+          done
+          echo "ERRO: push falhou apos 10 tentativas"
+          exit 1
