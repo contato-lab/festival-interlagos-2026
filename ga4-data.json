@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-11-12T12:30:12.161356+00:00",
+  "updated_at": "2026-11-12T20:18:04.459815+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-11-12"
   },
   "totals": {
-    "sessions": 1923100,
-    "users": 1668885,
-    "new_users": 1296324,
-    "pageviews": 4336383,
-    "events": 10546619,
+    "sessions": 1923139,
+    "users": 1668923,
+    "new_users": 1296357,
+    "pageviews": 4336452,
+    "events": 10546800,
     "conversions": 19659.0,
     "pages_per_session": 2.25,
-    "avg_bounce_rate": 56.93
+    "avg_bounce_rate": 57.0
   },
   "daily_series": [
     {
@@ -2515,14 +2515,14 @@
     },
     {
       "date": "2026-11-12",
-      "sessions": 5,
-      "users": 5,
-      "new_users": 5,
-      "pageviews": 8,
-      "events": 22,
+      "sessions": 44,
+      "users": 43,
+      "new_users": 38,
+      "pageviews": 77,
+      "events": 203,
       "conversions": 0.0,
-      "bounce_rate": 60.0,
-      "avg_session_s": 17.6
+      "bounce_rate": 75.0,
+      "avg_session_s": 105.7
     }
   ],
   "traffic_sources": [
@@ -2558,7 +2558,7 @@
     },
     {
       "channel": "Organic Search",
-      "sessions": 144961,
+      "sessions": 145015,
       "conversions": 580.0
     },
     {
@@ -2605,12 +2605,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2074802,
+      "pageviews": 2074833,
       "sessions": 1232777
     },
     {
       "page": "/ingressos/",
-      "pageviews": 542543,
+      "pageviews": 542568,
       "sessions": 382333
     },
     {
@@ -2635,7 +2635,7 @@
     },
     {
       "page": "/login",
-      "pageviews": 112331,
+      "pageviews": 112334,
       "sessions": 58788
     },
     {
@@ -2645,12 +2645,12 @@
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 83862,
+      "pageviews": 83865,
       "sessions": 54320
     },
     {
       "page": "/vendas/ingressos/ride-pass",
-      "pageviews": 80281,
+      "pageviews": 80282,
       "sessions": 38741
     }
   ],
@@ -3495,22 +3495,22 @@
     {
       "source": "google",
       "medium": "cpc",
-      "new_users": 203006,
+      "new_users": 203007,
       "sessions": 345360,
-      "pageviews": 1051812,
+      "pageviews": 1051813,
       "avg_session_s": 207.5,
       "engagement_rate": 64.84,
-      "event_count": 2426308
+      "event_count": 2426311
     },
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 254500,
+      "new_users": 254519,
       "sessions": 344258,
-      "pageviews": 777538,
+      "pageviews": 777560,
       "avg_session_s": 149.8,
       "engagement_rate": 49.05,
-      "event_count": 1947198
+      "event_count": 1947261
     },
     {
       "source": "ig",
@@ -3525,22 +3525,22 @@
     {
       "source": "organico",
       "medium": "instagram",
-      "new_users": 96035,
+      "new_users": 96039,
       "sessions": 136051,
-      "pageviews": 471641,
+      "pageviews": 471647,
       "avg_session_s": 164.8,
       "engagement_rate": 75.67,
-      "event_count": 1026370
+      "event_count": 1026388
     },
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 70516,
-      "sessions": 133968,
-      "pageviews": 413119,
+      "new_users": 70523,
+      "sessions": 134015,
+      "pageviews": 413154,
       "avg_session_s": 231.1,
-      "engagement_rate": 63.85,
-      "event_count": 949737
+      "engagement_rate": 63.87,
+      "event_count": 949819
     },
     {
       "source": "tiktok",
@@ -3695,12 +3695,12 @@
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 9068,
+      "new_users": 9069,
       "sessions": 11506,
-      "pageviews": 21276,
+      "pageviews": 21278,
       "avg_session_s": 95.4,
       "engagement_rate": 54.29,
-      "event_count": 56095
+      "event_count": 56101
     },
     {
       "source": "instagram.com",
@@ -3817,10 +3817,10 @@
       "medium": "(not set)",
       "new_users": 46,
       "sessions": 2988,
-      "pageviews": 6450,
+      "pageviews": 6452,
       "avg_session_s": 195.5,
       "engagement_rate": 0.07,
-      "event_count": 11058
+      "event_count": 11064
     },
     {
       "source": "display",
@@ -5223,6 +5223,16 @@
       "event_count": 85
     },
     {
+      "source": "bmw-motorrad.com.br",
+      "medium": "referral",
+      "new_users": 4,
+      "sessions": 5,
+      "pageviews": 4,
+      "avg_session_s": 3.1,
+      "engagement_rate": 20.0,
+      "event_count": 16
+    },
+    {
       "source": "ticketmaster.ie",
       "medium": "referral",
       "new_users": 4,
@@ -5291,16 +5301,6 @@
       "avg_session_s": 79.6,
       "engagement_rate": 50.0,
       "event_count": 47
-    },
-    {
-      "source": "bmw-motorrad.com.br",
-      "medium": "referral",
-      "new_users": 3,
-      "sessions": 4,
-      "pageviews": 3,
-      "avg_session_s": 3.8,
-      "engagement_rate": 25.0,
-      "event_count": 13
     },
     {
       "source": "(not set)",
@@ -39067,6 +39067,17 @@
       "event_count": 94
     },
     {
+      "date": "2026-11-12",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 21,
+      "sessions": 24,
+      "pageviews": 24,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 69
+    },
+    {
       "date": "2026-04-07",
       "source": "ticketmaster.com.br",
       "medium": "referral",
@@ -48461,6 +48472,17 @@
       "event_count": 31
     },
     {
+      "date": "2026-11-12",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 9,
+      "sessions": 9,
+      "pageviews": 40,
+      "eng_dur_s": 825.0,
+      "eng_sessions": 8,
+      "event_count": 95
+    },
+    {
       "date": "2026-04-01",
       "source": "autodromodeinterlagos.prefeitura.sp.gov.br",
       "medium": "referral",
@@ -56687,6 +56709,17 @@
       "eng_dur_s": 46.0,
       "eng_sessions": 3,
       "event_count": 24
+    },
+    {
+      "date": "2026-11-12",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 5,
+      "sessions": 6,
+      "pageviews": 7,
+      "eng_dur_s": 17.0,
+      "eng_sessions": 3,
+      "event_count": 21
     },
     {
       "date": "2026-03-30",
@@ -72527,28 +72560,6 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 1,
       "event_count": 8
-    },
-    {
-      "date": "2026-11-12",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 2,
-      "sessions": 2,
-      "pageviews": 2,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 6
-    },
-    {
-      "date": "2026-11-12",
-      "source": "google",
-      "medium": "organic",
-      "new_users": 2,
-      "sessions": 2,
-      "pageviews": 5,
-      "eng_dur_s": 80.0,
-      "eng_sessions": 2,
-      "event_count": 13
     },
     {
       "date": "2026-03-30",
@@ -93188,14 +93199,36 @@
     },
     {
       "date": "2026-11-12",
-      "source": "organico",
-      "medium": "instagram",
+      "source": "bmw-motorrad.com.br",
+      "medium": "referral",
       "new_users": 1,
       "sessions": 1,
       "pageviews": 1,
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 3
+    },
+    {
+      "date": "2026-11-12",
+      "source": "google",
+      "medium": "cpc",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
+    },
+    {
+      "date": "2026-11-12",
+      "source": "salesforce",
+      "medium": "email",
+      "new_users": 1,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 3.0,
+      "eng_sessions": 0,
+      "event_count": 6
     },
     {
       "date": "2026-03-30",
@@ -110741,6 +110774,17 @@
       "eng_dur_s": 5.0,
       "eng_sessions": 0,
       "event_count": 3
+    },
+    {
+      "date": "2026-11-12",
+      "source": "(not set)",
+      "medium": "(not set)",
+      "new_users": 0,
+      "sessions": 1,
+      "pageviews": 2,
+      "eng_dur_s": 44.0,
+      "eng_sessions": 0,
+      "event_count": 6
     }
   ]
 }
