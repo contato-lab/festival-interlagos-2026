@@ -34,6 +34,16 @@ const LOJAS = [
 ];
 
 // A Meta devolve respostas como "rio_de_janeiro" e "são_paulo": sublinhado vira espaço
+// A ferramenta de teste da Meta preenche tudo com "<test lead: dummy data for ...>".
+// Esse lead vai para uma loja fixa com nome fácil de achar na Auditoria de Leads.
+const LOJA_TESTE = 5;   // São Paulo
+const NOME_TESTE = 'TESTE LIME - DESCONSIDERAR';
+const ehTeste = campos => Object.values(campos).some(v => /test lead|dummy data/i.test(v || ''));
+const horaBRT = () => {
+  const s = new Date(Date.now() - 3 * 3600 * 1000).toISOString();
+  return `${s.slice(8, 10)}/${s.slice(5, 7)}/${s.slice(0, 4)} às ${s.slice(11, 16)}`;
+};
+
 const semAcento = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[_-]+/g, ' ').toLowerCase().trim();
 const legivel = s => (s || '').replace(/_+/g, ' ').trim();
 const digitos = s => (s || '').replace(/\D/g, '');
@@ -103,6 +113,13 @@ async function processar(env, chave, lead) {
   if (res.situacao === 'ACEITO') Object.assign(res, await acompanhar(res.trackingStatusUrl));
   delete res.trackingStatusUrl;
   await env.LEADS.put(chave, JSON.stringify({ ...res, loja: lead.dealerId, em: new Date().toISOString() }), { expirationTtl: GUARDA_DIAS * 86400 });
+  if (lead.metadados && lead.metadados.teste === 'true') {
+    const loja = LOJAS.find(l => l.dealerId === lead.dealerId);
+    await env.LEADS.put('ultimo_teste', JSON.stringify({
+      enviadoEm: horaBRT(), nomeNoCRM: lead.nome, loja: loja ? loja.nome : lead.dealerId,
+      situacao: res.situacao, codigoRastreio: res.codigoRastreio || '', detalhe: res.detalhe || '',
+    }));
+  }
   console.log('Lead', chave, '→ loja', lead.dealerId, res.situacao, res.codigoRastreio || res.detalhe || '');
   return res.situacao;
 }
@@ -126,6 +143,15 @@ async function tokenDaPagina(env) {
 function leadDaMeta(l) {
   const campo = {};
   for (const f of l.field_data || []) campo[f.name] = (f.values || [])[0] || '';
+  if (ehTeste(campo)) {
+    return {
+      dealerId: LOJA_TESTE, nome: NOME_TESTE, email: '', celular: '',
+      origem: ORIGEM.meta, categoriaOrigem: CATEGORIA_ORIGEM, tipo: 'WEB', marca: 'VOGE',
+      mensagem: `Lead de teste da integração Meta, enviado em ${horaBRT()}. Pode desconsiderar.`,
+      idExterno: 'meta-' + l.id,
+      metadados: { teste: 'true', form_id: l.form_id || '', criado_em: l.created_time || '' },
+    };
+  }
   const achar = re => { const k = Object.keys(campo).find(n => re.test(semAcento(n))); return k ? campo[k] : ''; };
   // Nomes padrão da Meta e os nomes em português que aparecem na exportação
   const nome = campo.full_name || campo.nome_completo || [campo.first_name, campo.last_name].filter(Boolean).join(' ');
@@ -243,6 +269,8 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     if (url.pathname === '/diagnostico') return json(await diagnostico(env));
+    // Resultado do último lead de teste: só loja, hora e situação, nenhum dado de cliente
+    if (url.pathname === '/ultimo-teste') return json(JSON.parse(await env.LEADS.get('ultimo_teste') || '{"situacao":"nenhum teste ainda"}'));
 
     if (url.pathname === '/google-webhook' && request.method === 'POST') {
       const b = await request.json().catch(() => null);
