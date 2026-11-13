@@ -20,9 +20,11 @@ const ENVIO_URL   = TECSINAPSE + '/public/voge/lead/web';
 const JANELA_H    = 24;                  // horas de leads da Meta relidas a cada rodada
 const GUARDA_DIAS = 90;                  // por quanto tempo o KV lembra que um lead já foi enviado
 
-// O que vai no campo ORIGEM e na categoria. Confirmar os textos com a TecSinapse.
-const ORIGEM = { fb: 'Facebook', ig: 'Instagram', meta: 'Meta Ads', google: 'Google Ads' };
-const CATEGORIA_ORIGEM = 'Mídia Paga';
+// ORIGEM tem que ser EXATAMENTE igual ao cadastro da VOGE no Portal (TecSinapse, 13/11/2026):
+// qualquer variação ("Facebook Ads", "FB", "Meta Ads") cria uma origem nova e quebra os relatórios.
+// Por isso só existem dois valores, e nada de categoriaOrigem, campanhaId ou midiaAtracaoId.
+// campanhaId tira o lead do funil da concessionária; midiaAtracaoId é opcional.
+const origemMeta = plataforma => (plataforma === 'ig' ? 'Instagram' : 'Facebook');
 
 // Lojas da planilha "Token de Integração Voge" (13/11/2026). O token de cada uma fica no secret.
 const LOJAS = [
@@ -147,7 +149,7 @@ function leadDaMeta(l) {
     return {
       // A TecSinapse recusa lead sem contato. example.com é reservado e não entrega para ninguém.
       dealerId: LOJA_TESTE, nome: NOME_TESTE, email: 'teste.integracao@example.com', celular: '',
-      origem: ORIGEM.meta, categoriaOrigem: CATEGORIA_ORIGEM, tipo: 'WEB', marca: 'VOGE',
+      origem: origemMeta(l.platform), tipo: 'WEB', marca: 'VOGE',
       mensagem: `Lead de teste da integração Meta, enviado em ${horaBRT()}. Pode desconsiderar.`,
       idExterno: 'meta-' + l.id,
       metadados: { teste: 'true', form_id: l.form_id || '', criado_em: l.created_time || '' },
@@ -165,8 +167,7 @@ function leadDaMeta(l) {
     email: campo.email || '',
     celular: celularBR(campo.phone_number || campo.telefone),
     cidade, uf, cep: digitos(campo.zip_code || campo.post_code || campo.cep),
-    origem: ORIGEM[l.platform] || ORIGEM.meta,
-    categoriaOrigem: CATEGORIA_ORIGEM,
+    origem: origemMeta(l.platform),
     tipo: 'WEB',
     marca: 'VOGE',
     produtoInteresse: modelo,
@@ -220,8 +221,7 @@ function leadDoGoogle(b) {
     email: v('EMAIL'),
     celular: celularBR(v('PHONE_NUMBER')),
     cidade, uf, cep: digitos(v('POSTAL_CODE')),
-    origem: ORIGEM.google,
-    categoriaOrigem: CATEGORIA_ORIGEM,
+    origem: 'Google Ads',   // rota sem uso: o Google vai só para o site (decisão de 13/11/2026)
     tipo: 'WEB',
     marca: 'VOGE',
     produtoInteresse: extra(/modelo|moto|interesse/),
