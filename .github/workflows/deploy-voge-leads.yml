@@ -1,0 +1,68 @@
+name: Deploy VOGE Leads (ponte Meta e Google para o CRM)
+
+# Worker que leva os leads dos formularios da Meta e do Google Ads para o CRM da TecSinapse.
+# Chaves novas que precisam existir nos secrets deste repositorio:
+#   VOGE_LOJAS_TOKENS  JSON com o token de formulario de cada loja, ex: {"7":"...","6":"..."}
+#   META_LEADS_TOKEN   token com leads_retrieval na pagina Voge Brasil (opcional, senao usa META_TOKEN)
+#   GOOGLE_LEAD_KEY    chave combinada com o formulario de lead do Google Ads
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare-worker/worker-voge-leads.js'
+      - 'cloudflare-worker/wrangler-voge-leads.toml'
+      - '.github/workflows/deploy-voge-leads.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cloudflare-worker
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Criar o armazenamento KV se ainda nao existir
+        run: |
+          achar() {
+            npx --yes wrangler@3 kv namespace list | python3 -c "
+          import json, sys
+          texto = sys.stdin.read()
+          lista = json.loads(texto[texto.find('['):]) if '[' in texto else []
+          print(next((n['id'] for n in lista if n['title'] in ('voge-leads-LEADS', 'voge-leads')), ''))"
+          }
+          ID=$(achar)
+          if [ -z "$ID" ]; then
+            npx --yes wrangler@3 kv namespace create LEADS --config wrangler-voge-leads.toml
+            ID=$(achar)
+          fi
+          if [ -z "$ID" ]; then echo "Nao consegui criar o KV"; exit 1; fi
+          sed -i "s/KV_ID_AQUI/$ID/" wrangler-voge-leads.toml
+          echo "KV pronto"
+
+      - name: Deploy Worker
+        run: npx --yes wrangler@3 deploy --config wrangler-voge-leads.toml
+
+      # Depois do deploy, senao o Worker ainda nao existe pra receber os secrets.
+      # Chave vazia nao e cadastrada, para nao apagar uma que ja exista.
+      - name: Cadastrar as chaves
+        env:
+          META_TOKEN:        ${{ secrets.META_TOKEN }}
+          META_LEADS_TOKEN:  ${{ secrets.META_LEADS_TOKEN }}
+          VOGE_LOJAS_TOKENS: ${{ secrets.VOGE_LOJAS_TOKENS }}
+          GOOGLE_LEAD_KEY:   ${{ secrets.GOOGLE_LEAD_KEY }}
+        run: |
+          for nome in META_TOKEN META_LEADS_TOKEN VOGE_LOJAS_TOKENS GOOGLE_LEAD_KEY; do
+            if [ -n "${!nome}" ]; then
+              printf '%s' "${!nome}" | npx --yes wrangler@3 secret put "$nome" --config wrangler-voge-leads.toml
+            else
+              echo "$nome vazio, pulei"
+            fi
+          done
