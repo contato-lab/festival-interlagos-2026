@@ -33,7 +33,9 @@ const LOJAS = [
   { dealerId: 5, nome: 'São Paulo',      chaves: ['sao paulo'],                    uf: ['SP'] },
 ];
 
-const semAcento = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+// A Meta devolve respostas como "rio_de_janeiro" e "são_paulo": sublinhado vira espaço
+const semAcento = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[_-]+/g, ' ').toLowerCase().trim();
+const legivel = s => (s || '').replace(/_+/g, ' ').trim();
 const digitos = s => (s || '').replace(/\D/g, '');
 
 function celularBR(tel) {
@@ -125,16 +127,17 @@ function leadDaMeta(l) {
   const campo = {};
   for (const f of l.field_data || []) campo[f.name] = (f.values || [])[0] || '';
   const achar = re => { const k = Object.keys(campo).find(n => re.test(semAcento(n))); return k ? campo[k] : ''; };
-  const nome = campo.full_name || [campo.first_name, campo.last_name].filter(Boolean).join(' ');
-  const cidade = campo.city || '', uf = campo.state || '';
+  // Nomes padrão da Meta e os nomes em português que aparecem na exportação
+  const nome = campo.full_name || campo.nome_completo || [campo.first_name, campo.last_name].filter(Boolean).join(' ');
+  const cidade = campo.city || campo.cidade || '', uf = campo.state || campo.estado || '';
   const loja = acharLoja({ resposta: achar(/loja|concession|revend|unidade/), cidade, uf });
-  const modelo = achar(/modelo|moto|interesse/);
+  const modelo = legivel(achar(/modelo|moto|interesse/));
   return {
     dealerId: loja ? loja.dealerId : null,
     nome: nome || 'Sem nome',
     email: campo.email || '',
-    celular: celularBR(campo.phone_number),
-    cidade, uf, cep: digitos(campo.zip_code || campo.post_code),
+    celular: celularBR(campo.phone_number || campo.telefone),
+    cidade, uf, cep: digitos(campo.zip_code || campo.post_code || campo.cep),
     origem: ORIGEM[l.platform] || ORIGEM.meta,
     categoriaOrigem: CATEGORIA_ORIGEM,
     tipo: 'WEB',
