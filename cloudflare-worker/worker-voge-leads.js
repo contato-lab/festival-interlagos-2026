@@ -219,6 +219,12 @@ async function diagnostico(env) {
     },
   };
   try {
+    const eu = await graph('me', { fields: 'name' }, tokenMeta(env));
+    out.usuarioDoToken = eu.name;
+    const contas = await graph('me/accounts', { fields: 'id', limit: '200' }, tokenMeta(env));
+    out.temAcessoAPaginaVoge = (contas.data || []).some(c => c.id === PAGE_ID);
+  } catch (e) { out.usuarioDoToken = 'erro: ' + e.message; }
+  try {
     const p = await graph('me/permissions', {}, tokenMeta(env));
     out.permissoes = (p.data || []).filter(x => x.status === 'granted').map(x => x.permission);
   } catch (e) { out.permissoes = 'erro: ' + e.message; }
