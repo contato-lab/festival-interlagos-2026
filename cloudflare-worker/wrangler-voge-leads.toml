@@ -1,0 +1,18 @@
+name = "voge-leads"
+main = "worker-voge-leads.js"
+compatibility_date = "2026-04-23"
+
+# Lê os formulários da Meta a cada 2 minutos
+[triggers]
+crons = ["*/2 * * * *"]
+
+# Guarda quais leads já foram enviados ao CRM. O id é preenchido pelo deploy-voge-leads.yml.
+[[kv_namespaces]]
+binding = "LEADS"
+id = "KV_ID_AQUI"
+
+[observability]
+enabled = true
+
+# As chaves NAO ficam aqui, este repositorio e publico.
+# Sao cadastradas pelo deploy-voge-leads.yml a partir dos secrets do GitHub.
