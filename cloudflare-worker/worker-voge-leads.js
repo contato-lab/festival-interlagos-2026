@@ -145,7 +145,8 @@ function leadDaMeta(l) {
   for (const f of l.field_data || []) campo[f.name] = (f.values || [])[0] || '';
   if (ehTeste(campo)) {
     return {
-      dealerId: LOJA_TESTE, nome: NOME_TESTE, email: '', celular: '',
+      // A TecSinapse recusa lead sem contato. example.com é reservado e não entrega para ninguém.
+      dealerId: LOJA_TESTE, nome: NOME_TESTE, email: 'teste.integracao@example.com', celular: '',
       origem: ORIGEM.meta, categoriaOrigem: CATEGORIA_ORIGEM, tipo: 'WEB', marca: 'VOGE',
       mensagem: `Lead de teste da integração Meta, enviado em ${horaBRT()}. Pode desconsiderar.`,
       idExterno: 'meta-' + l.id,
