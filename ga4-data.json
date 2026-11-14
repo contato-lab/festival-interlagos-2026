@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-11-14T14:55:50.725623+00:00",
+  "updated_at": "2026-11-14T19:37:59.538728+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-11-14"
   },
   "totals": {
-    "sessions": 1923192,
-    "users": 1668973,
-    "new_users": 1296405,
-    "pageviews": 4336561,
-    "events": 10547093,
+    "sessions": 1923209,
+    "users": 1668990,
+    "new_users": 1296418,
+    "pageviews": 4336581,
+    "events": 10547154,
     "conversions": 19659.0,
     "pages_per_session": 2.25,
-    "avg_bounce_rate": 57.02
+    "avg_bounce_rate": 57.01
   },
   "daily_series": [
     {
@@ -2526,14 +2526,14 @@
     },
     {
       "date": "2026-11-14",
-      "sessions": 6,
-      "users": 6,
-      "new_users": 6,
-      "pageviews": 6,
-      "events": 20,
+      "sessions": 23,
+      "users": 23,
+      "new_users": 19,
+      "pageviews": 26,
+      "events": 81,
       "conversions": 0.0,
-      "bounce_rate": 66.67,
-      "avg_session_s": 27.8
+      "bounce_rate": 65.22,
+      "avg_session_s": 26.8
     }
   ],
   "traffic_sources": [
@@ -2599,7 +2599,7 @@
     },
     {
       "channel": "AI Assistant",
-      "sessions": 2183,
+      "sessions": 2184,
       "conversions": 27.0
     },
     {
@@ -2616,12 +2616,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2074855,
+      "pageviews": 2074866,
       "sessions": 1232777
     },
     {
       "page": "/ingressos/",
-      "pageviews": 542597,
+      "pageviews": 542604,
       "sessions": 382522
     },
     {
@@ -3463,12 +3463,12 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 254528,
+      "new_users": 254530,
       "sessions": 344258,
-      "pageviews": 777582,
+      "pageviews": 777584,
       "avg_session_s": 149.8,
       "engagement_rate": 49.05,
-      "event_count": 1947319
+      "event_count": 1947325
     },
     {
       "source": "ig",
@@ -3483,22 +3483,22 @@
     {
       "source": "organico",
       "medium": "instagram",
-      "new_users": 96053,
+      "new_users": 96055,
       "sessions": 136051,
-      "pageviews": 471664,
+      "pageviews": 471669,
       "avg_session_s": 164.8,
       "engagement_rate": 75.67,
-      "event_count": 1026439
+      "event_count": 1026452
     },
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 70533,
+      "new_users": 70537,
       "sessions": 134050,
-      "pageviews": 413186,
+      "pageviews": 413194,
       "avg_session_s": 231.0,
       "engagement_rate": 63.92,
-      "event_count": 949904
+      "event_count": 949928
     },
     {
       "source": "tiktok",
@@ -3513,12 +3513,12 @@
     {
       "source": "Tiktok",
       "medium": "Tiktok+Ads",
-      "new_users": 48476,
+      "new_users": 48477,
       "sessions": 55749,
-      "pageviews": 102605,
+      "pageviews": 102606,
       "avg_session_s": 159.9,
       "engagement_rate": 28.29,
-      "event_count": 215737
+      "event_count": 215740
     },
     {
       "source": "programatica",
@@ -3653,12 +3653,12 @@
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 9069,
+      "new_users": 9071,
       "sessions": 11481,
-      "pageviews": 21278,
+      "pageviews": 21280,
       "avg_session_s": 95.6,
       "engagement_rate": 54.43,
-      "event_count": 56105
+      "event_count": 56113
     },
     {
       "source": "instagram.com",
@@ -3763,12 +3763,12 @@
     {
       "source": "(data not available)",
       "medium": "(data not available)",
-      "new_users": 3366,
+      "new_users": 3367,
       "sessions": 3488,
-      "pageviews": 16073,
+      "pageviews": 16074,
       "avg_session_s": 288.0,
       "engagement_rate": 90.25,
-      "event_count": 35505
+      "event_count": 35508
     },
     {
       "source": "(not set)",
@@ -3793,12 +3793,12 @@
     {
       "source": "chatgpt.com",
       "medium": "ai-assistant",
-      "new_users": 1473,
-      "sessions": 2134,
-      "pageviews": 4731,
-      "avg_session_s": 198.8,
-      "engagement_rate": 59.65,
-      "event_count": 12283
+      "new_users": 1474,
+      "sessions": 2135,
+      "pageviews": 4732,
+      "avg_session_s": 198.7,
+      "engagement_rate": 59.67,
+      "event_count": 12287
     },
     {
       "source": "direto",
@@ -56702,6 +56702,17 @@
       "event_count": 24
     },
     {
+      "date": "2026-11-14",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 5,
+      "sessions": 5,
+      "pageviews": 5,
+      "eng_dur_s": 6.0,
+      "eng_sessions": 1,
+      "event_count": 16
+    },
+    {
       "date": "2026-03-30",
       "source": "an",
       "medium": "paid",
@@ -59923,6 +59934,28 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 12
+    },
+    {
+      "date": "2026-11-14",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 4,
+      "sessions": 5,
+      "pageviews": 8,
+      "eng_dur_s": 266.0,
+      "eng_sessions": 4,
+      "event_count": 24
+    },
+    {
+      "date": "2026-11-14",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 4,
+      "sessions": 7,
+      "pageviews": 7,
+      "eng_dur_s": 12.0,
+      "eng_sessions": 1,
+      "event_count": 19
     },
     {
       "date": "2026-03-30",
@@ -64799,14 +64832,14 @@
     },
     {
       "date": "2026-11-14",
-      "source": "(direct)",
-      "medium": "(none)",
+      "source": "salesforce",
+      "medium": "email",
       "new_users": 3,
       "sessions": 3,
       "pageviews": 3,
-      "eng_dur_s": 6.0,
+      "eng_dur_s": 16.0,
       "eng_sessions": 1,
-      "event_count": 10
+      "event_count": 12
     },
     {
       "date": "2026-03-30",
@@ -72556,17 +72589,6 @@
       "date": "2026-11-13",
       "source": "sfmc",
       "medium": "email",
-      "new_users": 2,
-      "sessions": 2,
-      "pageviews": 2,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 6
-    },
-    {
-      "date": "2026-11-14",
-      "source": "organico",
-      "medium": "instagram",
       "new_users": 2,
       "sessions": 2,
       "pageviews": 2,
@@ -93267,12 +93289,34 @@
     },
     {
       "date": "2026-11-14",
-      "source": "salesforce",
-      "medium": "email",
+      "source": "(data not available)",
+      "medium": "(data not available)",
       "new_users": 1,
       "sessions": 1,
       "pageviews": 1,
-      "eng_dur_s": 9.0,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
+    },
+    {
+      "date": "2026-11-14",
+      "source": "Tiktok",
+      "medium": "Tiktok+Ads",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 3
+    },
+    {
+      "date": "2026-11-14",
+      "source": "chatgpt.com",
+      "medium": "ai-assistant",
+      "new_users": 1,
+      "sessions": 1,
+      "pageviews": 1,
+      "eng_dur_s": 10.0,
       "eng_sessions": 1,
       "event_count": 4
     },
