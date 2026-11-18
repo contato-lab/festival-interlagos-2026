@@ -2,8 +2,8 @@
  "updated_at": "2026-06-11T00:30:24Z",
  "metodo": "Varredura multi-agente (8 frentes, 236 consultas web, auditoria adversarial) · RECORTE: ano de 2026",
  "total_mencoes": 55,
- "voz_score": 72,
- "voz_why": "181 menções positivas e zero no Reclame Aqui mantêm força. Sete reclamações SAC Suhai não resolvidas em redes e dúvidas recorrentes sobre ingressos reduzem confiança em 1 ponto versus análise anterior.",
+ "voz_score": 71,
+ "voz_why": "181 menções positivas e zero no Reclame Aqui mantêm força pós agosto. Sete reclamações SAC Suhai não resolvidas em redes e dúvidas recorrentes sobre ingressos reduzem confiança em 1 ponto versus análise anterior.",
  "veredito": {
   "furou_bolha": "parcialmente",
   "justificativa": "A favor: 181 de 398 menções positivas versus 7 negativas consolida força pós eventos agosto 2026. Zero no Reclame Aqui valida operacional motos e carros. 25 menções Google News documentam 22 marcas confirmadas com headlines positivas Triumph Honda Ford. Instagram 206.457 seguidores crescimento 19,6% desde julho. Busca transacional 45% SERP saúde 100%. Tráfego site 86% últimos 14 dias reflete engagement pós evento. Contra: sete comentários negativos SAC Suhai passes preço estacionamento sem resposta pública acumulados em redes. Dúvidas recorrentes ingressos TikTok YouTube documentam gap comunicação. Críticas ausência rock segmento público raiz.",
@@ -252,18 +252,18 @@
  },
  "acoes": [
   {
-   "t": "Publicar FAQ passes respostas SAC",
-   "d": "Sete reclamações sem resposta pública em Instagram TikTok. Publicar resolução passes preço estacionamento nos comentários.",
+   "t": "Responder sete reclamações SAC nos comentários",
+   "d": "Passes preço estacionamento sem resposta pública em Instagram TikTok. Publicar resoluções oficiais nos comentários para converter negativas.",
    "prazo": "Esta semana"
   },
   {
-   "t": "Monitorar gap comunicação versus operação",
-   "d": "Dúvidas recorrentes ingressos TikTok YouTube indicam falha. Validar se informações site chegam a quem pergunta.",
-   "prazo": "Antes de julho"
+   "t": "Publicar FAQ ingressos em todas plataformas",
+   "d": "Dúvidas recorrentes TikTok YouTube sobre passes preços critérios test rides. Centralizar respostas em pinned post.",
+   "prazo": "Esta semana"
   },
   {
    "t": "Programa criadores janeiro sustentação 2027",
-   "d": "Zero posts comunidades prova dependência imprensa. Iniciar parcerias criadores junho para próxima edição.",
+   "d": "Zero posts comunidades prova dependência imprensa. Iniciar parcerias criadores junho para próxima edição gerar conversa orgânica.",
    "prazo": "Preparar agora"
   }
  ],
@@ -973,6 +973,12 @@
   {
    "data": "2026-11-17",
    "voz": 72,
+   "mencoes": 55,
+   "sent_pos": 96
+  },
+  {
+   "data": "2026-11-18",
+   "voz": 71,
    "mencoes": 55,
    "sent_pos": 96
   }
@@ -3379,11 +3385,11 @@
    "sentimento": "neutro"
   }
  ],
- "feed_auto_updated_at": "2026-11-17T19:38:13Z",
+ "feed_auto_updated_at": "2026-11-18T02:44:31Z",
  "feed_auto_total": 300,
  "feed_auto_negativas": 0,
  "busca": {
-  "updated_at": "2026-11-17",
+  "updated_at": "2026-11-18",
   "sugestoes": {
    "festival interlagos": [
     "festival interlagos 2026",
@@ -3414,11 +3420,6 @@
   "nota": "Percentual das sugestões do Google que mostram intenção de compra (ingressos, datas, valores)."
  },
  "historico_busca": [
-  {
-   "data": "2026-07-20",
-   "share_transacional": 45,
-   "total_sugestoes": 20
-  },
   {
    "data": "2026-07-21",
    "share_transacional": 45,
@@ -4013,6 +4014,11 @@
    "data": "2026-11-17",
    "share_transacional": 45,
    "total_sugestoes": 20
+  },
+  {
+   "data": "2026-11-18",
+   "share_transacional": 45,
+   "total_sugestoes": 20
   }
  ],
  "integracoes": {
@@ -4024,7 +4030,7 @@
   "apify_social": true
  },
  "serp": {
-  "updated_at": "2026-11-17",
+  "updated_at": "2026-11-18",
   "fonte": "Brave Search",
   "top": [
    {
@@ -4047,8 +4053,8 @@
    },
    {
     "q": "festival interlagos",
-    "titulo": "Suhai Festival Interlagos 2026",
-    "url": "https://www.ticketmaster.com.br/event/suhai-festival-de-interlagos-2026",
+    "titulo": "Auto | Festival Interlagos",
+    "url": "https://ingressosauto.festivalinterlagos.com.br/ingressos/",
     "tipo": "própria"
    },
    {
@@ -4059,8 +4065,8 @@
    },
    {
     "q": "festival interlagos",
-    "titulo": "Auto | Festival Interlagos",
-    "url": "https://ingressosauto.festivalinterlagos.com.br/ingressos/",
+    "titulo": "Suhai Festival Interlagos 2026",
+    "url": "https://www.ticketmaster.com.br/event/suhai-festival-de-interlagos-2026",
     "tipo": "própria"
    },
    {
@@ -4077,20 +4083,26 @@
    },
    {
     "q": "festival interlagos",
-    "titulo": "Festival Interlagos - 2025 - Shows",
-    "url": "https://www.festivalinterlagos.com.br/shows/",
-    "tipo": "própria"
+    "titulo": "Festival Interlagos 2026 confirma 22 montadoras para edição; confira | CNN Brasil",
+    "url": "https://www.cnnbrasil.com.br/auto/festival-interlagos-2026-confirma-22-montadoras-para-edicao-confira/",
+    "tipo": "imprensa/terceiros"
    },
    {
     "q": "festival interlagos",
-    "titulo": "Festival Interlagos 2026 confirma 22 montadoras para edição; confira | CNN Brasil",
-    "url": "https://www.cnnbrasil.com.br/auto/festival-interlagos-2026-confirma-22-montadoras-para-edicao-confira/",
+    "titulo": "Festival Interlagos 2026: horários, como chegar, ingressos e atrações - Grupo Sentinela",
+    "url": "https://www.gruposentinela.com.br/festival-interlagos-2026-horarios-como-chegar-ingressos-e-atracoes/",
     "tipo": "imprensa/terceiros"
    },
    {
     "q": "suhai festival interlagos",
     "titulo": "Suhai Festival Interlagos",
     "url": "https://www.festivalinterlagos.com.br/",
+    "tipo": "própria"
+   },
+   {
+    "q": "suhai festival interlagos",
+    "titulo": "Suhai Festival Interlagos 2026 Edição Auto - São Paulo",
+    "url": "https://www.ticketmaster.com.br/event/suhai-festival-de-interlagos-2026-edicao-auto",
     "tipo": "própria"
    },
    {
@@ -4107,26 +4119,8 @@
    },
    {
     "q": "suhai festival interlagos",
-    "titulo": "Suhai Festival Interlagos 2026 Edição Auto - São Paulo",
-    "url": "https://www.ticketmaster.com.br/event/suhai-festival-de-interlagos-2026-edicao-auto",
-    "tipo": "própria"
-   },
-   {
-    "q": "suhai festival interlagos",
     "titulo": "IMPRENSA, Festival Interlagos",
     "url": "https://auto.festivalinterlagos.com.br/imprensa/",
-    "tipo": "própria"
-   },
-   {
-    "q": "suhai festival interlagos",
-    "titulo": "Confira o line-up do Suhai Festival Interlagos 2026",
-    "url": "https://billboard.com.br/suhai-festival-interlagos-2026-line-up/",
-    "tipo": "imprensa/terceiros"
-   },
-   {
-    "q": "suhai festival interlagos",
-    "titulo": "Suhai Festival Interlagos 2026 Edição Moto - São Paulo",
-    "url": "https://www.ticketmaster.com.br/event/suhai-festival-de-interlagos-2026-edicao-moto",
     "tipo": "própria"
    },
    {
@@ -4137,15 +4131,27 @@
    },
    {
     "q": "suhai festival interlagos",
+    "titulo": "Suhai Festival Interlagos 2026 Edição Moto - São Paulo",
+    "url": "https://www.ticketmaster.com.br/event/suhai-festival-de-interlagos-2026-edicao-moto",
+    "tipo": "própria"
+   },
+   {
+    "q": "suhai festival interlagos",
     "titulo": "Duas Rodas | Suhai Festival Interlagos 2026 abre hoje venda de ingressos",
     "url": "https://www.revistaduasrodas.com.br/noticias/suhai-festival-interlagos-2026-abre-hoje-venda-de-ingressos",
     "tipo": "imprensa/terceiros"
    },
    {
     "q": "suhai festival interlagos",
-    "titulo": "Suhai Festival Interlagos - Festival Interlagos 2026",
-    "url": "https://festivalinterlagos.fotop.com.br/",
+    "titulo": "Confira o line-up do Suhai Festival Interlagos 2026",
+    "url": "https://billboard.com.br/suhai-festival-interlagos-2026-line-up/",
     "tipo": "imprensa/terceiros"
+   },
+   {
+    "q": "suhai festival interlagos",
+    "titulo": "Festival Suhai 2026 - Edição Auto, Ticketmaster Help",
+    "url": "https://help.ticketmaster.com.br/hc/pt-br/articles/48088101279505-Festival-Suhai-2026-Edi%C3%A7%C3%A3o-Auto",
+    "tipo": "própria"
    }
   ],
   "health": 100,
@@ -4153,12 +4159,6 @@
   "riscos": []
  },
  "historico_serp": [
-  {
-   "data": "2026-07-20",
-   "health": 100,
-   "owned": 14,
-   "riscos": 0
-  },
   {
    "data": "2026-07-21",
    "health": 100,
@@ -4872,6 +4872,12 @@
    "health": 100,
    "owned": 12,
    "riscos": 0
+  },
+  {
+   "data": "2026-11-18",
+   "health": 100,
+   "owned": 12,
+   "riscos": 0
   }
  ],
  "social_proprio": {
@@ -4886,11 +4892,6 @@
   }
  },
  "historico_social": [
-  {
-   "data": "2026-07-20",
-   "ig": 172826,
-   "tt": 3808
-  },
   {
    "data": "2026-07-21",
    "ig": 172826,
@@ -5483,6 +5484,11 @@
   },
   {
    "data": "2026-11-17",
+   "ig": 206457,
+   "tt": 4401
+  },
+  {
+   "data": "2026-11-18",
    "ig": 206457,
    "tt": 4401
   }
@@ -6246,7 +6252,7 @@
     "updated_at": "2026-11-12"
    }
   },
-  "updated_at": "2026-11-17",
+  "updated_at": "2026-11-18",
   "resumo": {
    "instagram": "O festival recebe elogios sobre a experiência de adrenalina e a qualidade geral do evento, com destaque para as ativações e test rides que levam emoção aos participantes. Há pedidos recorrentes pelas datas de próximas edições e críticas ao line-up de artistas, com sugestões para trazer mais nomes como Matué e 50 Cent.",
    "tiktok": "Os comentários indicam forte interesse na compra de ingressos, com muitas dúvidas sobre onde e como adquiri-los. O festival desperta empolgação principalmente por causa das apresentações musicais e oportunidades de test rides, com público desejando experiências imersivas como gravar com artistas e participar das atividades.",
@@ -6254,15 +6260,15 @@
   }
  },
  "leitura_ia": {
-  "titulo": "Força consolidada pós agosto limitada por SAC",
-  "paragrafo": "O festival mantém 181 menções positivas e zero no Reclame Aqui, validando a operação de agosto 2026. Porém sete reclamações SAC Suhai sem resposta pública em Instagram e TikTok, além de dúvidas recorrentes sobre ingressos e estacionamento, indicam gap crítico entre comunicação do site e dúvidas reais do público.",
+  "titulo": "Força consolidada com falhas de comunicação",
+  "paragrafo": "Pós agosto 2026 o festival mantém 181 menções positivas zero Reclame Aqui e 206 mil seguidores Instagram. Sete reclamações SAC Suhai sem resposta pública e dúvidas recorrentes sobre ingressos em TikTok YouTube criam atrito que corrói confiança.",
   "destaques": [
-   "25 menções Google News documentam 22 marcas confirmadas com headlines positivas",
-   "Instagram cresceu de 172.826 para 206.457 seguidores desde julho (19,6%)",
-   "Sete reclamações SAC Suhai passes preço estacionamento sem resposta pública"
+   "25 matérias Google News com 22 marcas confirmadas headlines positivas Ford Triumph Honda",
+   "Instagram cresceu 19,6% desde julho alcançando 206.457 seguidores versus 99 mil Salão Automóvel",
+   "Sete comentários negativos SAC Suhai passes estacionamento sem resposta pública em redes sociais"
   ],
-  "alerta": "Publicar FAQ com respostas às sete reclamações SAC Suhai em comentários Instagram e TikTok esta semana para evitar contaminação de reputação antes das próximas edições.",
-  "updated_at": "2026-11-17T19:38:24Z"
+  "alerta": "Responder sete reclamações SAC Suhai e publicar FAQ ingressos esta semana antes que dúvidas TikTok YouTube se ampliem em janeiro.",
+  "updated_at": "2026-11-18T02:44:43Z"
  },
- "interpretacao_updated_at": "2026-11-17T19:38:24Z"
+ "interpretacao_updated_at": "2026-11-18T02:44:43Z"
 }
