@@ -116,7 +116,7 @@ async function gerarCriativos(env) {
 }
 
 /* ── GOOGLE ── */
-async function gerarGoogle(env) {
+async function tokenGoogle(env) {
   const oauth = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -126,16 +126,12 @@ async function gerarGoogle(env) {
     }),
   });
   if (!oauth.ok) await falha('Google OAuth', oauth);
-  const { access_token } = await oauth.json();
+  return (await oauth.json()).access_token;
+}
 
-  const query = `SELECT campaign.id, campaign.name, campaign.status, segments.date,
-      metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions
-    FROM campaign
-    WHERE segments.date BETWEEN '${SINCE}' AND '${hojeBRT()}' AND campaign.status != 'REMOVED'
-    ORDER BY segments.date ASC`;
-
-  // Busca as duas contas ao mesmo tempo. Se só uma falhar, o painel mostra a outra e o erro vai em "erros".
-  const respostas = await Promise.all(GOOGLE_CONTAS.map(async conta => {
+// Roda a mesma consulta nas duas contas ao mesmo tempo. Conta que falhar volta com "erro" em vez de derrubar a outra.
+function consultarContas(env, access_token, query) {
+  return Promise.all(GOOGLE_CONTAS.map(async conta => {
     const r = await fetch(`${GOOGLE_API}/customers/${conta.id}/googleAds:searchStream`, {
       method: 'POST',
       headers: {
@@ -147,22 +143,31 @@ async function gerarGoogle(env) {
     if (!r.ok) return { conta, erro: `HTTP ${r.status}: ${(await r.text()).slice(0, 300)}` };
     return { conta, lotes: await r.json() };
   }));
+}
+const linhasDe = lotes => (lotes || []).flatMap(l => l.results || []);
+
+async function gerarGoogle(env) {
+  const access_token = await tokenGoogle(env);
+  const query = `SELECT campaign.id, campaign.name, campaign.status, segments.date,
+      metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions
+    FROM campaign
+    WHERE segments.date BETWEEN '${SINCE}' AND '${hojeBRT()}' AND campaign.status != 'REMOVED'
+    ORDER BY segments.date ASC`;
+  const respostas = await consultarContas(env, access_token, query);
   const erros = respostas.filter(x => x.erro).map(x => ({ conta: x.conta.id, erro: x.erro }));
   if (erros.length === GOOGLE_CONTAS.length) throw new Error('Google Ads: ' + erros.map(e => `${e.conta} ${e.erro}`).join(' | '));
   erros.forEach(e => console.error('Google Ads conta', e.conta, e.erro));
 
   const porDia = {}, campanhas = {};
   for (const { conta, lotes } of respostas.filter(x => !x.erro)) {
-    for (const lote of lotes) {
-      for (const row of lote.results || []) {
-        const iso = row.segments.date, m = row.metrics || {}, c0 = row.campaign;
-        const custo = Number(m.costMicros || 0) / 1e6, imp = Number(m.impressions || 0),
-              clk = Number(m.clicks || 0), conv = Number(m.conversions || 0);
-        const d = porDia[iso] || (porDia[iso] = { dataISO: iso, data: dd_mm(iso), gasto: 0, impressoes: 0, cliques: 0, conversoes: 0 });
-        d.gasto += custo; d.impressoes += imp; d.cliques += clk; d.conversoes += conv;
-        const c = campanhas[c0.id] || (campanhas[c0.id] = { id: c0.id, conta: conta.id, nome: c0.name, status: c0.status, gasto: 0, impressoes: 0, cliques: 0, conversoes: 0 });
-        c.gasto += custo; c.impressoes += imp; c.cliques += clk; c.conversoes += conv;
-      }
+    for (const row of linhasDe(lotes)) {
+      const iso = row.segments.date, m = row.metrics || {}, c0 = row.campaign;
+      const custo = Number(m.costMicros || 0) / 1e6, imp = Number(m.impressions || 0),
+            clk = Number(m.clicks || 0), conv = Number(m.conversions || 0);
+      const d = porDia[iso] || (porDia[iso] = { dataISO: iso, data: dd_mm(iso), gasto: 0, impressoes: 0, cliques: 0, conversoes: 0 });
+      d.gasto += custo; d.impressoes += imp; d.cliques += clk; d.conversoes += conv;
+      const c = campanhas[c0.id] || (campanhas[c0.id] = { id: c0.id, conta: conta.id, nome: c0.name, status: c0.status, gasto: 0, impressoes: 0, cliques: 0, conversoes: 0 });
+      c.gasto += custo; c.impressoes += imp; c.cliques += clk; c.conversoes += conv;
     }
   }
   const data = Object.values(porDia).sort((a, b) => (a.dataISO < b.dataISO ? -1 : 1)).map(d => ({
@@ -176,11 +181,89 @@ async function gerarGoogle(env) {
   return { updated: carimbo(), account: 'VOGE Brasil | ' + GOOGLE_CONTAS.map(c => c.id).join(' + '), since: SINCE, campanhas: lista, data, erros };
 }
 
+/* Imagens e vídeos que estão nas campanhas do Google (Performance Max e imagens de campanha).
+ * A mesma imagem em vários grupos de recursos vira um item só.
+ * Logos ficam de fora: não são o criativo.
+ * Números por imagem vêm de uma segunda consulta, opcional: se o Google não entregar, o card mostra só a imagem. */
+const FORMATOS = {
+  MARKETING_IMAGE: 'Horizontal', SQUARE_MARKETING_IMAGE: 'Quadrada', PORTRAIT_MARKETING_IMAGE: 'Vertical',
+  TALL_PORTRAIT_MARKETING_IMAGE: 'Vertical', AD_IMAGE: 'Imagem', YOUTUBE_VIDEO: 'Vídeo',
+};
+async function gerarGoogleCriativos(env) {
+  const access_token = await tokenGoogle(env);
+  const [doGrupo, daCampanha, numeros] = await Promise.all([
+    consultarContas(env, access_token, `SELECT campaign.id, campaign.name, campaign.status,
+        asset_group.name, asset_group.status, asset_group_asset.field_type, asset_group_asset.status,
+        asset.id, asset.name, asset.type, asset.image_asset.full_size.url,
+        asset.image_asset.full_size.width_pixels, asset.image_asset.full_size.height_pixels,
+        asset.youtube_video_asset.youtube_video_id, asset.youtube_video_asset.youtube_video_title
+      FROM asset_group_asset
+      WHERE asset.type IN ('IMAGE', 'YOUTUBE_VIDEO') AND asset_group_asset.status != 'REMOVED'
+        AND campaign.status != 'REMOVED'`),
+    consultarContas(env, access_token, `SELECT campaign.id, campaign.name, campaign.status,
+        campaign_asset.field_type, campaign_asset.status,
+        asset.id, asset.name, asset.type, asset.image_asset.full_size.url,
+        asset.image_asset.full_size.width_pixels, asset.image_asset.full_size.height_pixels
+      FROM campaign_asset
+      WHERE asset.type = 'IMAGE' AND campaign_asset.status != 'REMOVED' AND campaign.status != 'REMOVED'`),
+    consultarContas(env, access_token, `SELECT asset.id, segments.date,
+        metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions
+      FROM asset_group_asset
+      WHERE segments.date BETWEEN '${SINCE}' AND '${hojeBRT()}' AND asset.type IN ('IMAGE', 'YOUTUBE_VIDEO')`),
+  ]);
+
+  const itens = {};
+  const juntar = (row, tipoCampo, ativoNoGrupo, grupo) => {
+    const a = row.asset || {}, c = row.campaign || {};
+    const formato = FORMATOS[tipoCampo];
+    if (!formato) return;   // logo, ícone e afins
+    const img = (a.imageAsset || {}).fullSize || {}, yt = a.youtubeVideoAsset || {};
+    const thumb = img.url || (yt.youtubeVideoId ? `https://i.ytimg.com/vi/${yt.youtubeVideoId}/hqdefault.jpg` : '');
+    if (!thumb) return;
+    const it = itens[a.id] || (itens[a.id] = {
+      id: a.id, nome: a.name || yt.youtubeVideoTitle || '', formato, thumb,
+      largura: Number(img.widthPixels || 0), altura: Number(img.heightPixels || 0),
+      video: yt.youtubeVideoId ? `https://www.youtube.com/watch?v=${yt.youtubeVideoId}` : '',
+      ativo: false, campanhas: [], grupos: [], dias: [],
+    });
+    if (!it.campanhas.includes(c.name)) it.campanhas.push(c.name);
+    if (grupo && !it.grupos.includes(grupo)) it.grupos.push(grupo);
+    if (c.status === 'ENABLED' && ativoNoGrupo) it.ativo = true;
+  };
+  const erros = [];
+  for (const x of [...doGrupo, ...daCampanha]) if (x.erro) erros.push({ conta: x.conta.id, erro: x.erro });
+  for (const x of doGrupo.filter(x => !x.erro)) for (const row of linhasDe(x.lotes)) {
+    const ag = row.assetGroup || {}, aga = row.assetGroupAsset || {};
+    juntar(row, aga.fieldType, aga.status === 'ENABLED' && ag.status === 'ENABLED', ag.name);
+  }
+  for (const x of daCampanha.filter(x => !x.erro)) for (const row of linhasDe(x.lotes)) {
+    const ca = row.campaignAsset || {};
+    juntar(row, ca.fieldType === 'AD_IMAGE' ? 'AD_IMAGE' : ca.fieldType, ca.status === 'ENABLED', '');
+  }
+  let comNumeros = false;
+  for (const x of numeros.filter(x => !x.erro)) for (const row of linhasDe(x.lotes)) {
+    const it = itens[(row.asset || {}).id]; if (!it) continue;
+    const m = row.metrics || {}, iso = row.segments.date;
+    let d = it.dias.find(z => z.iso === iso);
+    if (!d) it.dias.push(d = { iso, gasto: 0, impressoes: 0, cliques: 0, conversoes: 0 });
+    d.gasto = dinheiro(d.gasto + Number(m.costMicros || 0) / 1e6);
+    d.impressoes += Number(m.impressions || 0); d.cliques += Number(m.clicks || 0);
+    d.conversoes = dinheiro(d.conversoes + Number(m.conversions || 0));
+    comNumeros = true;
+  }
+  numeros.filter(x => x.erro).forEach(x => console.error('Google números por imagem', x.conta.id, x.erro));
+  if (erros.length && !Object.keys(itens).length && erros.length === GOOGLE_CONTAS.length * 2)
+    throw new Error('Google criativos: ' + erros.map(e => `${e.conta} ${e.erro}`).join(' | '));
+  const lista = Object.values(itens).sort((a, b) => (b.ativo - a.ativo) || a.formato.localeCompare(b.formato));
+  return { updated: carimbo(), since: SINCE, comNumeros, itens: lista, erros };
+}
+
 /* ── ROTAS ── */
 const ROTAS = {
   '/meta-data.json':       gerarMeta,
   '/google-ads-data.json': gerarGoogle,
   '/meta-criativos.json':  gerarCriativos,
+  '/google-criativos.json': gerarGoogleCriativos,
 };
 
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS' };
