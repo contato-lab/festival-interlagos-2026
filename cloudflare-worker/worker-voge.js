@@ -13,7 +13,12 @@
  * Chaves ficam só nos secrets, cadastradas pelo deploy-voge-worker.yml. Este repositório é público.
  */
 const META_ACCT   = 'act_1397071468729208';
-const GOOGLE_ID   = '6244436447';   // a conta não tem MCC vinculada: login direto nela
+// Duas contas somadas: a antiga ficou parada pela verificação do anunciante e a nova assumiu em 16/11/2026.
+// Nenhuma tem MCC vinculada: o login é direto em cada uma.
+const GOOGLE_CONTAS = [
+  { id: '9618420419', nome: 'VOGE BRASIL (VERIFICADA)' },   // conta nova, 961-842-0419
+  { id: '6244436447', nome: 'VOGE Brasil (antiga)' },        // 624-443-6447, mantida pelo histórico
+];
 const SINCE       = '2026-11-01';   // início da campanha VOGE Sales Speed
 const GRAPH       = 'https://graph.facebook.com/v20.0';
 const GOOGLE_API  = 'https://googleads.googleapis.com/v26';
@@ -128,26 +133,36 @@ async function gerarGoogle(env) {
     FROM campaign
     WHERE segments.date BETWEEN '${SINCE}' AND '${hojeBRT()}' AND campaign.status != 'REMOVED'
     ORDER BY segments.date ASC`;
-  const r = await fetch(`${GOOGLE_API}/customers/${GOOGLE_ID}/googleAds:searchStream`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${access_token}`, 'developer-token': env.GOOGLE_ADS_DEVELOPER_TOKEN,
-      'login-customer-id': GOOGLE_ID, 'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ query }),
-  });
-  if (!r.ok) await falha('Google Ads', r);
+
+  // Busca as duas contas ao mesmo tempo. Se só uma falhar, o painel mostra a outra e o erro vai em "erros".
+  const respostas = await Promise.all(GOOGLE_CONTAS.map(async conta => {
+    const r = await fetch(`${GOOGLE_API}/customers/${conta.id}/googleAds:searchStream`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${access_token}`, 'developer-token': env.GOOGLE_ADS_DEVELOPER_TOKEN,
+        'login-customer-id': conta.id, 'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query }),
+    });
+    if (!r.ok) return { conta, erro: `HTTP ${r.status}: ${(await r.text()).slice(0, 300)}` };
+    return { conta, lotes: await r.json() };
+  }));
+  const erros = respostas.filter(x => x.erro).map(x => ({ conta: x.conta.id, erro: x.erro }));
+  if (erros.length === GOOGLE_CONTAS.length) throw new Error('Google Ads: ' + erros.map(e => `${e.conta} ${e.erro}`).join(' | '));
+  erros.forEach(e => console.error('Google Ads conta', e.conta, e.erro));
 
   const porDia = {}, campanhas = {};
-  for (const lote of await r.json()) {
-    for (const row of lote.results || []) {
-      const iso = row.segments.date, m = row.metrics || {}, c0 = row.campaign;
-      const custo = Number(m.costMicros || 0) / 1e6, imp = Number(m.impressions || 0),
-            clk = Number(m.clicks || 0), conv = Number(m.conversions || 0);
-      const d = porDia[iso] || (porDia[iso] = { dataISO: iso, data: dd_mm(iso), gasto: 0, impressoes: 0, cliques: 0, conversoes: 0 });
-      d.gasto += custo; d.impressoes += imp; d.cliques += clk; d.conversoes += conv;
-      const c = campanhas[c0.id] || (campanhas[c0.id] = { id: c0.id, nome: c0.name, status: c0.status, gasto: 0, impressoes: 0, cliques: 0, conversoes: 0 });
-      c.gasto += custo; c.impressoes += imp; c.cliques += clk; c.conversoes += conv;
+  for (const { conta, lotes } of respostas.filter(x => !x.erro)) {
+    for (const lote of lotes) {
+      for (const row of lote.results || []) {
+        const iso = row.segments.date, m = row.metrics || {}, c0 = row.campaign;
+        const custo = Number(m.costMicros || 0) / 1e6, imp = Number(m.impressions || 0),
+              clk = Number(m.clicks || 0), conv = Number(m.conversions || 0);
+        const d = porDia[iso] || (porDia[iso] = { dataISO: iso, data: dd_mm(iso), gasto: 0, impressoes: 0, cliques: 0, conversoes: 0 });
+        d.gasto += custo; d.impressoes += imp; d.cliques += clk; d.conversoes += conv;
+        const c = campanhas[c0.id] || (campanhas[c0.id] = { id: c0.id, conta: conta.id, nome: c0.name, status: c0.status, gasto: 0, impressoes: 0, cliques: 0, conversoes: 0 });
+        c.gasto += custo; c.impressoes += imp; c.cliques += clk; c.conversoes += conv;
+      }
     }
   }
   const data = Object.values(porDia).sort((a, b) => (a.dataISO < b.dataISO ? -1 : 1)).map(d => ({
@@ -158,7 +173,7 @@ async function gerarGoogle(env) {
   }));
   const lista = Object.values(campanhas).map(c => ({ ...c, gasto: dinheiro(c.gasto), conversoes: dinheiro(c.conversoes) }))
     .sort((a, b) => b.gasto - a.gasto);
-  return { updated: carimbo(), account: 'VOGE Brasil | ' + GOOGLE_ID, since: SINCE, campanhas: lista, data };
+  return { updated: carimbo(), account: 'VOGE Brasil | ' + GOOGLE_CONTAS.map(c => c.id).join(' + '), since: SINCE, campanhas: lista, data, erros };
 }
 
 /* ── ROTAS ── */
