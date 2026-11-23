@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-11-23T01:38:11.044685+00:00",
+  "updated_at": "2026-11-23T09:44:04.173292+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-11-23"
   },
   "totals": {
-    "sessions": 1924242,
-    "users": 1669992,
-    "new_users": 1297349,
-    "pageviews": 4337922,
-    "events": 10551010,
+    "sessions": 1924277,
+    "users": 1670026,
+    "new_users": 1297380,
+    "pageviews": 4337960,
+    "events": 10551124,
     "conversions": 19659.0,
     "pages_per_session": 2.25,
-    "avg_bounce_rate": 57.7
+    "avg_bounce_rate": 57.87
   },
   "daily_series": [
     {
@@ -2625,14 +2625,25 @@
     },
     {
       "date": "2026-11-22",
-      "sessions": 81,
-      "users": 81,
-      "new_users": 76,
-      "pageviews": 114,
-      "events": 324,
+      "sessions": 111,
+      "users": 110,
+      "new_users": 102,
+      "pageviews": 147,
+      "events": 423,
       "conversions": 0.0,
-      "bounce_rate": 81.48,
-      "avg_session_s": 35.6
+      "bounce_rate": 81.98,
+      "avg_session_s": 30.5
+    },
+    {
+      "date": "2026-11-23",
+      "sessions": 5,
+      "users": 5,
+      "new_users": 5,
+      "pageviews": 5,
+      "events": 15,
+      "conversions": 0.0,
+      "bounce_rate": 100.0,
+      "avg_session_s": 0.0
     }
   ],
   "traffic_sources": [
@@ -2683,7 +2694,7 @@
     },
     {
       "channel": "Email",
-      "sessions": 28329,
+      "sessions": 28337,
       "conversions": 17.0
     },
     {
@@ -2715,12 +2726,12 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2075653,
+      "pageviews": 2075679,
       "sessions": 1232900
     },
     {
       "page": "/ingressos/",
-      "pageviews": 542914,
+      "pageviews": 542920,
       "sessions": 382426
     },
     {
@@ -2755,7 +2766,7 @@
     },
     {
       "page": "/vendas/ingressos/drive-pass",
-      "pageviews": 83925,
+      "pageviews": 83927,
       "sessions": 54358
     },
     {
@@ -2990,15 +3001,15 @@
       "Social Orgânico": 6
     },
     "2026-11-22": {
-      "Direto pelo Link": 43,
-      "Busca Orgânica": 8,
-      "Social Orgânico": 7
+      "Direto pelo Link": 56,
+      "Busca Orgânica": 12,
+      "Social Orgânico": 9
     }
   },
   "influencer_breakdown": [
     {
       "source": "perfilfestival",
-      "sessions": 817,
+      "sessions": 824,
       "conversions": 0,
       "tickets": {
         "Drive Pass": 4,
@@ -3029,6 +3040,7 @@
         "2026-11-21": 17,
         "2026-10-08": 16,
         "2026-10-20": 16,
+        "2026-11-22": 16,
         "2026-10-13": 15,
         "2026-10-17": 15,
         "2026-10-18": 15,
@@ -3046,7 +3058,6 @@
         "2026-11-18": 10,
         "2026-10-19": 9,
         "2026-10-21": 9,
-        "2026-11-22": 9,
         "2026-10-31": 7,
         "2026-11-20": 7,
         "2026-10-22": 5,
@@ -3055,7 +3066,7 @@
     },
     {
       "source": "email_jornada_marketing_retencao-suhai_cliente_ip96",
-      "sessions": 296,
+      "sessions": 298,
       "conversions": 0,
       "tickets": {},
       "daily": {
@@ -3068,6 +3079,7 @@
         "2026-10-15": 9,
         "2026-11-16": 9,
         "2026-11-19": 9,
+        "2026-11-22": 9,
         "2026-10-16": 8,
         "2026-10-27": 8,
         "2026-10-28": 8,
@@ -3078,7 +3090,6 @@
         "2026-11-01": 7,
         "2026-11-09": 7,
         "2026-11-13": 7,
-        "2026-11-22": 7,
         "2026-10-14": 6,
         "2026-10-18": 6,
         "2026-11-14": 6,
@@ -3108,7 +3119,7 @@
     },
     {
       "source": "Tiktok+Ads",
-      "sessions": 192,
+      "sessions": 193,
       "conversions": 0,
       "tickets": {},
       "daily": {
@@ -3123,13 +3134,13 @@
         "2026-10-25": 6,
         "2026-11-12": 6,
         "2026-11-18": 6,
+        "2026-11-22": 6,
         "2026-10-22": 5,
         "2026-10-23": 5,
         "2026-10-27": 5,
         "2026-11-05": 5,
         "2026-11-16": 5,
         "2026-11-19": 5,
-        "2026-11-22": 5,
         "2026-10-13": 4,
         "2026-10-29": 4,
         "2026-11-03": 4,
@@ -3159,7 +3170,7 @@
     },
     {
       "source": "email_jornada_marketing_renovacao-suhai_cliente_ip96",
-      "sessions": 20,
+      "sessions": 21,
       "conversions": 0,
       "tickets": {},
       "daily": {
@@ -3179,7 +3190,8 @@
         "2026-11-14": 1,
         "2026-11-17": 1,
         "2026-11-18": 1,
-        "2026-11-21": 1
+        "2026-11-21": 1,
+        "2026-11-22": 1
       }
     },
     {
@@ -3200,6 +3212,26 @@
       }
     },
     {
+      "source": "Tiktok Ads",
+      "sessions": 14,
+      "conversions": 0,
+      "tickets": {},
+      "daily": {
+        "2026-11-11": 2,
+        "2026-11-22": 2,
+        "2026-10-17": 1,
+        "2026-10-18": 1,
+        "2026-10-21": 1,
+        "2026-10-23": 1,
+        "2026-10-28": 1,
+        "2026-11-08": 1,
+        "2026-11-09": 1,
+        "2026-11-10": 1,
+        "2026-11-12": 1,
+        "2026-11-13": 1
+      }
+    },
+    {
       "source": "EMAIL FORD",
       "sessions": 13,
       "conversions": 0,
@@ -3216,26 +3248,6 @@
         "2026-10-30": 1,
         "2026-11-01": 1,
         "2026-11-02": 1
-      }
-    },
-    {
-      "source": "Tiktok Ads",
-      "sessions": 13,
-      "conversions": 0,
-      "tickets": {},
-      "daily": {
-        "2026-11-11": 2,
-        "2026-10-17": 1,
-        "2026-10-18": 1,
-        "2026-10-21": 1,
-        "2026-10-23": 1,
-        "2026-10-28": 1,
-        "2026-11-08": 1,
-        "2026-11-09": 1,
-        "2026-11-10": 1,
-        "2026-11-12": 1,
-        "2026-11-13": 1,
-        "2026-11-22": 1
       }
     },
     {
@@ -3553,42 +3565,42 @@
     {
       "source": "(direct)",
       "medium": "(none)",
-      "new_users": 254983,
+      "new_users": 255000,
       "sessions": 344803,
-      "pageviews": 778099,
+      "pageviews": 778118,
       "avg_session_s": 149.6,
       "engagement_rate": 48.98,
-      "event_count": 1948857
+      "event_count": 1948915
     },
     {
       "source": "ig",
       "medium": "paid",
-      "new_users": 188413,
+      "new_users": 188414,
       "sessions": 284333,
-      "pageviews": 515488,
+      "pageviews": 515489,
       "avg_session_s": 70.0,
       "engagement_rate": 32.13,
-      "event_count": 1226734
+      "event_count": 1226737
     },
     {
       "source": "organico",
       "medium": "instagram",
-      "new_users": 96208,
+      "new_users": 96215,
       "sessions": 136309,
-      "pageviews": 471885,
+      "pageviews": 471892,
       "avg_session_s": 164.6,
       "engagement_rate": 75.56,
-      "event_count": 1027058
+      "event_count": 1027080
     },
     {
       "source": "google",
       "medium": "organic",
-      "new_users": 70652,
+      "new_users": 70653,
       "sessions": 134131,
-      "pageviews": 413546,
+      "pageviews": 413552,
       "avg_session_s": 231.0,
       "engagement_rate": 63.91,
-      "event_count": 950825
+      "event_count": 950838
     },
     {
       "source": "tiktok",
@@ -3603,12 +3615,12 @@
     {
       "source": "Tiktok",
       "medium": "Tiktok+Ads",
-      "new_users": 48514,
+      "new_users": 48515,
       "sessions": 55777,
-      "pageviews": 102643,
+      "pageviews": 102644,
       "avg_session_s": 159.9,
       "engagement_rate": 28.27,
-      "event_count": 215851
+      "event_count": 215854
     },
     {
       "source": "programatica",
@@ -3733,22 +3745,22 @@
     {
       "source": "Tiktok",
       "medium": "Tiktok Ads",
-      "new_users": 11056,
+      "new_users": 11057,
       "sessions": 11763,
-      "pageviews": 20735,
+      "pageviews": 20736,
       "avg_session_s": 244.1,
       "engagement_rate": 33.15,
-      "event_count": 43745
+      "event_count": 43748
     },
     {
       "source": "salesforce",
       "medium": "email",
-      "new_users": 9129,
-      "sessions": 11562,
-      "pageviews": 21342,
+      "new_users": 9132,
+      "sessions": 11563,
+      "pageviews": 21345,
       "avg_session_s": 95.1,
       "engagement_rate": 54.13,
-      "event_count": 56329
+      "event_count": 56341
     },
     {
       "source": "instagram.com",
@@ -31272,6 +31284,17 @@
       "event_count": 203
     },
     {
+      "date": "2026-11-22",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 47,
+      "sessions": 50,
+      "pageviews": 51,
+      "eng_dur_s": 212.0,
+      "eng_sessions": 5,
+      "event_count": 155
+    },
+    {
       "date": "2026-04-10",
       "source": "l.instagram.com",
       "medium": "referral",
@@ -34394,17 +34417,6 @@
       "eng_dur_s": 513.0,
       "eng_sessions": 11,
       "event_count": 158
-    },
-    {
-      "date": "2026-11-22",
-      "source": "(direct)",
-      "medium": "(none)",
-      "new_users": 35,
-      "sessions": 37,
-      "pageviews": 37,
-      "eng_dur_s": 62.0,
-      "eng_sessions": 2,
-      "event_count": 112
     },
     {
       "date": "2026-04-26",
@@ -42910,6 +42922,17 @@
       "event_count": 55
     },
     {
+      "date": "2026-11-22",
+      "source": "organico",
+      "medium": "instagram",
+      "new_users": 15,
+      "sessions": 16,
+      "pageviews": 17,
+      "eng_dur_s": 17.0,
+      "eng_sessions": 2,
+      "event_count": 51
+    },
+    {
       "date": "2026-04-04",
       "source": "ticketmaster.com.br",
       "medium": "referral",
@@ -47728,6 +47751,17 @@
       "event_count": 36
     },
     {
+      "date": "2026-11-22",
+      "source": "salesforce",
+      "medium": "email",
+      "new_users": 10,
+      "sessions": 10,
+      "pageviews": 10,
+      "eng_dur_s": 44.0,
+      "eng_sessions": 1,
+      "event_count": 37
+    },
+    {
       "date": "2026-04-03",
       "source": "l.instagram.com",
       "medium": "referral",
@@ -50314,14 +50348,14 @@
     },
     {
       "date": "2026-11-22",
-      "source": "organico",
-      "medium": "instagram",
+      "source": "google",
+      "medium": "organic",
       "new_users": 8,
-      "sessions": 9,
-      "pageviews": 10,
-      "eng_dur_s": 8.0,
-      "eng_sessions": 1,
-      "event_count": 29
+      "sessions": 12,
+      "pageviews": 42,
+      "eng_dur_s": 920.0,
+      "eng_sessions": 7,
+      "event_count": 97
     },
     {
       "date": "2026-04-01",
@@ -52027,28 +52061,6 @@
       "eng_dur_s": 431.0,
       "eng_sessions": 6,
       "event_count": 41
-    },
-    {
-      "date": "2026-11-22",
-      "source": "google",
-      "medium": "organic",
-      "new_users": 7,
-      "sessions": 8,
-      "pageviews": 36,
-      "eng_dur_s": 919.0,
-      "eng_sessions": 6,
-      "event_count": 84
-    },
-    {
-      "date": "2026-11-22",
-      "source": "salesforce",
-      "medium": "email",
-      "new_users": 7,
-      "sessions": 7,
-      "pageviews": 7,
-      "eng_dur_s": 31.0,
-      "eng_sessions": 1,
-      "event_count": 25
     },
     {
       "date": "2026-03-31",
@@ -54285,6 +54297,17 @@
     },
     {
       "date": "2026-11-18",
+      "source": "Tiktok",
+      "medium": "Tiktok+Ads",
+      "new_users": 6,
+      "sessions": 6,
+      "pageviews": 6,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 18
+    },
+    {
+      "date": "2026-11-22",
       "source": "Tiktok",
       "medium": "Tiktok+Ads",
       "new_users": 6,
@@ -57233,17 +57256,6 @@
     },
     {
       "date": "2026-11-22",
-      "source": "Tiktok",
-      "medium": "Tiktok+Ads",
-      "new_users": 5,
-      "sessions": 5,
-      "pageviews": 5,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 15
-    },
-    {
-      "date": "2026-11-22",
       "source": "google",
       "medium": "cpc",
       "new_users": 5,
@@ -57252,6 +57264,17 @@
       "eng_dur_s": 6.0,
       "eng_sessions": 1,
       "event_count": 16
+    },
+    {
+      "date": "2026-11-23",
+      "source": "(direct)",
+      "medium": "(none)",
+      "new_users": 5,
+      "sessions": 5,
+      "pageviews": 5,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 15
     },
     {
       "date": "2026-03-30",
@@ -73482,6 +73505,17 @@
       "date": "2026-11-21",
       "source": "tiktok",
       "medium": "paid",
+      "new_users": 2,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 6
+    },
+    {
+      "date": "2026-11-22",
+      "source": "Tiktok",
+      "medium": "Tiktok Ads",
       "new_users": 2,
       "sessions": 2,
       "pageviews": 2,
@@ -94677,17 +94711,6 @@
     },
     {
       "date": "2026-11-22",
-      "source": "Tiktok",
-      "medium": "Tiktok Ads",
-      "new_users": 1,
-      "sessions": 1,
-      "pageviews": 1,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 3
-    },
-    {
-      "date": "2026-11-22",
       "source": "arenacross.com.br",
       "medium": "referral",
       "new_users": 1,
@@ -94707,6 +94730,17 @@
       "eng_dur_s": 9.0,
       "eng_sessions": 0,
       "event_count": 4
+    },
+    {
+      "date": "2026-11-22",
+      "source": "ig",
+      "medium": "paid",
+      "new_users": 1,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 0.0,
+      "eng_sessions": 0,
+      "event_count": 5
     },
     {
       "date": "2026-11-22",
@@ -112373,17 +112407,6 @@
       "eng_dur_s": 15.0,
       "eng_sessions": 1,
       "event_count": 3
-    },
-    {
-      "date": "2026-11-22",
-      "source": "ig",
-      "medium": "paid",
-      "new_users": 0,
-      "sessions": 1,
-      "pageviews": 1,
-      "eng_dur_s": 0.0,
-      "eng_sessions": 0,
-      "event_count": 2
     }
   ]
 }
