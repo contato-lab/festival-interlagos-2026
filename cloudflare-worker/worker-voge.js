@@ -25,7 +25,7 @@ const GOOGLE_API  = 'https://googleads.googleapis.com/v26';
 
 const CACHE_TTL   = 45;                 // segundos, menor que o intervalo de 1 minuto do painel
 const STALE_TTL   = 7 * 24 * 60 * 60;   // 7 dias, reserva para quando a API falhar
-const CACHE_VER   = 'v2';
+const CACHE_VER   = 'v3';
 
 // O nome do evento muda conforme a origem. Vale o primeiro que existir, para não contar duas vezes.
 const TIPOS_LEAD    = ['lead', 'offsite_conversion.fb_pixel_lead'];
@@ -74,26 +74,38 @@ function urlInsights(env, level, fields) {
   return `${GRAPH}/${META_ACCT}/insights?${q}`;
 }
 
+// Uma linha de insights da Meta vira um dia no formato do painel (vale para conta e para campanha)
+function diaMeta(d) {
+  const form = contar(d.actions, TIPOS_LEAD), contatos = contar(d.actions, TIPOS_CONTATO);
+  const leads = form + contatos, gasto = dinheiro(d.spend);
+  return {
+    data: dd_mm(d.date_start), dataISO: d.date_start, leads, leadsForm: form, contatos, gasto,
+    cpl: leads ? dinheiro(gasto / leads) : null,
+    impressoes: Number(d.impressions || 0), alcance: Number(d.reach || 0), cliques: Number(d.clicks || 0),
+    lpViews: contar(d.actions, ['landing_page_view']), viewContent: contar(d.actions, TIPOS_VC),
+  };
+}
+
+// "data" é a conta inteira; "campanhas" traz os mesmos números separados por campanha, para o filtro do painel.
+// Alcance por campanha não soma com o da conta (a mesma pessoa pode ver duas campanhas).
 async function gerarMeta(env) {
-  const linhas = await graphTudo(urlInsights(env, 'account', 'date_start,spend,impressions,reach,clicks,actions'));
-  const data = linhas.map(d => {
-    const form = contar(d.actions, TIPOS_LEAD), contatos = contar(d.actions, TIPOS_CONTATO);
-    const leads = form + contatos, gasto = dinheiro(d.spend);
-    return {
-      data: dd_mm(d.date_start), dataISO: d.date_start, leads, leadsForm: form, contatos, gasto,
-      cpl: leads ? dinheiro(gasto / leads) : null,
-      impressoes: Number(d.impressions || 0), alcance: Number(d.reach || 0), cliques: Number(d.clicks || 0),
-      lpViews: contar(d.actions, ['landing_page_view']), viewContent: contar(d.actions, TIPOS_VC),
-    };
-  });
-  return { updated: carimbo(), account: 'VOGE Brasil | ' + META_ACCT, since: SINCE, data };
+  const [linhas, porCampanha] = await Promise.all([
+    graphTudo(urlInsights(env, 'account', 'date_start,spend,impressions,reach,clicks,actions')),
+    graphTudo(urlInsights(env, 'campaign', 'campaign_id,campaign_name,date_start,spend,impressions,reach,clicks,actions')),
+  ]);
+  const campanhas = {};
+  for (const l of porCampanha) {
+    const c = campanhas[l.campaign_id] || (campanhas[l.campaign_id] = { id: l.campaign_id, nome: l.campaign_name || '', dias: [] });
+    c.dias.push(diaMeta(l));
+  }
+  return { updated: carimbo(), account: 'VOGE Brasil | ' + META_ACCT, since: SINCE, data: linhas.map(diaMeta), campanhas: Object.values(campanhas) };
 }
 
 async function gerarCriativos(env) {
-  const linhas = await graphTudo(urlInsights(env, 'ad', 'ad_id,ad_name,date_start,spend,impressions,clicks,actions'));
+  const linhas = await graphTudo(urlInsights(env, 'ad', 'ad_id,ad_name,campaign_name,date_start,spend,impressions,clicks,actions'));
   const ads = {};
   for (const l of linhas) {
-    const ad = ads[l.ad_id] || (ads[l.ad_id] = { id: l.ad_id, nome: l.ad_name || '', status: '', thumb: '', dias: [] });
+    const ad = ads[l.ad_id] || (ads[l.ad_id] = { id: l.ad_id, nome: l.ad_name || '', campanha: l.campaign_name || '', status: '', thumb: '', dias: [] });
     ad.dias.push({
       iso: l.date_start, gasto: dinheiro(l.spend),
       impressoes: Number(l.impressions || 0), cliques: Number(l.clicks || 0),
@@ -166,8 +178,9 @@ async function gerarGoogle(env) {
             clk = Number(m.clicks || 0), conv = Number(m.conversions || 0);
       const d = porDia[iso] || (porDia[iso] = { dataISO: iso, data: dd_mm(iso), gasto: 0, impressoes: 0, cliques: 0, conversoes: 0 });
       d.gasto += custo; d.impressoes += imp; d.cliques += clk; d.conversoes += conv;
-      const c = campanhas[c0.id] || (campanhas[c0.id] = { id: c0.id, conta: conta.id, nome: c0.name, status: c0.status, gasto: 0, impressoes: 0, cliques: 0, conversoes: 0 });
+      const c = campanhas[c0.id] || (campanhas[c0.id] = { id: c0.id, conta: conta.id, nome: c0.name, status: c0.status, gasto: 0, impressoes: 0, cliques: 0, conversoes: 0, dias: [] });
       c.gasto += custo; c.impressoes += imp; c.cliques += clk; c.conversoes += conv;
+      c.dias.push({ dataISO: iso, data: dd_mm(iso), gasto: dinheiro(custo), impressoes: imp, cliques: clk, conversoes: dinheiro(conv) });
     }
   }
   const data = Object.values(porDia).sort((a, b) => (a.dataISO < b.dataISO ? -1 : 1)).map(d => ({
