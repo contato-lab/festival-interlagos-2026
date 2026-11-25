@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-11-25T09:11:18.807825+00:00",
+  "updated_at": "2026-11-25T19:09:46.977208+00:00",
   "property_id": "378336436",
   "period": {
     "start": "2026-03-30",
     "end": "2026-11-25"
   },
   "totals": {
-    "sessions": 1924576,
-    "users": 1670320,
+    "sessions": 1924578,
+    "users": 1670322,
     "new_users": 1297659,
-    "pageviews": 4338316,
-    "events": 10552175,
+    "pageviews": 4338318,
+    "events": 10552181,
     "conversions": 19659.0,
     "pages_per_session": 2.25,
-    "avg_bounce_rate": 57.89
+    "avg_bounce_rate": 57.65
   },
   "daily_series": [
     {
@@ -2655,6 +2655,17 @@
       "conversions": 0.0,
       "bounce_rate": 77.78,
       "avg_session_s": 39.5
+    },
+    {
+      "date": "2026-11-25",
+      "sessions": 2,
+      "users": 2,
+      "new_users": 0,
+      "pageviews": 2,
+      "events": 6,
+      "conversions": 0.0,
+      "bounce_rate": 0.0,
+      "avg_session_s": 83.5
     }
   ],
   "traffic_sources": [
@@ -2670,7 +2681,7 @@
     },
     {
       "channel": "Direct",
-      "sessions": 344535,
+      "sessions": 344497,
       "conversions": 3984.0
     },
     {
@@ -2685,12 +2696,12 @@
     },
     {
       "channel": "Organic Social",
-      "sessions": 169821,
+      "sessions": 169766,
       "conversions": 75.0
     },
     {
       "channel": "Organic Search",
-      "sessions": 145199,
+      "sessions": 145192,
       "conversions": 580.0
     },
     {
@@ -2705,7 +2716,7 @@
     },
     {
       "channel": "Email",
-      "sessions": 28340,
+      "sessions": 28342,
       "conversions": 17.0
     },
     {
@@ -2715,7 +2726,7 @@
     },
     {
       "channel": "Cross-network",
-      "sessions": 3499,
+      "sessions": 3500,
       "conversions": 0.0
     },
     {
@@ -2737,13 +2748,13 @@
   "top_pages": [
     {
       "page": "/",
-      "pageviews": 2075911,
+      "pageviews": 2075912,
       "sessions": 1232900
     },
     {
       "page": "/ingressos/",
       "pageviews": 542970,
-      "sessions": 382568
+      "sessions": 382426
     },
     {
       "page": "/event/suhai-festival-de-interlagos-2026-edicao-auto",
@@ -3586,7 +3597,7 @@
       "source": "(direct)",
       "medium": "(none)",
       "new_users": 255162,
-      "sessions": 344535,
+      "sessions": 344497,
       "pageviews": 778293,
       "avg_session_s": 149.7,
       "engagement_rate": 49.02,
@@ -3616,11 +3627,11 @@
       "source": "google",
       "medium": "organic",
       "new_users": 70672,
-      "sessions": 134172,
-      "pageviews": 413625,
+      "sessions": 134166,
+      "pageviews": 413627,
       "avg_session_s": 231.0,
-      "engagement_rate": 63.93,
-      "event_count": 951017
+      "engagement_rate": 63.91,
+      "event_count": 951023
     },
     {
       "source": "tiktok",
@@ -3779,7 +3790,7 @@
       "sessions": 11581,
       "pageviews": 21369,
       "avg_session_s": 95.1,
-      "engagement_rate": 54.14,
+      "engagement_rate": 54.15,
       "event_count": 56428
     },
     {
@@ -3826,10 +3837,10 @@
       "source": "bing",
       "medium": "organic",
       "new_users": 4510,
-      "sessions": 8492,
+      "sessions": 8494,
       "pageviews": 28402,
-      "avg_session_s": 319.7,
-      "engagement_rate": 72.14,
+      "avg_session_s": 319.6,
+      "engagement_rate": 72.13,
       "event_count": 71067
     },
     {
@@ -3886,10 +3897,10 @@
       "source": "(data not available)",
       "medium": "(data not available)",
       "new_users": 3377,
-      "sessions": 3499,
+      "sessions": 3500,
       "pageviews": 16084,
-      "avg_session_s": 287.1,
-      "engagement_rate": 90.0,
+      "avg_session_s": 287.0,
+      "engagement_rate": 89.97,
       "event_count": 35539
     },
     {
@@ -112746,6 +112757,17 @@
       "eng_dur_s": 0.0,
       "eng_sessions": 0,
       "event_count": 2
+    },
+    {
+      "date": "2026-11-25",
+      "source": "google",
+      "medium": "organic",
+      "new_users": 0,
+      "sessions": 2,
+      "pageviews": 2,
+      "eng_dur_s": 10.0,
+      "eng_sessions": 2,
+      "event_count": 6
     }
   ]
 }
